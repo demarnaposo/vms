@@ -1,0 +1,162 @@
+import { router, usePage } from '@inertiajs/react';
+import { AdminLayout, PageHeader, Card, Badge, AppIcon } from '@/Components';
+// Start Update 12 September 2026, by @WNP: Translate static rule-management controls without translating rule data.
+import { useLanguage } from '@/Contexts/LanguageContext';
+
+export default function ComplianceRules({ rules = [] }) {
+    // Start Update 12 September 2026, by @WNP: Keep user-facing labels reactive to the selected language.
+    const { t } = useLanguage();
+    const { auth } = usePage().props;
+    const can = auth?.can || {};
+
+    const updateRule = (ruleId, field, value) => {
+        router.patch(
+            `/admin/compliance/rules/${ruleId}`,
+            { [field]: value },
+            { preserveScroll: true }
+        );
+    };
+
+    const header = (
+        <PageHeader
+            title="Compliance Rules"
+            subtitle="Configure compliance evaluation rules"
+            backLink="/admin/compliance"
+        />
+    );
+
+    return (
+        <AdminLayout title="Compliance Rules" activeNav="Compliance" header={header}>
+            {/* Start Update 12 September 2026, by @WNP: Localize rule-management controls while preserving stored names and descriptions. */}
+            <div className="space-y-6">
+                {rules.map((rule) => (
+                    <Card key={rule.id}>
+                        <div className="p-6">
+                            <div className="flex items-start justify-between mb-4">
+                                <div>
+                                    <h3 className="text-lg font-semibold text-(--color-text-primary)">
+                                        {/* Start Update 12 September 2026, by @WNP: Display the database rule name verbatim. */}
+                                        {rule.name}
+                                    </h3>
+                                    <p className="text-sm text-(--color-text-tertiary) mt-1">
+                                        {rule.description}
+                                    </p>
+                                    {/* Start Update 13 September 2026, by @WNP: Translate the rule-type enum label, not its editable name or description. */}
+                                    <Badge status={rule.type} className="mt-2" />
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-(--color-text-tertiary)">
+                                        {t('Active')}
+                                    </span>
+                                    <button
+                                        onClick={() =>
+                                            updateRule(rule.id, 'is_active', !rule.is_active)
+                                        }
+                                        disabled={!can.edit_rules}
+                                        className={`relative w-12 h-6 rounded-full transition-colors ${
+                                            rule.is_active
+                                                ? 'bg-(--color-success)'
+                                                : 'bg-(--color-bg-muted)'
+                                        } ${!can.edit_rules ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    >
+                                        <div
+                                            className={`absolute top-1 w-4 h-4 rounded-full bg-(--color-bg-primary) shadow transition-transform ${
+                                                rule.is_active ? 'left-7' : 'left-1'
+                                            }`}
+                                        />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="grid md:grid-cols-3 gap-4 mt-4 p-4 bg-(--color-bg-secondary) rounded-xl border border-(--color-border-secondary)">
+                                <div>
+                                    <label className="text-sm text-(--color-text-tertiary) block mb-1 font-medium">
+                                        {t('Penalty Points')}
+                                    </label>
+                                    {can.edit_rules ? (
+                                        <select
+                                            value={rule.penalty_points}
+                                            onChange={(e) =>
+                                                updateRule(
+                                                    rule.id,
+                                                    'penalty_points',
+                                                    parseInt(e.target.value)
+                                                )
+                                            }
+                                            className="input-field w-full"
+                                        >
+                                            {[0, 1, 2, 3, 5, 10, 15, 20, 25].map((p) => (
+                                                <option key={p} value={p}>
+                                                    {p} {t('points')}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    ) : (
+                                        <span className="text-(--color-text-primary) font-medium">
+                                            {rule.penalty_points} {t('points')}
+                                        </span>
+                                    )}
+                                </div>
+                                <div>
+                                    <label className="text-sm text-(--color-text-tertiary) block mb-1 font-medium">
+                                        {t('Blocks Payments')}
+                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={rule.blocks_payment}
+                                            onChange={(e) =>
+                                                updateRule(
+                                                    rule.id,
+                                                    'blocks_payment',
+                                                    e.target.checked
+                                                )
+                                            }
+                                            disabled={!can.edit_rules}
+                                            className="w-4 h-4 rounded border-(--color-border-primary) bg-(--color-bg-primary) text-(--color-brand-primary) focus:ring-(--color-brand-primary)"
+                                        />
+                                        <span className="text-(--color-text-primary) text-sm">
+                                            {t(rule.blocks_payment ? 'Yes' : 'No')}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label className="text-sm text-(--color-text-tertiary) block mb-1 font-medium">
+                                        {t('Blocks Activation')}
+                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={rule.blocks_activation}
+                                            onChange={(e) =>
+                                                updateRule(
+                                                    rule.id,
+                                                    'blocks_activation',
+                                                    e.target.checked
+                                                )
+                                            }
+                                            disabled={!can.edit_rules}
+                                            className="w-4 h-4 rounded border-(--color-border-primary) bg-(--color-bg-primary) text-(--color-brand-primary) focus:ring-(--color-brand-primary)"
+                                        />
+                                        <span className="text-(--color-text-primary) text-sm">
+                                            {t(rule.blocks_activation ? 'Yes' : 'No')}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+                ))}
+
+                {rules.length === 0 && (
+                    <div className="glass-card p-12 text-center text-(--color-text-tertiary)">
+                        <span className="text-4xl block mb-4 inline-flex justify-center w-full">
+                            <AppIcon name="reports" className="h-10 w-10" />
+                        </span>
+                        {t('No compliance rules configured')}
+                    </div>
+                )}
+            </div>
+        </AdminLayout>
+    );
+}

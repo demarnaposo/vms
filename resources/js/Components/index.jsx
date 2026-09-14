@@ -1,0 +1,203 @@
+// =====================================
+// LAYOUT COMPONENTS
+// =====================================
+import React from 'react';
+import { Link } from '@inertiajs/react';
+import AppIconComponent from './AppIcon';
+// Start Update 11 September 2026, by @WNP: Translate shared button labels and tooltips.
+import { useLanguage } from '@/Contexts/LanguageContext';
+
+export { default as AdminLayout } from './AdminLayout';
+export { default as VendorLayout } from './VendorLayout';
+export { default as GuestLayout, AuthLayout } from './GuestLayout';
+
+// =====================================
+// NAVIGATION COMPONENTS
+// =====================================
+export { default as Sidebar } from './Sidebar';
+export { default as Navbar, NavLink } from './Navbar';
+export { default as Footer, FooterMinimal } from './Footer';
+export { default as PageHeader } from './PageHeader';
+export { default as Logo } from './Logo';
+export { default as AppIcon } from './AppIcon';
+export { default as ThemeSwitcher } from './ThemeSwitcher';
+export {
+    Tabs,
+    Breadcrumb,
+    Dropdown,
+    DropdownItem,
+    Accordion,
+    Pill,
+    FilterPills,
+    SearchInput,
+} from './Navigation';
+
+// =====================================
+// DATA DISPLAY COMPONENTS
+// =====================================
+export { default as Badge, statusColors } from './Badge';
+export { default as DataTable, Card, ListCard } from './DataTable';
+export { default as StatCard, StatGrid } from './StatCard';
+
+// =====================================
+// FORM COMPONENTS
+// =====================================
+export { FormInput, FormTextarea, FormSelect, FormCheckbox } from './FormInputs';
+
+// =====================================
+// MODAL COMPONENTS
+// =====================================
+export { default as Modal, ModalCancelButton, ModalPrimaryButton } from './Modal';
+
+// =====================================
+// UI UTILITIES
+// =====================================
+export {
+    Alert,
+    Toast,
+    EmptyState,
+    Spinner,
+    LoadingState,
+    Skeleton,
+    Avatar,
+    ProgressBar,
+    Divider,
+    Tooltip,
+} from './UI';
+
+// =====================================
+// BUTTON COMPONENTS
+// =====================================
+
+export function Button({
+    children,
+    variant = 'primary',
+    size = 'md',
+    disabled = false,
+    onClick,
+    type = 'button',
+    className = '',
+}) {
+    const { t } = useLanguage();
+    const variants = {
+        primary:
+            'bg-(--color-brand-primary) hover:bg-(--color-brand-primary-hover) text-white shadow-md shadow-(--color-brand-primary)/30',
+        secondary:
+            'bg-(--color-bg-secondary) hover:bg-(--color-bg-tertiary) text-(--color-text-secondary)',
+        success: 'bg-(--color-success) hover:bg-(--color-success-dark) text-white',
+        danger: 'bg-(--color-danger) hover:bg-(--color-danger-dark) text-white',
+        warning: 'bg-(--color-warning) hover:bg-(--color-warning-dark) text-white',
+        ghost: 'hover:bg-(--color-bg-secondary) text-(--color-text-secondary) hover:text-(--color-text-primary)',
+        outline:
+            'border border-(--color-border-primary) hover:border-(--color-border-secondary) text-(--color-text-secondary) hover:bg-(--color-bg-secondary)',
+    };
+
+    const sizes = {
+        sm: 'px-3 py-1.5 text-sm',
+        md: 'px-4 py-2 text-sm',
+        lg: 'px-6 py-3',
+    };
+
+    return (
+        <button
+            type={type}
+            onClick={onClick}
+            disabled={disabled}
+            className={`inline-flex items-center gap-2 rounded-xl font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]} ${className}`}
+        >
+            {t(children)}
+        </button>
+    );
+}
+
+export function LinkButton({ href, children, variant = 'primary', size = 'md', className = '' }) {
+    const { t } = useLanguage();
+    const variants = {
+        primary: 'bg-(--color-brand-primary) hover:bg-(--color-brand-primary-hover) text-white',
+        secondary:
+            'bg-(--color-bg-secondary) hover:bg-(--color-bg-tertiary) text-(--color-text-secondary)',
+        ghost: 'hover:bg-(--color-bg-secondary) text-(--color-text-muted) hover:text-(--color-text-primary)',
+    };
+
+    const sizes = {
+        sm: 'px-3 py-1.5 text-sm',
+        md: 'px-4 py-2 text-sm',
+        lg: 'px-6 py-3',
+    };
+
+    return (
+        <Link
+            href={href}
+            className={`inline-block rounded-lg font-medium transition-colors ${variants[variant]} ${sizes[size]} ${className}`}
+        >
+            {t(children)}
+        </Link>
+    );
+}
+
+// =====================================
+// ICON BUTTON
+// =====================================
+export function IconButton({ icon, onClick, variant = 'ghost', size = 'md', title = '' }) {
+    const { t } = useLanguage();
+    const variants = {
+        ghost: 'hover:bg-(--color-bg-secondary) text-(--color-text-muted) hover:text-(--color-text-primary)',
+        primary:
+            'bg-(--color-brand-primary)/10 hover:bg-(--color-brand-primary)/20 text-(--color-brand-primary)',
+        danger: 'hover:bg-(--color-danger)/10 text-(--color-text-muted) hover:text-(--color-danger)',
+    };
+
+    const sizes = {
+        sm: 'w-8 h-8',
+        md: 'w-10 h-10',
+        lg: 'w-12 h-12',
+    };
+
+    return (
+        <button
+            onClick={onClick}
+            title={t(title)}
+            className={`${sizes[size]} rounded-lg flex items-center justify-center transition-colors ${variants[variant]}`}
+        >
+            {typeof icon === 'string' ? (
+                <AppIconComponent
+                    name={icon}
+                    className={size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'}
+                    fallback={<span>{icon}</span>}
+                />
+            ) : (
+                icon
+            )}
+        </button>
+    );
+}
+
+// =====================================
+// COPY TO CLIPBOARD BUTTON
+// =====================================
+export function CopyButton({ text, className = '' }) {
+    const [copied, setCopied] = React.useState(false);
+
+    const handleCopy = () => {
+        navigator.clipboard
+            .writeText(text)
+            .then(() => {
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            })
+            .catch(() => {});
+    };
+
+    return (
+        <button
+            onClick={handleCopy}
+            className={`px-2 py-1 rounded text-xs transition-colors ${
+                copied
+                    ? 'bg-(--color-success-light) text-(--color-success-dark)'
+                    : 'bg-(--color-bg-tertiary) text-(--color-text-tertiary) hover:text-white'
+            } ${className}`}
+        >
+            {copied ? 'Copied' : 'Copy'}
+        </button>
+    );
+}

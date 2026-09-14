@@ -1,0 +1,135 @@
+# ==============================================================================
+# VendorFlow .gitignore - Laravel + React/Vite + Node.js
+# ==============================================================================
+
+# DEPENDENCIES
+/vendor/
+/node_modules/
+auth.json
+
+# ENVIRONMENT & SECRETS
+.env
+.env.*
+!.env.example
+.vault
+
+# LARAVEL RUNTIME & CACHE
+/bootstrap/cache/*
+!/bootstrap/cache/.gitkeep
+/storage/*.key
+/storage/framework/cache/*
+!/storage/framework/cache/.gitkeep
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitkeep
+/storage/framework/testing/*
+!/storage/framework/testing/.gitkeep
+/storage/framework/views/*
+!/storage/framework/views/.gitkeep
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/app/*
+!/storage/app/.gitkeep
+/storage/app/public
+/public/storage
+/public/hot
+
+# BUILD & ARTIFACTS
+/public/build/
+/public/mix-manifest.json
+.vite/
+dist/
+build/
+out/
+
+# DATABASES
+/database/*.sqlite
+/database/*.sqlite-journal
+
+# TESTING & COVERAGE
+/coverage/
+/.phpunit.cache/
+.phpunit.result.cache
+.php-cs-fixer.cache
+.phpstan.cache/
+.pest/
+.nyc_output/
+*.clover
+coverage-final.json
+/tests/Browser/screenshots/
+/tests/Browser/console/
+Test Results - Main.xml
+test_output.txt
+manual_test_data.txt
+
+# LOGS & TEMPORARY FILES
+*.log
+*.pid
+*.seed
+*.stackdump
+nohup.out
+*.tmp
+*.bak
+*.orig
+*.rej
+*~
+*.old
+*.save
+*.cache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# IDE & EDITOR CONFIGURATION
+.idea/
+.vscode/
+.vscode-test/
+.fleet/
+*.iml
+*.sublime-workspace
+*.sublime-project
+.editorconfig.bak
+.history/
+*.swp
+*.swo
+*.swn
+
+# CODE ANALYSIS CACHES
+.eslintcache
+.stylelintcache
+.phpactor.json
+*.tsbuildinfo
+
+# BUILD & STYLE CACHES
+.sass-cache/
+.parcel-cache/
+.cache-loader/
+
+# LOCAL DEVELOPMENT
+.php-version
+.turbo/
+.vagrant/
+Homestead.yaml
+Homestead.json
+.cache/
+.tmp/
+tmp/
+temp/
+
+# OS-SPECIFIC FILES
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+$RECYCLE.BIN/
+._*
+.AppleDouble
+.LSOverride
+.TemporaryItems
+.Spotlight-V100
+.Trashes
+
+
+.agents/
+.ai
