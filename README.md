@@ -1,10 +1,10 @@
-# VendorFlow | Enterprise Vendor Lifecycle Management (VLM)
+# Vendor Management System | Enterprise Vendor Lifecycle Management (VLM)
 
-**VendorFlow** is a next-generation Vendor Management System (VMS) engineered to optimize procurement lifecycles, enforce stringent regulatory governance, and unify supply chain operations. Built on a bleeding-edge technology stack, it facilitates frictionless collaboration between enterprises and their vendor ecosystems.
+**Vendor Management System** is a next-generation Vendor Management System (VMS) engineered to optimize procurement lifecycles, enforce stringent regulatory governance, and unify supply chain operations. Built on a bleeding-edge technology stack, it facilitates frictionless collaboration between enterprises and their vendor ecosystems.
 
 ## Executive Summary
 
-Navigating complex regulatory landscapes requires robust digital infrastructure. VendorFlow delivers a centralized governance framework that automates vendor onboarding, validates statutory compliance in real-time, and orchestrates multi-tier payment workflows—ensuring operational transparency and audit capability.
+Navigating complex regulatory landscapes requires robust digital infrastructure. Vendor Management System delivers a centralized governance framework that automates vendor onboarding, validates statutory compliance in real-time, and orchestrates multi-tier payment workflows—ensuring operational transparency and audit capability.
 
 ## Core Capabilities
 
@@ -30,7 +30,7 @@ Navigating complex regulatory landscapes requires robust digital infrastructure.
 
 ## Technical Architecture
 
-VendorFlow is architected for high availability and scalability, utilizing the latest innovations in the ecosystem:
+Vendor Management System is architected for high availability and scalability, utilizing the latest innovations in the ecosystem:
 
 -   **Backend Core**: **Laravel 12.x** (Bleeding Edge) - Leveraging the latest PHP capabilities for robust, secure API architecture.
 -   **Frontend Experience**: **React 19** + **Inertia.js 2.0** - Delivering a monolithic-like developer experience with Single Page Application (SPA) performance.
@@ -50,8 +50,8 @@ VendorFlow is architected for high availability and scalability, utilizing the l
 
 1.  **Repository Cloning**
     ```bash
-    git clone https://github.com/khatriharsh08/vendorflow.git
-    cd vendorflow
+    git clone https://github.com/demarnaposo/vms.git
+    cd vms
     ```
 
 2.  **Dependency Resolution**
@@ -87,15 +87,9 @@ VendorFlow is architected for high availability and scalability, utilizing the l
 
 The system is pre-configured with the following RBAC accounts for validation and UAT (User Acceptance Testing).
 
-### Internal Stakeholders
+<!-- ### Internal Stakeholders
 | Role | Username | Password | Operational Scope |
 |------|----------|----------|-------------------|
 | **Super Admin** | `admin@vendorflow.com` | `password` | System-wide Audit & Control |
 | **Ops Manager** | `ops@vendorflow.com` | `password` | Vendor Onboarding & Doc Verification |
-| **Finance Controller** | `finance@vendorflow.com` | `password` | Payment Approvals & Disbursement |
-
-### External Vendors (Mock Entities)
-| Entity | Username | Password |
-|--------|----------|----------|
-| **Tech Solutions** | `rajesh@techsolutions.com` | `Password@123` |
-| **Global Trade** | `priya@globaltrade.com` | `Password@123` |
+| **Finance Controller** | `finance@vendorflow.com` | `password` | Payment Approvals & Disbursement | -->
