@@ -339,7 +339,8 @@ export default function StepCompany({ vendor, sessionData }) {
 
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {t('Phone Number / Mobile')} <span className="text-(--color-danger)">*</span>
+                            {t('Phone Number / Mobile')}{' '}
+                            <span className="text-(--color-danger)">*</span>
                         </label>
                         {/* Start Update 14 September 2026, by @WNP: Guide Indonesian mobile input without blocking the +62 alternative. */}
                         <input
