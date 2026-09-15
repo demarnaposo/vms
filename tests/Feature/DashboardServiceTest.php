@@ -87,6 +87,9 @@ class DashboardServiceTest extends TestCase
 
         $this->assertCount(1, $data['pendingVendors']);
         $this->assertCount(1, $data['pendingDocuments']);
+        // Start Update 15 September 2026, by @WNP: Keep the document key available for selective frontend localization.
+        $this->assertSame('tax_certificate', $data['pendingDocuments']->first()['document_type']['name']);
+        $this->assertSame('Tax Certificate', $data['pendingDocuments']->first()['document_type']['display_name']);
         $this->assertCount(1, $data['pendingPayments']);
         $this->assertGreaterThanOrEqual(1, $data['recentActivity']->count());
 

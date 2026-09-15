@@ -6,7 +6,7 @@ import LanguageSwitcher from './LanguageSwitcher';
 
 export default function GuestLayout({
     children,
-    title = 'VendorFlow',
+    title = 'VMS',
     showNavbar = true,
     showFooter = true,
     navbarVariant = 'glass',
@@ -27,7 +27,7 @@ export default function GuestLayout({
 }
 
 // Auth layout for login/register pages - Light theme
-export function AuthLayout({ children, title = 'VendorFlow' }) {
+export function AuthLayout({ children, title = 'VMS' }) {
     return (
         <>
             <Head title={title} />

@@ -11,8 +11,8 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     Privacy: 'Privasi',
     Terms: 'Ketentuan',
     Company: 'Perusahaan',
-    'VendorFlow keeps vendor onboarding, compliance, documents, and payments in one clean workspace.':
-        'VendorFlow menyatukan pendaftaran vendor, kepatuhan, dokumen, dan pembayaran dalam satu ruang kerja yang rapi.',
+    'VMS keeps vendor onboarding, compliance, documents, and payments in one clean workspace.':
+        'VMS menyatukan pendaftaran vendor, kepatuhan, dokumen, dan pembayaran dalam satu ruang kerja yang rapi.',
     Dashboard: 'Dasbor',
     Vendors: 'Vendor',
     Vendor: 'Vendor',
@@ -21,6 +21,31 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     Performance: 'Kinerja',
     Payments: 'Pembayaran',
     Notifications: 'Notifikasi',
+    // Start Update 15 September 2026, by @WNP: Complete shared and vendor notification-center translations.
+    ':count unread': ':count belum dibaca',
+    ':count unread notification': ':count notifikasi belum dibaca',
+    ':count unread notifications': ':count notifikasi belum dibaca',
+    'Mark all as read': 'Tandai semua sudah dibaca',
+    'Mark All as Read': 'Tandai Semua Sudah Dibaca',
+    'Mark read': 'Tandai sudah dibaca',
+    'No notifications': 'Tidak ada notifikasi',
+    'You are all caught up. New notifications will appear here.':
+        'Semua sudah selesai. Notifikasi baru akan muncul di sini.',
+    'You are all caught up.': 'Semua sudah selesai.',
+    'No notifications found for this filter.': 'Tidak ada notifikasi untuk filter ini.',
+    'View Details': 'Lihat Detail',
+    'What notifications will you receive?': 'Notifikasi apa yang akan Anda terima?',
+    'Document Updates': 'Pembaruan Dokumen',
+    'When your documents are verified or need attention':
+        'Saat dokumen Anda diverifikasi atau memerlukan perhatian',
+    'Payment Status': 'Status Pembayaran',
+    'Updates on your payment requests and approvals':
+        'Pembaruan mengenai permintaan dan persetujuan pembayaran Anda',
+    'Compliance Alerts': 'Peringatan Kepatuhan',
+    'When compliance status changes or action needed':
+        'Saat status kepatuhan berubah atau memerlukan tindakan',
+    'Account Updates': 'Pembaruan Akun',
+    'Status changes and important announcements': 'Perubahan status dan pengumuman penting',
     Profile: 'Profil',
     Reports: 'Laporan',
     Messages: 'Pesan',
@@ -95,11 +120,11 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Start Free': 'Mulai Gratis',
     'Talk to Team': 'Hubungi Tim',
     'Continue to Dashboard': 'Lanjut ke Dasbor',
-    'About VendorFlow': 'Tentang VendorFlow',
+    'About VMS': 'Tentang VMS',
     'We build vendor operations software that stays simple at scale.':
         'Kami membangun perangkat lunak operasional vendor yang tetap sederhana saat berkembang.',
-    'VendorFlow helps teams replace scattered spreadsheets and email chains with one structured workflow for onboarding, compliance, and payments.':
-        'VendorFlow membantu tim mengganti spreadsheet dan rangkaian email yang tersebar dengan satu alur terstruktur untuk pendaftaran, kepatuhan, dan pembayaran.',
+    'VMS helps teams replace scattered spreadsheets and email chains with one structured workflow for onboarding, compliance, and payments.':
+        'VMS membantu tim mengganti spreadsheet dan rangkaian email yang tersebar dengan satu alur terstruktur untuk pendaftaran, kepatuhan, dan pembayaran.',
     'Vendors Managed': 'Vendor Dikelola',
     'Documents Tracked': 'Dokumen Dipantau',
     'Team Satisfaction': 'Kepuasan Tim',
@@ -116,11 +141,160 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Fast Collaboration': 'Kolaborasi Cepat',
     'Vendor, operations, and finance teams work from the same source of truth.':
         'Tim vendor, operasional, dan keuangan bekerja dari sumber data yang sama.',
-    'Want to see VendorFlow in action?': 'Ingin melihat VendorFlow secara langsung?',
+    'Want to see VMS in action?': 'Ingin melihat VMS secara langsung?',
     'Explore the platform and tailor it to your workflows.':
         'Jelajahi platform dan sesuaikan dengan alur kerja Anda.',
     'Contact Team': 'Hubungi Tim',
-    'Contact VendorFlow': 'Hubungi VendorFlow',
+    // Start Update 15 September 2026, by @WNP: Translate all static content on the public privacy-policy page.
+    'Effective Date: January 15, 2026': 'Tanggal Berlaku: 15 Januari 2026',
+    Contents: 'Daftar Isi',
+    'Information We Collect': 'Informasi yang Kami Kumpulkan',
+    'How We Use Your Information': 'Cara Kami Menggunakan Informasi Anda',
+    'Information Sharing': 'Pembagian Informasi',
+    'Data Security': 'Keamanan Data',
+    'Data Retention': 'Penyimpanan Data',
+    'Your Rights': 'Hak Anda',
+    Cookies: 'Cookie',
+    'Contact Us': 'Hubungi Kami',
+    'We believe in transparency. This policy outlines how we collect, use, and store your data to ensure your trust and safety.':
+        'Kami menjunjung transparansi. Kebijakan ini menjelaskan cara kami mengumpulkan, menggunakan, dan menyimpan data Anda untuk menjaga kepercayaan dan keamanan Anda.',
+    'At VMS, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform. By using our services, you agree to the collection and use of information in accordance with this policy.':
+        'Di VMS, kami menjaga privasi Anda dengan serius. Kebijakan Privasi ini menjelaskan cara kami mengumpulkan, menggunakan, mengungkapkan, dan melindungi informasi Anda saat menggunakan platform kami. Dengan menggunakan layanan kami, Anda menyetujui pengumpulan dan penggunaan informasi sesuai dengan kebijakan ini.',
+    '1. Information We Collect': '1. Informasi yang Kami Kumpulkan',
+    'We collect information that you provide directly to us, specifically:':
+        'Kami mengumpulkan informasi yang Anda berikan langsung kepada kami, khususnya:',
+    'Identity Data': 'Data Identitas',
+    'Name, username, or similar identifier.': 'Nama, nama pengguna, atau pengenal serupa.',
+    'Contact Data': 'Data Kontak',
+    'Billing address, delivery address, email address, and telephone numbers.':
+        'Alamat penagihan, alamat pengiriman, alamat email, dan nomor telepon.',
+    'Financial Data': 'Data Keuangan',
+    'Bank account and payment card details.': 'Detail rekening bank dan kartu pembayaran.',
+    'Technical Data': 'Data Teknis',
+    'IP address, login data, browser type and version.':
+        'Alamat IP, data masuk, serta jenis dan versi peramban.',
+    '2. How We Use Your Information': '2. Cara Kami Menggunakan Informasi Anda',
+    'We use the information we collect to:': 'Kami menggunakan informasi yang dikumpulkan untuk:',
+    'Provide, maintain, and improve our services to meet your needs.':
+        'Menyediakan, memelihara, dan meningkatkan layanan kami untuk memenuhi kebutuhan Anda.',
+    'Process transactions and strictly send related information such as confirmations and invoices.':
+        'Memproses transaksi dan hanya mengirimkan informasi terkait seperti konfirmasi dan faktur.',
+    'Send technical notices, updates, security alerts, and support and administrative messages.':
+        'Mengirim pemberitahuan teknis, pembaruan, peringatan keamanan, serta pesan dukungan dan administratif.',
+    'Respond to your comments, questions, and requests, and provide customer service.':
+        'Menanggapi komentar, pertanyaan, dan permintaan Anda serta memberikan layanan pelanggan.',
+    'Monitor and analyze trends, usage, and activities in connection with our services.':
+        'Memantau dan menganalisis tren, penggunaan, serta aktivitas yang berkaitan dengan layanan kami.',
+    'Detect, investigate, and prevent fraudulent transactions and other illegal activities.':
+        'Mendeteksi, menyelidiki, dan mencegah transaksi penipuan serta aktivitas ilegal lainnya.',
+    '3. Information Sharing': '3. Pembagian Informasi',
+    'We do not sell, trade, or rent your personal information to third parties. We may share your information only in the following circumstances:':
+        'Kami tidak menjual, memperdagangkan, atau menyewakan informasi pribadi Anda kepada pihak ketiga. Kami hanya dapat membagikan informasi Anda dalam keadaan berikut:',
+    'With your consent:': 'Dengan persetujuan Anda:',
+    'We may share information when you direct us to do so.':
+        'Kami dapat membagikan informasi ketika Anda meminta kami untuk melakukannya.',
+    'Service Providers:': 'Penyedia Layanan:',
+    'We share information with vendors, consultants, and other service providers who need access to such information to carry out work on our behalf.':
+        'Kami membagikan informasi kepada vendor, konsultan, dan penyedia layanan lain yang memerlukan akses untuk melaksanakan pekerjaan atas nama kami.',
+    'Legal Compliance:': 'Kepatuhan Hukum:',
+    'We may disclose information if we believe disclosure is in accordance with any applicable law, regulation, or legal process.':
+        'Kami dapat mengungkapkan informasi jika pengungkapan tersebut sesuai dengan hukum, peraturan, atau proses hukum yang berlaku.',
+    'Protection of Rights:': 'Perlindungan Hak:',
+    'To enforce our agreements, policies, and terms of service, and to protect the security or integrity of our services.':
+        'Untuk menegakkan perjanjian, kebijakan, dan ketentuan layanan kami serta melindungi keamanan atau integritas layanan kami.',
+    '4. Data Security': '4. Keamanan Data',
+    'We implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. This includes:':
+        'Kami menerapkan langkah keamanan teknis dan organisasi yang sesuai untuk melindungi informasi pribadi Anda dari akses, perubahan, pengungkapan, atau pemusnahan tanpa izin. Langkah tersebut meliputi:',
+    'Encryption of data in transit (TLS 1.2+) and at rest (AES-256).':
+        'Enkripsi data saat dikirim (TLS 1.2+) dan saat disimpan (AES-256).',
+    'Regular security audits and vulnerability assessments.':
+        'Audit keamanan dan penilaian kerentanan secara berkala.',
+    'Strict access controls and authentication mechanisms.':
+        'Kontrol akses dan mekanisme autentikasi yang ketat.',
+    'Continuous monitoring for suspicious activities.':
+        'Pemantauan berkelanjutan terhadap aktivitas mencurigakan.',
+    '5. Data Retention': '5. Penyimpanan Data',
+    'We retain your information for as long as your account is active or as needed to provide you services. We will also retain and use your information to comply with legal obligations, resolve disputes, and enforce our agreements. When we no longer have a legitimate business need to process your information, we will either delete or anonymize it.':
+        'Kami menyimpan informasi Anda selama akun Anda aktif atau selama diperlukan untuk menyediakan layanan. Kami juga akan menyimpan dan menggunakan informasi Anda untuk memenuhi kewajiban hukum, menyelesaikan sengketa, dan menegakkan perjanjian kami. Ketika tidak lagi memiliki kebutuhan bisnis yang sah untuk memproses informasi Anda, kami akan menghapus atau menganonimkannya.',
+    '6. Your Rights': '6. Hak Anda',
+    'Depending on your location, you may have the following rights regarding your personal data:':
+        'Bergantung pada lokasi Anda, Anda dapat memiliki hak berikut atas data pribadi Anda:',
+    'Access:': 'Akses:',
+    'The right to request copies of your personal data.':
+        'Hak untuk meminta salinan data pribadi Anda.',
+    'Rectification:': 'Perbaikan:',
+    'The right to request correction of inaccurate information.':
+        'Hak untuk meminta perbaikan atas informasi yang tidak akurat.',
+    'Erasure:': 'Penghapusan:',
+    'The right to request deletion of your personal data.':
+        'Hak untuk meminta penghapusan data pribadi Anda.',
+    'Restriction:': 'Pembatasan:',
+    'The right to request restriction of processing.': 'Hak untuk meminta pembatasan pemrosesan.',
+    'Data Portability:': 'Portabilitas Data:',
+    'The right to request transfer of data to another organization.':
+        'Hak untuk meminta pemindahan data ke organisasi lain.',
+    '7. Cookies and Tracking': '7. Cookie dan Pelacakan',
+    'We use cookies and similar tracking technologies to track activity on our platform and hold certain information. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our service.':
+        'Kami menggunakan cookie dan teknologi pelacakan serupa untuk melacak aktivitas pada platform serta menyimpan informasi tertentu. Anda dapat mengatur peramban untuk menolak semua cookie atau memberi tahu saat cookie dikirim. Namun, jika tidak menerima cookie, Anda mungkin tidak dapat menggunakan sebagian layanan kami.',
+    'If you have any questions about this Privacy Policy, please contact us. We are committed to working with you to obtain a fair resolution of any complaint or concern about privacy.':
+        'Jika memiliki pertanyaan mengenai Kebijakan Privasi ini, silakan hubungi kami. Kami berkomitmen bekerja sama dengan Anda untuk memperoleh penyelesaian yang adil atas keluhan atau kekhawatiran terkait privasi.',
+    // Start Update 15 September 2026, by @WNP: Translate all static content on the public terms-of-service page.
+    'Terms of Service': 'Ketentuan Layanan',
+    '1. Acceptance of Terms': '1. Penerimaan Ketentuan',
+    '2. Description of Service': '2. Deskripsi Layanan',
+    '3. User Accounts': '3. Akun Pengguna',
+    '4. Acceptable Use': '4. Penggunaan yang Diizinkan',
+    '5. Vendor Data & Responsibility': '5. Data dan Tanggung Jawab Vendor',
+    '6. Payment Terms': '6. Ketentuan Pembayaran',
+    '7. Intellectual Property': '7. Kekayaan Intelektual',
+    '8. Limitation of Liability': '8. Batasan Tanggung Jawab',
+    '9. Termination': '9. Penghentian',
+    '10. Governing Law': '10. Hukum yang Berlaku',
+    'Please read these terms carefully. They state the rules for using VMS for your business.':
+        'Harap baca ketentuan ini dengan saksama. Ketentuan ini menetapkan aturan penggunaan VMS untuk bisnis Anda.',
+    'By accessing or using our platform, you agree to be bound by these Terms and our Privacy Policy. If you do not agree to these Terms, you may not access or use our services.':
+        'Dengan mengakses atau menggunakan platform kami, Anda setuju untuk terikat oleh Ketentuan ini dan Kebijakan Privasi kami. Jika tidak menyetujui Ketentuan ini, Anda tidak diperkenankan mengakses atau menggunakan layanan kami.',
+    'By accessing and using VMS, you acknowledge that you have read, understood, and agree to be bound by these Terms and our Privacy Policy. These Terms apply to all visitors, users, and others who access or use the Service.':
+        'Dengan mengakses dan menggunakan VMS, Anda menyatakan telah membaca, memahami, dan setuju untuk terikat oleh Ketentuan ini serta Kebijakan Privasi kami. Ketentuan ini berlaku bagi seluruh pengunjung, pengguna, dan pihak lain yang mengakses atau menggunakan Layanan.',
+    "VMS is a comprehensive vendor management platform that enables businesses to streamline vendor onboarding, verify documents, track compliance, and process payments. We assume no responsibility for any interactions between vendors and businesses outside the scope of our platform's functionality.":
+        'VMS adalah platform manajemen vendor menyeluruh yang memungkinkan bisnis menyederhanakan pendaftaran vendor, memverifikasi dokumen, memantau kepatuhan, dan memproses pembayaran. Kami tidak bertanggung jawab atas interaksi antara vendor dan bisnis di luar lingkup fungsi platform kami.',
+    'When you create an account with us, you must provide us information that is accurate, complete, and current at all times. Failure to do so constitutes a breach of the Terms, which may result in immediate termination of your account on our Service.':
+        'Saat membuat akun, Anda wajib memberikan informasi yang akurat, lengkap, dan selalu terbaru. Kegagalan memenuhi kewajiban tersebut merupakan pelanggaran Ketentuan dan dapat mengakibatkan penghentian langsung akun Anda pada Layanan kami.',
+    'You are responsible for:': 'Anda bertanggung jawab untuk:',
+    'Safeguarding the password that you use to access the Service.':
+        'Menjaga keamanan kata sandi yang digunakan untuk mengakses Layanan.',
+    'Any activities or actions under your password.':
+        'Setiap aktivitas atau tindakan yang dilakukan menggunakan kata sandi Anda.',
+    'Notifying us immediately upon becoming aware of any breach of security.':
+        'Segera memberi tahu kami setelah mengetahui adanya pelanggaran keamanan.',
+    'You agree not to use the Service in any way that violates any applicable national or international law or regulation. Additionally, you agree not to:':
+        'Anda setuju untuk tidak menggunakan Layanan dengan cara yang melanggar hukum atau peraturan nasional maupun internasional yang berlaku. Selain itu, Anda setuju untuk tidak:',
+    'Upload irrelevant, obscene, defamatory, or unlawful content.':
+        'Mengunggah konten yang tidak relevan, tidak senonoh, memfitnah, atau melanggar hukum.',
+    'Attempt to gain unauthorized access to, interfere with, damage, or disrupt any parts of the Service.':
+        'Mencoba memperoleh akses tanpa izin, mengganggu, merusak, atau mengacaukan bagian mana pun dari Layanan.',
+    'Use any robot, spider, or other automatic device to access the Service for any purpose.':
+        'Menggunakan robot, spider, atau perangkat otomatis lainnya untuk mengakses Layanan dengan tujuan apa pun.',
+    'Introduce any viruses, trojan horses, worms, logic bombs, or other material that is malicious.':
+        'Memasukkan virus, trojan horse, worm, logic bomb, atau materi berbahaya lainnya.',
+    'You retain all rights to the data you upload to VMS. By uploading data, you grant us a license to use, store, and display that data solely for the purpose of providing the service to you.':
+        'Anda tetap memiliki seluruh hak atas data yang diunggah ke VMS. Dengan mengunggah data, Anda memberikan lisensi kepada kami untuk menggunakan, menyimpan, dan menampilkan data tersebut semata-mata untuk menyediakan layanan kepada Anda.',
+    'We take data accuracy seriously, but you are ultimately responsible for verifying the authenticity of the documents and information provided by vendors or businesses on our platform.':
+        'Kami menjaga akurasi data dengan serius, tetapi Anda tetap bertanggung jawab untuk memverifikasi keaslian dokumen dan informasi yang diberikan oleh vendor atau bisnis pada platform kami.',
+    'Certain aspects of the Service may be provided for a fee or other charge. If you elect to use paid aspects of the Service, you agree to the pricing and payment terms as we may update them from time to time.':
+        'Bagian tertentu dari Layanan dapat dikenakan biaya. Jika memilih menggunakan bagian Layanan berbayar, Anda menyetujui harga dan ketentuan pembayaran yang dapat kami perbarui dari waktu ke waktu.',
+    'The Service and its original content (excluding Content provided by users), features, and functionality are and will remain the exclusive property of VMS and its licensors.':
+        'Layanan beserta konten aslinya (tidak termasuk Konten yang diberikan pengguna), fitur, dan fungsinya merupakan dan akan tetap menjadi milik eksklusif VMS dan pemberi lisensinya.',
+    'In no event shall VMS, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the Service.':
+        'Dalam keadaan apa pun, VMS maupun direktur, karyawan, mitra, agen, pemasok, atau afiliasinya tidak bertanggung jawab atas kerugian tidak langsung, insidental, khusus, konsekuensial, atau bersifat menghukum, termasuk tetapi tidak terbatas pada hilangnya keuntungan, data, penggunaan, reputasi baik, atau kerugian tidak berwujud lainnya akibat akses, penggunaan, atau ketidakmampuan Anda mengakses maupun menggunakan Layanan.',
+    'We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms. Upon termination, your right to use the Service will immediately cease.':
+        'Kami dapat segera menghentikan atau menangguhkan akun Anda tanpa pemberitahuan sebelumnya atau tanggung jawab apa pun, termasuk apabila Anda melanggar Ketentuan. Setelah penghentian, hak Anda untuk menggunakan Layanan akan segera berakhir.',
+    'These Terms shall be governed and construed in accordance with the laws of the Republic of Indonesia, without regard to its conflict of law provisions. Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights.':
+        'Ketentuan ini diatur dan ditafsirkan sesuai dengan hukum Republik Indonesia tanpa memperhatikan ketentuan pertentangan hukumnya. Kegagalan kami menegakkan hak atau ketentuan apa pun dalam Ketentuan ini tidak dianggap sebagai pelepasan hak tersebut.',
+    'Legal Contact': 'Kontak Hukum',
+    'For any questions regarding these Terms, please contact our legal team.':
+        'Untuk pertanyaan mengenai Ketentuan ini, silakan hubungi tim hukum kami.',
+    'Contact VMS': 'Hubungi VMS',
     'Let us help you simplify vendor operations':
         'Kami siap membantu menyederhanakan operasional vendor',
     'Ask product questions, request a walkthrough, or share your requirements. We will get back quickly.':
@@ -145,6 +319,9 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     Uptime: 'Waktu Aktif',
     Email: 'Email',
     Password: 'Kata Sandi',
+    // Start Update 15 September 2026, by @WNP: Localize accessible password visibility controls.
+    'Show password': 'Tampilkan kata sandi',
+    'Hide password': 'Sembunyikan kata sandi',
     'Remember me': 'Ingat saya',
     'Forgot password?': 'Lupa kata sandi?',
     'Forgot Password': 'Lupa Kata Sandi',
@@ -161,6 +338,12 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     "Don't have an account?": 'Belum memiliki akun?',
     'Create one': 'Buat akun',
     'Demo Accounts': 'Akun Demo',
+    // Start Update 15 September 2026, by @WNP: Complete static login and registration examples and demo-role labels.
+    'you@company.com': 'anda@perusahaan.com',
+    'John Doe': 'John Doe',
+    Admin: 'Admin',
+    Ops: 'Operasional',
+    Finance: 'Keuangan',
     'Join thousands of businesses': 'Bergabung dengan ribuan bisnis',
     'Create your account and start managing vendors efficiently. Free to get started, upgrade anytime.':
         'Buat akun dan mulai kelola vendor secara efisien. Mulai gratis dan tingkatkan kapan saja.',
@@ -188,8 +371,8 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Current Step': 'Tahap Saat Ini',
     Pending: 'Menunggu',
     'Review and Submit': 'Tinjau dan Kirim',
-    'Please complete your onboarding to start using VendorFlow':
-        'Selesaikan pendaftaran untuk mulai menggunakan VendorFlow',
+    'Please complete your onboarding to start using VMS':
+        'Selesaikan pendaftaran untuk mulai menggunakan VMS',
     'Your application is under review': 'Pengajuan Anda sedang ditinjau',
     'Your application is approved. Awaiting activation.':
         'Pengajuan Anda disetujui dan menunggu aktivasi.',
@@ -210,7 +393,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     '9-18 digit account number': 'Nomor rekening 9-18 digit',
     'Bank Code': 'Kode Bank',
     'Branch Name': 'Nama Cabang',
-    'e.g., KCP Bandung Dago': 'contoh: KCP Bandung Dago',
+    'e.g., KCP Jakarta Menteng': 'contoh: KCP Jakarta Menteng',
     'Bank Name is required.': 'Nama bank wajib diisi.',
     'Account Number is required.': 'Nomor rekening wajib diisi.',
     'Account number must be 9 to 18 digits.':
@@ -394,9 +577,40 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Detailed metric breakdown and monthly trend': 'Rincian metrik dan tren bulanan',
     'Contact Messages': 'Pesan Kontak',
     'Manage and respond to customer inquiries': 'Kelola dan tanggapi pertanyaan pelanggan',
+    // Start Update 15 September 2026, by @WNP: Complete static contact-message list and detail translations.
+    Sender: 'Pengirim',
+    Received: 'Diterima',
+    Total: 'Total',
+    'Search messages...': 'Cari pesan...',
+    'Message Details': 'Detail Pesan',
+    From: 'Dari',
+    'Message from :name': 'Pesan dari :name',
+    'Update Status': 'Perbarui Status',
+    'Add notes for your team...': 'Tambahkan catatan untuk tim Anda...',
+    'Sender Details': 'Detail Pengirim',
+    'Quick Reply': 'Balasan Cepat',
+    'Open your email client to respond directly.':
+        'Buka aplikasi email Anda untuk membalas secara langsung.',
+    'Compose Reply': 'Tulis Balasan',
+    'Delete Message': 'Hapus Pesan',
+    'Are you sure you want to delete this message? This action cannot be undone.':
+        'Apakah Anda yakin ingin menghapus pesan ini? Tindakan ini tidak dapat dibatalkan.',
     'Compose Notification': 'Buat Notifikasi',
     'Broadcast notifications to vendors or staff users':
         'Kirim notifikasi kepada vendor atau pengguna staf',
+    // Start Update 15 September 2026, by @WNP: Complete static send-notification form translations.
+    Title: 'Judul',
+    'Notification title': 'Judul notifikasi',
+    'Write your notification message...': 'Tulis pesan notifikasi Anda...',
+    'Send To': 'Kirim Kepada',
+    'Specific Vendor': 'Vendor Tertentu',
+    'Specific User': 'Pengguna Tertentu',
+    Info: 'Informasi',
+    'Select Recipient': 'Pilih Penerima',
+    'Choose a recipient...': 'Pilih penerima...',
+    'Action URL (Optional)': 'URL Tindakan (Opsional)',
+    '/vendor/documents or any path': '/vendor/documents atau path lainnya',
+    Clear: 'Kosongkan',
     'Internal Users': 'Pengguna Internal',
     // Start Update 13 September 2026, by @WNP: Use full Indonesian wording for the static staff-management subtitle.
     'Create and manage internal Ops/Finance/Admin accounts':
@@ -418,6 +632,15 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Vendor performance scores and rankings': 'Skor dan peringkat kinerja vendor',
     'Profile Settings': 'Pengaturan Profil',
     'Manage your account settings': 'Kelola pengaturan akun Anda',
+    // Start Update 15 September 2026, by @WNP: Complete static profile, password, and account-deletion translations.
+    'Profile Information': 'Informasi Profil',
+    'Current Password': 'Kata Sandi Saat Ini',
+    'Confirm New Password': 'Konfirmasi Kata Sandi Baru',
+    'Update Password': 'Perbarui Kata Sandi',
+    'Updating...': 'Memperbarui...',
+    'Delete My Account': 'Hapus Akun Saya',
+    'Deleting...': 'Menghapus...',
+    'Enter your password to confirm': 'Masukkan kata sandi Anda untuk konfirmasi',
     'Manage your uploaded documents': 'Kelola dokumen yang Anda unggah',
     'View your compliance status and requirements': 'Lihat status dan persyaratan kepatuhan Anda',
     'Track your performance metrics and scores': 'Pantau metrik dan skor kinerja Anda',
@@ -445,6 +668,23 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Internal Notes': 'Catatan Internal',
     'Danger Zone': 'Zona Berbahaya',
     'Document Type': 'Jenis Dokumen',
+    // Start Update 15 September 2026, by @WNP: Localize fixed document master data without modifying stored database values.
+    'Company Registration Certificate': 'Sertifikat Pendaftaran Perusahaan',
+    'Certificate of incorporation or business registration':
+        'Sertifikat pendirian atau pendaftaran usaha',
+    'GST Registration Certificate': 'Sertifikat Registrasi GST',
+    'Goods and Services Tax registration certificate':
+        'Sertifikat registrasi Pajak Barang dan Jasa',
+    'PAN Card': 'Kartu PAN',
+    'Permanent Account Number card': 'Kartu Nomor Rekening Permanen',
+    'Cancelled Cheque': 'Cek yang Dibatalkan',
+    'Cancelled cheque for bank verification': 'Cek yang dibatalkan untuk verifikasi bank',
+    'Insurance Certificate': 'Sertifikat Asuransi',
+    'Business liability insurance certificate': 'Sertifikat asuransi tanggung jawab usaha',
+    'Non-Disclosure Agreement': 'Perjanjian Kerahasiaan',
+    'Signed NDA/Confidentiality agreement': 'NDA atau perjanjian kerahasiaan yang ditandatangani',
+    'Service Agreement': 'Perjanjian Layanan',
+    'Master service agreement or contract': 'Perjanjian layanan utama atau kontrak',
     Document: 'Dokumen',
     File: 'Berkas',
     Amount: 'Nominal',
@@ -908,6 +1148,50 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Super Admin': 'Admin Utama',
     'Operations Manager': 'Manajer Operasional',
     'Finance Manager': 'Manajer Keuangan',
+    // Start Update 15 September 2026, by @WNP: Translate fixed VMS roles, permissions, states, rules, and performance master data.
+    'Full system access': 'Akses penuh ke sistem',
+    'Vendor onboarding and document verification': 'Pendaftaran vendor dan verifikasi dokumen',
+    'Payment approvals and financial history': 'Persetujuan pembayaran dan riwayat keuangan',
+    'External vendor with limited access': 'Vendor eksternal dengan akses terbatas',
+    'View Vendors': 'Lihat Vendor',
+    'Create Vendors': 'Buat Vendor',
+    'Update Vendors': 'Perbarui Vendor',
+    'Delete Vendors': 'Hapus Vendor',
+    'Approve Vendors': 'Setujui Vendor',
+    'Suspend Vendors': 'Tangguhkan Vendor',
+    'View Documents': 'Lihat Dokumen',
+    'Verify Documents': 'Verifikasi Dokumen',
+    'Reject Documents': 'Tolak Dokumen',
+    'Reject Payments': 'Tolak Pembayaran',
+    'View Compliance': 'Lihat Kepatuhan',
+    'Manage Compliance Rules': 'Kelola Aturan Kepatuhan',
+    'View Reports': 'Lihat Laporan',
+    'Export Reports': 'Ekspor Laporan',
+    'Manage Users': 'Kelola Pengguna',
+    'Manage Roles': 'Kelola Peran',
+    'View Audit Logs': 'Lihat Log Audit',
+    'Under Review': 'Sedang Ditinjau',
+    Terminated: 'Dihentikan',
+    'Mandatory Documents': 'Dokumen Wajib',
+    'Document Expiry Check': 'Pemeriksaan Kedaluwarsa Dokumen',
+    'Minimum Performance': 'Kinerja Minimum',
+    'All mandatory documents must be uploaded and verified':
+        'Semua dokumen wajib harus diunggah dan diverifikasi',
+    'Documents should not be expired or expiring within 15 days':
+        'Dokumen tidak boleh kedaluwarsa atau akan kedaluwarsa dalam 15 hari',
+    'Vendor performance score must be at least 40': 'Skor kinerja vendor minimal harus 40',
+    'Delivery Timeliness': 'Ketepatan Waktu Pengiriman',
+    'How consistently the vendor meets delivery deadlines':
+        'Konsistensi vendor dalam memenuhi tenggat pengiriman',
+    'Issue Frequency': 'Frekuensi Masalah',
+    'Frequency of issues or defects reported (lower is better)':
+        'Frekuensi masalah atau cacat yang dilaporkan (lebih rendah lebih baik)',
+    'Operations Rating': 'Penilaian Operasional',
+    'Manual rating provided by operations team':
+        'Penilaian manual yang diberikan oleh tim operasional',
+    'Contract Adherence': 'Kepatuhan terhadap Kontrak',
+    'How well the vendor adheres to contract terms':
+        'Tingkat kepatuhan vendor terhadap ketentuan kontrak',
     'Delete Account': 'Hapus Akun',
     'Once you delete your account, all of your data will be permanently removed. This action cannot be undone.':
         'Setelah akun dihapus, semua data Anda akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.',

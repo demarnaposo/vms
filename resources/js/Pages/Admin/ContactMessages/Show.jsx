@@ -14,9 +14,10 @@ import { formatDateTime } from '@/utils/dateFormatters';
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function Show({ message }) {
-    // Start Update 13 September 2026, by @WNP: Resolve enum labels while retaining stored option values.
-    const { t } = useLanguage();
-    const { data, setData, put, processing } = useForm({
+    // Start Update 15 September 2026, by @WNP: Resolve static labels and dates while retaining stored message content.
+    const { language, t } = useLanguage();
+    const dateLocale = language === 'id' ? 'id-ID' : 'en-IN';
+    const { data, setData, put, processing, errors } = useForm({
         status: message.status,
         admin_notes: message.admin_notes || '',
     });
@@ -32,10 +33,15 @@ export default function Show({ message }) {
         router.delete(`/admin/contact-messages/${message.id}`);
     };
 
+    // Start Update 15 September 2026, by @WNP: Translate the static frame around the original sender name.
     const header = (
         <PageHeader
             title="Message Details"
-            subtitle={`From ${message.name} - ${formatDateTime(message.created_at)}`}
+            subtitle={
+                <>
+                    {t('From')} {message.name} - {formatDateTime(message.created_at, dateLocale)}
+                </>
+            }
             backLink="/admin/contact-messages"
             actions={
                 <Button variant="danger" onClick={() => setShowDeleteModal(true)}>
@@ -45,8 +51,13 @@ export default function Show({ message }) {
         />
     );
 
+    // Start Update 15 September 2026, by @WNP: Localize the page title without translating the sender name.
     return (
-        <AdminLayout title={`Message from ${message.name}`} activeNav="Messages" header={header}>
+        <AdminLayout
+            title={t('Message from :name', { name: message.name })}
+            activeNav="Messages"
+            header={header}
+        >
             <div className="grid lg:grid-cols-3 gap-6">
                 {/* Main Content */}
                 <div className="lg:col-span-2 space-y-6">
@@ -91,13 +102,14 @@ export default function Show({ message }) {
                     <div className="card">
                         <div className="p-6 border-b border-(--color-border-primary)">
                             <h3 className="text-lg font-semibold text-(--color-text-primary)">
-                                Update Status
+                                {/* Start Update 15 September 2026, by @WNP: Localize the fixed status action heading. */}
+                                {t('Update Status')}
                             </h3>
                         </div>
                         <form onSubmit={handleUpdate} className="p-6 space-y-5">
                             <div>
                                 <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
-                                    Status
+                                    {t('Status')}
                                 </label>
                                 <select
                                     value={data.status}
@@ -114,15 +126,21 @@ export default function Show({ message }) {
 
                             <div>
                                 <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
-                                    Internal Notes
+                                    {t('Internal Notes')}
                                 </label>
                                 <textarea
                                     value={data.admin_notes}
                                     onChange={(e) => setData('admin_notes', e.target.value)}
                                     rows={4}
                                     className="input-field w-full resize-none"
-                                    placeholder="Add notes for your team..."
+                                    placeholder={t('Add notes for your team...')}
                                 />
+                                {/* Start Update 15 September 2026, by @WNP: Surface localized server validation while preserving typed notes. */}
+                                {errors.admin_notes && (
+                                    <p className="text-sm text-(--color-danger) mt-1" role="alert">
+                                        {t(errors.admin_notes)}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="flex justify-end pt-2">
@@ -139,18 +157,19 @@ export default function Show({ message }) {
                     {/* Sender Info */}
                     <div className="card p-6">
                         <h3 className="text-sm font-semibold text-(--color-text-tertiary) uppercase tracking-wider mb-4">
-                            Sender Details
+                            {/* Start Update 15 September 2026, by @WNP: Localize the fixed sender information heading. */}
+                            {t('Sender Details')}
                         </h3>
                         <div className="space-y-4">
                             <div>
                                 <label className="text-xs text-(--color-text-tertiary) uppercase font-medium">
-                                    Name
+                                    {t('Name')}
                                 </label>
                                 <p className="text-(--color-text-primary) mt-1">{message.name}</p>
                             </div>
                             <div>
                                 <label className="text-xs text-(--color-text-tertiary) uppercase font-medium">
-                                    Email
+                                    {t('Email')}
                                 </label>
                                 <p className="mt-1">
                                     <a
@@ -163,10 +182,10 @@ export default function Show({ message }) {
                             </div>
                             <div>
                                 <label className="text-xs text-(--color-text-tertiary) uppercase font-medium">
-                                    Received
+                                    {t('Received')}
                                 </label>
                                 <p className="text-(--color-text-primary) mt-1">
-                                    {formatDateTime(message.created_at)}
+                                    {formatDateTime(message.created_at, dateLocale)}
                                 </p>
                             </div>
                         </div>
@@ -191,17 +210,18 @@ export default function Show({ message }) {
                                 </svg>
                             </div>
                             <h4 className="font-semibold text-(--color-text-primary)">
-                                Quick Reply
+                                {/* Start Update 15 September 2026, by @WNP: Localize quick-reply controls without changing the recipient. */}
+                                {t('Quick Reply')}
                             </h4>
                         </div>
                         <p className="text-sm text-(--color-text-secondary) mb-4">
-                            Open your email client to respond directly.
+                            {t('Open your email client to respond directly.')}
                         </p>
                         <a
                             href={`mailto:${message.email}?subject=Re: ${encodeURIComponent(message.subject)}`}
                             className="block w-full py-2.5 px-4 bg-(--color-brand-primary) text-white text-center font-medium rounded-lg hover:opacity-90 transition-opacity"
                         >
-                            Compose Reply
+                            {t('Compose Reply')}
                         </a>
                     </div>
                 </div>
@@ -221,7 +241,9 @@ export default function Show({ message }) {
                 }
             >
                 <p className="text-sm text-(--color-text-secondary)">
-                    Are you sure you want to delete this message? This action cannot be undone.
+                    {t(
+                        'Are you sure you want to delete this message? This action cannot be undone.'
+                    )}
                 </p>
             </Modal>
         </AdminLayout>

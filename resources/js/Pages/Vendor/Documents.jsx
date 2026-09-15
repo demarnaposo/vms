@@ -16,6 +16,8 @@ import { DocumentViewer } from '@/Components/DocumentViewer';
 import { formatDate, formatDateTime } from '@/utils/dateFormatters';
 // Start Update 12 September 2026, by @WNP: Translate the vendor document list and upload flow.
 import { useLanguage } from '@/Contexts/LanguageContext';
+// Start Update 15 September 2026, by @WNP: Reuse selective document master-data localization across the list and form.
+import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
 
 export default function Documents({ vendor, documents = [], documentTypes = [] }) {
     // Start Update 12 September 2026, by @WNP: Keep document copy reactive to the global language switch.
@@ -220,9 +222,12 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                                             </div>
                                             <div className="min-w-0">
                                                 <div className="text-(--color-text-primary) font-medium">
-                                                    {/* Start Update 12 September 2026, by @WNP: Display document type names exactly as stored in the database. */}
-                                                    {doc.document_type?.display_name ||
-                                                        t('Document')}
+                                                    {/* Start Update 15 September 2026, by @WNP: Translate fixed master labels while retaining custom names verbatim. */}
+                                                    {translateDocumentTypeLabel(
+                                                        language,
+                                                        doc.document_type,
+                                                        t('Document')
+                                                    )}
                                                 </div>
                                                 <div
                                                     className="text-sm text-(--color-text-tertiary) truncate"
@@ -308,7 +313,7 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                 }
             >
                 <div className="space-y-4">
-                    {/* Start Update 12 September 2026, by @WNP: Keep database-backed document type options verbatim. */}
+                    {/* Start Update 15 September 2026, by @WNP: Localize only system-defined document options. */}
                     <FormSelect
                         label="Document Type"
                         value={uploadForm.data.document_type_id}
@@ -316,7 +321,7 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                         translateOptions={false}
                         options={documentTypes.map((type) => ({
                             value: type.id,
-                            label: type.display_name,
+                            label: translateDocumentTypeLabel(language, type),
                         }))}
                         placeholder="Select document type"
                         required

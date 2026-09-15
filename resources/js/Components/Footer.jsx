@@ -43,7 +43,7 @@ export default function Footer({ links = defaultLinks, showSocial = true, classN
                         </div>
                         <p className="max-w-md text-sm text-(--color-text-tertiary)">
                             {t(
-                                'VendorFlow keeps vendor onboarding, compliance, documents, and payments in one clean workspace.'
+                                'VMS keeps vendor onboarding, compliance, documents, and payments in one clean workspace.'
                             )}
                         </p>
 
@@ -130,7 +130,7 @@ export default function Footer({ links = defaultLinks, showSocial = true, classN
 
                 <div className="mt-10 pt-6 border-t border-(--color-border-secondary) flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <p className="text-xs text-(--color-text-muted)">
-                        (c) {year} VendorFlow. {t('All rights reserved.')}
+                        (c) {year} VMS. {t('All rights reserved.')}
                     </p>
                     <div className="flex items-center gap-4 text-xs text-(--color-text-tertiary)">
                         <Link href="/privacy" className="hover:text-(--color-brand-primary)">
@@ -150,7 +150,7 @@ export function FooterMinimal() {
     return (
         <footer className="border-t border-(--color-border-primary) bg-(--color-bg-primary)/80">
             <div className="max-w-7xl mx-auto px-4 py-4 text-center text-xs text-(--color-text-muted)">
-                (c) {new Date().getFullYear()} VendorFlow.
+                (c) {new Date().getFullYear()} VMS.
             </div>
         </footer>
     );

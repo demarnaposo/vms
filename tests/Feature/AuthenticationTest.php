@@ -93,6 +93,34 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
+    // Start Update 15 September 2026, by @WNP: Verify login failures follow the Indonesian locale cookie.
+    public function test_invalid_login_feedback_is_localized_in_indonesian()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->withUnencryptedCookie('vms_locale', 'id')->post('/login', [
+            'email' => $user->email,
+            'password' => 'wrong-password',
+        ]);
+
+        $response->assertSessionHasErrors([
+            'email' => 'Email atau kata sandi yang Anda masukkan tidak sesuai.',
+        ]);
+        $this->assertGuest();
+    }
+
+    // Start Update 15 September 2026, by @WNP: Verify registration validation uses Indonesian field labels.
+    public function test_registration_validation_feedback_is_localized_in_indonesian()
+    {
+        $response = $this->withUnencryptedCookie('vms_locale', 'id')->post('/register', []);
+
+        $response->assertSessionHasErrors([
+            'name' => 'nama wajib diisi.',
+            'email' => 'email wajib diisi.',
+            'password' => 'kata sandi wajib diisi.',
+        ]);
+    }
+
     public function test_users_can_logout()
     {
         /** @var \App\Models\User $user */

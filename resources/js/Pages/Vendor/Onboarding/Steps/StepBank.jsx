@@ -250,7 +250,7 @@ export default function StepBank({ vendor, sessionData }) {
                                 }));
                             }}
                             className={fieldClass('bank_branch')}
-                            placeholder={t('e.g., KCP Bandung Dago')}
+                            placeholder={t('e.g., KCP Jakarta Menteng')}
                         />
                         <p className="text-xs text-(--color-text-tertiary)">
                             {t('Enter the branch registered for this account.')}

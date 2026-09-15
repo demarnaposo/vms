@@ -26,7 +26,7 @@ class ProposalGenerationService
             // Start Update 11 September 2026, by @WNP: Provide a fully formatted IDR bond amount to the PDF template.
             'bond_amount' => Currency::format($bondAmountRequired),
             'commission_rate' => $commissionRate,
-            'platform_name' => config('app.name', 'VendorFlow'),
+            'platform_name' => config('app.name', 'VMS'),
         ];
 
         // Ensure directory exists

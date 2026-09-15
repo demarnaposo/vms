@@ -57,6 +57,24 @@ class UserNotificationServiceTest extends TestCase
         $this->assertSame(0, $service->unreadCount($user));
     }
 
+    // Start Update 15 September 2026, by @WNP: Verify mark-all-read feedback follows the Indonesian locale cookie.
+    public function test_mark_all_as_read_feedback_is_localized_in_indonesian(): void
+    {
+        $user = User::factory()->create();
+        $this->insertNotification($user->id, null);
+
+        $this
+            ->actingAs($user)
+            ->withUnencryptedCookie('vms_locale', 'id')
+            ->post('/notifications/mark-all-read')
+            ->assertRedirect()
+            ->assertSessionHas('success', 'Semua notifikasi telah ditandai dibaca.');
+
+        /** @var UserNotificationService $service */
+        $service = app(UserNotificationService::class);
+        $this->assertSame(0, $service->unreadCount($user));
+    }
+
     private function insertNotification(int $userId, $readAt): string
     {
         $id = (string) Str::uuid();

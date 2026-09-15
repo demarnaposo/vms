@@ -713,7 +713,7 @@ export default function Profile({ vendor }) {
                                             }
                                         }}
                                         className={inputClass('bank_branch')}
-                                        placeholder={t('e.g., KCP Bandung Dago')}
+                                        placeholder={t('e.g., KCP Jakarta Menteng')}
                                         disabled={!isEditing}
                                     />
                                     <p className="text-xs text-(--color-text-tertiary)">

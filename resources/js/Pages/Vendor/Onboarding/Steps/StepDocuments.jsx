@@ -3,9 +3,12 @@ import { router, usePage } from '@inertiajs/react';
 import { formatDate } from '@/utils/dateFormatters';
 // Start Update 11 September 2026, by @WNP: Translate the document onboarding step through the global language context.
 import { useLanguage } from '@/Contexts/LanguageContext';
+// Start Update 15 September 2026, by @WNP: Localize fixed document master labels and descriptions during onboarding.
+import { translateDocumentTypeDescription, translateDocumentTypeLabel } from '@/i18n/documentTypes';
 
 export default function StepDocuments({ documentTypes, sessionData }) {
-    const { t } = useLanguage();
+    // Start Update 15 September 2026, by @WNP: Read the active language for master-data translation.
+    const { language, t } = useLanguage();
     const [uploadedDocs, setUploadedDocs] = useState([]);
     const [expiryByType, setExpiryByType] = useState({});
     const [localErrors, setLocalErrors] = useState({});
@@ -188,7 +191,8 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <div className="font-medium text-(--color-text-primary)">
-                                            {docType.display_name}
+                                            {/* Start Update 15 September 2026, by @WNP: Translate only the recognized system document type. */}
+                                            {translateDocumentTypeLabel(language, docType)}
                                             {docType.is_mandatory && (
                                                 <span className="text-(--color-danger) ml-1">
                                                     *
@@ -197,7 +201,11 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                                         </div>
                                         {docType.description && (
                                             <p className="text-sm text-(--color-text-tertiary) mt-1">
-                                                {docType.description}
+                                                {/* Start Update 15 September 2026, by @WNP: Keep custom descriptions raw and translate master descriptions. */}
+                                                {translateDocumentTypeDescription(
+                                                    language,
+                                                    docType
+                                                )}
                                             </p>
                                         )}
                                         {typeRequiresExpiry && (

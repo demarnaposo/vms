@@ -95,7 +95,7 @@ class FullSystemTest extends TestCase
             'bank_name' => 'Bank Mandiri',
             'bank_account_number' => '123456789012',
             'bank_ifsc' => '008',
-            'bank_branch' => 'KCP Bandung Dago',
+            'bank_branch' => 'KCP Jakarta Menteng',
         ];
 
         $this->post('/vendor/onboarding/step2', $bankData)

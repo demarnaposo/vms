@@ -18,6 +18,12 @@ export function FormInput({
 }) {
     const id = useId();
     const { t } = useLanguage();
+    // Start Update 15 September 2026, by @WNP: Add reusable password visibility state for profile and staff forms.
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const isPassword = type === 'password';
+    const resolvedType = isPassword && isPasswordVisible ? 'text' : type;
+    const passwordToggleLabel = t(isPasswordVisible ? 'Hide password' : 'Show password');
+
     return (
         <div className={className}>
             {label && (
@@ -44,7 +50,7 @@ export function FormInput({
                 )}
                 <input
                     id={id}
-                    type={type}
+                    type={resolvedType}
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={t(placeholder)}
@@ -56,9 +62,26 @@ export function FormInput({
                         focus:outline-none focus:border-(--color-brand-primary) focus:ring-4 focus:ring-(--color-brand-primary)/10
                         hover:border-(--color-border-secondary) disabled:bg-(--color-bg-secondary) disabled:cursor-not-allowed
                         ${icon ? 'pl-10' : ''}
+                        ${isPassword ? 'pr-12' : ''}
                         ${error ? 'border-(--color-danger) focus:border-(--color-danger) focus:ring-(--color-danger)/10' : ''}
                     `}
                 />
+                {/* Start Update 15 September 2026, by @WNP: Keep password toggles non-submitting, bilingual, and accessible. */}
+                {isPassword && (
+                    <button
+                        type="button"
+                        onClick={() =>
+                            setIsPasswordVisible((currentVisibility) => !currentVisibility)
+                        }
+                        disabled={disabled}
+                        aria-label={passwordToggleLabel}
+                        aria-pressed={isPasswordVisible}
+                        title={passwordToggleLabel}
+                        className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-xl text-(--color-text-muted) transition-colors hover:text-(--color-text-primary) focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-(--color-brand-primary) disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                        <AppIcon name={isPasswordVisible ? 'eye-off' : 'eye'} className="h-5 w-5" />
+                    </button>
+                )}
             </div>
             {error && (
                 <p className="text-sm text-(--color-danger) mt-1.5 flex items-center gap-1">

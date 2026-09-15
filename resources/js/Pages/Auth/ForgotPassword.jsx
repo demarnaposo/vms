@@ -18,7 +18,7 @@ export default function ForgotPassword({ status }) {
 
     return (
         <>
-            <Head title={`${t('Forgot Password')} - VendorFlow`} />
+            <Head title={`${t('Forgot Password')} - VMS`} />
             <div className="min-h-screen flex items-center justify-center p-8 bg-(--color-bg-secondary)">
                 {/* Start Update 11 September 2026, by @WNP: Keep language selection available during password recovery. */}
                 <div className="fixed right-4 top-4 z-50">

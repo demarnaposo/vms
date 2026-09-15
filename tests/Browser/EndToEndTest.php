@@ -113,7 +113,7 @@ class EndToEndTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/')
-                ->assertSee('VendorFlow');
+                ->assertSee('VMS');
 
             $browser->visit('/about')
                 ->assertPathIs('/about')

@@ -16,6 +16,8 @@ import {
 import { formatDateTime } from '@/utils/dateFormatters';
 // Start Update 12 September 2026, by @WNP: Translate compliance dashboard UI while preserving database result content.
 import { useLanguage } from '@/Contexts/LanguageContext';
+// Start Update 15 September 2026, by @WNP: Localize recognized compliance rule master records.
+import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 
 export default function ComplianceDashboard({ stats, atRiskVendors, recentResults, rules }) {
     // Start Update 12 September 2026, by @WNP: Resolve only static dashboard labels through the shared language context.
@@ -133,8 +135,14 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                                             </div>
                                         </div>
                                         <div className="text-sm text-(--color-danger) mt-1">
-                                            {/* Start Update 12 September 2026, by @WNP: Display the database rule name verbatim. */}
-                                            {result.rule?.name}
+                                            {/* Start Update 15 September 2026, by @WNP: Translate system rules and preserve custom rules. */}
+                                            {translateSystemMasterDataField(
+                                                language,
+                                                'compliance_rules',
+                                                result.rule,
+                                                'display_name',
+                                                result.rule?.name
+                                            )}
                                         </div>
                                         <div className="text-sm text-(--color-text-tertiary) mt-1">
                                             {result.details}
@@ -192,11 +200,23 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                                         >
                                             <td className="p-4">
                                                 <div className="text-(--color-text-primary) font-medium">
-                                                    {/* Start Update 12 September 2026, by @WNP: Display the database rule name verbatim. */}
-                                                    {rule.name}
+                                                    {/* Start Update 15 September 2026, by @WNP: Resolve the fixed rule label from its stable name. */}
+                                                    {translateSystemMasterDataField(
+                                                        language,
+                                                        'compliance_rules',
+                                                        rule,
+                                                        'display_name',
+                                                        rule.name
+                                                    )}
                                                 </div>
                                                 <div className="text-xs text-(--color-text-tertiary)">
-                                                    {rule.description}
+                                                    {/* Start Update 15 September 2026, by @WNP: Translate only master rule descriptions. */}
+                                                    {translateSystemMasterDataField(
+                                                        language,
+                                                        'compliance_rules',
+                                                        rule,
+                                                        'description'
+                                                    )}
                                                 </div>
                                             </td>
                                             <td className="p-4">

@@ -118,7 +118,7 @@ const resolvePageComponent = (name) => {
 };
 
 createInertiaApp({
-    title: (title) => (title ? `${title} - VendorFlow` : 'VendorFlow'),
+    title: (title) => (title ? `${title} - VMS` : 'VMS'),
     resolve: (name) => resolvePageComponent(name),
     setup({ el, App, props }) {
         const root = createRoot(el);

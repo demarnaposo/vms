@@ -2,6 +2,8 @@ import { Link } from '@inertiajs/react';
 import { AdminLayout, PageHeader, DataTable, Badge, Button, AppIcon } from '@/Components';
 // Start Update 13 September 2026, by @WNP: Localize fixed performance labels without translating database metric content.
 import { useLanguage } from '@/Contexts/LanguageContext';
+// Start Update 15 September 2026, by @WNP: Localize recognized performance metric master records.
+import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 
 export default function PerformanceIndex({
     vendors = [],
@@ -10,7 +12,8 @@ export default function PerformanceIndex({
     lowPerformers = [],
 }) {
     // Start Update 13 September 2026, by @WNP: Resolve only static score and empty-state copy through the shared locale.
-    const { t } = useLanguage();
+    // Start Update 15 September 2026, by @WNP: Read the selected language for performance master data.
+    const { language, t } = useLanguage();
     const getScoreColor = (score) => {
         if (score >= 80) return 'text-(--color-success)';
         if (score >= 60) return 'text-(--color-warning)';
@@ -92,10 +95,22 @@ export default function PerformanceIndex({
                                 className="p-4 rounded-lg bg-(--color-bg-secondary) border border-(--color-border-secondary)"
                             >
                                 <div className="text-(--color-text-primary) font-medium">
-                                    {metric.display_name}
+                                    {/* Start Update 15 September 2026, by @WNP: Translate fixed metric labels and preserve custom metrics. */}
+                                    {translateSystemMasterDataField(
+                                        language,
+                                        'performance_metrics',
+                                        metric,
+                                        'display_name'
+                                    )}
                                 </div>
                                 <div className="text-sm text-(--color-text-tertiary) mt-1">
-                                    {metric.description}
+                                    {/* Start Update 15 September 2026, by @WNP: Translate only fixed metric descriptions. */}
+                                    {translateSystemMasterDataField(
+                                        language,
+                                        'performance_metrics',
+                                        metric,
+                                        'description'
+                                    )}
                                 </div>
                                 <div className="flex items-center gap-2 mt-2">
                                     <span className="text-xs text-(--color-brand-primary)">

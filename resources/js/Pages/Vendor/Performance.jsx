@@ -2,6 +2,8 @@ import { AppIcon, Card, PageHeader, VendorLayout } from '@/Components';
 import { formatDate } from '@/utils/dateFormatters';
 // Start Update 13 September 2026, by @WNP: Localize fixed vendor performance guidance while preserving stored metric data.
 import { useLanguage } from '@/Contexts/LanguageContext';
+// Start Update 15 September 2026, by @WNP: Localize fixed performance metric master records for vendors.
+import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 
 export default function Performance({ vendor, performanceScores = [], metrics = [] }) {
     // Start Update 13 September 2026, by @WNP: Use the selected UI locale for labels and score-period dates.
@@ -132,10 +134,22 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                                         <div className="flex items-center justify-between mb-3">
                                             <div>
                                                 <h3 className="font-semibold text-(--color-text-primary)">
-                                                    {metric.display_name}
+                                                    {/* Start Update 15 September 2026, by @WNP: Translate known metric labels and retain custom values. */}
+                                                    {translateSystemMasterDataField(
+                                                        language,
+                                                        'performance_metrics',
+                                                        metric,
+                                                        'display_name'
+                                                    )}
                                                 </h3>
                                                 <p className="text-sm text-(--color-text-tertiary)">
-                                                    {metric.description}
+                                                    {/* Start Update 15 September 2026, by @WNP: Translate only fixed master metric descriptions. */}
+                                                    {translateSystemMasterDataField(
+                                                        language,
+                                                        'performance_metrics',
+                                                        metric,
+                                                        'description'
+                                                    )}
                                                 </p>
                                             </div>
                                             <div
@@ -183,9 +197,14 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                                         >
                                             <div>
                                                 <div className="font-medium text-(--color-text-primary)">
-                                                    {/* Start Update 13 September 2026, by @WNP: Keep database metric names raw and translate only the fallback. */}
-                                                    {score.metric?.display_name ||
-                                                        t('Performance Review')}
+                                                    {/* Start Update 15 September 2026, by @WNP: Translate fixed master metrics in history and preserve custom names. */}
+                                                    {translateSystemMasterDataField(
+                                                        language,
+                                                        'performance_metrics',
+                                                        score.metric,
+                                                        'display_name',
+                                                        t('Performance Review')
+                                                    )}
                                                 </div>
                                                 <div className="text-sm text-(--color-text-tertiary)">
                                                     {score.period_start && score.period_end

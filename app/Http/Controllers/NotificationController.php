@@ -47,7 +47,8 @@ class NotificationController extends Controller
         $user = Auth::user();
         $this->notificationService->markAllAsRead($user);
 
-        return back()->with('success', 'All notifications marked as read.');
+        // Start Update 15 September 2026, by @WNP: Return localized notification-center success feedback.
+        return back()->with('success', __('alerts.notifications_marked_read'));
     }
 
     /**

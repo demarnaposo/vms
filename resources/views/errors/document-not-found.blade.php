@@ -99,7 +99,7 @@
     <script>
         (function() {
             try {
-                var theme = localStorage.getItem('vendorflow-theme') || 'aurora';
+                var theme = localStorage.getItem('vms-theme') || 'aurora';
                 document.documentElement.dataset.theme = theme;
             } catch (e) {}
         })();

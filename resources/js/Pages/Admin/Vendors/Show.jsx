@@ -18,6 +18,10 @@ import { formatDate, formatDateTime } from '@/utils/dateFormatters';
 import { useLanguage } from '@/Contexts/LanguageContext';
 // Start Update 13 September 2026, by @WNP: Translate only known automatic vendor timeline comments.
 import { translateTimelineComment } from '@/i18n/timelineComments';
+// Start Update 15 September 2026, by @WNP: Translate only fixed document types in vendor details.
+import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
+// Start Update 15 September 2026, by @WNP: Localize recognized compliance master labels in the vendor tab.
+import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 
 export default function VendorShow({
     vendor,
@@ -367,9 +371,12 @@ export default function VendorShow({
                                             >
                                                 <span className="w-2 h-2 rounded-full bg-(--color-danger) shrink-0" />
                                                 <span className="text-(--color-text-secondary)">
-                                                    {/* Start Update 12 September 2026, by @WNP: Keep the stored document type label unchanged. */}
-                                                    {d.document_type}:{' '}
-                                                    <Badge status={d.verification_status} />
+                                                    {/* Start Update 15 September 2026, by @WNP: Localize recognized master labels in verification readiness. */}
+                                                    {translateDocumentTypeLabel(
+                                                        language,
+                                                        d.document_type
+                                                    )}
+                                                    : <Badge status={d.verification_status} />
                                                 </span>
                                             </div>
                                         ))}
@@ -406,8 +413,11 @@ export default function VendorShow({
                                     >
                                         <td className="p-4 text-(--color-text-primary)">
                                             <div>
-                                                {/* Start Update 12 September 2026, by @WNP: Render document type names from the database verbatim. */}
-                                                {doc.document_type?.display_name}
+                                                {/* Start Update 15 September 2026, by @WNP: Translate fixed master labels and preserve custom names. */}
+                                                {translateDocumentTypeLabel(
+                                                    language,
+                                                    doc.document_type
+                                                )}
                                                 {doc.verification_status === 'rejected' &&
                                                     doc.verification_notes && (
                                                         <div className="text-xs text-(--color-danger) mt-0.5">
@@ -511,9 +521,14 @@ export default function VendorShow({
                             <div className="flex items-center justify-between">
                                 <div>
                                     <div className="text-(--color-text-primary) font-medium">
-                                        {/* Start Update 12 September 2026, by @WNP: Keep database rule names unchanged alongside document data. */}
-                                        {/* Start Update 12 September 2026, by @WNP: Keep the original database compliance rule name. */}
-                                        {result.rule?.name}
+                                        {/* Start Update 15 September 2026, by @WNP: Translate system rule labels and preserve custom names. */}
+                                        {translateSystemMasterDataField(
+                                            language,
+                                            'compliance_rules',
+                                            result.rule,
+                                            'display_name',
+                                            result.rule?.name
+                                        )}
                                     </div>
                                     <div className="text-sm text-(--color-text-secondary)">
                                         {result.details}

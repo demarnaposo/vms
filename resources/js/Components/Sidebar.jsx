@@ -5,6 +5,8 @@ import Logo from './Logo';
 // Start Update 11 September 2026, by @WNP: Translate sidebar content and expose the global language switch.
 import LanguageSwitcher from './LanguageSwitcher';
 import { useLanguage } from '@/Contexts/LanguageContext';
+// Start Update 15 September 2026, by @WNP: Resolve authenticated role codes through VMS master-data labels.
+import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 
 // =====================================
 // SIDEBAR CONFIGURATION
@@ -262,8 +264,8 @@ export default function Sidebar({
     onClose = () => {},
 }) {
     const { auth } = usePage().props;
-    // Start Update 11 September 2026, by @WNP: Translate sidebar labels without changing route or active-item identifiers.
-    const { t } = useLanguage();
+    // Start Update 15 September 2026, by @WNP: Read the selected language for sidebar labels and role master data.
+    const { language, t } = useLanguage();
     const user = auth?.user;
     const can = auth?.can || {};
     const roles = auth?.roles || [];
@@ -288,8 +290,21 @@ export default function Sidebar({
             badge: badges[item.name] || null,
         }));
 
+    // Start Update 15 September 2026, by @WNP: Translate fixed roles and retain unknown role codes as readable fallbacks.
     const roleDisplay =
-        roles.length > 0 ? roles.map((role) => role.replace(/_/g, ' ')).join(', ') : 'Staff';
+        roles.length > 0
+            ? roles
+                  .map((role) =>
+                      translateSystemMasterDataField(
+                          language,
+                          'roles',
+                          { name: role },
+                          'display_name',
+                          role.replace(/_/g, ' ')
+                      )
+                  )
+                  .join(', ')
+            : t('Staff');
 
     const logoText = variant === 'vendor' ? 'Vendor Portal' : 'Admin Panel';
 

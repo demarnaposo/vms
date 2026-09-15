@@ -163,7 +163,7 @@ class VendorOnboardingTest extends TestCase
                 'bank_name' => 'Bank Mandiri',
                 'bank_account_number' => '1234567890',
                 'bank_ifsc' => '008',
-                'bank_branch' => 'KCP Bandung Dago',
+                'bank_branch' => 'KCP Jakarta Menteng',
             ])
             ->assertSessionHasNoErrors();
 
@@ -203,7 +203,7 @@ class VendorOnboardingTest extends TestCase
                 'bank_name' => 'Bank Mandiri',
                 'bank_account_number' => '1234567890',
                 'bank_ifsc' => '008',
-                'bank_branch' => 'KCP Bandung Dago',
+                'bank_branch' => 'KCP Jakarta Menteng',
             ]);
 
         $response->assertRedirect(route('vendor.onboarding', ['step' => 3]));

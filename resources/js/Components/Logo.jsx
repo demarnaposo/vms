@@ -2,7 +2,7 @@ import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 
 /**
- * Reusable Logo component for VendorFlow
+ * Reusable Logo component for VMS
  * Shows image if available, falls back to text if image fails to load
  * @param {Object} props
  * @param {string} [props.size='md'] - Size: 'sm' | 'md' | 'lg' | 'xl' | '2xl'
@@ -34,7 +34,7 @@ export default function Logo({ size = 'md', light = false, linkToHome = true, cl
             {!imageError ? (
                 <img
                     src="/images/logo.png"
-                    alt="VendorFlow"
+                    alt="VMS"
                     className={sizes[size] || sizes.md}
                     onError={() => setImageError(true)}
                 />
@@ -42,7 +42,7 @@ export default function Logo({ size = 'md', light = false, linkToHome = true, cl
                 <span
                     className={`font-bold ${textSizes[size] || textSizes.md} ${light ? 'text-(--color-text-primary)' : 'text-white'}`}
                 >
-                    VendorFlow
+                    VMS
                 </span>
             )}
         </div>

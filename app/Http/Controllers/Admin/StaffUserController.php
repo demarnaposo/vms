@@ -39,6 +39,8 @@ class StaffUserController extends Controller
                     'created_at' => $user->created_at?->toDateTimeString(),
                     'roles' => $user->roles->pluck('name')->values(),
                     'role_labels' => $user->roles->pluck('display_name')->values(),
+                    // Start Update 15 September 2026, by @WNP: Pair stable role keys with labels for selective master-data translation.
+                    'role_items' => $user->roles->map->only(['name', 'display_name'])->values(),
                 ];
             });
 

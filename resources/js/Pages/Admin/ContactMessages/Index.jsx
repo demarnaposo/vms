@@ -6,8 +6,9 @@ import { useState } from 'react';
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function Index() {
-    // Start Update 13 September 2026, by @WNP: Use the selected language only for static enum labels.
-    const { t } = useLanguage();
+    // Start Update 15 September 2026, by @WNP: Use the selected language for static message labels and received dates.
+    const { language, t } = useLanguage();
+    const dateLocale = language === 'id' ? 'id-ID' : 'en-IN';
     const { messages, stats, filters } = usePage().props;
     const [search, setSearch] = useState(filters?.search || '');
 
@@ -52,7 +53,8 @@ export default function Index() {
             header: 'Received',
             render: (row) => (
                 <span className="text-(--color-text-secondary)">
-                    {formatDateTime(row.created_at)}
+                    {/* Start Update 15 September 2026, by @WNP: Format received timestamps in the active UI locale. */}
+                    {formatDateTime(row.created_at, dateLocale)}
                 </span>
             ),
         },
@@ -77,11 +79,12 @@ export default function Index() {
             subtitle="Manage and respond to customer inquiries"
             actions={
                 <form onSubmit={handleSearch} className="flex gap-2">
+                    {/* Start Update 15 September 2026, by @WNP: Localize the fixed message-search placeholder. */}
                     <input
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Search messages..."
+                        placeholder={t('Search messages...')}
                         className="input-field"
                     />
                     <Button type="submit">Search</Button>
@@ -98,7 +101,10 @@ export default function Index() {
                     <div className="card p-5 rounded-2xl border-2 border-(--color-text-tertiary)">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-(--color-text-tertiary) mb-1">Total</p>
+                                {/* Start Update 15 September 2026, by @WNP: Localize the fixed total summary label. */}
+                                <p className="text-sm text-(--color-text-tertiary) mb-1">
+                                    {t('Total')}
+                                </p>
                                 <p className="text-2xl font-bold text-(--color-text-primary)">
                                     {stats?.total || 0}
                                 </p>

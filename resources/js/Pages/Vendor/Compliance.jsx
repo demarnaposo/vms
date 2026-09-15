@@ -1,10 +1,13 @@
 import { VendorLayout, PageHeader, Card, Badge, AppIcon } from '@/Components';
 // Start Update 12 September 2026, by @WNP: Translate vendor compliance UI while keeping stored rule data unchanged.
 import { useLanguage } from '@/Contexts/LanguageContext';
+// Start Update 15 September 2026, by @WNP: Localize fixed compliance master records for vendors.
+import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 
 export default function Compliance({ vendor, complianceResults = [], rules = [] }) {
     // Start Update 12 September 2026, by @WNP: Resolve only static score, status, and guidance copy.
-    const { t } = useLanguage();
+    // Start Update 15 September 2026, by @WNP: Read the selected language for compliance master data.
+    const { language, t } = useLanguage();
     const complianceScore = vendor?.compliance_score || 0;
     const passedRules = complianceResults.filter((r) => r.status === 'pass').length;
     const failedRules = complianceResults.filter((r) => r.status === 'fail').length;
@@ -156,11 +159,24 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2">
                                                     <h3 className="font-semibold text-(--color-text-primary)">
-                                                        {rule.name}
+                                                        {/* Start Update 15 September 2026, by @WNP: Translate recognized system rule labels. */}
+                                                        {translateSystemMasterDataField(
+                                                            language,
+                                                            'compliance_rules',
+                                                            rule,
+                                                            'display_name',
+                                                            rule.name
+                                                        )}
                                                     </h3>
                                                 </div>
                                                 <p className="text-sm text-(--color-text-tertiary) mt-1">
-                                                    {rule.description}
+                                                    {/* Start Update 15 September 2026, by @WNP: Keep custom descriptions raw. */}
+                                                    {translateSystemMasterDataField(
+                                                        language,
+                                                        'compliance_rules',
+                                                        rule,
+                                                        'description'
+                                                    )}
                                                 </p>
                                                 {result?.details && (
                                                     <p

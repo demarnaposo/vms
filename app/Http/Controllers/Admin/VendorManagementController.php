@@ -108,7 +108,8 @@ class VendorManagementController extends Controller
             }
 
             return [
-                'document_type' => $docType->display_name,
+                // Start Update 15 September 2026, by @WNP: Expose the stable master key so the UI translates only system document types.
+                'document_type' => $docType->only(['name', 'display_name']),
                 'is_uploaded' => $doc !== null,
                 'verification_status' => $doc === null ? 'missing' : $doc->verification_status,
                 'is_verified' => $isVerified,

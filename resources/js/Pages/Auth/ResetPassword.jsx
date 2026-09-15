@@ -21,7 +21,7 @@ export default function ResetPassword({ token, email }) {
 
     return (
         <>
-            <Head title={`${t('Reset Password')} - VendorFlow`} />
+            <Head title={`${t('Reset Password')} - VMS`} />
             <div className="min-h-screen flex items-center justify-center p-8 bg-(--color-bg-secondary)">
                 {/* Start Update 11 September 2026, by @WNP: Keep language selection available on the reset form. */}
                 <div className="fixed right-4 top-4 z-50">

@@ -4,9 +4,12 @@ import { AppIcon, Badge, Card, LinkButton, PageHeader, VendorLayout } from '@/Co
 import { formatCurrency } from '@/utils/currencyFormatters';
 // Start Update 11 September 2026, by @WNP: Translate vendor dashboard status and actions.
 import { useLanguage } from '@/Contexts/LanguageContext';
+// Start Update 15 September 2026, by @WNP: Localize fixed document master labels on the vendor dashboard.
+import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
 
 export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) {
-    const { t } = useLanguage();
+    // Start Update 15 September 2026, by @WNP: Read the language used for system document types.
+    const { language, t } = useLanguage();
     // Start Update 11 September 2026, by @WNP: Read the shared IDR settings supplied by Laravel.
     const { auth, currency } = usePage().props;
     const user = auth?.user;
@@ -221,7 +224,11 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                                                 {doc.file_name}
                                             </div>
                                             <div className="text-xs text-(--color-text-tertiary)">
-                                                {doc.document_type?.display_name}
+                                                {/* Start Update 15 September 2026, by @WNP: Preserve custom types while translating master labels. */}
+                                                {translateDocumentTypeLabel(
+                                                    language,
+                                                    doc.document_type
+                                                )}
                                             </div>
                                         </div>
                                     </div>

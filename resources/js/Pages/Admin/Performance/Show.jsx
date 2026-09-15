@@ -2,6 +2,8 @@ import { Link } from '@inertiajs/react';
 import { AdminLayout, Badge, Card, DataTable, PageHeader, StatCard, StatGrid } from '@/Components';
 // Start Update 13 September 2026, by @WNP: Translate fixed performance detail copy while retaining vendor and metric data.
 import { useLanguage } from '@/Contexts/LanguageContext';
+// Start Update 15 September 2026, by @WNP: Localize recognized performance master metric labels.
+import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 
 export default function PerformanceShow({ vendor, breakdown = [], history = [] }) {
     // Start Update 13 September 2026, by @WNP: Keep the company name outside translation lookup.
@@ -25,7 +27,16 @@ export default function PerformanceShow({ vendor, breakdown = [], history = [] }
         {
             header: 'Metric',
             render: (row) => (
-                <span className="font-medium text-(--color-text-primary)">{row.metric_name}</span>
+                <span className="font-medium text-(--color-text-primary)">
+                    {/* Start Update 15 September 2026, by @WNP: Translate fixed metric labels and retain custom names. */}
+                    {translateSystemMasterDataField(
+                        language,
+                        'performance_metrics',
+                        row.metric,
+                        'display_name',
+                        row.metric_name
+                    )}
+                </span>
             ),
         },
         {

@@ -34,6 +34,29 @@ class AlertLocalizationTest extends TestCase
             ->assertSessionHas('success', 'Notifikasi berhasil dikirim kepada 0 penerima.');
     }
 
+    // Start Update 15 September 2026, by @WNP: Verify send-notification validation uses Indonesian field names.
+    public function test_notification_form_validation_uses_indonesian_labels(): void
+    {
+        $role = Role::firstOrCreate(['name' => 'ops_manager'], ['display_name' => 'Ops Manager']);
+        $admin = User::factory()->create();
+        $admin->roles()->attach($role);
+
+        $this->actingAs($admin)
+            ->withUnencryptedCookie('vms_locale', 'id')
+            ->post('/admin/notifications/send', [
+                'title' => '',
+                'message' => '',
+                'severity' => 'info',
+                'target' => 'all_vendors',
+                'action_url' => 'not-a-url',
+            ])
+            ->assertSessionHasErrors([
+                'title' => 'judul wajib diisi.',
+                'message' => 'pesan wajib diisi.',
+                'action_url' => 'URL tindakan harus berupa URL yang valid.',
+            ]);
+    }
+
     public function test_password_reset_feedback_uses_indonesian(): void
     {
         Notification::fake();

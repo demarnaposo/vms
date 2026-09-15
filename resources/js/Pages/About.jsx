@@ -37,20 +37,20 @@ export default function About() {
     const { t } = useLanguage();
 
     return (
-        <GuestLayout title="About - VendorFlow">
+        <GuestLayout title="About - VMS">
             <section className="py-16 lg:py-24">
                 <div className="max-w-6xl mx-auto px-6 lg:px-8">
                     <div className="max-w-3xl animate-fade-in">
                         <div className="inline-flex items-center gap-2 rounded-full border border-(--color-border-primary) bg-(--color-bg-primary)/80 px-4 py-2 text-sm text-(--color-text-secondary)">
                             <AppIcon name="info" className="h-4 w-4" />
-                            <span>{t('About VendorFlow')}</span>
+                            <span>{t('About VMS')}</span>
                         </div>
                         <h1 className="mt-6 text-4xl lg:text-5xl font-bold text-(--color-text-primary) leading-tight">
                             {t('We build vendor operations software that stays simple at scale.')}
                         </h1>
                         <p className="mt-5 text-lg text-(--color-text-tertiary)">
                             {t(
-                                'VendorFlow helps teams replace scattered spreadsheets and email chains with one structured workflow for onboarding, compliance, and payments.'
+                                'VMS helps teams replace scattered spreadsheets and email chains with one structured workflow for onboarding, compliance, and payments.'
                             )}
                         </p>
                     </div>
@@ -120,7 +120,7 @@ export default function About() {
                 <div className="max-w-4xl mx-auto px-6 lg:px-8">
                     <div className="surface-panel p-8 text-center">
                         <h2 className="text-3xl font-bold text-(--color-text-primary)">
-                            {t('Want to see VendorFlow in action?')}
+                            {t('Want to see VMS in action?')}
                         </h2>
                         <p className="mt-3 text-(--color-text-tertiary)">
                             {t('Explore the platform and tailor it to your workflows.')}

@@ -52,16 +52,19 @@ export function formatDateTime(value, locale = 'en-IN') {
  * @param {string|Date} value
  * @returns {string}
  */
-export function formatRelativeTime(value) {
+// Start Update 15 September 2026, by @WNP: Format notification relative time with the selected UI locale.
+export function formatRelativeTime(value, locale = 'en-US') {
     if (!value) return '-';
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return String(value);
     const now = new Date();
     const diffMs = now - date;
 
-    if (diffMs < 60000) return 'Just now';
-    if (diffMs < 3600000) return `${Math.floor(diffMs / 60000)} min ago`;
-    if (diffMs < 86400000) return `${Math.floor(diffMs / 3600000)} hours ago`;
-    if (diffMs < 604800000) return `${Math.floor(diffMs / 86400000)} days ago`;
-    return date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+    const relativeTime = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+
+    if (diffMs < 60000) return relativeTime.format(0, 'second');
+    if (diffMs < 3600000) return relativeTime.format(-Math.floor(diffMs / 60000), 'minute');
+    if (diffMs < 86400000) return relativeTime.format(-Math.floor(diffMs / 3600000), 'hour');
+    if (diffMs < 604800000) return relativeTime.format(-Math.floor(diffMs / 86400000), 'day');
+    return date.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
 }

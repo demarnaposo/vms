@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title inertia>{{ config('app.name', 'VendorFlow') }}</title>
+    <title inertia>{{ config('app.name', 'VMS') }}</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
     <link rel="dns-prefetch" href="https://fonts.bunny.net">
@@ -15,7 +15,7 @@
     <script>
         (function() {
             try {
-                var theme = localStorage.getItem('vendorflow-theme') || 'aurora';
+                var theme = localStorage.getItem('vms-theme') || 'aurora';
                 document.documentElement.dataset.theme = theme;
                 if (theme === 'midnight') {
                     document.documentElement.classList.add('dark');

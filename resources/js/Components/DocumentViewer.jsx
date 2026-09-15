@@ -3,6 +3,8 @@ import AppIcon from './AppIcon';
 import { formatDate } from '@/utils/dateFormatters';
 // Start Update 12 September 2026, by @WNP: Translate shared document preview controls for admin and vendor pages.
 import { useLanguage } from '@/Contexts/LanguageContext';
+// Start Update 15 September 2026, by @WNP: Translate only fixed master document type labels in previews.
+import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
 
 export function DocumentViewer({ document, isOpen, onClose }) {
     // Start Update 12 September 2026, by @WNP: Resolve preview labels using the active language.
@@ -83,8 +85,12 @@ export function DocumentViewer({ document, isOpen, onClose }) {
                         </span>
                         <div className="min-w-0">
                             <h3 className="font-semibold text-(--color-text-primary) truncate max-w-md">
-                                {/* Start Update 12 September 2026, by @WNP: Show stored document type names without translation in the preview. */}
-                                {document.document_type?.display_name || t('Document')}
+                                {/* Start Update 15 September 2026, by @WNP: Localize fixed master labels and preserve custom document names. */}
+                                {translateDocumentTypeLabel(
+                                    language,
+                                    document.document_type,
+                                    t('Document')
+                                )}
                             </h3>
                             <p className="text-sm text-(--color-text-tertiary) truncate max-w-md">
                                 {fileName}

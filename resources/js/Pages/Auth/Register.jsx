@@ -1,6 +1,8 @@
 import { Link, useForm } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
 import Logo from '@/Components/Logo';
+// Start Update 15 September 2026, by @WNP: Reuse the accessible password visibility input on registration.
+import PasswordInput from '@/Components/PasswordInput';
 // Start Update 11 September 2026, by @WNP: Enable bilingual registration content and language selection.
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { useLanguage } from '@/Contexts/LanguageContext';
@@ -22,7 +24,7 @@ export default function Register() {
 
     return (
         <>
-            <Head title={`${t('Sign Up')} - VendorFlow`} />
+            <Head title={`${t('Sign Up')} - VMS`} />
             <div className="min-h-screen flex">
                 {/* Start Update 11 September 2026, by @WNP: Keep language selection available on the registration page. */}
                 <div className="fixed right-4 top-4 z-50">
@@ -80,7 +82,7 @@ export default function Register() {
                         </div>
 
                         <div className="text-white/80 text-sm">
-                            (c) 2026 VendorFlow. {t('All rights reserved.')}
+                            (c) 2026 VMS. {t('All rights reserved.')}
                         </div>
                     </div>
                 </div>
@@ -105,12 +107,13 @@ export default function Register() {
                                 <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
                                     {t('Full Name')}
                                 </label>
+                                {/* Start Update 15 September 2026, by @WNP: Localize the static full-name example on registration. */}
                                 <input
                                     type="text"
                                     value={form.data.name}
                                     onChange={(e) => form.setData('name', e.target.value)}
                                     className="w-full px-4 py-3 rounded-lg border border-(--color-border-primary) focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-primary)/20 transition-colors bg-(--color-bg-primary)"
-                                    placeholder="John Doe"
+                                    placeholder={t('John Doe')}
                                     required
                                 />
                                 {form.errors.name && (
@@ -124,12 +127,13 @@ export default function Register() {
                                 <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
                                     {t('Email')}
                                 </label>
+                                {/* Start Update 15 September 2026, by @WNP: Localize the static email example on registration. */}
                                 <input
                                     type="email"
                                     value={form.data.email}
                                     onChange={(e) => form.setData('email', e.target.value)}
                                     className="w-full px-4 py-3 rounded-lg border border-(--color-border-primary) focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-primary)/20 transition-colors bg-(--color-bg-primary)"
-                                    placeholder="you@company.com"
+                                    placeholder={t('you@company.com')}
                                     required
                                 />
                                 {form.errors.email && (
@@ -143,12 +147,13 @@ export default function Register() {
                                 <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
                                     {t('Password')}
                                 </label>
-                                <input
-                                    type="password"
+                                {/* Start Update 15 September 2026, by @WNP: Let users show or hide their new registration password. */}
+                                <PasswordInput
                                     value={form.data.password}
                                     onChange={(e) => form.setData('password', e.target.value)}
                                     className="w-full px-4 py-3 rounded-lg border border-(--color-border-primary) focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-primary)/20 transition-colors bg-(--color-bg-primary)"
                                     placeholder="Min 8 characters"
+                                    autoComplete="new-password"
                                     required
                                 />
                                 {form.errors.password && (
@@ -162,14 +167,15 @@ export default function Register() {
                                 <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
                                     {t('Confirm Password')}
                                 </label>
-                                <input
-                                    type="password"
+                                {/* Start Update 15 September 2026, by @WNP: Give password confirmation its own independent visibility control. */}
+                                <PasswordInput
                                     value={form.data.password_confirmation}
                                     onChange={(e) =>
                                         form.setData('password_confirmation', e.target.value)
                                     }
                                     className="w-full px-4 py-3 rounded-lg border border-(--color-border-primary) focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-primary)/20 transition-colors bg-(--color-bg-primary)"
                                     placeholder="Repeat password"
+                                    autoComplete="new-password"
                                     required
                                 />
                             </div>

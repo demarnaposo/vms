@@ -9,8 +9,13 @@ import {
     AppIcon,
 } from '@/Components';
 import { formatDateTime } from '@/utils/dateFormatters';
+// Start Update 15 September 2026, by @WNP: Translate the shared notification-center interface without altering database content.
+import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function NotificationsIndex({ notifications, unreadCount }) {
+    // Start Update 15 September 2026, by @WNP: Use the selected language for fixed copy and notification timestamps.
+    const { language, t } = useLanguage();
+    const dateLocale = language === 'id' ? 'id-ID' : 'en-US';
     const { auth } = usePage().props;
     const isVendor = auth?.roles?.includes('vendor');
 
@@ -37,11 +42,14 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
     };
 
     const displayNotifications = notifications?.data || notifications || [];
+    const resolvedUnreadCount =
+        unreadCount ?? displayNotifications.filter((n) => !n.read_at).length;
 
     const header = (
+        // Start Update 15 September 2026, by @WNP: Localize the unread count while preserving its dynamic value.
         <PageHeader
             title="Notifications"
-            subtitle={`${unreadCount || displayNotifications.filter((n) => !n.read_at).length} unread`}
+            subtitle={t(':count unread', { count: resolvedUnreadCount })}
             actions={
                 <Button variant="ghost" onClick={markAllAsRead}>
                     Mark all as read
@@ -100,7 +108,10 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
                                                 {notification.data?.message}
                                             </p>
                                             <div className="text-xs text-(--color-text-tertiary)">
-                                                {formatDateTime(notification.created_at)}
+                                                {formatDateTime(
+                                                    notification.created_at,
+                                                    dateLocale
+                                                )}
                                             </div>
                                         </div>
                                     </div>

@@ -4,6 +4,8 @@ import { AdminLayout, AppIcon, Card, PageHeader, StatCard, StatGrid } from '@/Co
 import { formatCurrency } from '@/utils/currencyFormatters';
 // Start Update 11 September 2026, by @WNP: Translate admin dashboard actions and empty states.
 import { useLanguage } from '@/Contexts/LanguageContext';
+// Start Update 15 September 2026, by @WNP: Localize fixed document master labels on the dashboard.
+import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
 
 export default function AdminDashboard({
     stats = {},
@@ -11,7 +13,8 @@ export default function AdminDashboard({
     pendingDocuments = [],
     pendingPayments = [],
 }) {
-    const { t } = useLanguage();
+    // Start Update 15 September 2026, by @WNP: Read the language used for system document types.
+    const { language, t } = useLanguage();
     // Start Update 11 September 2026, by @WNP: Read the shared IDR settings supplied by Laravel.
     const { auth, currency } = usePage().props;
 
@@ -184,7 +187,11 @@ export default function AdminDashboard({
                                                 </div>
                                                 <div>
                                                     <div className="font-semibold text-(--color-text-primary)">
-                                                        {doc.document_type}
+                                                        {/* Start Update 15 September 2026, by @WNP: Translate only recognized system document types. */}
+                                                        {translateDocumentTypeLabel(
+                                                            language,
+                                                            doc.document_type
+                                                        )}
                                                     </div>
                                                     <div className="text-sm text-(--color-text-secondary)">
                                                         {doc.vendor_name}

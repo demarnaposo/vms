@@ -301,4 +301,19 @@ class VendorManagementTest extends TestCase
 
         $this->assertSame(Vendor::STATUS_ACTIVE, $this->vendor->fresh()->status);
     }
+
+    // Start Update 14 September 2026, by @WNP: Confirm suspension and termination use the Indonesian comment field name.
+    public function test_indonesian_suspension_and_termination_require_komentar(): void
+    {
+        $this->vendor->update(['status' => Vendor::STATUS_ACTIVE]);
+
+        foreach (['suspend', 'terminate'] as $action) {
+            $this->actingAs($this->adminUser)
+                ->withUnencryptedCookie('vms_locale', 'id')
+                ->post(route("admin.vendors.{$action}", $this->vendor), [])
+                ->assertSessionHasErrors(['comment' => 'komentar wajib diisi.']);
+        }
+
+        $this->assertSame(Vendor::STATUS_ACTIVE, $this->vendor->fresh()->status);
+    }
 }

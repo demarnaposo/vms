@@ -35,7 +35,7 @@ export default function VendorLayout({
             bg: 'bg-(--color-warning-light) border-b border-(--color-warning)',
             text: 'text-(--color-warning-dark)',
             icon: 'warning',
-            message: 'Please complete your onboarding to start using VendorFlow',
+            message: 'Please complete your onboarding to start using VMS',
         },
         submitted: {
             bg: 'bg-(--color-info-light)/70 border-b border-(--color-border-primary)',

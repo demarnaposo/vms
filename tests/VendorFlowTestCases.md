@@ -1,4 +1,4 @@
-# VendorFlow - Comprehensive Test Cases
+# VMS - Comprehensive Test Cases
 
 ## Table of Contents
 1. [Authentication & Authorization (Module 1)](#module-1-authentication--authorization)
@@ -399,7 +399,7 @@ php artisan test --coverage
 ---
 
 ## Document Information
-- **Project**: VendorFlow
+- **Project**: VMS
 - **Version**: 1.0
 - **Created**: 2026-01-16
 - **Author**: Auto-generated from project analysis

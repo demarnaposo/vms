@@ -57,7 +57,7 @@ export default function Contact() {
     };
 
     return (
-        <GuestLayout title="Contact - VendorFlow">
+        <GuestLayout title="Contact - VMS">
             <section className="py-16 lg:py-24">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="grid lg:grid-cols-2 gap-10">
@@ -65,7 +65,7 @@ export default function Contact() {
                             <div>
                                 <div className="inline-flex items-center gap-2 rounded-full border border-(--color-border-primary) bg-(--color-bg-primary)/80 px-4 py-2 text-sm text-(--color-text-secondary)">
                                     <AppIcon name="messages" className="h-4 w-4" />
-                                    <span>{t('Contact VendorFlow')}</span>
+                                    <span>{t('Contact VMS')}</span>
                                 </div>
                                 <h1 className="mt-6 text-4xl lg:text-5xl font-bold text-(--color-text-primary)">
                                     {t('Let us help you simplify vendor operations')}

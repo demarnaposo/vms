@@ -26,6 +26,9 @@ class StaffUserManagementTest extends TestCase
             fn ($page) => $page
                 ->component('Admin/Staff/Index')
                 ->has('availableRoles')
+                // Start Update 15 September 2026, by @WNP: Expose stable role keys beside display labels for localization.
+                ->where('staffUsers.0.role_items.0.name', Role::SUPER_ADMIN)
+                ->where('staffUsers.0.role_items.0.display_name', 'Super Admin')
         );
     }
 

@@ -10,8 +10,13 @@ import {
     DataTable,
     FormInput,
 } from '@/Components';
+// Start Update 15 September 2026, by @WNP: Translate fixed document master labels in the expiry report.
+import { useLanguage } from '@/Contexts/LanguageContext';
+import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
 
 export default function DocumentExpiryReport({ documents, stats, filters }) {
+    // Start Update 15 September 2026, by @WNP: Read the selected language for master document labels.
+    const { language } = useLanguage();
     const { auth } = usePage().props;
     const can = auth?.can || {};
 
@@ -52,7 +57,8 @@ export default function DocumentExpiryReport({ documents, stats, filters }) {
             label: 'Document Type',
             render: (row) => (
                 <span className="text-(--color-text-secondary)">
-                    {row.document_type?.display_name || row.document_type?.name || 'N/A'}
+                    {/* Start Update 15 September 2026, by @WNP: Translate recognized master types and retain custom report values. */}
+                    {translateDocumentTypeLabel(language, row.document_type, 'N/A')}
                 </span>
             ),
         },

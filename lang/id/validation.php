@@ -5,6 +5,8 @@ return [
     'accepted' => ':attribute harus diterima.',
     'boolean' => ':attribute harus bernilai benar atau salah.',
     'confirmed' => 'Konfirmasi :attribute tidak cocok.',
+    // Start Update 15 September 2026, by @WNP: Localize an incorrect current-password response on profile settings.
+    'current_password' => 'Kata sandi saat ini tidak sesuai.',
     'date' => ':attribute harus berupa tanggal yang valid.',
     'email' => ':attribute harus berupa alamat email yang valid.',
     'in' => ':attribute yang dipilih tidak valid.',
@@ -28,15 +30,32 @@ return [
     'string' => ':attribute harus berupa teks.',
     'unique' => ':attribute sudah digunakan.',
     'uploaded' => ':attribute gagal diunggah.',
+    // Start Update 15 September 2026, by @WNP: Localize URL validation used by the send-notification form.
+    'url' => ':attribute harus berupa URL yang valid.',
 
     'attributes' => [
         'name' => 'nama',
         'email' => 'email',
         'password' => 'kata sandi',
         'password_confirmation' => 'konfirmasi kata sandi',
+        // Start Update 15 September 2026, by @WNP: Use Indonesian profile field names in validation feedback.
+        'current_password' => 'kata sandi saat ini',
+        'phone' => 'nomor telepon / ponsel',
         'company_name' => 'nama perusahaan',
         'contact_person' => 'narahubung',
         'contact_phone' => 'nomor telepon',
+        // Start Update 14 September 2026, by @WNP: Show the Indonesian field name in vendor action comment validation errors.
+        'comment' => 'komentar',
+        // Start Update 15 September 2026, by @WNP: Localize contact-message status and internal-note validation attributes.
+        'status' => 'status',
+        'admin_notes' => 'catatan internal',
+        // Start Update 15 September 2026, by @WNP: Localize send-notification validation attribute names.
+        'title' => 'judul',
+        'message' => 'pesan',
+        'severity' => 'tingkat keparahan',
+        'target' => 'tujuan pengiriman',
+        'target_id' => 'penerima',
+        'action_url' => 'URL tindakan',
         'address' => 'alamat',
         'city' => 'kabupaten atau kota',
         'state' => 'provinsi',

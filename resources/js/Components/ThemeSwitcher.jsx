@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import AppIcon from './AppIcon';
 
-const STORAGE_KEY = 'vendorflow-theme';
+const STORAGE_KEY = 'vms-theme';
 const DEFAULT_THEME = 'aurora';
 
 const THEME_OPTIONS = [

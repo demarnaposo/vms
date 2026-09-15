@@ -3,6 +3,8 @@
 // Start Update 12 September 2026, by @WNP: Keep dynamic alert copy separate from database and user-provided values.
 return [
     'notification_sent' => 'Notification sent to :count recipient(s).',
+    // Start Update 15 September 2026, by @WNP: Centralize notification-center success feedback.
+    'notifications_marked_read' => 'All notifications marked as read.',
     'document_verified' => ':document verified successfully.',
     'document_rejected' => ':document rejected.',
     'vendor_account_status' => 'Your vendor account is currently :status. Please contact support.',

@@ -2,10 +2,13 @@ import { Link, useForm } from '@inertiajs/react';
 import { AdminLayout, PageHeader, Card, Button } from '@/Components';
 // Start Update 13 September 2026, by @WNP: Translate rating controls while keeping metric records and typed notes unchanged.
 import { useLanguage } from '@/Contexts/LanguageContext';
+// Start Update 15 September 2026, by @WNP: Localize fixed performance metric master records in the rating form.
+import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 
 export default function RateVendor({ vendor, metrics = [] }) {
     // Start Update 13 September 2026, by @WNP: Resolve only fixed rating copy through the current UI language.
-    const { t } = useLanguage();
+    // Start Update 15 September 2026, by @WNP: Read the selected language for metric labels and descriptions.
+    const { language, t } = useLanguage();
     const form = useForm({
         ratings: metrics.map((m) => ({
             metric_id: m.id,
@@ -101,10 +104,22 @@ export default function RateVendor({ vendor, metrics = [] }) {
                                         <div className="flex items-start justify-between mb-3">
                                             <div>
                                                 <div className="text-(--color-text-primary) font-medium">
-                                                    {metric.display_name}
+                                                    {/* Start Update 15 September 2026, by @WNP: Preserve custom metric labels and translate fixed ones. */}
+                                                    {translateSystemMasterDataField(
+                                                        language,
+                                                        'performance_metrics',
+                                                        metric,
+                                                        'display_name'
+                                                    )}
                                                 </div>
                                                 <div className="text-sm text-(--color-text-secondary)">
-                                                    {metric.description}
+                                                    {/* Start Update 15 September 2026, by @WNP: Translate only the recognized master description. */}
+                                                    {translateSystemMasterDataField(
+                                                        language,
+                                                        'performance_metrics',
+                                                        metric,
+                                                        'description'
+                                                    )}
                                                 </div>
                                                 <span className="text-xs text-(--color-brand-primary) mt-1 inline-block">
                                                     {/* Start Update 13 September 2026, by @WNP: Translate the fixed weight label only. */}

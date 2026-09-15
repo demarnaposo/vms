@@ -87,9 +87,9 @@ Vendor Management System is architected for high availability and scalability, u
 
 The system is pre-configured with the following RBAC accounts for validation and UAT (User Acceptance Testing).
 
-<!-- ### Internal Stakeholders
+### Internal Stakeholders
 | Role | Username | Password | Operational Scope |
 |------|----------|----------|-------------------|
 | **Super Admin** | `admin@vendorflow.com` | `password` | System-wide Audit & Control |
 | **Ops Manager** | `ops@vendorflow.com` | `password` | Vendor Onboarding & Doc Verification |
-| **Finance Controller** | `finance@vendorflow.com` | `password` | Payment Approvals & Disbursement | -->
+| **Finance Controller** | `finance@vendorflow.com` | `password` | Payment Approvals & Disbursement |

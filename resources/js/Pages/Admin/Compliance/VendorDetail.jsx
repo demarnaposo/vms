@@ -2,10 +2,13 @@ import { Link } from '@inertiajs/react';
 import { AdminLayout, PageHeader, Card, StatCard, StatGrid, Badge, Button } from '@/Components';
 // Start Update 12 September 2026, by @WNP: Translate static compliance detail labels without altering vendor or rule data.
 import { useLanguage } from '@/Contexts/LanguageContext';
+// Start Update 15 September 2026, by @WNP: Localize recognized compliance rule master labels.
+import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 
 export default function VendorComplianceDetail({ vendor, results, summary }) {
     // Start Update 12 September 2026, by @WNP: Keep the database company name outside translation lookup.
-    const { t } = useLanguage();
+    // Start Update 15 September 2026, by @WNP: Read the selected language for compliance master data.
+    const { language, t } = useLanguage();
     // Start Update 12 September 2026, by @WNP: Compose a localized heading around the original company name.
     const header = (
         <PageHeader
@@ -109,8 +112,14 @@ export default function VendorComplianceDetail({ vendor, results, summary }) {
                                         className="border-b border-(--color-border-secondary) hover:bg-(--color-bg-hover)"
                                     >
                                         <td className="p-4 text-(--color-text-primary) font-medium">
-                                            {/* Start Update 12 September 2026, by @WNP: Keep the original database rule name. */}
-                                            {result.rule?.name || t('Rule')}
+                                            {/* Start Update 15 September 2026, by @WNP: Translate system rules while preserving custom rule names. */}
+                                            {translateSystemMasterDataField(
+                                                language,
+                                                'compliance_rules',
+                                                result.rule,
+                                                'display_name',
+                                                result.rule?.name || t('Rule')
+                                            )}
                                         </td>
                                         <td className="p-4">
                                             {/* Start Update 13 September 2026, by @WNP: Localize the result enum label only. */}

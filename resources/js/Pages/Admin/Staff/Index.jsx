@@ -11,6 +11,8 @@ import {
 // Start Update 13 September 2026, by @WNP: Localize fixed staff role options and creation dates without translating user records.
 import { useLanguage } from '@/Contexts/LanguageContext';
 import { translateStaffRoleOption } from '@/i18n/staffRoles';
+// Start Update 15 September 2026, by @WNP: Translate recognized role master records in the staff table.
+import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 import { formatDateTime } from '@/utils/dateFormatters';
 
 const INITIAL_FORM_DATA = {
@@ -62,7 +64,12 @@ export default function StaffIndex({ staffUsers = [], availableRoles = [] }) {
             header: 'Roles',
             render: (row) => (
                 <span className="text-(--color-text-secondary)">
-                    {(row.role_labels || []).join(', ') || '-'}
+                    {/* Start Update 15 September 2026, by @WNP: Preserve custom roles and localize fixed master roles. */}
+                    {(row.role_items || [])
+                        .map((role) =>
+                            translateSystemMasterDataField(language, 'roles', role, 'display_name')
+                        )
+                        .join(', ') || '-'}
                 </span>
             ),
         },

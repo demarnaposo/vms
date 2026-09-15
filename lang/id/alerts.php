@@ -3,6 +3,8 @@
 // Start Update 12 September 2026, by @WNP: Translate dynamic alerts while preserving names, status codes, and counts verbatim.
 return [
     'notification_sent' => 'Notifikasi berhasil dikirim kepada :count penerima.',
+    // Start Update 15 September 2026, by @WNP: Localize notification-center success feedback.
+    'notifications_marked_read' => 'Semua notifikasi telah ditandai dibaca.',
     'document_verified' => ':document berhasil diverifikasi.',
     'document_rejected' => ':document ditolak.',
     'vendor_account_status' => 'Akun vendor Anda saat ini berstatus :status. Silakan hubungi dukungan.',

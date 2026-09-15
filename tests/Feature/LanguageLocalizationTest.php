@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+// Start Update 15 September 2026, by @WNP: Verify localized contact-message validation attributes.
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Validator;
 use Tests\TestCase;
 
 // Start Update 11 September 2026, by @WNP: Verify the supported language list and server-side Indonesian validation locale.
@@ -37,5 +40,21 @@ class LanguageLocalizationTest extends TestCase
 
         $response->assertRedirect('/register');
         $this->assertSame('The name field is required.', session('errors')->get('name')[0]);
+    }
+
+    // Start Update 15 September 2026, by @WNP: Keep contact-message validation labels in Indonesian without modifying note content.
+    public function test_contact_message_internal_note_attribute_is_localized(): void
+    {
+        App::setLocale('id');
+
+        $validator = Validator::make(
+            ['admin_notes' => str_repeat('x', 2001)],
+            ['admin_notes' => 'max:2000']
+        );
+
+        $this->assertSame(
+            'catatan internal tidak boleh lebih dari 2000 karakter.',
+            $validator->errors()->first('admin_notes')
+        );
     }
 }

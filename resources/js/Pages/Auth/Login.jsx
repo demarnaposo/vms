@@ -1,6 +1,8 @@
 // Start Update 11 September 2026, by @WNP: Read centralized currency settings on the login page.
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import Logo from '@/Components/Logo';
+// Start Update 15 September 2026, by @WNP: Reuse the accessible password visibility input on login.
+import PasswordInput from '@/Components/PasswordInput';
 // Start Update 11 September 2026, by @WNP: Enable bilingual login content and language selection.
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { useLanguage } from '@/Contexts/LanguageContext';
@@ -25,7 +27,7 @@ export default function Login() {
 
     return (
         <>
-            <Head title={`${t('Login')} - VendorFlow`} />
+            <Head title={`${t('Login')} - VMS`} />
             <div className="min-h-screen flex">
                 {/* Start Update 11 September 2026, by @WNP: Keep language selection available on the login page. */}
                 <div className="fixed right-4 top-4 z-50">
@@ -101,7 +103,7 @@ export default function Login() {
                         </div>
 
                         <div className="text-white/80 text-sm">
-                            (c) 2026 VendorFlow. {t('All rights reserved.')}
+                            (c) 2026 VMS. {t('All rights reserved.')}
                         </div>
                     </div>
                 </div>
@@ -126,12 +128,13 @@ export default function Login() {
                                 <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
                                     {t('Email')}
                                 </label>
+                                {/* Start Update 15 September 2026, by @WNP: Localize the static email example on the login form. */}
                                 <input
                                     type="email"
                                     value={form.data.email}
                                     onChange={(e) => form.setData('email', e.target.value)}
                                     className="w-full px-4 py-3 rounded-lg border border-(--color-border-primary) focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-primary)/20 transition-colors bg-(--color-bg-primary)"
-                                    placeholder="you@company.com"
+                                    placeholder={t('you@company.com')}
                                     required
                                 />
                                 {form.errors.email && (
@@ -145,12 +148,13 @@ export default function Login() {
                                 <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
                                     {t('Password')}
                                 </label>
-                                <input
-                                    type="password"
+                                {/* Start Update 15 September 2026, by @WNP: Let users show or hide the login password without changing its value. */}
+                                <PasswordInput
                                     value={form.data.password}
                                     onChange={(e) => form.setData('password', e.target.value)}
                                     className="w-full px-4 py-3 rounded-lg border border-(--color-border-primary) focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-primary)/20 transition-colors bg-(--color-bg-primary)"
                                     placeholder="********"
+                                    autoComplete="current-password"
                                     required
                                 />
                                 {form.errors.password && (
@@ -204,10 +208,11 @@ export default function Login() {
                                 <p className="text-xs font-medium text-(--color-text-tertiary) mb-2">
                                     {t('Demo Accounts')}
                                 </p>
+                                {/* Start Update 15 September 2026, by @WNP: Translate demo role labels without altering the actual credentials. */}
                                 <div className="grid gap-1 text-xs text-(--color-text-muted)">
-                                    <div>Admin: admin@vendorflow.com / password</div>
-                                    <div>Ops: ops@vendorflow.com / password</div>
-                                    <div>Finance: finance@vendorflow.com / password</div>
+                                    <div>{t('Admin')}: admin@vendorflow.com / password</div>
+                                    <div>{t('Ops')}: ops@vendorflow.com / password</div>
+                                    <div>{t('Finance')}: finance@vendorflow.com / password</div>
                                 </div>
                             </div>
                         )}

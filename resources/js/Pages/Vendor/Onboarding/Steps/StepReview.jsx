@@ -4,9 +4,12 @@ import { AppIcon } from '@/Components';
 import { formatDate } from '@/utils/dateFormatters';
 // Start Update 11 September 2026, by @WNP: Translate the onboarding review through the global language context.
 import { useLanguage } from '@/Contexts/LanguageContext';
+// Start Update 15 September 2026, by @WNP: Reuse selective master document label localization in the review step.
+import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
 
 export default function StepReview({ vendor, sessionData, documentTypes }) {
-    const { t } = useLanguage();
+    // Start Update 15 September 2026, by @WNP: Read the active language for fixed document labels.
+    const { language, t } = useLanguage();
     const step1Session = sessionData?.step1 || {};
     const step2Session = sessionData?.step2 || {};
     const normalizeDocumentTypeId = (typeId) => String(typeId ?? '');
@@ -176,8 +179,9 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                                 const type = documentTypesById.get(
                                     normalizeDocumentTypeId(doc.document_type_id)
                                 );
+                                // Start Update 15 September 2026, by @WNP: Translate a known master type and preserve session fallbacks verbatim.
                                 const displayName =
-                                    type?.display_name ||
+                                    translateDocumentTypeLabel(language, type) ||
                                     doc?.document_type_name ||
                                     (doc?.file_name
                                         ? doc.file_name.replace(/\.[^/.]+$/, '')

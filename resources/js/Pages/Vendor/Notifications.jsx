@@ -2,8 +2,13 @@ import { router } from '@inertiajs/react';
 import { useState } from 'react';
 import { VendorLayout, PageHeader, Card, Button, AppIcon } from '@/Components';
 import { formatRelativeTime } from '@/utils/dateFormatters';
+// Start Update 15 September 2026, by @WNP: Translate vendor notification controls without altering stored notification content.
+import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function Notifications({ vendor, notifications = { data: [] } }) {
+    // Start Update 15 September 2026, by @WNP: Use the selected language for static labels and relative timestamps.
+    const { language, t } = useLanguage();
+    const dateLocale = language === 'id' ? 'id-ID' : 'en-US';
     const [filter, setFilter] = useState('all');
 
     const displayNotifications = notifications.data || [];
@@ -70,9 +75,13 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
     };
 
     const header = (
+        // Start Update 15 September 2026, by @WNP: Localize singular and plural unread counts.
         <PageHeader
             title="Notifications"
-            subtitle={`${unreadCount} unread notification${unreadCount !== 1 ? 's' : ''}`}
+            subtitle={t(
+                unreadCount === 1 ? ':count unread notification' : ':count unread notifications',
+                { count: unreadCount }
+            )}
             actions={
                 unreadCount > 0 && (
                     <Button variant="outline" onClick={handleMarkAllAsRead}>
@@ -110,7 +119,8 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                                     : 'bg-(--color-bg-secondary) text-(--color-text-secondary) hover:bg-(--color-bg-hover)'
                             }`}
                         >
-                            {f.label}
+                            {/* Start Update 15 September 2026, by @WNP: Translate fixed filter labels while preserving filter codes. */}
+                            {t(f.label)}
                             {f.count !== undefined && (
                                 <span
                                     className={`ml-2 px-1.5 py-0.5 rounded-full text-xs ${
@@ -132,11 +142,11 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                             <div className="text-5xl mb-4 inline-flex justify-center w-full">
                                 <AppIcon name="notifications" className="h-12 w-12" />
                             </div>
-                            <p className="text-lg font-medium">No notifications</p>
+                            <p className="text-lg font-medium">{t('No notifications')}</p>
                             <p className="text-sm mt-1">
                                 {filter === 'all'
-                                    ? 'You are all caught up.'
-                                    : `No ${filter} notifications found.`}
+                                    ? t('You are all caught up.')
+                                    : t('No notifications found for this filter.')}
                             </p>
                         </div>
                     ) : (
@@ -177,7 +187,8 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                                                     </h3>
                                                     <span className="text-xs text-(--color-text-muted) whitespace-nowrap">
                                                         {formatRelativeTime(
-                                                            notification.created_at
+                                                            notification.created_at,
+                                                            dateLocale
                                                         )}
                                                     </span>
                                                 </div>
@@ -196,8 +207,9 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                                                         href={notification.data.action_url}
                                                         className="inline-flex items-center gap-1 text-sm text-(--color-brand-primary) hover:underline mt-2"
                                                     >
+                                                        {/* Start Update 15 September 2026, by @WNP: Preserve stored action text and translate only the system fallback. */}
                                                         {notification.data.action_text ||
-                                                            'View Details'}
+                                                            t('View Details')}
                                                     </a>
                                                 )}
                                             </div>
@@ -216,7 +228,7 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                 {displayNotifications.length === 0 && (
                     <div className="bg-(--color-bg-secondary) border border-(--color-border-secondary) rounded-xl p-6">
                         <h3 className="font-semibold text-(--color-text-primary) mb-4">
-                            What notifications will you receive?
+                            {t('What notifications will you receive?')}
                         </h3>
                         <div className="grid md:grid-cols-2 gap-4">
                             {[
@@ -247,10 +259,10 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                                     </span>
                                     <div>
                                         <div className="font-medium text-(--color-text-primary)">
-                                            {item.title}
+                                            {t(item.title)}
                                         </div>
                                         <div className="text-sm text-(--color-text-tertiary)">
-                                            {item.desc}
+                                            {t(item.desc)}
                                         </div>
                                     </div>
                                 </div>
