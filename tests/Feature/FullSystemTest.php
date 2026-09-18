@@ -66,9 +66,10 @@ class FullSystemTest extends TestCase
         // Start Update 11 September 2026, by @WNP: Gunakan lokasi dan kode pos Indonesia pada alur onboarding penuh.
         $companyData = [
             'company_name' => 'Test Corp Ltd',
-            'registration_number' => 'U12345MH2023PTC123456',
-            'tax_id' => '22AAAAA0000A1Z5',
-            'pan_number' => 'ABCDE1234F',
+            // Start Update 16 September 2026, by @WNP: Use NIB and NPWP in the complete onboarding flow.
+            'registration_number' => '1234567890123',
+            'tax_id' => '0123456789012345',
+            'deed_number' => 'DEED-000001',
             'business_type' => 'pvt_ltd',
             'contact_person' => 'John Doe',
             // Start Update 14 September 2026, by @WNP: Use a valid Indonesian mobile number in the VMS onboarding flow.

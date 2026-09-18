@@ -3,6 +3,8 @@ import { VendorLayout, PageHeader, Card, Badge, AppIcon } from '@/Components';
 import { useLanguage } from '@/Contexts/LanguageContext';
 // Start Update 15 September 2026, by @WNP: Localize fixed compliance master records for vendors.
 import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
+// Start Update 16 September 2026, by @WNP: Translate only known automatic compliance-result details.
+import { translateComplianceDetails } from '@/i18n/complianceDetails';
 
 export default function Compliance({ vendor, complianceResults = [], rules = [] }) {
     // Start Update 12 September 2026, by @WNP: Resolve only static score, status, and guidance copy.
@@ -186,7 +188,12 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
                                                                 : 'text-(--color-text-muted)'
                                                         }`}
                                                     >
-                                                        {result.details}
+                                                        {/* Start Update 16 September 2026, by @WNP: Preserve custom details and localize verified system patterns. */}
+                                                        {translateComplianceDetails(
+                                                            language,
+                                                            rule,
+                                                            result.details
+                                                        )}
                                                     </p>
                                                 )}
                                             </div>
@@ -234,7 +241,8 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
                                         </li>
                                         <li>
                                             {t(
-                                                'Keep your company registration and GST certificates up to date'
+                                                // Start Update 16 September 2026, by @WNP: Guide vendors using Indonesian company documents.
+                                                'Keep your Business Identification Number (NIB) and Taxpayer Identification Number (NPWP) documents up to date'
                                             )}
                                         </li>
                                         <li>{t('Maintain valid insurance coverage')}</li>

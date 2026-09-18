@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+// Start Update 16 September 2026, by @WNP: Verify localized performance rating validation copy.
+use App\Http\Requests\Admin\StorePerformanceRatingRequest;
 // Start Update 15 September 2026, by @WNP: Verify localized contact-message validation attributes.
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
@@ -55,6 +57,33 @@ class LanguageLocalizationTest extends TestCase
         $this->assertSame(
             'catatan internal tidak boleh lebih dari 2000 karakter.',
             $validator->errors()->first('admin_notes')
+        );
+    }
+
+    // Start Update 16 September 2026, by @WNP: Keep performance period and maximum-score validation in the selected language.
+    public function test_performance_rating_validation_is_localized(): void
+    {
+        App::setLocale('id');
+        $request = new StorePerformanceRatingRequest;
+
+        $validator = Validator::make(
+            [
+                'ratings' => [],
+                'period_start' => '2026-09-16',
+                'period_end' => '2026-09-15',
+            ],
+            $request->rules(),
+            $request->messages(),
+            $request->attributes()
+        );
+
+        $this->assertSame(
+            'Tanggal selesai harus setelah atau sama dengan tanggal mulai.',
+            $validator->errors()->first('period_end')
+        );
+        $this->assertSame(
+            'Skor tidak boleh lebih dari 10 untuk metrik yang dipilih.',
+            __('performance.validation.score_max', ['max' => 10])
         );
     }
 }

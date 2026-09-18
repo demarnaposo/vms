@@ -36,6 +36,21 @@ export default function Error({ status }) {
                 </svg>
             ),
         },
+        // Start Update 16 September 2026, by @WNP: Represent rate limiting accurately instead of falling back to the 404 copy.
+        429: {
+            title: 'Too Many Requests',
+            description: 'Please wait a moment before trying again.',
+            icon: (
+                <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                </svg>
+            ),
+        },
         500: {
             title: 'Server Error',
             description: 'Something went wrong on our end. Please try again later.',

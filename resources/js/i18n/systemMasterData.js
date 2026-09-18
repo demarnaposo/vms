@@ -59,16 +59,19 @@ export const SYSTEM_MASTER_DATA = Object.freeze({
             description: 'Certificate of incorporation or business registration',
         },
         gst_certificate: {
-            display_name: 'GST Registration Certificate',
-            description: 'Goods and Services Tax registration certificate',
+            // Start Update 16 September 2026, by @WNP: Localize the stable master key with the complete taxpayer identifier label.
+            display_name: 'Taxpayer Identification Number (NPWP) Document',
+            description: 'Taxpayer identification document',
         },
         pan_card: {
-            display_name: 'PAN Card',
-            description: 'Permanent Account Number card',
+            // Start Update 16 September 2026, by @WNP: Localize the stable master key with the complete business identifier label.
+            display_name: 'Business Identification Number (NIB) Document',
+            description: 'Business identification document',
         },
         cancelled_cheque: {
-            display_name: 'Cancelled Cheque',
-            description: 'Cancelled cheque for bank verification',
+            // Start Update 16 September 2026, by @WNP: Present bank-account proof instead of a cheque-specific document.
+            display_name: 'Bank Account Proof',
+            description: 'Bank account ownership proof for payment verification',
         },
         insurance: {
             display_name: 'Insurance Certificate',

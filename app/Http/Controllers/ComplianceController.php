@@ -7,6 +7,8 @@ use App\Models\ComplianceRule;
 use App\Models\Vendor;
 use App\Services\ComplianceDashboardService;
 use App\Services\ComplianceService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class ComplianceController extends Controller
@@ -57,17 +59,27 @@ class ComplianceController extends Controller
     /**
      * Run compliance evaluation for a vendor.
      */
-    public function evaluate(Vendor $vendor)
+    public function evaluate(Vendor $vendor): RedirectResponse
     {
         $this->authorize('runCompliance');
 
-        $result = $this->complianceService->evaluateVendor($vendor);
+        try {
+            $result = $this->complianceService->evaluateVendor($vendor);
 
-        // Start Update 13 September 2026, by @WNP: Localize the system status label in the alert without changing the stored status code.
-        return back()->with('success', __('compliance.evaluated', [
-            'score' => $result['score'],
-            'status' => __('compliance.statuses.'.$result['status']),
-        ]));
+            // Start Update 13 September 2026, by @WNP: Localize the system status label in the alert without changing the stored status code.
+            return back()->with('success', __('compliance.evaluated', [
+                'score' => $result['score'],
+                'status' => __('compliance.statuses.'.$result['status']),
+            ]));
+        } catch (\Throwable $e) {
+            // Start Update 16 September 2026, by @WNP: Keep evaluation failures on the vendor page with visible feedback.
+            Log::error('Compliance evaluation failed', [
+                'vendor_id' => $vendor->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', __('compliance.evaluation_failed'));
+        }
     }
 
     /**

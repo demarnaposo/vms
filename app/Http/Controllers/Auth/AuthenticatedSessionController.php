@@ -9,6 +9,7 @@ use App\Models\Vendor;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -58,6 +59,17 @@ class AuthenticatedSessionController extends Controller
 
         HandleInertiaRequests::clearAuthCache($user->id);
         $request->session()->regenerate();
+
+        if ($user->isVendor() && ! $user->hasVerifiedEmail()) {
+            RateLimiter::attempt(
+                "vendor-verification-login:{$user->id}",
+                1,
+                fn () => $user->sendEmailVerificationNotification(),
+                300
+            );
+
+            return redirect()->intended(route('verification.notice'));
+        }
 
         return redirect()->intended(route('dashboard'));
     }

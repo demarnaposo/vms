@@ -18,6 +18,8 @@ export default function RateVendor({ vendor, metrics = [] }) {
         period_start: new Date().toISOString().split('T')[0].slice(0, 7) + '-01',
         period_end: new Date().toISOString().split('T')[0],
     });
+    // Start Update 16 September 2026, by @WNP: Surface localized nested rating errors without duplicating messages.
+    const validationErrors = [...new Set(Object.values(form.errors).filter(Boolean))];
 
     const updateRating = (metricId, field, value) => {
         form.setData(
@@ -44,11 +46,12 @@ export default function RateVendor({ vendor, metrics = [] }) {
         <AdminLayout title="Rate Performance" activeNav="Performance" header={header}>
             <form onSubmit={handleSubmit} className="max-w-4xl space-y-8">
                 {/* Validation Errors */}
-                {(form.errors.period_start || form.errors.period_end || form.errors.ratings) && (
+                {validationErrors.length > 0 && (
                     <div className="p-4 rounded-xl bg-(--color-danger-light) border border-(--color-danger) text-(--color-danger-dark) text-sm space-y-1">
-                        {form.errors.period_start && <p>{form.errors.period_start}</p>}
-                        {form.errors.period_end && <p>{form.errors.period_end}</p>}
-                        {form.errors.ratings && <p>{form.errors.ratings}</p>}
+                        {/* Start Update 16 September 2026, by @WNP: Render every localized validation message, including metric-level errors. */}
+                        {validationErrors.map((message) => (
+                            <p key={message}>{message}</p>
+                        ))}
                     </div>
                 )}
 
@@ -58,7 +61,8 @@ export default function RateVendor({ vendor, metrics = [] }) {
                         <div className="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label className="text-sm font-medium text-(--color-text-secondary) mb-2 block">
-                                    Start Date
+                                    {/* Start Update 16 September 2026, by @WNP: Localize the performance period start label. */}
+                                    {t('Start Date')}
                                 </label>
                                 <input
                                     type="date"
@@ -69,7 +73,8 @@ export default function RateVendor({ vendor, metrics = [] }) {
                             </div>
                             <div>
                                 <label className="text-sm font-medium text-(--color-text-secondary) mb-2 block">
-                                    End Date
+                                    {/* Start Update 16 September 2026, by @WNP: Localize the performance period end label. */}
+                                    {t('End Date')}
                                 </label>
                                 <input
                                     type="date"

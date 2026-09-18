@@ -9,9 +9,10 @@ import {
 test('translates document types sourced from system master data', () => {
     const examples = [
         ['company_registration', 'Sertifikat Pendaftaran Perusahaan'],
-        ['gst_certificate', 'Sertifikat Registrasi GST'],
-        ['pan_card', 'Kartu PAN'],
-        ['cancelled_cheque', 'Cek yang Dibatalkan'],
+        // Start Update 16 September 2026, by @WNP: Expect Indonesian identification and bank-proof master labels.
+        ['gst_certificate', 'Dokumen Nomor Pokok Wajib Pajak (NPWP)'],
+        ['pan_card', 'Dokumen Nomor Induk Berusaha (NIB)'],
+        ['cancelled_cheque', 'Bukti Rekening Bank'],
         ['insurance', 'Sertifikat Asuransi'],
         ['nda', 'Perjanjian Kerahasiaan'],
         ['service_agreement', 'Perjanjian Layanan'],

@@ -10,8 +10,12 @@ import {
     DataTable,
     FormSelect,
 } from '@/Components';
+// Start Update 16 September 2026, by @WNP: Translate static vendor-summary filters and count frames.
+import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function VendorSummaryReport({ vendors, stats, filters }) {
+    // Start Update 16 September 2026, by @WNP: Resolve report-only static copy in the selected language.
+    const { t } = useLanguage();
     const { auth } = usePage().props;
     const can = auth?.can || {};
 
@@ -132,7 +136,8 @@ export default function VendorSummaryReport({ vendors, stats, filters }) {
                     <div className="p-4 flex flex-wrap items-end gap-4">
                         <div className="flex-1 min-w-[150px]">
                             <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
-                                Status
+                                {/* Start Update 16 September 2026, by @WNP: Translate the fixed lifecycle filter label. */}
+                                {t('Status')}
                             </label>
                             <FormSelect
                                 value={localFilters.status}
@@ -144,7 +149,8 @@ export default function VendorSummaryReport({ vendors, stats, filters }) {
                         </div>
                         <div className="flex-1 min-w-[150px]">
                             <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
-                                Compliance
+                                {/* Start Update 16 September 2026, by @WNP: Translate the fixed compliance filter label. */}
+                                {t('Compliance')}
                             </label>
                             <FormSelect
                                 value={localFilters.compliance}
@@ -166,7 +172,12 @@ export default function VendorSummaryReport({ vendors, stats, filters }) {
                 </Card>
 
                 {/* Data Table */}
-                <Card title={`Vendors (${vendors?.data?.length || 0} shown)`}>
+                {/* Start Update 16 September 2026, by @WNP: Translate the vendor count frame while retaining its numeric value. */}
+                <Card
+                    title={t('Vendors (:count shown)', {
+                        count: vendors?.data?.length || 0,
+                    })}
+                >
                     <DataTable
                         columns={columns}
                         data={vendors?.data || []}

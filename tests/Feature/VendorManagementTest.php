@@ -50,7 +50,14 @@ class VendorManagementTest extends TestCase
             'compliance_score' => 90,
             'submitted_at' => now(),
             // Minimum required fields based on model/migrations
-            'pan_number' => 'ABCDE1234F',
+            // Start Update 16 September 2026, by @WNP: Use Indonesian company and bank identifiers in vendor-detail coverage.
+            'registration_number' => '1234567890123',
+            'tax_id' => '0123456789012345',
+            'deed_number' => 'DEED-000001',
+            'bank_name' => 'Bank Mandiri',
+            'bank_account_number' => '1234567890',
+            'bank_ifsc' => '008',
+            'bank_branch' => 'KCP Jakarta Menteng',
             'address' => '123 St',
             // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia.
             'city' => 'Kota Bandung',
@@ -82,6 +89,12 @@ class VendorManagementTest extends TestCase
             fn ($page) => $page
                 ->component('Admin/Vendors/Show')
                 ->where('vendor.id', $this->vendor->id)
+                // Start Update 16 September 2026, by @WNP: Confirm authorized staff receive decrypted summary identifiers.
+                ->where('vendor.registration_number', '1234567890123')
+                ->where('vendor.tax_id', '0123456789012345')
+                ->where('vendor.deed_number', 'DEED-000001')
+                ->where('vendor.bank_account_number', '1234567890')
+                ->where('vendor.bank_ifsc', '008')
         );
     }
 
@@ -202,6 +215,39 @@ class VendorManagementTest extends TestCase
             'to_status' => Vendor::STATUS_ACTIVE,
             'comment' => 'Activating vendor',
         ]);
+    }
+
+    // Start Update 16 September 2026, by @WNP: Confirm activation comments remain optional as indicated by the lifecycle form.
+    public function test_admin_can_activate_approved_vendor_without_comment(): void
+    {
+        $this->vendor->update([
+            'status' => Vendor::STATUS_APPROVED,
+        ]);
+
+        $this->actingAs($this->adminUser)
+            ->post(route('admin.vendors.activate', $this->vendor))
+            ->assertSessionHas('success', 'Vendor activated!');
+
+        $this->assertSame(Vendor::STATUS_ACTIVE, $this->vendor->fresh()->status);
+    }
+
+    // Start Update 16 September 2026, by @WNP: Ensure repeated activation cannot create a duplicate state transition.
+    public function test_repeated_activation_keeps_one_successful_transition(): void
+    {
+        $this->vendor->update(['status' => Vendor::STATUS_APPROVED]);
+
+        $this->actingAs($this->adminUser)
+            ->post(route('admin.vendors.activate', $this->vendor))
+            ->assertSessionHas('success', 'Vendor activated!');
+
+        $this->actingAs($this->adminUser)
+            ->post(route('admin.vendors.activate', $this->vendor))
+            ->assertSessionHasErrors('status');
+
+        $this->assertSame(Vendor::STATUS_ACTIVE, $this->vendor->fresh()->status);
+        $this->assertSame(1, $this->vendor->stateLogs()
+            ->where('to_status', Vendor::STATUS_ACTIVE)
+            ->count());
     }
 
     public function test_admin_cannot_reactivate_suspended_vendor_without_compliance()

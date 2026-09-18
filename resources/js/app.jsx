@@ -36,6 +36,55 @@ function AppWrapper({ children }) {
     return children;
 }
 
+// Start Update 16 September 2026, by @WNP: Localize the global React error fallback through the shared language context.
+function GlobalErrorFallback() {
+    const { t } = useLanguage();
+
+    return (
+        <div className="min-h-screen bg-gradient-page flex items-center justify-center p-6">
+            <div className="max-w-md w-full text-center">
+                <div className="mb-6 flex justify-center">
+                    <div className="w-24 h-24 rounded-full bg-(--color-danger-light) flex items-center justify-center text-(--color-danger)">
+                        <svg
+                            className="w-16 h-16"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={1.5}
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                            />
+                        </svg>
+                    </div>
+                </div>
+                <h1 className="text-2xl font-bold text-(--color-text-primary) mb-3">
+                    {t('Something went wrong')}
+                </h1>
+                <p className="text-(--color-text-tertiary) mb-8">
+                    {t('An unexpected error occurred. Please try refreshing the page.')}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="px-6 py-3 rounded-xl bg-(--color-brand-primary) text-white font-medium hover:opacity-90 transition-opacity"
+                    >
+                        {t('Refresh Page')}
+                    </button>
+                    <a
+                        href="/dashboard"
+                        className="px-6 py-3 rounded-xl border border-(--color-border-primary) text-(--color-text-secondary) font-medium hover:bg-(--color-bg-tertiary) transition-colors"
+                    >
+                        {t('Go to Dashboard')}
+                    </a>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 // Error Boundary to catch React errors gracefully
 class ErrorBoundary extends Component {
     constructor(props) {
@@ -53,49 +102,8 @@ class ErrorBoundary extends Component {
 
     render() {
         if (this.state.hasError) {
-            return (
-                <div className="min-h-screen bg-gradient-page flex items-center justify-center p-6">
-                    <div className="max-w-md w-full text-center">
-                        <div className="mb-6 flex justify-center">
-                            <div className="w-24 h-24 rounded-full bg-(--color-danger-light) flex items-center justify-center text-(--color-danger)">
-                                <svg
-                                    className="w-16 h-16"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={1.5}
-                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                                    />
-                                </svg>
-                            </div>
-                        </div>
-                        <h1 className="text-2xl font-bold text-(--color-text-primary) mb-3">
-                            Something went wrong
-                        </h1>
-                        <p className="text-(--color-text-tertiary) mb-8">
-                            An unexpected error occurred. Please try refreshing the page.
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                            <button
-                                onClick={() => window.location.reload()}
-                                className="px-6 py-3 rounded-xl bg-(--color-brand-primary) text-white font-medium hover:opacity-90 transition-opacity"
-                            >
-                                Refresh Page
-                            </button>
-                            <a
-                                href="/dashboard"
-                                className="px-6 py-3 rounded-xl border border-(--color-border-primary) text-(--color-text-secondary) font-medium hover:bg-(--color-bg-tertiary) transition-colors"
-                            >
-                                Go to Dashboard
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            );
+            // Start Update 16 September 2026, by @WNP: Render the translated functional fallback from the class boundary.
+            return <GlobalErrorFallback />;
         }
 
         return this.props.children;
@@ -137,6 +145,6 @@ createInertiaApp({
     },
     progress: {
         color: '#0f766e',
-        showSpinner: true,
+        showSpinner: false,
     },
 });

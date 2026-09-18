@@ -102,8 +102,9 @@ return [
         ],
         [
             'name' => 'gst_certificate',
-            'display_name' => 'GST Registration Certificate',
-            'description' => 'Goods and Services Tax registration certificate',
+            // Start Update 16 September 2026, by @WNP: Keep the stable key while presenting the complete taxpayer identifier label.
+            'display_name' => 'Taxpayer Identification Number (NPWP) Document',
+            'description' => 'Taxpayer identification document',
             'is_mandatory' => true,
             'has_expiry' => false,
             'expiry_warning_days' => 30,
@@ -112,8 +113,9 @@ return [
         ],
         [
             'name' => 'pan_card',
-            'display_name' => 'PAN Card',
-            'description' => 'Permanent Account Number card',
+            // Start Update 16 September 2026, by @WNP: Keep the stable key while presenting the complete business identifier label.
+            'display_name' => 'Business Identification Number (NIB) Document',
+            'description' => 'Business identification document',
             'is_mandatory' => true,
             'has_expiry' => false,
             'expiry_warning_days' => 30,
@@ -122,8 +124,9 @@ return [
         ],
         [
             'name' => 'cancelled_cheque',
-            'display_name' => 'Cancelled Cheque',
-            'description' => 'Cancelled cheque for bank verification',
+            // Start Update 16 September 2026, by @WNP: Use bank-account ownership proof for Indonesian transfers.
+            'display_name' => 'Bank Account Proof',
+            'description' => 'Bank account ownership proof for payment verification',
             'is_mandatory' => true,
             'has_expiry' => false,
             'expiry_warning_days' => 30,

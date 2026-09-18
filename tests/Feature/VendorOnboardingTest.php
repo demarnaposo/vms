@@ -44,7 +44,8 @@ class VendorOnboardingTest extends TestCase
         // Create Document Type
         $this->documentType = DocumentType::create([
             'name' => 'pan_card',
-            'display_name' => 'PAN Card',
+            // Start Update 16 September 2026, by @WNP: Use the NIB document label for onboarding coverage.
+            'display_name' => 'Business Identification Number (NIB) Document',
             'is_mandatory' => true,
             'is_active' => true,
         ]);
@@ -58,13 +59,14 @@ class VendorOnboardingTest extends TestCase
         $response = $this->actingAs($this->vendorUser)
             ->post(route('vendor.onboarding.step1'), [
                 'company_name' => 'Test Company',
-                'registration_number' => 'U12345MH2023PTC123456',
-                'tax_id' => '22AAAAA0000A1Z5',
+                // Start Update 16 September 2026, by @WNP: Exercise Indonesian NIB and NPWP onboarding values.
+                'registration_number' => '1234567890123',
+                'tax_id' => '0123456789012345',
+                'deed_number' => 'DEED-000001',
                 'business_type' => 'pvt_ltd',
                 'contact_person' => 'Test Person',
                 // Start Update 14 September 2026, by @WNP: Submit an Indonesian mobile number during VMS onboarding.
                 'contact_phone' => '081234567890',
-                'pan_number' => 'ABCDE1234F',
                 'address' => '123 Test St',
                 'city' => 'Kota Bandung',
                 'state' => 'Jawa Barat',
@@ -80,7 +82,70 @@ class VendorOnboardingTest extends TestCase
 
         $application = \App\Models\VendorApplication::where('user_id', $this->vendorUser->id)->first();
         $this->assertEquals('Test Company', $application->data['step1']['company_name']);
+        $this->assertSame('1234567890123', $application->data['step1']['registration_number']);
+        $this->assertSame('0123456789012345', $application->data['step1']['tax_id']);
+        $this->assertSame('DEED-000001', $application->data['step1']['deed_number']);
         $this->assertSame('081234567890', $application->data['step1']['contact_phone']);
+    }
+
+    // Start Update 16 September 2026, by @WNP: Keep backend required-field messages aligned with the onboarding form.
+    public function test_step_1_returns_specific_errors_for_all_required_company_fields(): void
+    {
+        $this->actingAs($this->vendorUser)
+            ->post(route('vendor.onboarding.step1'), [])
+            ->assertSessionHasErrors([
+                'company_name' => 'Company Name is required.',
+                'registration_number' => 'Business Identification Number (NIB) is required.',
+                'tax_id' => 'Taxpayer Identification Number (NPWP) is required.',
+                'deed_number' => 'Deed of Establishment Number is required.',
+                'business_type' => 'Business Type is required.',
+                'contact_person' => 'Contact Person is required.',
+                'contact_phone' => 'Phone Number / Mobile is required.',
+                'address' => 'Address is required.',
+                'state' => 'Province is required.',
+                'city' => 'Regency or city is required.',
+                'pincode' => 'Postal code is required.',
+            ]);
+    }
+
+    // Start Update 16 September 2026, by @WNP: Accept formatted identifiers and reject invalid NIB or NPWP lengths.
+    public function test_vendor_company_identifiers_follow_indonesian_formats(): void
+    {
+        $validPayload = [
+            'company_name' => 'Test Company',
+            'registration_number' => '1234-5678-90123',
+            'tax_id' => '01.234.567.8-901.234',
+            'deed_number' => 'DEED-000001',
+            'business_type' => 'pvt_ltd',
+            'contact_person' => 'Test Person',
+            'contact_phone' => '081234567890',
+            'address' => '123 Test St',
+            'city' => 'Kota Bandung',
+            'state' => 'Jawa Barat',
+            'pincode' => '40115',
+        ];
+
+        $this->actingAs($this->vendorUser)
+            ->post(route('vendor.onboarding.step1'), $validPayload)
+            ->assertSessionHasNoErrors();
+
+        $application = \App\Models\VendorApplication::where('user_id', $this->vendorUser->id)->firstOrFail();
+        $this->assertSame('1234567890123', $application->data['step1']['registration_number']);
+        $this->assertSame('012345678901234', $application->data['step1']['tax_id']);
+
+        $this->actingAs($this->vendorUser)
+            ->post(route('vendor.onboarding.step1'), array_merge($validPayload, [
+                'registration_number' => '123456789012',
+                'tax_id' => '12345678901234',
+            ]))
+            ->assertSessionHasErrors(['registration_number', 'tax_id']);
+
+        // Start Update 16 September 2026, by @WNP: Reject an application without the required deed number.
+        $this->actingAs($this->vendorUser)
+            ->post(route('vendor.onboarding.step1'), array_merge($validPayload, [
+                'deed_number' => '',
+            ]))
+            ->assertSessionHasErrors(['deed_number']);
     }
 
     // Start Update 14 September 2026, by @WNP: Pastikan lokasi yang tidak didukung dan kode pos enam digit ditolak oleh backend.
@@ -90,13 +155,13 @@ class VendorOnboardingTest extends TestCase
             ->from(route('vendor.onboarding'))
             ->post(route('vendor.onboarding.step1'), [
                 'company_name' => 'Test Company',
-                'registration_number' => 'U12345MH2023PTC123456',
-                'tax_id' => '22AAAAA0000A1Z5',
+                'registration_number' => '1234567890123',
+                'tax_id' => '0123456789012345',
+                'deed_number' => 'DEED-000001',
                 'business_type' => 'pvt_ltd',
                 'contact_person' => 'Test Person',
                 // Start Update 14 September 2026, by @WNP: Keep the contact number valid while testing address errors.
                 'contact_phone' => '081234567890',
-                'pan_number' => 'ABCDE1234F',
                 'address' => '123 Test St',
                 'city' => 'Mumbai',
                 'state' => 'Maharashtra',
@@ -114,12 +179,12 @@ class VendorOnboardingTest extends TestCase
         $this->actingAs($this->vendorUser)
             ->post(route('vendor.onboarding.step1'), [
                 'company_name' => 'Test Company',
-                'registration_number' => 'U12345MH2023PTC123456',
-                'tax_id' => '22AAAAA0000A1Z5',
+                'registration_number' => '1234567890123',
+                'tax_id' => '0123456789012345',
+                'deed_number' => 'DEED-000001',
                 'business_type' => 'pvt_ltd',
                 'contact_person' => 'Test Person',
                 'contact_phone' => '+6281234567890',
-                'pan_number' => 'ABCDE1234F',
                 'address' => '123 Test St',
                 'city' => 'Kota Bandung',
                 'state' => 'Jawa Barat',
@@ -286,10 +351,13 @@ class VendorOnboardingTest extends TestCase
                 // Start Update 11 September 2026, by @WNP: Simpan lokasi vendor Indonesia saat aplikasi dikirim.
                 'step1' => [
                     'company_name' => 'Test Company',
+                    // Start Update 16 September 2026, by @WNP: Persist Indonesian identifiers during final application submission.
+                    'registration_number' => '1234567890123',
+                    'tax_id' => '0123456789012345',
+                    'deed_number' => 'DEED-000001',
                     'contact_person' => 'Test Person',
                     // Start Update 14 September 2026, by @WNP: Use an Indonesian mobile number in the VMS submission fixture.
                     'contact_phone' => '081234567890',
-                    'pan_number' => 'ABCDE1234F',
                     'address' => '123 Test St',
                     'city' => 'Kota Bandung',
                     'state' => 'Jawa Barat',

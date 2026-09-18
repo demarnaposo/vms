@@ -25,9 +25,11 @@ class VendorFactory extends Factory
         return [
             'user_id' => User::factory(),
             'company_name' => $this->faker->company(),
-            'registration_number' => $this->faker->numerify('REG-#####'),
-            'tax_id' => $this->faker->numerify('TAX-#####'),
-            'pan_number' => strtoupper($this->faker->regexify('[A-Z]{5}[0-9]{4}[A-Z]')),
+            // Start Update 16 September 2026, by @WNP: Generate Indonesian NIB and NPWP fixture values for new vendors.
+            'registration_number' => $this->faker->numerify('#############'),
+            'tax_id' => $this->faker->numerify('################'),
+            // Start Update 16 September 2026, by @WNP: Generate a deed number for complete vendor fixtures.
+            'deed_number' => 'DEED-'.$this->faker->unique()->numerify('######'),
             'business_type' => $this->faker->randomElement(['proprietorship', 'partnership', 'private_limited']),
             'contact_person' => $this->faker->name(),
             'contact_email' => $this->faker->companyEmail(),
@@ -39,7 +41,8 @@ class VendorFactory extends Factory
             'state' => 'Jawa Barat',
             'country' => 'Indonesia',
             'pincode' => $this->faker->numerify('40###'),
-            'bank_name' => $this->faker->company().' Bank',
+            // Start Update 16 September 2026, by @WNP: Use a recognized Indonesian bank in generated vendor fixtures.
+            'bank_name' => 'Bank Mandiri',
             'bank_account_number' => $this->faker->numerify('#############'),
             // Start Update 11 September 2026, by @WNP: Generate an Indonesian three-digit bank code fixture.
             'bank_ifsc' => '008',

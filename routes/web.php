@@ -16,6 +16,7 @@ use App\Http\Controllers\PerformanceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\VendorOnboardingController;
+use App\Http\Middleware\EnsureVendorEmailIsVerified;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -32,9 +33,9 @@ Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'store'
 Route::get('/privacy', fn () => Inertia::render('Privacy'))->name('privacy');
 Route::get('/terms', fn () => Inertia::render('Terms'))->name('terms');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', EnsureVendorEmailIsVerified::class])->group(function () {
     // Default Dashboard - redirects based on role
-    Route::get('/dashboard', DashboardRedirectController::class)->middleware(['verified'])->name('dashboard');
+    Route::get('/dashboard', DashboardRedirectController::class)->name('dashboard');
 
     // ==========================================
     // NOTIFICATION ROUTES (All authenticated users)
@@ -56,7 +57,7 @@ Route::middleware('auth')->group(function () {
     // ==========================================
     // VENDOR ROUTES
     // ==========================================
-    Route::middleware(['role:vendor'])->prefix('vendor')->name('vendor.')->group(function () {
+    Route::middleware('role:vendor')->prefix('vendor')->name('vendor.')->group(function () {
         // Vendor Onboarding
         Route::prefix('onboarding')->name('onboarding')->group(function () {
             Route::get('/', [VendorOnboardingController::class, 'show']);

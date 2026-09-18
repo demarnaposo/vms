@@ -59,13 +59,13 @@
 <!-- Start Update 11 September 2026, by @WNP: Use Indonesian bank code terminology in onboarding test cases. -->
 | Test ID | Test Case | Precondition | Test Steps | Expected Result | Priority |
 |---------|-----------|--------------|------------|-----------------|----------|
-| VND-001 | Complete Step 1 - Basic Info | Vendor logged in | 1. Go to `/vendor/onboarding` 2. Fill company name, registration number, tax ID, PAN 3. Next | Data saved to session, proceed to Step 2 | High |
+| VND-001 | Complete Step 1 - Basic Info | Vendor logged in | 1. Go to `/vendor/onboarding` 2. Fill company name, Business Identification Number (NIB), Taxpayer Identification Number (NPWP), and deed number 3. Next | Data saved to session, proceed to Step 2 | High |
 | VND-002 | Complete Step 2 - Bank Details | Step 1 complete | 1. Fill bank name, account number, bank code, branch 2. Next | Data saved to session, proceed to Step 3 | High |
 | VND-003 | Complete Step 3 - Documents | Step 2 complete | 1. Upload required documents (registration, tax cert) 2. Next | Files uploaded to temp storage | High |
 | VND-004 | Submit Complete Application | All steps complete | 1. Review all data 2. Submit | Vendor created with status 'submitted' | Critical |
 | VND-005 | Step 1 validation - missing required fields | Vendor logged in | 1. Leave company name empty 2. Next | Validation error displayed | High |
-| VND-006 | Step 1 validation - invalid PAN format | Vendor logged in | 1. Enter invalid PAN number 2. Next | Error: "Invalid PAN format" | Medium |
-| VND-007 | Step 1 validation - invalid GST format | Vendor logged in | 1. Enter invalid GST number 2. Next | Error: "Invalid GST format" | Medium |
+| VND-006 | Step 1 validation - missing deed number | Vendor logged in | 1. Leave deed number empty 2. Next | Error: "Deed of Establishment Number is required" | Medium |
+| VND-007 | Step 1 validation - invalid Taxpayer Identification Number (NPWP) format | Vendor logged in | 1. Enter an invalid Taxpayer Identification Number (NPWP) 2. Next | Taxpayer Identification Number (NPWP) validation error displayed | Medium |
 | VND-008 | Step 2 validation - invalid bank code | Step 1 complete | 1. Enter a bank code that is not three digits 2. Next | Error: "Bank Code must be exactly 3 digits" | Medium |
 | VND-009 | Step 3 - Upload file too large | Step 2 complete | 1. Upload file > max size 2. Submit | Error: "File size exceeds limit" | Medium |
 | VND-010 | Step 3 - Upload invalid file type | Step 2 complete | 1. Upload executable file 2. Submit | Error: "Invalid file type" | High |

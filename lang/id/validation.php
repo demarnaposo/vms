@@ -3,12 +3,19 @@
 // Start Update 11 September 2026, by @WNP: Translate common Laravel validation responses for Indonesian requests.
 return [
     'accepted' => ':attribute harus diterima.',
+    // Start Update 16 September 2026, by @WNP: Cover validation rules used by the performance rating form.
+    'array' => ':attribute harus berupa daftar.',
+    'between' => [
+        'numeric' => ':attribute harus bernilai antara :min dan :max.',
+    ],
     'boolean' => ':attribute harus bernilai benar atau salah.',
     'confirmed' => 'Konfirmasi :attribute tidak cocok.',
     // Start Update 15 September 2026, by @WNP: Localize an incorrect current-password response on profile settings.
     'current_password' => 'Kata sandi saat ini tidak sesuai.',
     'date' => ':attribute harus berupa tanggal yang valid.',
     'email' => ':attribute harus berupa alamat email yang valid.',
+    'distinct' => ':attribute memiliki nilai yang duplikat.',
+    'exists' => ':attribute yang dipilih tidak valid.',
     'in' => ':attribute yang dipilih tidak valid.',
     'integer' => ':attribute harus berupa bilangan bulat.',
     'max' => [
@@ -18,6 +25,7 @@ return [
         'string' => ':attribute tidak boleh lebih dari :max karakter.',
     ],
     'mimes' => ':attribute harus berupa berkas dengan tipe: :values.',
+    'missing' => ':attribute tidak boleh dikirim.',
     'min' => [
         'array' => ':attribute harus memiliki minimal :min item.',
         'file' => 'Ukuran :attribute minimal :min kilobita.',

@@ -38,7 +38,8 @@ export default function Profile({ vendor }) {
         company_name: vendor?.company_name || '',
         registration_number: vendor?.registration_number || '',
         tax_id: vendor?.tax_id || '',
-        pan_number: vendor?.pan_number || '',
+        // Start Update 16 September 2026, by @WNP: Display the submitted deed number with other locked company details.
+        deed_number: vendor?.deed_number || '',
         business_type: vendor?.business_type || '',
         contact_person: vendor?.contact_person || '',
         contact_phone: vendor?.contact_phone || '',
@@ -223,23 +224,23 @@ export default function Profile({ vendor }) {
                                     required
                                     disabled={true}
                                 />
+                                {/* Start Update 16 September 2026, by @WNP: Display Indonesian company identifiers on the vendor profile. */}
                                 <FormInput
-                                    label="Registration Number (CIN / LLPIN)"
+                                    label="Business Identification Number (NIB)"
                                     value={form.data.registration_number}
                                     onChange={() => {}}
                                     disabled={true}
                                 />
                                 <FormInput
-                                    label="GST Number"
+                                    label="Taxpayer Identification Number (NPWP)"
                                     value={form.data.tax_id}
                                     onChange={() => {}}
                                     disabled={true}
                                 />
                                 <FormInput
-                                    label="PAN Number"
-                                    value={form.data.pan_number}
+                                    label="Deed of Establishment Number"
+                                    value={form.data.deed_number}
                                     onChange={() => {}}
-                                    required
                                     disabled={true}
                                 />
                                 <div className="md:col-span-2">

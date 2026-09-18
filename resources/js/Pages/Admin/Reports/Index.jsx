@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { AdminLayout, PageHeader, Card, StatCard, Button, FormSelect, AppIcon } from '@/Components';
+// Start Update 16 September 2026, by @WNP: Translate static report cards and scheduled-job descriptions.
+import { useLanguage } from '@/Contexts/LanguageContext';
 // Start Update 11 September 2026, by @WNP: Reuse the centralized Indonesian currency formatter.
 import { formatCurrency } from '@/utils/currencyFormatters';
 
 export default function ReportsIndex({ stats = {} }) {
     const [dateRange, setDateRange] = useState('this_month');
+    // Start Update 16 September 2026, by @WNP: Resolve report dashboard copy using the selected language.
+    const { t } = useLanguage();
     // Start Update 11 September 2026, by @WNP: Read the shared IDR settings supplied by Laravel.
     const { auth, currency } = usePage().props;
     const can = auth?.can || {};
@@ -142,10 +146,11 @@ export default function ReportsIndex({ stats = {} }) {
                                         </div>
                                         <div className="flex-1">
                                             <h3 className="text-(--color-text-primary) font-semibold mb-1">
-                                                {report.title}
+                                                {/* Start Update 16 September 2026, by @WNP: Translate fixed report names without changing route identifiers. */}
+                                                {t(report.title)}
                                             </h3>
                                             <p className="text-sm text-(--color-text-tertiary)">
-                                                {report.description}
+                                                {t(report.description)}
                                             </p>
                                             <div className="flex gap-2 mt-3">
                                                 {report.route ? (
@@ -176,7 +181,8 @@ export default function ReportsIndex({ stats = {} }) {
                         </div>
                     ) : (
                         <div className="p-8 text-center text-(--color-text-tertiary)">
-                            No reports available for your role.
+                            {/* Start Update 16 September 2026, by @WNP: Localize the static report permission empty state. */}
+                            {t('No reports available for your role.')}
                         </div>
                     )}
                 </Card>
@@ -185,7 +191,10 @@ export default function ReportsIndex({ stats = {} }) {
                 <Card title="Scheduled Jobs">
                     <div className="p-4">
                         <p className="text-(--color-text-tertiary) text-sm mb-4">
-                            These commands run automatically but can also be triggered manually:
+                            {/* Start Update 16 September 2026, by @WNP: Translate scheduled-job guidance while retaining command text. */}
+                            {t(
+                                'These commands run automatically but can also be triggered manually:'
+                            )}
                         </p>
                         <div className="grid md:grid-cols-3 gap-4">
                             <div className="relative p-4 rounded-xl overflow-hidden shadow-lg shadow-token-sm border border-(--color-brand-primary-light)">
@@ -194,9 +203,12 @@ export default function ReportsIndex({ stats = {} }) {
                                     style={{ background: 'var(--gradient-primary)' }}
                                 />
                                 <div className="relative z-10 text-(--color-text-primary)">
-                                    <div className="font-semibold mb-1">Compliance Evaluation</div>
+                                    {/* Start Update 16 September 2026, by @WNP: Translate fixed scheduled-job labels only. */}
+                                    <div className="font-semibold mb-1">
+                                        {t('Compliance Evaluation')}
+                                    </div>
                                     <div className="text-xs text-(--color-text-secondary) mb-2">
-                                        Runs daily at 2:00 AM
+                                        {t('Runs daily at 2:00 AM')}
                                     </div>
                                     <code className="text-xs bg-(--color-bg-primary)/60 px-2 py-1 rounded block text-(--color-text-primary)">
                                         php artisan vendors:evaluate-compliance
@@ -209,9 +221,12 @@ export default function ReportsIndex({ stats = {} }) {
                                     style={{ background: 'var(--gradient-success)' }}
                                 />
                                 <div className="relative z-10 text-(--color-text-primary)">
-                                    <div className="font-semibold mb-1">Expiry Reminders</div>
+                                    {/* Start Update 16 September 2026, by @WNP: Translate fixed scheduled-job labels only. */}
+                                    <div className="font-semibold mb-1">
+                                        {t('Expiry Reminders')}
+                                    </div>
                                     <div className="text-xs text-(--color-text-secondary) mb-2">
-                                        Runs daily at 8:00 AM
+                                        {t('Runs daily at 8:00 AM')}
                                     </div>
                                     <code className="text-xs bg-(--color-bg-primary)/60 px-2 py-1 rounded block text-(--color-text-primary)">
                                         php artisan vendors:expiry-reminders
@@ -224,9 +239,10 @@ export default function ReportsIndex({ stats = {} }) {
                                     style={{ background: 'var(--gradient-warning)' }}
                                 />
                                 <div className="relative z-10 text-(--color-text-primary)">
-                                    <div className="font-semibold mb-1">Weekly Summary</div>
+                                    {/* Start Update 16 September 2026, by @WNP: Translate fixed scheduled-job labels only. */}
+                                    <div className="font-semibold mb-1">{t('Weekly Summary')}</div>
                                     <div className="text-xs text-(--color-text-secondary) mb-2">
-                                        Runs every Monday
+                                        {t('Runs every Monday')}
                                     </div>
                                     <code className="text-xs bg-(--color-bg-primary)/60 px-2 py-1 rounded block text-(--color-text-primary)">
                                         php artisan vendors:weekly-summary

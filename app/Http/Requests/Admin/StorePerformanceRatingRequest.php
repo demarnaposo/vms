@@ -33,6 +33,37 @@ class StorePerformanceRatingRequest extends FormRequest
         ];
     }
 
+    /**
+     * Get localized display names for performance rating fields.
+     *
+     * @return array<string, string>
+     */
+    // Start Update 16 September 2026, by @WNP: Localize performance period and rating field names in validation feedback.
+    public function attributes(): array
+    {
+        return [
+            'ratings' => __('performance.fields.ratings'),
+            'ratings.*.metric_id' => __('performance.fields.metric'),
+            'ratings.*.score' => __('performance.fields.score'),
+            'ratings.*.notes' => __('performance.fields.notes'),
+            'period_start' => __('performance.fields.start_date'),
+            'period_end' => __('performance.fields.end_date'),
+        ];
+    }
+
+    /**
+     * Get localized validation messages for date relationships.
+     *
+     * @return array<string, string>
+     */
+    // Start Update 16 September 2026, by @WNP: Localize the rating period ordering validation message.
+    public function messages(): array
+    {
+        return [
+            'period_end.after_or_equal' => __('performance.validation.end_after_start'),
+        ];
+    }
+
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator): void {
@@ -58,7 +89,8 @@ class StorePerformanceRatingRequest extends FormRequest
                 if ($maxScore > 0 && $score > $maxScore) {
                     $validator->errors()->add(
                         "ratings.{$index}.score",
-                        "Score cannot be greater than {$maxScore} for the selected metric."
+                        // Start Update 16 September 2026, by @WNP: Localize the custom maximum-score validation response.
+                        __('performance.validation.score_max', ['max' => $maxScore])
                     );
                 }
             }

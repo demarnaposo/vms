@@ -5,6 +5,8 @@ return [
     'notification_sent' => 'Notifikasi berhasil dikirim kepada :count penerima.',
     // Start Update 15 September 2026, by @WNP: Localize notification-center success feedback.
     'notifications_marked_read' => 'Semua notifikasi telah ditandai dibaca.',
+    // Start Update 16 September 2026, by @WNP: Show clear feedback when form actions are temporarily limited.
+    'too_many_requests' => 'Terlalu banyak tindakan dikirim. Tunggu sebentar lalu coba lagi.',
     'document_verified' => ':document berhasil diverifikasi.',
     'document_rejected' => ':document ditolak.',
     'vendor_account_status' => 'Akun vendor Anda saat ini berstatus :status. Silakan hubungi dukungan.',

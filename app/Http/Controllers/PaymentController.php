@@ -39,11 +39,16 @@ class PaymentController extends Controller
     /**
      * Show a specific payment request.
      */
-    public function show(PaymentRequest $payment)
+    public function show(Request $request, PaymentRequest $payment)
     {
         $this->authorize('view', $payment);
 
         $payment->load(['vendor', 'requester', 'approvals.user']);
+
+        // Start Update 16 September 2026, by @WNP: Expose transfer account details only to staff authorized to disburse payments.
+        if ($request->user()?->can('markPaid', $payment)) {
+            $payment->vendor?->makeVisible(['bank_account_number', 'bank_ifsc']);
+        }
 
         return Inertia::render('Admin/Payments/Show', [
             'payment' => $payment,

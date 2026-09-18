@@ -18,6 +18,8 @@ import { formatDateTime } from '@/utils/dateFormatters';
 import { useLanguage } from '@/Contexts/LanguageContext';
 // Start Update 15 September 2026, by @WNP: Localize recognized compliance rule master records.
 import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
+// Start Update 16 September 2026, by @WNP: Reuse automatic compliance-detail translations in recent failures.
+import { translateComplianceDetails } from '@/i18n/complianceDetails';
 
 export default function ComplianceDashboard({ stats, atRiskVendors, recentResults, rules }) {
     // Start Update 12 September 2026, by @WNP: Resolve only static dashboard labels through the shared language context.
@@ -145,7 +147,12 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                                             )}
                                         </div>
                                         <div className="text-sm text-(--color-text-tertiary) mt-1">
-                                            {result.details}
+                                            {/* Start Update 16 September 2026, by @WNP: Translate known system details and retain custom database text. */}
+                                            {translateComplianceDetails(
+                                                language,
+                                                result.rule,
+                                                result.details
+                                            )}
                                         </div>
                                     </div>
                                 ))

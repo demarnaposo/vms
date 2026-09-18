@@ -49,7 +49,7 @@ class DocumentVerificationWorkflowTest extends TestCase
             'status' => Vendor::STATUS_SUBMITTED,
             'compliance_status' => Vendor::COMPLIANCE_PENDING,
             'compliance_score' => 0,
-            'pan_number' => 'ABCDE1234F',
+            'deed_number' => 'DEED-000001',
             'address' => '123 QA Street',
             // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia.
             'city' => 'Kota Bandung',
@@ -59,8 +59,9 @@ class DocumentVerificationWorkflowTest extends TestCase
 
         $this->documentType = DocumentType::create([
             'name' => 'pan_card',
-            'display_name' => 'PAN Card',
-            'description' => 'PAN verification',
+            // Start Update 16 September 2026, by @WNP: Use the Indonesian NIB document label for the stable master key.
+            'display_name' => 'Business Identification Number (NIB) Document',
+            'description' => 'Deed verification',
             'is_mandatory' => true,
             'has_expiry' => false,
             'expiry_warning_days' => 30,
@@ -98,7 +99,7 @@ class DocumentVerificationWorkflowTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        $response->assertSessionHas('success', 'PAN Card verified successfully.');
+        $response->assertSessionHas('success', 'Business Identification Number (NIB) Document verified successfully.');
 
         $document->refresh();
         $this->assertSame(VendorDocument::STATUS_VERIFIED, $document->verification_status);
@@ -124,8 +125,8 @@ class DocumentVerificationWorkflowTest extends TestCase
         $this->assertNull($document->verified_at);
     }
 
-    // Start Update 12 September 2026, by @WNP: Verify Indonesian document alerts retain the database document type name.
-    public function test_document_actions_localize_alerts_without_translating_document_type(): void
+    // Start Update 16 September 2026, by @WNP: Verify alerts localize known VMS master document labels.
+    public function test_document_actions_localize_system_master_document_type(): void
     {
         $verifiedDocument = $this->createDocument(VendorDocument::STATUS_PENDING, 'localize-verify-pan.pdf');
         $rejectedDocument = $this->createDocument(VendorDocument::STATUS_PENDING, 'localize-reject-pan.pdf');
@@ -133,12 +134,29 @@ class DocumentVerificationWorkflowTest extends TestCase
         $this->actingAs($this->opsUser)
             ->withUnencryptedCookie('vms_locale', 'id')
             ->post(route('admin.documents.verify', $verifiedDocument))
-            ->assertSessionHas('success', 'PAN Card berhasil diverifikasi.');
+            ->assertSessionHas('success', 'Dokumen Nomor Induk Berusaha (NIB) berhasil diverifikasi.');
 
         $this->actingAs($this->opsUser)
             ->withUnencryptedCookie('vms_locale', 'id')
             ->post(route('admin.documents.reject', $rejectedDocument), ['reason' => 'Not valid'])
-            ->assertSessionHas('success', 'PAN Card ditolak.');
+            ->assertSessionHas('success', 'Dokumen Nomor Induk Berusaha (NIB) ditolak.');
+    }
+
+    // Start Update 16 September 2026, by @WNP: Preserve custom database document labels inside localized alerts.
+    public function test_document_alert_preserves_custom_document_type_label(): void
+    {
+        $this->documentType = DocumentType::create([
+            'name' => 'supplier_custom_license',
+            'display_name' => 'Supplier Custom License',
+            'is_mandatory' => false,
+            'is_active' => true,
+        ]);
+        $document = $this->createDocument(VendorDocument::STATUS_PENDING, 'custom-license.pdf');
+
+        $this->actingAs($this->opsUser)
+            ->withUnencryptedCookie('vms_locale', 'id')
+            ->post(route('admin.documents.verify', $document))
+            ->assertSessionHas('success', 'Supplier Custom License berhasil diverifikasi.');
     }
 
     private function createDocument(string $status, string $fileName): VendorDocument

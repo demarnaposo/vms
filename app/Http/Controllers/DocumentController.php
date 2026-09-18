@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\VendorDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -84,9 +85,13 @@ class DocumentController extends Controller
         );
 
         $document->loadMissing('documentType');
-        $documentType = $document->documentType->display_name;
+        // Start Update 16 September 2026, by @WNP: Translate only known VMS master document types in alerts.
+        $documentType = $this->documentTypeLabel(
+            $document->documentType->name,
+            $document->documentType->display_name
+        );
 
-        // Start Update 12 September 2026, by @WNP: Translate the alert around the unchanged database document name.
+        // Start Update 16 September 2026, by @WNP: Build the verification alert with the selectively localized document label.
         return back()->with('success', __('alerts.document_verified', ['document' => $documentType]));
     }
 
@@ -124,9 +129,13 @@ class DocumentController extends Controller
         );
 
         $document->loadMissing('documentType');
-        $documentType = $document->documentType->display_name;
+        // Start Update 16 September 2026, by @WNP: Preserve custom document names while localizing known master records.
+        $documentType = $this->documentTypeLabel(
+            $document->documentType->name,
+            $document->documentType->display_name
+        );
 
-        // Start Update 12 September 2026, by @WNP: Translate the rejection alert without translating the document name.
+        // Start Update 16 September 2026, by @WNP: Build the rejection alert with the selectively localized document label.
         return back()->with('success', __('alerts.document_rejected', ['document' => $documentType]));
     }
 
@@ -220,5 +229,13 @@ class DocumentController extends Controller
         }
 
         return $resolvedPath;
+    }
+
+    // Start Update 16 September 2026, by @WNP: Resolve localized master labels by stable key with a verbatim database fallback.
+    private function documentTypeLabel(string $name, string $fallback): string
+    {
+        $translationKey = "master_data.document_types.{$name}";
+
+        return Lang::has($translationKey) ? __($translationKey) : $fallback;
     }
 }

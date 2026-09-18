@@ -51,7 +51,13 @@ class PaymentWorkflowTest extends TestCase
             'contact_phone' => '9876543210',
             'status' => Vendor::STATUS_ACTIVE,
             'compliance_status' => 'compliant',
-            'pan_number' => 'ABCDE1234F',
+            // Start Update 16 September 2026, by @WNP: Provide an Indonesian transfer destination for payment detail coverage.
+            'registration_number' => '1234567890123',
+            'tax_id' => '0123456789012345',
+            'bank_name' => 'Bank Mandiri',
+            'bank_account_number' => '1234567890',
+            'bank_ifsc' => '008',
+            'bank_branch' => 'KCP Jakarta Menteng',
             'address' => '123 St',
             // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia.
             'city' => 'Kota Bandung',
@@ -204,6 +210,39 @@ class PaymentWorkflowTest extends TestCase
             'status' => 'paid',
             'payment_reference' => 'UTR-123456',
         ]);
+    }
+
+    // Start Update 16 September 2026, by @WNP: Expose full transfer details to Finance while keeping them hidden from Operations.
+    public function test_payment_transfer_destination_is_limited_to_disbursement_roles(): void
+    {
+        $payment = PaymentRequest::create([
+            'vendor_id' => $this->vendor->id,
+            'requested_by' => $this->vendorUser->id,
+            'amount' => 5000,
+            'status' => 'approved',
+            'reference_number' => 'PAY-BANK-DETAIL',
+            'description' => 'Transfer destination visibility',
+        ]);
+
+        $this->actingAs($this->financeUser)
+            ->get(route('admin.payments.show', $payment))
+            ->assertInertia(
+                fn ($page) => $page
+                    ->component('Admin/Payments/Show')
+                    ->where('payment.vendor.bank_name', 'Bank Mandiri')
+                    ->where('payment.vendor.bank_account_number', '1234567890')
+                    ->where('payment.vendor.bank_ifsc', '008')
+                    ->where('payment.vendor.bank_branch', 'KCP Jakarta Menteng')
+            );
+
+        $this->actingAs($this->opsUser)
+            ->get(route('admin.payments.show', $payment))
+            ->assertInertia(
+                fn ($page) => $page
+                    ->component('Admin/Payments/Show')
+                    ->missing('payment.vendor.bank_account_number')
+                    ->missing('payment.vendor.bank_ifsc')
+            );
     }
 
     public function test_finance_manager_sees_error_when_payment_is_compliance_blocked()

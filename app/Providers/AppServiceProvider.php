@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
@@ -60,7 +61,12 @@ class AppServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('sensitive-action', function (Request $request) {
-            return Limit::perMinute(10)->by($request->user()?->id.'|'.$request->ip());
+            // Start Update 16 September 2026, by @WNP: Keep rate-limited form actions on their current page with visible feedback.
+            return Limit::perMinute(10)
+                ->by($request->user()?->id.'|'.$request->ip())
+                ->response(fn (Request $request, array $headers) => back()
+                    ->with('error', __('alerts.too_many_requests'))
+                    ->withHeaders($headers));
         });
 
         RateLimiter::for('login', function (Request $request) {
@@ -103,6 +109,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(function (User $user) {
             return $user->hasRole(Role::SUPER_ADMIN) ? true : null;
         });
+
+        // production
+        if (str_starts_with(config('app.url'), 'https://')) {
+            URL::forceScheme('https');
+        }
     }
 
     private function registerDestructiveCommandGuard(): void

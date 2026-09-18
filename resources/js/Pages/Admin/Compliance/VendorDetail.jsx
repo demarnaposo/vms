@@ -4,6 +4,8 @@ import { AdminLayout, PageHeader, Card, StatCard, StatGrid, Badge, Button } from
 import { useLanguage } from '@/Contexts/LanguageContext';
 // Start Update 15 September 2026, by @WNP: Localize recognized compliance rule master labels.
 import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
+// Start Update 16 September 2026, by @WNP: Reuse automatic compliance-detail translations in rule results.
+import { translateComplianceDetails } from '@/i18n/complianceDetails';
 
 export default function VendorComplianceDetail({ vendor, results, summary }) {
     // Start Update 12 September 2026, by @WNP: Keep the database company name outside translation lookup.
@@ -126,7 +128,12 @@ export default function VendorComplianceDetail({ vendor, results, summary }) {
                                             <Badge status={result.status} />
                                         </td>
                                         <td className="p-4 text-(--color-text-secondary)">
-                                            {result.details || '-'}
+                                            {/* Start Update 16 September 2026, by @WNP: Translate known system details and retain custom database text. */}
+                                            {translateComplianceDetails(
+                                                language,
+                                                result.rule,
+                                                result.details
+                                            ) || '-'}
                                         </td>
                                         <td className="p-4 text-(--color-text-tertiary)">
                                             {result.evaluated_at}

@@ -37,7 +37,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard'));
+        $response->assertRedirect(route('verification.notice'));
     }
 
     public function test_vendor_login_redirects_to_vendor_dashboard()

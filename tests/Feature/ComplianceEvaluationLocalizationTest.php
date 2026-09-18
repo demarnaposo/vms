@@ -67,6 +67,27 @@ class ComplianceEvaluationLocalizationTest extends TestCase
         $this->assertSame(80, $vendor->fresh()->compliance_score);
     }
 
+    // Start Update 16 September 2026, by @WNP: Verify repeated evaluations return visible feedback instead of a not-found page.
+    public function test_repeated_evaluation_returns_rate_limit_alert_on_current_flow(): void
+    {
+        $admin = $this->operationsUser();
+        $vendor = Vendor::factory()->create();
+
+        for ($attempt = 1; $attempt <= 10; $attempt++) {
+            $this->actingAs($admin)
+                ->post("/admin/compliance/evaluate/{$vendor->id}")
+                ->assertRedirect();
+        }
+
+        $this->actingAs($admin)
+            ->post("/admin/compliance/evaluate/{$vendor->id}")
+            ->assertRedirect()
+            ->assertSessionHas(
+                'error',
+                'Too many actions were submitted. Please wait a moment and try again.'
+            );
+    }
+
     private function operationsUser(): User
     {
         // Start Update 12 September 2026, by @WNP: Create an authorized operations user for evaluation route tests.

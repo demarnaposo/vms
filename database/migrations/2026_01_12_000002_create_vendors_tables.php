@@ -19,8 +19,9 @@ return new class extends Migration
             // Company Information
             $table->string('company_name');
             $table->string('registration_number')->nullable();
-            $table->string('tax_id')->nullable(); // GST/VAT number
-            $table->string('pan_number')->nullable();
+            // Start Update 16 September 2026, by @WNP: Document current Indonesian use while retaining the legacy column for historical data.
+            $table->string('tax_id')->nullable(); // NPWP
+            $table->string('pan_number')->nullable(); // Legacy identifier; no longer collected
             $table->string('business_type')->nullable(); // sole_proprietor, partnership, pvt_ltd, etc.
 
             // Contact Information

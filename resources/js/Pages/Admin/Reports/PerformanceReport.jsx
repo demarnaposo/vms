@@ -157,7 +157,8 @@ export default function PerformanceReport({ vendors, stats, filters }) {
                     <div className="p-4 flex flex-wrap items-end gap-4">
                         <div className="flex-1 min-w-[150px]">
                             <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
-                                Minimum Score
+                                {/* Start Update 16 September 2026, by @WNP: Translate the fixed minimum-score filter label. */}
+                                {t('Minimum Score')}
                             </label>
                             <FormInput
                                 type="number"

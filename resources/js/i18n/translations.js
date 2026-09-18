@@ -69,6 +69,17 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Signing in...': 'Sedang masuk...',
     'Create Account': 'Buat Akun',
     'Creating Account...': 'Membuat Akun...',
+    'We will send a verification link to your email address.':
+        'Kami akan mengirim tautan verifikasi ke alamat email Anda.',
+    'Verify Email Address': 'Verifikasi Alamat Email',
+    'A verification link has been sent to :email. Follow it to continue.':
+        'Tautan verifikasi telah dikirim ke :email. Buka tautan tersebut untuk melanjutkan.',
+    'Check your inbox and spam folder. The link expires in 60 minutes.':
+        'Periksa kotak masuk dan folder spam. Tautan berlaku selama 60 menit.',
+    'A new verification link has been sent to your email address.':
+        'Tautan verifikasi baru telah dikirim ke alamat email Anda.',
+    'Resend Verification Email': 'Kirim Ulang Email Verifikasi',
+    'Log Out': 'Keluar',
     'Welcome back': 'Selamat datang kembali',
     'Enter your credentials to access your account':
         'Masukkan kredensial untuk mengakses akun Anda',
@@ -385,6 +396,8 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     Staff: 'Staf',
     'Bank Information': 'Informasi Bank',
     'Bank Details': 'Detail Bank',
+    // Start Update 16 September 2026, by @WNP: Localize the restricted payment transfer destination card.
+    'Transfer Destination': 'Tujuan Transfer',
     'Add your bank details for payment processing.':
         'Tambahkan detail rekening bank untuk proses pembayaran.',
     'Bank Name': 'Nama Bank',
@@ -408,6 +421,10 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Company Information': 'Informasi Perusahaan',
     'Tell us about your business entity.': 'Ceritakan tentang badan usaha Anda.',
     'Company Name': 'Nama Perusahaan',
+    // Start Update 16 September 2026, by @WNP: Localize company-field validation displayed during onboarding.
+    'Company Name is required.': 'Nama perusahaan wajib diisi.',
+    'Company Name may not exceed 255 characters.':
+        'Nama perusahaan tidak boleh lebih dari 255 karakter.',
     'Legal Entity Name': 'Nama badan hukum',
     'Business Type': 'Jenis Usaha',
     'Select Type': 'Pilih jenis usaha',
@@ -417,11 +434,17 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     LLP: 'Kemitraan Tanggung Jawab Terbatas (LLP)',
     'Private Limited': 'Perseroan Terbatas (PT)',
     'Public Limited': 'Perseroan Terbatas Terbuka (Tbk)',
-    'Registration Number': 'Nomor Registrasi',
-    'GST Number': 'Nomor GST',
-    'PAN Number': 'Nomor PAN',
+    // Start Update 16 September 2026, by @WNP: Use Indonesian business identifiers consistently in both languages.
+    // Start Update 16 September 2026, by @WNP: Localize complete business and taxpayer identifier labels.
+    'Business Identification Number (NIB)': 'Nomor Induk Berusaha (NIB)',
+    'Taxpayer Identification Number (NPWP)': 'Nomor Pokok Wajib Pajak (NPWP)',
+    // Start Update 16 September 2026, by @WNP: Localize the vendor deed-number field and its input guidance.
+    'Deed of Establishment Number': 'Nomor Akta Pendirian',
+    'Enter deed number': 'Masukkan nomor akta pendirian',
     'Contact Person': 'Narahubung',
     'Contact Person is required.': 'Narahubung wajib diisi.',
+    'Contact Person may not exceed 255 characters.':
+        'Narahubung tidak boleh lebih dari 255 karakter.',
     'Full name of contact person': 'Nama lengkap narahubung',
     // Start Update 14 September 2026, by @WNP: Label the VMS contact field as telephone or mobile.
     'Phone Number / Mobile': 'Nomor Telepon / Ponsel',
@@ -486,6 +509,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     Name: 'Nama',
     Address: 'Alamat',
     'Address is required.': 'Alamat wajib diisi.',
+    'Address may not exceed 500 characters.': 'Alamat tidak boleh lebih dari 500 karakter.',
     Phone: 'Telepon',
     Branch: 'Cabang',
     'Account No.': 'No. Rekening',
@@ -520,6 +544,9 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     "You don't have permission to access this page.":
         'Anda tidak memiliki izin untuk mengakses halaman ini.',
     'Page Not Found': 'Halaman Tidak Ditemukan',
+    // Start Update 16 September 2026, by @WNP: Localize the dedicated rate-limit error page.
+    'Too Many Requests': 'Terlalu Banyak Permintaan',
+    'Please wait a moment before trying again.': 'Tunggu sebentar sebelum mencoba kembali.',
     "The page you're looking for doesn't exist or has been moved.":
         'Halaman yang Anda cari tidak tersedia atau telah dipindahkan.',
     'Server Error': 'Kesalahan Server',
@@ -617,7 +644,51 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
         'Buat dan kelola akun internal operasional, keuangan, dan administrator',
     'Background jobs, failures, and execution visibility':
         'Pantau pekerjaan latar belakang, kegagalan, dan eksekusi',
+    // Start Update 16 September 2026, by @WNP: Complete static system-health summaries, table headings, filters, and pagination.
+    'Total Jobs': 'Total Pekerjaan',
+    Successful: 'Berhasil',
+    Job: 'Pekerjaan',
+    Started: 'Dimulai',
+    Duration: 'Durasi',
+    Finished: 'Selesai',
+    Error: 'Kesalahan',
+    'Job Name': 'Nama Pekerjaan',
+    Apply: 'Terapkan',
+    '\u00AB Previous': '\u00AB Sebelumnya',
+    'Next \u00BB': 'Lanjut \u00BB',
     'Generate and download reports': 'Buat dan unduh laporan',
+    // Start Update 16 September 2026, by @WNP: Complete static report dashboard, filters, summaries, and count-frame translations.
+    'Vendor Summary': 'Ringkasan Vendor',
+    'Overview of all vendors by status, compliance, and performance':
+        'Ringkasan seluruh vendor berdasarkan status, kepatuhan, dan kinerja',
+    'Payment requests, approvals, and disbursements':
+        'Permintaan, persetujuan, dan pencairan pembayaran',
+    'Vendor performance scores and trends': 'Skor dan tren kinerja vendor',
+    'Audit Trail Report': 'Laporan Jejak Audit',
+    'Complete history of all system activities': 'Riwayat lengkap seluruh aktivitas sistem',
+    'No reports available for your role.': 'Tidak ada laporan yang tersedia untuk peran Anda.',
+    'These commands run automatically but can also be triggered manually:':
+        'Perintah berikut berjalan otomatis, tetapi juga dapat dijalankan secara manual:',
+    'Compliance Evaluation': 'Evaluasi Kepatuhan',
+    'Runs daily at 2:00 AM': 'Berjalan setiap hari pukul 02.00',
+    'Expiry Reminders': 'Pengingat Kedaluwarsa',
+    'Runs daily at 8:00 AM': 'Berjalan setiap hari pukul 08.00',
+    'Weekly Summary': 'Ringkasan Mingguan',
+    'Runs every Monday': 'Berjalan setiap hari Senin',
+    'Compliance Rate': 'Tingkat Kepatuhan',
+    'Avg Score': 'Rata-rata Skor',
+    'Compliance Overview (:count shown)': 'Ringkasan Kepatuhan (:count ditampilkan)',
+    'Expiring in 7 Days': 'Kedaluwarsa dalam 7 Hari',
+    'Expiring in 30 Days': 'Kedaluwarsa dalam 30 Hari',
+    'Already Expired': 'Sudah Kedaluwarsa',
+    'Total with Expiry': 'Total dengan Tanggal Kedaluwarsa',
+    'Expiring Documents (:count shown)': 'Dokumen Akan Kedaluwarsa (:count ditampilkan)',
+    'No documents found for the selected date range.':
+        'Tidak ada dokumen untuk rentang tanggal yang dipilih.',
+    'Vendors (:count shown)': 'Vendor (:count ditampilkan)',
+    'Comp. Score': 'Skor Kepatuhan',
+    'Perf. Score': 'Skor Kinerja',
+    ':count days': ':count hari',
     'Vendor Summary Report': 'Laporan Ringkasan Vendor',
     'Overview of all vendors by status and compliance':
         'Ringkasan seluruh vendor berdasarkan status dan kepatuhan',
@@ -672,13 +743,14 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Company Registration Certificate': 'Sertifikat Pendaftaran Perusahaan',
     'Certificate of incorporation or business registration':
         'Sertifikat pendirian atau pendaftaran usaha',
-    'GST Registration Certificate': 'Sertifikat Registrasi GST',
-    'Goods and Services Tax registration certificate':
-        'Sertifikat registrasi Pajak Barang dan Jasa',
-    'PAN Card': 'Kartu PAN',
-    'Permanent Account Number card': 'Kartu Nomor Rekening Permanen',
-    'Cancelled Cheque': 'Cek yang Dibatalkan',
-    'Cancelled cheque for bank verification': 'Cek yang dibatalkan untuk verifikasi bank',
+    // Start Update 16 September 2026, by @WNP: Translate the default identification and bank-proof documents.
+    'Taxpayer Identification Number (NPWP) Document': 'Dokumen Nomor Pokok Wajib Pajak (NPWP)',
+    'Taxpayer identification document': 'Dokumen identitas wajib pajak',
+    'Business Identification Number (NIB) Document': 'Dokumen Nomor Induk Berusaha (NIB)',
+    'Business identification document': 'Dokumen identitas usaha',
+    'Bank Account Proof': 'Bukti Rekening Bank',
+    'Bank account ownership proof for payment verification':
+        'Bukti kepemilikan rekening bank untuk verifikasi pembayaran',
     'Insurance Certificate': 'Sertifikat Asuransi',
     'Business liability insurance certificate': 'Sertifikat asuransi tanggung jawab usaha',
     'Non-Disclosure Agreement': 'Perjanjian Kerahasiaan',
@@ -799,7 +871,6 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'No documents found for this filter.': 'Tidak ada dokumen untuk filter ini.',
     'Reject Document': 'Tolak Dokumen',
     'Reason for Rejection': 'Alasan Penolakan',
-    'Reason for Rejection *': 'Alasan Penolakan *',
     'Please provide a reason for rejection...': 'Masukkan alasan penolakan...',
     Verify: 'Verifikasi',
     Reject: 'Tolak',
@@ -835,9 +906,6 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
         'Semua dokumen wajib harus diverifikasi sebelum vendor ini disetujui.',
     'Reason:': 'Alasan:',
     // Start Update 12 September 2026, by @WNP: Cover vendor detail review, timeline, and action-dialog copy.
-    'Registration No.': 'No. Registrasi',
-    PAN: 'PAN',
-    'GST/Tax ID': 'GST/ID Pajak',
     'Scores & Status': 'Skor & Status',
     'Rate Performance': 'Nilai Kinerja',
     Approve: 'Setujui',
@@ -855,9 +923,12 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Add internal notes about this vendor...': 'Tambahkan catatan internal tentang vendor ini...',
     'Processing...': 'Memproses...',
     Comment: 'Komentar',
+    // Start Update 16 September 2026, by @WNP: Localize the optional lifecycle comment label as one reusable field label.
+    'Comment (Optional)': 'Komentar (Opsional)',
     '(optional)': '(opsional)',
     'Add a comment...': 'Tambahkan komentar...',
     'Run Evaluation': 'Jalankan Evaluasi',
+    'Evaluating...': 'Sedang mengevaluasi...',
     'Save Notes': 'Simpan Catatan',
     Update: 'Perbarui',
     pass: 'Lulus',
@@ -905,12 +976,23 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Critical. Immediate action required.': 'Kritis. Tindakan segera diperlukan.',
     Passed: 'Lulus',
     'No compliance rules defined yet.': 'Belum ada aturan kepatuhan yang ditetapkan.',
+    // Start Update 16 September 2026, by @WNP: Localize known automatic compliance-result details without changing stored values.
+    'All mandatory documents are verified.': 'Semua dokumen wajib telah diverifikasi.',
+    'Missing mandatory documents: :documents': 'Dokumen wajib yang belum terpenuhi: :documents',
+    'Expired documents: :documents': 'Dokumen kedaluwarsa: :documents',
+    'Documents expiring soon: :documents': 'Dokumen akan segera kedaluwarsa: :documents',
+    'No document expiry issues.': 'Tidak ada masalah kedaluwarsa dokumen.',
+    'Performance score (:score) meets threshold (:threshold).':
+        'Skor kinerja (:score) memenuhi ambang batas (:threshold).',
+    'Performance score (:score) below threshold (:threshold).':
+        'Skor kinerja (:score) berada di bawah ambang batas (:threshold).',
     'How to Improve': 'Cara Meningkatkan',
     'Tips to improve your compliance score:': 'Tips meningkatkan skor kepatuhan Anda:',
     'Ensure all mandatory documents are uploaded and verified':
         'Pastikan semua dokumen wajib telah diunggah dan diverifikasi',
-    'Keep your company registration and GST certificates up to date':
-        'Pastikan sertifikat pendaftaran perusahaan dan GST tetap berlaku',
+    // Start Update 16 September 2026, by @WNP: Refer to Indonesian company documents in compliance guidance.
+    'Keep your Business Identification Number (NIB) and Taxpayer Identification Number (NPWP) documents up to date':
+        'Pastikan dokumen Nomor Induk Berusaha (NIB) dan Nomor Pokok Wajib Pajak (NPWP) Anda tetap berlaku',
     'Maintain valid insurance coverage': 'Pertahankan perlindungan asuransi yang berlaku',
     'Complete all required agreements and contracts':
         'Lengkapi semua perjanjian dan kontrak yang diwajibkan',
@@ -1079,6 +1161,8 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Select method': 'Pilih metode',
     'Select Method...': 'Pilih metode...',
     'Wire Transfer': 'Transfer Bank',
+    // Start Update 16 September 2026, by @WNP: Cover the historical fixed bank-transfer method label.
+    'Bank Transfer': 'Transfer Bank',
     Cheque: 'Cek',
     'Transaction ID or UTR': 'ID Transaksi atau Referensi Pembayaran',
     'Reject Payment': 'Tolak Pembayaran',
@@ -1203,15 +1287,17 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Please select a valid Indonesian province.': 'Silakan pilih provinsi Indonesia yang valid.',
     'Please select a valid regency or city for the selected province.':
         'Silakan pilih kabupaten atau kota yang valid untuk provinsi tersebut.',
-    'Registration Number (CIN / LLPIN) is required.': 'Nomor registrasi (CIN / LLPIN) wajib diisi.',
-    'Enter a valid CIN (e.g. U12345MH2020PTC123456) or LLPIN (e.g. AAA-1234).':
-        'Masukkan CIN yang valid (contoh U12345MH2020PTC123456) atau LLPIN (contoh AAA-1234).',
-    'GST Number is required.': 'Nomor GST wajib diisi.',
-    'GST Number must be exactly 15 characters.': 'Nomor GST harus tepat 15 karakter.',
-    'Enter a valid GSTIN (e.g. 22AAAAA0000A1Z5).':
-        'Masukkan GSTIN yang valid (contoh 22AAAAA0000A1Z5).',
-    'PAN must be in the format ABCDE1234F (5 letters, 4 digits, 1 letter).':
-        'PAN harus berformat ABCDE1234F (5 huruf, 4 digit, 1 huruf).',
+    // Start Update 16 September 2026, by @WNP: Localize Indonesian NIB and NPWP validation feedback.
+    'Business Identification Number (NIB) is required.': 'Nomor Induk Berusaha (NIB) wajib diisi.',
+    'Business Identification Number (NIB) must be exactly 13 digits.':
+        'Nomor Induk Berusaha (NIB) harus tepat 13 digit.',
+    'Taxpayer Identification Number (NPWP) is required.':
+        'Nomor Pokok Wajib Pajak (NPWP) wajib diisi.',
+    'Taxpayer Identification Number (NPWP) must be 15 or 16 digits.':
+        'Nomor Pokok Wajib Pajak (NPWP) harus terdiri dari 15 atau 16 digit.',
+    'Deed of Establishment Number is required.': 'Nomor akta pendirian wajib diisi.',
+    'Deed of Establishment Number may not exceed 100 characters.':
+        'Nomor akta pendirian tidak boleh lebih dari 100 karakter.',
     'Business Type is required.': 'Jenis usaha wajib dipilih.',
     // Start Update 12 September 2026, by @WNP: Translate the document-step expiry alert from client-side validation.
     'Expiry date is required for this document type.':

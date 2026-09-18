@@ -34,7 +34,7 @@ class AuthorizationRouteDenialTest extends TestCase
             'status' => Vendor::STATUS_ACTIVE,
             'compliance_status' => Vendor::COMPLIANCE_COMPLIANT,
             'compliance_score' => 95,
-            'pan_number' => 'ABCDE1234F',
+            'deed_number' => 'DEED-000001',
             'address' => '123 St',
             // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia untuk vendor pertama.
             'city' => 'Kota Bandung',
@@ -84,7 +84,7 @@ class AuthorizationRouteDenialTest extends TestCase
             'status' => Vendor::STATUS_ACTIVE,
             'compliance_status' => Vendor::COMPLIANCE_COMPLIANT,
             'compliance_score' => 95,
-            'pan_number' => 'ABCDE1234G',
+            'deed_number' => 'DEED-000002',
             'address' => '123 St',
             // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia untuk vendor kedua.
             'city' => 'Kota Bandung',
@@ -125,7 +125,7 @@ class AuthorizationRouteDenialTest extends TestCase
             'status' => Vendor::STATUS_ACTIVE,
             'compliance_status' => Vendor::COMPLIANCE_COMPLIANT,
             'compliance_score' => 95,
-            'pan_number' => 'ABCDE1234H',
+            'deed_number' => 'DEED-000003',
             'address' => '123 St',
             // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia untuk vendor ketiga.
             'city' => 'Kota Bandung',

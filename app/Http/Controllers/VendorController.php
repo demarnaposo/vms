@@ -201,9 +201,10 @@ class VendorController extends Controller
         /** @var \App\Models\User $user */
         $vendor = $user->vendor;
 
-        // Make hidden fields visible so they appear on the Profile page
+        // Start Update 16 September 2026, by @WNP: Expose only current Indonesian tax and bank identifiers on the vendor's own profile.
         if ($vendor) {
-            $vendor->makeVisible(['tax_id', 'pan_number', 'bank_account_number', 'bank_ifsc']);
+            // Start Update 16 September 2026, by @WNP: Expose the protected deed number to its owning vendor profile.
+            $vendor->makeVisible(['tax_id', 'deed_number', 'bank_account_number', 'bank_ifsc']);
         }
 
         return Inertia::render('Vendor/Profile', [

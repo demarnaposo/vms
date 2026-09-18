@@ -103,15 +103,20 @@ class VendorLifecycleService
      */
     public function activate(Vendor $vendor, User $actor, ?string $comment = null): void
     {
-        if (! in_array($vendor->status, [Vendor::STATUS_APPROVED, Vendor::STATUS_SUSPENDED], true)) {
-            // Start Update 12 September 2026, by @WNP: Localize the blocked activation alert while preserving the vendor status.
-            throw new InvalidArgumentException(__('alerts.vendor_transition', ['action' => __('alerts.actions.activated'), 'status' => $vendor->status]));
-        }
+        // Start Update 16 September 2026, by @WNP: Serialize activation requests so concurrent submissions cannot transition twice.
+        DB::transaction(function () use ($vendor, $actor, $comment): void {
+            $lockedVendor = Vendor::query()->lockForUpdate()->findOrFail($vendor->getKey());
 
-        $this->assertReadyForActivation($vendor);
+            if (! in_array($lockedVendor->status, [Vendor::STATUS_APPROVED, Vendor::STATUS_SUSPENDED], true)) {
+                // Start Update 12 September 2026, by @WNP: Localize the blocked activation alert while preserving the vendor status.
+                throw new InvalidArgumentException(__('alerts.vendor_transition', ['action' => __('alerts.actions.activated'), 'status' => $lockedVendor->status]));
+            }
 
-        // Start Update 13 September 2026, by @WNP: Tag the activation note without altering the comment itself.
-        $vendor->transitionTo(Vendor::STATUS_ACTIVE, $actor, $comment ?: 'Vendor activated', automaticComment: blank($comment));
+            $this->assertReadyForActivation($lockedVendor);
+
+            // Start Update 13 September 2026, by @WNP: Tag the activation note without altering the comment itself.
+            $lockedVendor->transitionTo(Vendor::STATUS_ACTIVE, $actor, $comment ?: 'Vendor activated', automaticComment: blank($comment));
+        });
     }
 
     /**
@@ -175,8 +180,11 @@ class VendorLifecycleService
                 ->where('is_current', true)
                 ->where('verification_status', 'verified')
                 ->where(function ($query) {
-                    $query->whereNull('expiry_date')
-                        ->orWhereDate('expiry_date', '>=', now()->toDateString());
+                    $query->whereDate('expiry_date', '>=', now()->toDateString())
+                        ->orWhere(function ($query) {
+                            $query->whereNull('expiry_date')
+                                ->whereHas('documentType', fn ($typeQuery) => $typeQuery->where('has_expiry', false));
+                        });
                 })
                 ->pluck('document_type_id');
 
@@ -204,6 +212,10 @@ class VendorLifecycleService
 
         $openFlagsCount = ComplianceFlag::where('vendor_id', $vendor->id)
             ->where('status', 'open')
+            ->where(function ($query) {
+                $query->whereNull('compliance_rule_id')
+                    ->orWhereHas('complianceRule', fn ($ruleQuery) => $ruleQuery->where('is_active', true));
+            })
             ->count();
 
         if ($openFlagsCount > 0) {

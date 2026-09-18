@@ -12,6 +12,8 @@ export function FormInput({
     error = null,
     placeholder = '',
     required = false,
+    showRequiredIndicator = false,
+    inputMode,
     disabled = false,
     icon = null,
     className = '',
@@ -31,7 +33,10 @@ export function FormInput({
                     htmlFor={id}
                     className="text-sm font-semibold text-(--color-text-primary) mb-2 block"
                 >
-                    {t(label)} {required && <span className="text-(--color-danger)">*</span>}
+                    {t(label)}{' '}
+                    {(required || showRequiredIndicator) && (
+                        <span className="text-(--color-danger)">*</span>
+                    )}
                 </label>
             )}
             <div className="relative">
@@ -51,6 +56,7 @@ export function FormInput({
                 <input
                     id={id}
                     type={resolvedType}
+                    inputMode={inputMode}
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={t(placeholder)}

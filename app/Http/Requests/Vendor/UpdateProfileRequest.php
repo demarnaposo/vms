@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Vendor;
 
 use App\Models\Vendor;
+// Start Update 16 September 2026, by @WNP: Normalize draft NIB and NPWP consistently with onboarding.
+use App\Support\IndonesianBusinessIdentifier;
 // Start Update 14 September 2026, by @WNP: Reuse Indonesian mobile-number rules for VMS profile edits.
 use App\Support\IndonesianMobilePhone;
 // Start Update 11 September 2026, by @WNP: Validate profile locations against the shared Indonesian region dataset.
@@ -13,9 +15,21 @@ use Illuminate\Validation\Rule;
 
 class UpdateProfileRequest extends FormRequest
 {
-    // Start Update 14 September 2026, by @WNP: Keep profile contact numbers in the same 08 format as onboarding.
+    // Start Update 16 September 2026, by @WNP: Normalize profile identifiers and contact numbers consistently with onboarding.
     protected function prepareForValidation(): void
     {
+        // Start Update 16 September 2026, by @WNP: Normalize identifiers only when company fields are present in the request.
+        $identifierData = [];
+        if ($this->has('registration_number')) {
+            $identifierData['registration_number'] = IndonesianBusinessIdentifier::normalize($this->input('registration_number'));
+        }
+        if ($this->has('tax_id')) {
+            $identifierData['tax_id'] = IndonesianBusinessIdentifier::normalize($this->input('tax_id'));
+        }
+        if ($identifierData !== []) {
+            $this->merge($identifierData);
+        }
+
         if (is_string($this->input('contact_phone'))) {
             $this->merge(['contact_phone' => IndonesianMobilePhone::normalize($this->input('contact_phone'))]);
         }
@@ -63,9 +77,11 @@ class UpdateProfileRequest extends FormRequest
 
         return [
             'company_name' => 'required|string|max:255',
-            'registration_number' => 'nullable|string|max:50',
-            'tax_id' => 'nullable|string|max:50',
-            'pan_number' => 'required|string|max:20',
+            // Start Update 16 September 2026, by @WNP: Validate draft company identifiers as NIB and NPWP.
+            'registration_number' => ['required', 'string', 'regex:/^[0-9]{13}$/'],
+            'tax_id' => ['required', 'string', 'regex:/^[0-9]{15,16}$/'],
+            // Start Update 16 September 2026, by @WNP: Keep draft company verification aligned with onboarding.
+            'deed_number' => ['required', 'string', 'max:100'],
             'business_type' => 'nullable|string|max:50',
             'contact_person' => 'required|string|max:255',
             // Start Update 14 September 2026, by @WNP: Apply the same Indonesian mobile rule to draft profiles.
@@ -86,6 +102,13 @@ class UpdateProfileRequest extends FormRequest
     public function messages(): array
     {
         return [
+            // Start Update 16 September 2026, by @WNP: Keep profile identifier errors aligned with onboarding.
+            'registration_number.required' => 'Business Identification Number (NIB) is required.',
+            'registration_number.regex' => 'Business Identification Number (NIB) must be exactly 13 digits.',
+            'tax_id.required' => 'Taxpayer Identification Number (NPWP) is required.',
+            'tax_id.regex' => 'Taxpayer Identification Number (NPWP) must be 15 or 16 digits.',
+            'deed_number.required' => 'Deed of Establishment Number is required.',
+            'deed_number.max' => 'Deed of Establishment Number may not exceed 100 characters.',
             // Start Update 14 September 2026, by @WNP: Keep the VMS mobile validation message concise.
             'contact_phone.regex' => 'Enter a valid mobile number (e.g. 081234567890 or +6281234567890).',
             // Start Update 11 September 2026, by @WNP: Return location validation messages using Indonesian address terminology.

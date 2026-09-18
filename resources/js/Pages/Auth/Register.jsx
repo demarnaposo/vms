@@ -187,6 +187,9 @@ export default function Register() {
                             >
                                 {form.processing ? t('Creating Account...') : t('Create Account')}
                             </button>
+                            <p className="text-center text-sm text-(--color-text-tertiary)">
+                                {t('We will send a verification link to your email address.')}
+                            </p>
                         </form>
 
                         <p className="mt-6 text-center text-(--color-text-tertiary)">

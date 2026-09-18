@@ -5,6 +5,8 @@ return [
     'notification_sent' => 'Notification sent to :count recipient(s).',
     // Start Update 15 September 2026, by @WNP: Centralize notification-center success feedback.
     'notifications_marked_read' => 'All notifications marked as read.',
+    // Start Update 16 September 2026, by @WNP: Explain throttled form actions without leaving the current page.
+    'too_many_requests' => 'Too many actions were submitted. Please wait a moment and try again.',
     'document_verified' => ':document verified successfully.',
     'document_rejected' => ':document rejected.',
     'vendor_account_status' => 'Your vendor account is currently :status. Please contact support.',

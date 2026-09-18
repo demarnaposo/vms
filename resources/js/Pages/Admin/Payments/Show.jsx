@@ -15,6 +15,8 @@ import { formatCurrency } from '@/utils/currencyFormatters';
 import { formatDateTime } from '@/utils/dateFormatters';
 // Start Update 13 September 2026, by @WNP: Localize fixed approval stage/action labels, not user names or comments.
 import { useLanguage } from '@/Contexts/LanguageContext';
+// Start Update 16 September 2026, by @WNP: Translate known payment-method values without changing stored references.
+import { translatePaymentMethod } from '@/i18n/paymentMethods';
 
 export default function PaymentsShow({ payment }) {
     // Start Update 13 September 2026, by @WNP: Reuse the selected UI language for payment approval enums.
@@ -197,7 +199,14 @@ export default function PaymentsShow({ payment }) {
                                             <div className="mt-1 break-all text-(--color-text-primary)">
                                                 {payment.payment_reference || 'N/A'}{' '}
                                                 <span className="text-(--color-text-tertiary)">
-                                                    ({payment.payment_method || 'N/A'})
+                                                    {/* Start Update 16 September 2026, by @WNP: Localize fixed methods and preserve custom database values. */}
+                                                    (
+                                                    {translatePaymentMethod(
+                                                        language,
+                                                        payment.payment_method,
+                                                        'N/A'
+                                                    )}
+                                                    )
                                                 </span>
                                             </div>
                                         </div>
@@ -431,6 +440,29 @@ export default function PaymentsShow({ payment }) {
                             </div>
                         </div>
                     </Card>
+
+                    {/* Start Update 16 September 2026, by @WNP: Show the transfer destination only to Finance and Super Admin users. */}
+                    {can.mark_paid && (
+                        <Card title="Transfer Destination">
+                            <div className="space-y-4 p-5">
+                                {[
+                                    ['Bank Name', payment.vendor.bank_name || 'N/A'],
+                                    ['Account Number', payment.vendor.bank_account_number || 'N/A'],
+                                    ['Bank Code', payment.vendor.bank_ifsc || 'N/A'],
+                                    ['Branch Name', payment.vendor.bank_branch || 'N/A'],
+                                ].map(([label, value]) => (
+                                    <div key={label}>
+                                        <label className="text-sm text-(--color-text-tertiary)">
+                                            {t(label)}
+                                        </label>
+                                        <div className="break-all font-medium text-(--color-text-primary)">
+                                            {value}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </Card>
+                    )}
                 </div>
             </div>
 

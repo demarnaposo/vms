@@ -16,7 +16,7 @@ import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
 
 export default function DocumentExpiryReport({ documents, stats, filters }) {
     // Start Update 15 September 2026, by @WNP: Read the selected language for master document labels.
-    const { language } = useLanguage();
+    const { language, t } = useLanguage();
     const { auth } = usePage().props;
     const can = auth?.can || {};
 
@@ -37,9 +37,11 @@ export default function DocumentExpiryReport({ documents, stats, filters }) {
     const getExpiryBadge = (daysUntil) => {
         if (daysUntil === null) return <Badge variant="default">Unknown</Badge>;
         if (daysUntil < 0) return <Badge variant="danger">Expired</Badge>;
-        if (daysUntil <= 7) return <Badge variant="danger">{daysUntil} days</Badge>;
-        if (daysUntil <= 30) return <Badge variant="warning">{daysUntil} days</Badge>;
-        return <Badge variant="success">{daysUntil} days</Badge>;
+        // Start Update 16 September 2026, by @WNP: Localize calculated day counts without translating document data.
+        const daysLabel = t(':count days', { count: daysUntil });
+        if (daysUntil <= 7) return <Badge variant="danger">{daysLabel}</Badge>;
+        if (daysUntil <= 30) return <Badge variant="warning">{daysLabel}</Badge>;
+        return <Badge variant="success">{daysLabel}</Badge>;
     };
 
     const columns = [
@@ -129,7 +131,8 @@ export default function DocumentExpiryReport({ documents, stats, filters }) {
                     <div className="p-4 flex flex-wrap items-end gap-4">
                         <div className="flex-1 min-w-[150px]">
                             <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
-                                Start Date
+                                {/* Start Update 16 September 2026, by @WNP: Translate fixed date-filter labels. */}
+                                {t('Start Date')}
                             </label>
                             <FormInput
                                 type="date"
@@ -141,7 +144,8 @@ export default function DocumentExpiryReport({ documents, stats, filters }) {
                         </div>
                         <div className="flex-1 min-w-[150px]">
                             <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
-                                End Date
+                                {/* Start Update 16 September 2026, by @WNP: Translate fixed date-filter labels. */}
+                                {t('End Date')}
                             </label>
                             <FormInput
                                 type="date"
@@ -163,7 +167,12 @@ export default function DocumentExpiryReport({ documents, stats, filters }) {
                 </Card>
 
                 {/* Data Table */}
-                <Card title={`Expiring Documents (${documents?.data?.length || 0} shown)`}>
+                {/* Start Update 16 September 2026, by @WNP: Translate the document count frame while retaining its numeric value. */}
+                <Card
+                    title={t('Expiring Documents (:count shown)', {
+                        count: documents?.data?.length || 0,
+                    })}
+                >
                     <DataTable
                         columns={columns}
                         data={documents?.data || []}

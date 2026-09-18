@@ -31,13 +31,17 @@ class VerifyVendorFlowFeatures extends Command
         $vendor = Vendor::create([
             'user_id' => $user->id,
             'company_name' => 'Demo Company LLC',
+            // Start Update 16 September 2026, by @WNP: Use Indonesian company identifiers in the verification fixture.
+            'registration_number' => '1234567890123',
+            'tax_id' => '0123456789012345',
+            // Start Update 16 September 2026, by @WNP: Include the required deed number in the verification fixture.
+            'deed_number' => 'DEED-000001',
             'contact_person' => 'John Doe',
             'contact_email' => 'contact@democompany.com',
             'contact_phone' => '1234567890',
             'status' => 'draft',
-            'tax_id' => 'TAX123',
-            'pan_number' => 'PAN123',
-            'bank_account_number' => 'ACC123',
+            // Start Update 16 September 2026, by @WNP: Use an Indonesian-compatible numeric account fixture.
+            'bank_account_number' => '1234567890',
             // Start Update 11 September 2026, by @WNP: Use an Indonesian bank code in the verification fixture.
             'bank_ifsc' => '008',
         ]);

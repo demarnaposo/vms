@@ -10,8 +10,12 @@ import {
     DataTable,
     FormSelect,
 } from '@/Components';
+// Start Update 16 September 2026, by @WNP: Translate static compliance-report filters and count frames.
+import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function ComplianceReport({ vendors, stats, filters }) {
+    // Start Update 16 September 2026, by @WNP: Resolve report-only static copy in the selected language.
+    const { t } = useLanguage();
     const { auth } = usePage().props;
     const can = auth?.can || {};
 
@@ -133,7 +137,8 @@ export default function ComplianceReport({ vendors, stats, filters }) {
                     <div className="p-4 flex flex-wrap items-end gap-4">
                         <div className="flex-1 min-w-[200px]">
                             <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
-                                Compliance Status
+                                {/* Start Update 16 September 2026, by @WNP: Translate the fixed compliance filter label. */}
+                                {t('Compliance Status')}
                             </label>
                             <FormSelect
                                 value={localFilters.compliance_status}
@@ -155,7 +160,12 @@ export default function ComplianceReport({ vendors, stats, filters }) {
                 </Card>
 
                 {/* Data Table */}
-                <Card title={`Compliance Overview (${vendors?.data?.length || 0} shown)`}>
+                {/* Start Update 16 September 2026, by @WNP: Translate the report count frame while retaining its numeric value. */}
+                <Card
+                    title={t('Compliance Overview (:count shown)', {
+                        count: vendors?.data?.length || 0,
+                    })}
+                >
                     <DataTable
                         columns={columns}
                         data={vendors?.data || []}

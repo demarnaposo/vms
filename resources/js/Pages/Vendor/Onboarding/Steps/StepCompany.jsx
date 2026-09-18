@@ -10,6 +10,12 @@ import {
     sanitizeIndonesianMobileInput,
     validateIndonesianMobileNumber as validatePhoneNumber,
 } from '@/utils/indonesianMobilePhone';
+// Start Update 16 September 2026, by @WNP: Reuse Indonesian NIB and NPWP input rules during onboarding.
+import {
+    sanitizeBusinessIdentifier,
+    validateNib,
+    validateNpwp,
+} from '@/utils/indonesianBusinessIdentifiers';
 
 export default function StepCompany({ vendor, sessionData }) {
     const { t } = useLanguage();
@@ -18,7 +24,8 @@ export default function StepCompany({ vendor, sessionData }) {
         company_name: step1Session.company_name || vendor?.company_name || '',
         registration_number: step1Session.registration_number || vendor?.registration_number || '',
         tax_id: step1Session.tax_id || vendor?.tax_id || '',
-        pan_number: step1Session.pan_number || vendor?.pan_number || '',
+        // Start Update 16 September 2026, by @WNP: Collect the vendor deed number during company onboarding.
+        deed_number: step1Session.deed_number || vendor?.deed_number || '',
         business_type: step1Session.business_type || vendor?.business_type || '',
         contact_person: step1Session.contact_person || vendor?.contact_person || '',
         contact_phone: step1Session.contact_phone || vendor?.contact_phone || '',
@@ -30,30 +37,13 @@ export default function StepCompany({ vendor, sessionData }) {
 
     const [clientErrors, setClientErrors] = useState({});
 
-    // CIN: U12345MH2020PTC123456 (21 chars) or LLPIN: AAA-1234
-    const CIN_LLPIN_REGEX = /^([UL][0-9]{5}[A-Z]{2}[0-9]{4}[A-Z]{3}[0-9]{6}|[A-Z]{3}-[0-9]{4})$/;
-    // GSTIN: 22AAAAA0000A1Z5 (15 chars)
-    const GST_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
-
-    const validateRegistrationNumber = (value) => {
+    // Start Update 16 September 2026, by @WNP: Validate every required company field before stopping the client-side submission.
+    const validateCompanyName = (value) => {
         if (!value || value.trim() === '') {
-            return 'Registration Number (CIN / LLPIN) is required.';
+            return 'Company Name is required.';
         }
-        if (!CIN_LLPIN_REGEX.test(value)) {
-            return 'Enter a valid CIN (e.g. U12345MH2020PTC123456) or LLPIN (e.g. AAA-1234).';
-        }
-        return '';
-    };
-
-    const validateGstNumber = (value) => {
-        if (!value || value.trim() === '') {
-            return 'GST Number is required.';
-        }
-        if (value.length !== 15) {
-            return 'GST Number must be exactly 15 characters.';
-        }
-        if (!GST_REGEX.test(value)) {
-            return 'Enter a valid GSTIN (e.g. 22AAAAA0000A1Z5).';
+        if (value.length > 255) {
+            return 'Company Name may not exceed 255 characters.';
         }
         return '';
     };
@@ -61,6 +51,19 @@ export default function StepCompany({ vendor, sessionData }) {
     const validateContactPerson = (value) => {
         if (!value || value.trim() === '') {
             return 'Contact Person is required.';
+        }
+        if (value.length > 255) {
+            return 'Contact Person may not exceed 255 characters.';
+        }
+        return '';
+    };
+
+    const validateAddress = (value) => {
+        if (!value || value.trim() === '') {
+            return 'Address is required.';
+        }
+        if (value.length > 500) {
+            return 'Address may not exceed 500 characters.';
         }
         return '';
     };
@@ -97,16 +100,31 @@ export default function StepCompany({ vendor, sessionData }) {
         return '';
     };
 
+    // Start Update 16 September 2026, by @WNP: Require a concise deed number before advancing onboarding.
+    const validateDeedNumber = (value) => {
+        if (!value || value.trim() === '') {
+            return 'Deed of Establishment Number is required.';
+        }
+        if (value.length > 100) {
+            return 'Deed of Establishment Number may not exceed 100 characters.';
+        }
+        return '';
+    };
+
     // Start Update 11 September 2026, by @WNP: Derive regency/city options only when the selected province changes.
     const cityOptions = useMemo(() => getRegenciesForProvince(data.state), [data.state]);
 
     const submit = (e) => {
         e.preventDefault();
 
-        const regError = validateRegistrationNumber(data.registration_number);
-        const gstError = validateGstNumber(data.tax_id);
+        // Start Update 16 September 2026, by @WNP: Validate all required company fields before submitting company data.
+        const companyNameError = validateCompanyName(data.company_name);
+        const nibError = validateNib(data.registration_number);
+        const npwpError = validateNpwp(data.tax_id);
+        const deedNumberError = validateDeedNumber(data.deed_number);
         const contactError = validateContactPerson(data.contact_person);
         const phoneError = validatePhoneNumber(data.contact_phone);
+        const addressError = validateAddress(data.address);
         const stateError = validateState(data.state);
         const cityError = validateCity(data.city);
         // Start Update 11 September 2026, by @WNP: Include postal code validation before submitting onboarding data.
@@ -114,20 +132,26 @@ export default function StepCompany({ vendor, sessionData }) {
         const bizError = validateBusinessType(data.business_type);
 
         if (
-            regError ||
-            gstError ||
+            companyNameError ||
+            nibError ||
+            npwpError ||
+            deedNumberError ||
             contactError ||
             phoneError ||
+            addressError ||
             stateError ||
             cityError ||
             postalCodeError ||
             bizError
         ) {
             setClientErrors({
-                registration_number: regError,
-                tax_id: gstError,
+                company_name: companyNameError,
+                registration_number: nibError,
+                tax_id: npwpError,
+                deed_number: deedNumberError,
                 contact_person: contactError,
                 contact_phone: phoneError,
+                address: addressError,
                 state: stateError,
                 city: cityError,
                 pincode: postalCodeError,
@@ -160,14 +184,34 @@ export default function StepCompany({ vendor, sessionData }) {
                         <input
                             type="text"
                             value={data.company_name}
-                            onChange={(e) => setData('company_name', e.target.value)}
-                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-(--color-brand-primary)/20 outline-none transition-all"
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                setData('company_name', value);
+                                if (clientErrors.company_name) {
+                                    setClientErrors((prev) => ({
+                                        ...prev,
+                                        company_name: validateCompanyName(value),
+                                    }));
+                                }
+                            }}
+                            onBlur={() => {
+                                setClientErrors((prev) => ({
+                                    ...prev,
+                                    company_name: validateCompanyName(data.company_name),
+                                }));
+                            }}
+                            className={`w-full px-4 py-3 bg-(--color-bg-primary) border rounded-lg text-sm focus:ring-2 outline-none transition-all ${
+                                clientErrors.company_name || errors.company_name
+                                    ? 'border-(--color-danger) focus:border-(--color-danger) focus:ring-(--color-danger)/20'
+                                    : 'border-(--color-border-primary) focus:border-(--color-border-focus) focus:ring-(--color-brand-primary)/20'
+                            }`}
                             placeholder={t('Legal Entity Name')}
+                            maxLength={255}
                         />
-                        {/* Start Update 12 September 2026, by @WNP: Localize the company-name validation alert. */}
-                        {errors.company_name && (
+                        {/* Start Update 16 September 2026, by @WNP: Show company-name validation from both client and server checks. */}
+                        {(clientErrors.company_name || errors.company_name) && (
                             <p className="text-sm text-(--color-danger)">
-                                {t(errors.company_name)}
+                                {t(clientErrors.company_name || errors.company_name)}
                             </p>
                         )}
                     </div>
@@ -201,28 +245,28 @@ export default function StepCompany({ vendor, sessionData }) {
 
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {t('Registration Number')}{' '}
+                            {/* Start Update 16 September 2026, by @WNP: Show the complete business identifier label. */}
+                            {t('Business Identification Number (NIB)')}{' '}
                             <span className="text-(--color-danger)">*</span>
                         </label>
                         <input
                             type="text"
                             value={data.registration_number}
                             onChange={(e) => {
-                                const val = e.target.value.toUpperCase();
+                                // Start Update 16 September 2026, by @WNP: Accept pasted NIB separators while storing digits only.
+                                const val = sanitizeBusinessIdentifier(e.target.value, 13);
                                 setData('registration_number', val);
                                 if (clientErrors.registration_number) {
                                     setClientErrors((prev) => ({
                                         ...prev,
-                                        registration_number: validateRegistrationNumber(val),
+                                        registration_number: validateNib(val),
                                     }));
                                 }
                             }}
                             onBlur={() => {
                                 setClientErrors((prev) => ({
                                     ...prev,
-                                    registration_number: validateRegistrationNumber(
-                                        data.registration_number
-                                    ),
+                                    registration_number: validateNib(data.registration_number),
                                 }));
                             }}
                             className={`w-full px-4 py-3 bg-(--color-bg-primary) border rounded-lg text-sm focus:ring-2 outline-none transition-all ${
@@ -230,8 +274,9 @@ export default function StepCompany({ vendor, sessionData }) {
                                     ? 'border-(--color-danger) focus:border-(--color-danger) focus:ring-(--color-danger)/20'
                                     : 'border-(--color-border-primary) focus:border-(--color-border-focus) focus:ring-(--color-brand-primary)/20'
                             }`}
-                            placeholder="U12345MH2020PTC123456 / AAA-1234"
-                            maxLength={21}
+                            placeholder="1234567890123"
+                            inputMode="numeric"
+                            maxLength={13}
                         />
                         {/* Start Update 12 September 2026, by @WNP: Localize registration-number validation feedback. */}
                         {(clientErrors.registration_number || errors.registration_number) && (
@@ -243,25 +288,28 @@ export default function StepCompany({ vendor, sessionData }) {
 
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {t('GST Number')} <span className="text-(--color-danger)">*</span>
+                            {/* Start Update 16 September 2026, by @WNP: Show the complete taxpayer identifier label. */}
+                            {t('Taxpayer Identification Number (NPWP)')}{' '}
+                            <span className="text-(--color-danger)">*</span>
                         </label>
                         <input
                             type="text"
                             value={data.tax_id}
                             onChange={(e) => {
-                                const val = e.target.value.toUpperCase();
+                                // Start Update 16 September 2026, by @WNP: Normalize formatted NPWP input to digits only.
+                                const val = sanitizeBusinessIdentifier(e.target.value, 16);
                                 setData('tax_id', val);
                                 if (clientErrors.tax_id) {
                                     setClientErrors((prev) => ({
                                         ...prev,
-                                        tax_id: validateGstNumber(val),
+                                        tax_id: validateNpwp(val),
                                     }));
                                 }
                             }}
                             onBlur={() => {
                                 setClientErrors((prev) => ({
                                     ...prev,
-                                    tax_id: validateGstNumber(data.tax_id),
+                                    tax_id: validateNpwp(data.tax_id),
                                 }));
                             }}
                             className={`w-full px-4 py-3 bg-(--color-bg-primary) border rounded-lg text-sm focus:ring-2 outline-none transition-all ${
@@ -269,8 +317,9 @@ export default function StepCompany({ vendor, sessionData }) {
                                     ? 'border-(--color-danger) focus:border-(--color-danger) focus:ring-(--color-danger)/20'
                                     : 'border-(--color-border-primary) focus:border-(--color-border-focus) focus:ring-(--color-brand-primary)/20'
                             }`}
-                            placeholder="22AAAAA0000A1Z5"
-                            maxLength={15}
+                            placeholder="0123456789012345"
+                            inputMode="numeric"
+                            maxLength={16}
                         />
                         {/* Start Update 12 September 2026, by @WNP: Localize tax-number validation feedback. */}
                         {(clientErrors.tax_id || errors.tax_id) && (
@@ -280,23 +329,43 @@ export default function StepCompany({ vendor, sessionData }) {
                         )}
                     </div>
 
+                    {/* Start Update 16 September 2026, by @WNP: Match the deed-number field width to the other company identifiers. */}
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {t('PAN Number')} <span className="text-(--color-danger)">*</span>
+                            {t('Deed of Establishment Number')}{' '}
+                            <span className="text-(--color-danger)">*</span>
                         </label>
                         <input
                             type="text"
-                            value={data.pan_number}
-                            onChange={(e) => setData('pan_number', e.target.value.toUpperCase())}
-                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-(--color-brand-primary)/20 outline-none transition-all"
-                            placeholder="ABCDE1234F"
-                            maxLength={10}
-                            pattern="[A-Z]{5}[0-9]{4}[A-Z]"
-                            title="5 letters, 4 digits, 1 letter (e.g. ABCDE1234F)"
+                            value={data.deed_number}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                setData('deed_number', value);
+                                if (clientErrors.deed_number) {
+                                    setClientErrors((prev) => ({
+                                        ...prev,
+                                        deed_number: validateDeedNumber(value),
+                                    }));
+                                }
+                            }}
+                            onBlur={() => {
+                                setClientErrors((prev) => ({
+                                    ...prev,
+                                    deed_number: validateDeedNumber(data.deed_number),
+                                }));
+                            }}
+                            className={`w-full px-4 py-3 bg-(--color-bg-primary) border rounded-lg text-sm focus:ring-2 outline-none transition-all ${
+                                clientErrors.deed_number || errors.deed_number
+                                    ? 'border-(--color-danger) focus:border-(--color-danger) focus:ring-(--color-danger)/20'
+                                    : 'border-(--color-border-primary) focus:border-(--color-border-focus) focus:ring-(--color-brand-primary)/20'
+                            }`}
+                            placeholder={t('Enter deed number')}
+                            maxLength={100}
                         />
-                        {/* Start Update 12 September 2026, by @WNP: Localize PAN validation feedback. */}
-                        {errors.pan_number && (
-                            <p className="text-sm text-(--color-danger)">{t(errors.pan_number)}</p>
+                        {(clientErrors.deed_number || errors.deed_number) && (
+                            <p className="text-sm text-(--color-danger)">
+                                {t(clientErrors.deed_number || errors.deed_number)}
+                            </p>
                         )}
                     </div>
 
@@ -328,6 +397,7 @@ export default function StepCompany({ vendor, sessionData }) {
                                     : 'border-(--color-border-primary) focus:border-(--color-border-focus) focus:ring-(--color-brand-primary)/20'
                             }`}
                             placeholder={t('Full name of contact person')}
+                            maxLength={255}
                         />
                         {/* Start Update 12 September 2026, by @WNP: Localize contact-person validation feedback. */}
                         {(clientErrors.contact_person || errors.contact_person) && (
@@ -389,10 +459,36 @@ export default function StepCompany({ vendor, sessionData }) {
                         </label>
                         <textarea
                             value={data.address}
-                            onChange={(e) => setData('address', e.target.value)}
-                            className="w-full px-4 py-3 bg-(--color-bg-primary) border border-(--color-border-primary) rounded-lg text-sm focus:border-(--color-border-focus) focus:ring-2 focus:ring-(--color-brand-primary)/20 outline-none transition-all min-h-[80px]"
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                setData('address', value);
+                                if (clientErrors.address) {
+                                    setClientErrors((prev) => ({
+                                        ...prev,
+                                        address: validateAddress(value),
+                                    }));
+                                }
+                            }}
+                            onBlur={() => {
+                                setClientErrors((prev) => ({
+                                    ...prev,
+                                    address: validateAddress(data.address),
+                                }));
+                            }}
+                            className={`w-full px-4 py-3 bg-(--color-bg-primary) border rounded-lg text-sm focus:ring-2 outline-none transition-all min-h-[80px] ${
+                                clientErrors.address || errors.address
+                                    ? 'border-(--color-danger) focus:border-(--color-danger) focus:ring-(--color-danger)/20'
+                                    : 'border-(--color-border-primary) focus:border-(--color-border-focus) focus:ring-(--color-brand-primary)/20'
+                            }`}
                             placeholder={t('Full street address')}
+                            maxLength={500}
                         ></textarea>
+                        {/* Start Update 16 September 2026, by @WNP: Show registered-address validation from both client and server checks. */}
+                        {(clientErrors.address || errors.address) && (
+                            <p className="text-sm text-(--color-danger)">
+                                {t(clientErrors.address || errors.address)}
+                            </p>
+                        )}
                     </div>
 
                     <div className="space-y-2">

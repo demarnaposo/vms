@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { translateMessage } from '../../resources/js/i18n/translations.js';
+// Start Update 16 September 2026, by @WNP: Verify known stored payment methods separately from manual text.
+import { translatePaymentMethod } from '../../resources/js/i18n/paymentMethods.js';
 
 // Start Update 13 September 2026, by @WNP: Cover fixed payment labels, status enums, and count frames in both languages.
 test('payment UI labels follow the selected language', () => {
@@ -22,4 +24,18 @@ test('payment free text remains unchanged', () => {
         translateMessage('id', 'Monthly maintenance for client A'),
         'Monthly maintenance for client A'
     );
+});
+
+// Start Update 16 September 2026, by @WNP: Translate fixed method choices case-insensitively and preserve custom values.
+test('known payment methods are localized without changing stored custom methods', () => {
+    assert.equal(translatePaymentMethod('id', 'Wire Transfer'), 'Transfer Bank');
+    assert.equal(translatePaymentMethod('id', 'wire transfer'), 'Transfer Bank');
+    assert.equal(translatePaymentMethod('id', 'Bank Transfer'), 'Transfer Bank');
+    assert.equal(translatePaymentMethod('id', 'Cheque'), 'Cek');
+    assert.equal(translatePaymentMethod('en', 'wire transfer'), 'Wire Transfer');
+    assert.equal(
+        translatePaymentMethod('id', 'Corporate Treasury Channel'),
+        'Corporate Treasury Channel'
+    );
+    assert.equal(translatePaymentMethod('id', null, 'N/A'), 'N/A');
 });

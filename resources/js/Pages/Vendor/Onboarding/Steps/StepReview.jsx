@@ -67,16 +67,31 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                                 {step1Session.company_name || vendor?.company_name}
                             </span>
                         </div>
+                        {/* Start Update 16 September 2026, by @WNP: Review Indonesian NIB and NPWP values instead of legacy identifiers. */}
                         <div>
-                            <span className="text-(--color-text-tertiary)">PAN:</span>{' '}
+                            <span className="text-(--color-text-tertiary)">
+                                {t('Business Identification Number (NIB)')}:
+                            </span>{' '}
                             <span className="text-(--color-text-primary) ml-2 font-medium">
-                                {step1Session.pan_number || vendor?.pan_number}
+                                {step1Session.registration_number ||
+                                    vendor?.registration_number ||
+                                    'N/A'}
                             </span>
                         </div>
                         <div>
-                            <span className="text-(--color-text-tertiary)">GST:</span>{' '}
+                            <span className="text-(--color-text-tertiary)">
+                                {t('Taxpayer Identification Number (NPWP)')}:
+                            </span>{' '}
                             <span className="text-(--color-text-primary) ml-2 font-medium">
                                 {step1Session.tax_id || vendor?.tax_id || 'N/A'}
+                            </span>
+                        </div>
+                        <div>
+                            <span className="text-(--color-text-tertiary)">
+                                {t('Deed of Establishment Number')}:
+                            </span>{' '}
+                            <span className="text-(--color-text-primary) ml-2 font-medium">
+                                {step1Session.deed_number || vendor?.deed_number || 'N/A'}
                             </span>
                         </div>
                         <div>

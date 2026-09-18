@@ -30,7 +30,7 @@ class ComplianceEngineTest extends TestCase
             'status' => Vendor::STATUS_ACTIVE,
             'compliance_status' => Vendor::COMPLIANCE_COMPLIANT,
             'compliance_score' => 95,
-            'pan_number' => 'ABCDE1234F',
+            'deed_number' => 'DEED-000001',
             'address' => '123 St',
             // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia.
             'city' => 'Kota Bandung',

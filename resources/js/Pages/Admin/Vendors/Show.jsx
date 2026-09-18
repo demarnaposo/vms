@@ -1,5 +1,6 @@
 import { Link, router, useForm, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+// Start Update 16 September 2026, by @WNP: Guard vendor actions immediately before React processing state is rendered.
+import { useRef, useState } from 'react';
 import {
     AdminLayout,
     PageHeader,
@@ -22,6 +23,10 @@ import { translateTimelineComment } from '@/i18n/timelineComments';
 import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
 // Start Update 15 September 2026, by @WNP: Localize recognized compliance master labels in the vendor tab.
 import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
+// Start Update 16 September 2026, by @WNP: Reuse automatic compliance-detail translations in the vendor tab.
+import { translateComplianceDetails } from '@/i18n/complianceDetails';
+// Start Update 16 September 2026, by @WNP: Render fixed business-type codes as localized display labels.
+import { translateBusinessType } from '@/i18n/businessTypes';
 
 export default function VendorShow({
     vendor,
@@ -47,7 +52,12 @@ export default function VendorShow({
     const [docRejectReason, setDocRejectReason] = useState('');
 
     const actionForm = useForm({ comment: '' });
+    // Start Update 16 September 2026, by @WNP: Track evaluation requests so repeated clicks cannot submit concurrently.
+    const evaluationForm = useForm({});
     const notesForm = useForm({ internal_notes: vendor?.internal_notes || '' });
+    const isVendorActionProcessing = actionForm.processing || evaluationForm.processing;
+    // Start Update 16 September 2026, by @WNP: Block rapid duplicate requests within the same render cycle.
+    const vendorActionInFlight = useRef(false);
 
     // Start Update 14 September 2026, by @WNP: Keep VMS lifecycle errors scoped to the active confirmation modal.
     const closeActionModal = () => {
@@ -56,11 +66,16 @@ export default function VendorShow({
     };
 
     const openActionModal = (action) => {
+        if (vendorActionInFlight.current || isVendorActionProcessing) return;
+
         actionForm.clearErrors();
         setShowActionModal(action);
     };
 
+    // Start Update 16 September 2026, by @WNP: Release the immediate request lock after every lifecycle response.
     const handleAction = (action) => {
+        if (vendorActionInFlight.current || isVendorActionProcessing) return;
+
         const routes = {
             approve: `/admin/vendors/${vendor.id}/approve`,
             reject: `/admin/vendors/${vendor.id}/reject`,
@@ -75,10 +90,27 @@ export default function VendorShow({
             return;
         }
 
+        vendorActionInFlight.current = true;
         actionForm.post(route, {
             onSuccess: () => {
                 closeActionModal();
                 actionForm.reset();
+            },
+            onFinish: () => {
+                vendorActionInFlight.current = false;
+            },
+        });
+    };
+
+    // Start Update 16 September 2026, by @WNP: Submit one compliance evaluation at a time and keep the current tab visible.
+    const runComplianceEvaluation = () => {
+        if (!vendor?.id || vendorActionInFlight.current || isVendorActionProcessing) return;
+
+        vendorActionInFlight.current = true;
+        evaluationForm.post(`/admin/compliance/evaluate/${vendor.id}`, {
+            preserveScroll: true,
+            onFinish: () => {
+                vendorActionInFlight.current = false;
             },
         });
     };
@@ -145,12 +177,20 @@ export default function VendorShow({
     const headerActions = (
         <div className="flex gap-2">
             {canApprove && (
-                <Button variant="success" onClick={() => openActionModal('approve')}>
+                <Button
+                    variant="success"
+                    onClick={() => openActionModal('approve')}
+                    disabled={isVendorActionProcessing}
+                >
                     Approve
                 </Button>
             )}
             {canReject && (
-                <Button variant="danger" onClick={() => openActionModal('reject')}>
+                <Button
+                    variant="danger"
+                    onClick={() => openActionModal('reject')}
+                    disabled={isVendorActionProcessing}
+                >
                     Reject
                 </Button>
             )}
@@ -158,7 +198,7 @@ export default function VendorShow({
                 <div className="relative group">
                     <Button
                         onClick={() => openActionModal('activate')}
-                        disabled={!isReadyForActivation}
+                        disabled={!isReadyForActivation || isVendorActionProcessing}
                         className={!isReadyForActivation ? 'opacity-50 cursor-not-allowed' : ''}
                     >
                         Activate
@@ -173,17 +213,29 @@ export default function VendorShow({
                 </div>
             )}
             {canSuspend && (
-                <Button variant="warning" onClick={() => openActionModal('suspend')}>
+                <Button
+                    variant="warning"
+                    onClick={() => openActionModal('suspend')}
+                    disabled={isVendorActionProcessing}
+                >
                     Suspend
                 </Button>
             )}
             {canTerminate && (
-                <Button variant="danger" onClick={() => openActionModal('terminate')}>
+                <Button
+                    variant="danger"
+                    onClick={() => openActionModal('terminate')}
+                    disabled={isVendorActionProcessing}
+                >
                     Terminate
                 </Button>
             )}
             {canReactivate && (
-                <Button variant="warning" onClick={() => openActionModal('reactivate')}>
+                <Button
+                    variant="warning"
+                    onClick={() => openActionModal('reactivate')}
+                    disabled={isVendorActionProcessing}
+                >
                     Reactivate
                 </Button>
             )}
@@ -236,10 +288,20 @@ export default function VendorShow({
                         <div className="p-6 space-y-3 text-sm">
                             {[
                                 ['Company Name', vendor?.company_name],
-                                ['Registration No.', vendor?.registration_number || '-'],
-                                ['PAN', vendor?.pan_number],
-                                ['GST/Tax ID', vendor?.tax_id || '-'],
-                                ['Business Type', vendor?.business_type || '-'],
+                                // Start Update 16 September 2026, by @WNP: Display Indonesian vendor identifiers in the admin summary.
+                                // Start Update 16 September 2026, by @WNP: Use complete identifier labels in the company summary.
+                                [
+                                    'Business Identification Number (NIB)',
+                                    vendor?.registration_number || '-',
+                                ],
+                                ['Taxpayer Identification Number (NPWP)', vendor?.tax_id || '-'],
+                                // Start Update 16 September 2026, by @WNP: Show the submitted deed number on the staff summary.
+                                ['Deed of Establishment Number', vendor?.deed_number || '-'],
+                                // Start Update 16 September 2026, by @WNP: Keep the stored code stable while showing its business label.
+                                [
+                                    'Business Type',
+                                    translateBusinessType(language, vendor?.business_type),
+                                ],
                             ].map(([label, value]) => (
                                 <div key={label} className="flex justify-between">
                                     <span className="text-(--color-text-secondary)">
@@ -505,11 +567,10 @@ export default function VendorShow({
                     {can.run_compliance && (
                         <div className="flex justify-end">
                             <Button
-                                onClick={() =>
-                                    router.post(`/admin/compliance/evaluate/${vendor?.id}`)
-                                }
+                                onClick={runComplianceEvaluation}
+                                disabled={isVendorActionProcessing}
                             >
-                                Run Evaluation
+                                {evaluationForm.processing ? 'Evaluating...' : 'Run Evaluation'}
                             </Button>
                         </div>
                     )}
@@ -531,7 +592,12 @@ export default function VendorShow({
                                         )}
                                     </div>
                                     <div className="text-sm text-(--color-text-secondary)">
-                                        {result.details}
+                                        {/* Start Update 16 September 2026, by @WNP: Translate known system details and retain custom database text. */}
+                                        {translateComplianceDetails(
+                                            language,
+                                            result.rule,
+                                            result.details
+                                        )}
                                     </div>
                                 </div>
                                 <Badge status={result.status} />
@@ -631,8 +697,9 @@ export default function VendorShow({
                     </>
                 }
             >
+                {/* Start Update 16 September 2026, by @WNP: Let the shared field render a single required marker. */}
                 <FormTextarea
-                    label="Reason for Rejection *"
+                    label="Reason for Rejection"
                     value={docRejectReason}
                     onChange={setDocRejectReason}
                     placeholder="Please provide a reason for rejection..."
@@ -655,7 +722,7 @@ export default function VendorShow({
                                     : 'danger'
                             }
                             onClick={() => handleAction(showActionModal)}
-                            disabled={actionForm.processing}
+                            disabled={isVendorActionProcessing}
                         >
                             {actionForm.processing
                                 ? t('Processing...')
@@ -664,8 +731,9 @@ export default function VendorShow({
                     </>
                 }
             >
+                {/* Start Update 16 September 2026, by @WNP: Match lifecycle comment labels to backend required rules without duplicate markers. */}
                 <FormTextarea
-                    label={`${t('Comment')} ${isCommentRequired ? '*' : t('(optional)')}`}
+                    label={isCommentRequired ? 'Comment' : 'Comment (Optional)'}
                     value={actionForm.data.comment}
                     onChange={(val) => actionForm.setData('comment', val)}
                     placeholder={t('Add a comment...')}

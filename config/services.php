@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    // Start Update 16 September 2026, by @WNP: Keep the legacy Razorpay gateway explicitly disabled while preserving future configuration.
+    'razorpay' => [
+        'enabled' => env('RAZORPAY_ENABLED', false),
+        'key_id' => env('RAZORPAY_KEY_ID'),
+        'key_secret' => env('RAZORPAY_KEY_SECRET'),
+    ],
+
 ];

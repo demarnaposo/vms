@@ -89,7 +89,7 @@ class DocumentExpiryWorkflowTest extends TestCase
                     'company_name' => 'Expiry Persist Co',
                     'contact_person' => 'Owner',
                     'contact_phone' => '9999999999',
-                    'pan_number' => 'ABCDE1234F',
+                    'deed_number' => 'DEED-000001',
                     'address' => 'Address',
                     // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia pada data aplikasi.
                     'city' => 'Kota Bandung',
@@ -141,7 +141,7 @@ class DocumentExpiryWorkflowTest extends TestCase
             'contact_email' => $user->email,
             'contact_phone' => '9999999999',
             'status' => Vendor::STATUS_ACTIVE,
-            'pan_number' => 'ABCDE1234F',
+            'deed_number' => 'DEED-000002',
             'address' => 'Address',
             // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia pada vendor pertama.
             'city' => 'Kota Bandung',
@@ -179,7 +179,7 @@ class DocumentExpiryWorkflowTest extends TestCase
             'contact_email' => $user->email,
             'contact_phone' => '9999999999',
             'status' => Vendor::STATUS_ACTIVE,
-            'pan_number' => 'ABCDE1234F',
+            'deed_number' => 'DEED-000003',
             'address' => 'Address',
             // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia pada vendor kedua.
             'city' => 'Kota Bandung',

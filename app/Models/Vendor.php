@@ -20,7 +20,8 @@ class Vendor extends Model
         'company_name',
         'registration_number',
         'tax_id',
-        'pan_number',
+        // Start Update 16 September 2026, by @WNP: Store the vendor deed number under its actual business meaning.
+        'deed_number',
         'business_type',
         'contact_person',
         'contact_email',
@@ -46,7 +47,7 @@ class Vendor extends Model
      */
     protected $hidden = [
         'tax_id',
-        'pan_number',
+        'deed_number',
         'bank_account_number',
         'bank_ifsc',
         'internal_notes',
@@ -59,7 +60,7 @@ class Vendor extends Model
         'suspended_at' => 'datetime',
         'terminated_at' => 'datetime',
         'tax_id' => 'encrypted',
-        'pan_number' => 'encrypted',
+        'deed_number' => 'encrypted',
         'bank_account_number' => 'encrypted',
         'bank_ifsc' => 'encrypted',
     ];

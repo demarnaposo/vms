@@ -60,6 +60,10 @@ class VendorManagementController extends Controller
     {
         $this->authorize('view', $vendor);
 
+        // Start Update 16 September 2026, by @WNP: Explicitly expose Indonesian tax and bank identifiers on the authorized staff summary.
+        // Start Update 16 September 2026, by @WNP: Expose the protected deed number on the authorized staff summary.
+        $vendor->makeVisible(['tax_id', 'deed_number', 'bank_account_number', 'bank_ifsc']);
+
         $vendor->load([
             'documents:id,vendor_id,document_type_id,file_name,verification_status,verification_notes,expiry_date,is_current,created_at' => [
                 'documentType:id,name,display_name',
