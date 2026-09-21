@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('reference_number')->unique();
             $table->string('invoice_number')->nullable();
             $table->decimal('amount', 12, 2);
-            // Start Update 11 September 2026, by @WNP: Use IDR as the payment currency default for fresh installations.
+            // Use IDR as the payment currency default for fresh installations.
             $table->string('currency', 3)->default('IDR');
             $table->text('description');
 

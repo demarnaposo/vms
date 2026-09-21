@@ -2,7 +2,7 @@ import { Head, usePage } from '@inertiajs/react';
 import React from 'react';
 import AppIcon from './AppIcon';
 import Sidebar from './Sidebar';
-// Start Update 11 September 2026, by @WNP: Translate admin layout titles globally.
+// Translate admin layout titles globally.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 // =====================================
@@ -56,7 +56,7 @@ export default function AdminLayout({
                     {/* Flash Messages */}
                     {(flash?.success || flash?.error) && (
                         <div className="px-4 md:px-8 pt-6">
-                            {/* Start Update 14 September 2026, by @WNP: Announce VMS lifecycle success feedback accessibly. */}
+                            {/* Announce VMS lifecycle success feedback accessibly. */}
                             {flash.success && (
                                 <div
                                     role="status"
@@ -66,11 +66,11 @@ export default function AdminLayout({
                                     <span className="w-6 h-6 rounded-full bg-(--color-success) text-white flex items-center justify-center text-sm font-bold min-w-[24px]">
                                         <AppIcon name="success" className="h-4 w-4" />
                                     </span>
-                                    {/* Start Update 11 September 2026, by @WNP: Translate known server flash messages before display. */}
+                                    {/* Translate known server flash messages before display. */}
                                     <span className="font-medium text-sm">{t(flash.success)}</span>
                                 </div>
                             )}
-                            {/* Start Update 14 September 2026, by @WNP: Announce VMS lifecycle failure feedback accessibly. */}
+                            {/* Announce VMS lifecycle failure feedback accessibly. */}
                             {flash.error && (
                                 <div
                                     role="alert"
@@ -79,7 +79,7 @@ export default function AdminLayout({
                                     <span className="w-6 h-6 rounded-full bg-(--color-danger) text-white flex items-center justify-center text-sm font-bold min-w-[24px]">
                                         <AppIcon name="error" className="h-4 w-4" />
                                     </span>
-                                    {/* Start Update 11 September 2026, by @WNP: Translate known server flash errors before display. */}
+                                    {/* Translate known server flash errors before display. */}
                                     <span className="font-medium text-sm">{t(flash.error)}</span>
                                 </div>
                             )}

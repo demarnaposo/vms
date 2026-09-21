@@ -1,7 +1,7 @@
 import { useForm } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
 import Logo from '@/Components/Logo';
-// Start Update 11 September 2026, by @WNP: Enable bilingual password reset content and language selection.
+// Enable bilingual password reset content and language selection.
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { useLanguage } from '@/Contexts/LanguageContext';
 
@@ -21,9 +21,9 @@ export default function ResetPassword({ token, email }) {
 
     return (
         <>
-            <Head title={`${t('Reset Password')} - VMS`} />
+            <Head title={t('Reset Password')} />
             <div className="min-h-screen flex items-center justify-center p-8 bg-(--color-bg-secondary)">
-                {/* Start Update 11 September 2026, by @WNP: Keep language selection available on the reset form. */}
+                {/* Keep language selection available on the reset form. */}
                 <div className="fixed right-4 top-4 z-50">
                     <LanguageSwitcher />
                 </div>

@@ -1,8 +1,8 @@
 import { Link } from '@inertiajs/react';
 import { AdminLayout, PageHeader, DataTable, Badge, Button, AppIcon } from '@/Components';
-// Start Update 13 September 2026, by @WNP: Localize fixed performance labels without translating database metric content.
+// Localize fixed performance labels without translating database metric content.
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 15 September 2026, by @WNP: Localize recognized performance metric master records.
+// Localize recognized performance metric master records.
 import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 
 export default function PerformanceIndex({
@@ -11,8 +11,8 @@ export default function PerformanceIndex({
     topPerformers = [],
     lowPerformers = [],
 }) {
-    // Start Update 13 September 2026, by @WNP: Resolve only static score and empty-state copy through the shared locale.
-    // Start Update 15 September 2026, by @WNP: Read the selected language for performance master data.
+    // Resolve only static score and empty-state copy through the shared locale.
+    // Read the selected language for performance master data.
     const { language, t } = useLanguage();
     const getScoreColor = (score) => {
         if (score >= 80) return 'text-(--color-success)';
@@ -85,7 +85,7 @@ export default function PerformanceIndex({
             <div className="space-y-8">
                 <div className="bg-(--color-bg-primary) rounded-xl border border-(--color-border-primary) shadow-sm p-6">
                     <h2 className="text-lg font-semibold text-(--color-text-primary) mb-4">
-                        {/* Start Update 13 September 2026, by @WNP: Translate the fixed section heading. */}
+                        {/* Translate the fixed section heading. */}
                         {t('Performance Metrics')}
                     </h2>
                     <div className="grid md:grid-cols-4 gap-4">
@@ -95,7 +95,7 @@ export default function PerformanceIndex({
                                 className="p-4 rounded-lg bg-(--color-bg-secondary) border border-(--color-border-secondary)"
                             >
                                 <div className="text-(--color-text-primary) font-medium">
-                                    {/* Start Update 15 September 2026, by @WNP: Translate fixed metric labels and preserve custom metrics. */}
+                                    {/* Translate fixed metric labels and preserve custom metrics. */}
                                     {translateSystemMasterDataField(
                                         language,
                                         'performance_metrics',
@@ -104,7 +104,7 @@ export default function PerformanceIndex({
                                     )}
                                 </div>
                                 <div className="text-sm text-(--color-text-tertiary) mt-1">
-                                    {/* Start Update 15 September 2026, by @WNP: Translate only fixed metric descriptions. */}
+                                    {/* Translate only fixed metric descriptions. */}
                                     {translateSystemMasterDataField(
                                         language,
                                         'performance_metrics',
@@ -114,13 +114,13 @@ export default function PerformanceIndex({
                                 </div>
                                 <div className="flex items-center gap-2 mt-2">
                                     <span className="text-xs text-(--color-brand-primary)">
-                                        {/* Start Update 13 September 2026, by @WNP: Translate the fixed weight label, not metric data. */}
+                                        {/* Translate the fixed weight label, not metric data. */}
                                         {t('Weight: :weight%', {
                                             weight: (metric.weight * 100).toFixed(0),
                                         })}
                                     </span>
                                     <span className="text-xs text-(--color-text-tertiary)">
-                                        {/* Start Update 13 September 2026, by @WNP: Translate the fixed maximum-score label. */}
+                                        {/* Translate the fixed maximum-score label. */}
                                         {t('Max: :score', { score: metric.max_score })}
                                     </span>
                                 </div>
@@ -132,7 +132,7 @@ export default function PerformanceIndex({
                 <div className="grid lg:grid-cols-2 gap-8">
                     <div className="bg-(--color-bg-primary) rounded-xl border border-(--color-border-primary) shadow-sm p-6">
                         <h2 className="text-lg font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
-                            {/* Start Update 13 September 2026, by @WNP: Translate the fixed ranking heading. */}
+                            {/* Translate the fixed ranking heading. */}
                             <AppIcon name="metrics" className="h-5 w-5" /> {t('Top Performers')}
                         </h2>
                         <div className="space-y-3">
@@ -158,7 +158,7 @@ export default function PerformanceIndex({
                             ))}
                             {topPerformers.length === 0 && (
                                 <div className="text-center text-(--color-text-tertiary) py-4">
-                                    {/* Start Update 13 September 2026, by @WNP: Translate the fixed empty state. */}
+                                    {/* Translate the fixed empty state. */}
                                     {t('No data yet')}
                                 </div>
                             )}
@@ -167,7 +167,7 @@ export default function PerformanceIndex({
 
                     <div className="bg-(--color-bg-primary) rounded-xl border border-(--color-border-primary) shadow-sm p-6">
                         <h2 className="text-lg font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
-                            {/* Start Update 13 September 2026, by @WNP: Translate the fixed improvement heading. */}
+                            {/* Translate the fixed improvement heading. */}
                             <AppIcon name="warning" className="h-5 w-5" /> {t('Needs Improvement')}
                         </h2>
                         <div className="space-y-3">
@@ -195,7 +195,7 @@ export default function PerformanceIndex({
                             ))}
                             {lowPerformers.length === 0 && (
                                 <div className="text-center text-(--color-text-tertiary) py-4">
-                                    {/* Start Update 13 September 2026, by @WNP: Translate the fixed empty state. */}
+                                    {/* Translate the fixed empty state. */}
                                     {t('No data yet')}
                                 </div>
                             )}

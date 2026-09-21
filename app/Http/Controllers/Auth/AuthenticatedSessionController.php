@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Models\Vendor;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,21 +37,20 @@ class AuthenticatedSessionController extends Controller
         // Guard vendor access for restricted lifecycle states.
         if ($user->isVendor()) {
             $vendor = $user->vendor;
-            $blockedStates = [
-                Vendor::STATUS_SUSPENDED,
-                Vendor::STATUS_TERMINATED,
-                Vendor::STATUS_REJECTED,
-            ];
+            $error = match (true) {
+                $vendor?->blocksUserAccess() => __('alerts.vendor_account_status', ['status' => $vendor->status]),
+                ! $user->is_active => __('alerts.user_account_inactive'),
+                default => null,
+            };
 
-            if ($vendor && in_array($vendor->status, $blockedStates, true)) {
+            if ($error !== null) {
                 HandleInertiaRequests::clearAuthCache($user->id);
                 Auth::guard('web')->logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
 
                 return back()->withErrors([
-                    // Start Update 12 September 2026, by @WNP: Localize the login alert while preserving the vendor status code.
-                    'email' => __('alerts.vendor_account_status', ['status' => $vendor->status]),
+                    'email' => $error,
                 ])->onlyInput('email');
             }
         }

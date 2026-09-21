@@ -1,7 +1,7 @@
 import { Link } from '@inertiajs/react';
 import AppIcon from './AppIcon';
 import ThemeSwitcher from './ThemeSwitcher';
-// Start Update 11 September 2026, by @WNP: Translate shared page headers from the global language context.
+// Translate shared page headers from the global language context.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function PageHeader({ title, subtitle, backLink = null, actions = null }) {

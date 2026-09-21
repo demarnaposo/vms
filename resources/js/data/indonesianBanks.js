@@ -1,4 +1,4 @@
-// Start Update 11 September 2026, by @WNP: Centralize commonly used Indonesian transfer bank codes for local auto-fill.
+// Centralize commonly used Indonesian transfer bank codes for local auto-fill.
 export const INDONESIAN_BANKS = Object.freeze([
     { code: '002', name: 'Bank Rakyat Indonesia (BRI)' },
     { code: '008', name: 'Bank Mandiri' },
@@ -69,10 +69,10 @@ export const INDONESIAN_BANKS = Object.freeze([
     { code: '567', name: 'Bank Aladin Syariah' },
 ]);
 
-// Start Update 11 September 2026, by @WNP: Build a module-level map for constant-time bank code lookup without network requests.
+// Build a module-level map for constant-time bank code lookup without network requests.
 const BANKS_BY_CODE = new Map(INDONESIAN_BANKS.map((bank) => [bank.code, bank]));
 
-// Start Update 11 September 2026, by @WNP: Resolve an Indonesian bank locally while allowing unlisted banks to be entered manually.
+// Resolve an Indonesian bank locally while allowing unlisted banks to be entered manually.
 export function findIndonesianBankByCode(code) {
     return BANKS_BY_CODE.get(code) || null;
 }

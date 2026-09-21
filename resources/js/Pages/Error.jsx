@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-// Start Update 11 September 2026, by @WNP: Translate shared error pages and recovery actions.
+// Translate shared error pages and recovery actions.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function Error({ status }) {
@@ -36,7 +36,7 @@ export default function Error({ status }) {
                 </svg>
             ),
         },
-        // Start Update 16 September 2026, by @WNP: Represent rate limiting accurately instead of falling back to the 404 copy.
+        // Represent rate limiting accurately instead of falling back to the 404 copy.
         429: {
             title: 'Too Many Requests',
             description: 'Please wait a moment before trying again.',

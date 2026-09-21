@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-// Start Update 11 September 2026, by @WNP: Cover IDR labels and formatting in payment CSV exports.
+// Cover IDR labels and formatting in payment CSV exports.
 use App\Models\PaymentRequest;
 use App\Models\Role;
 use App\Models\User;
@@ -51,7 +51,7 @@ class ReportExportTest extends TestCase
         $this->assertStringContainsString('Compliance Status', $response->getContent());
     }
 
-    // Start Update 11 September 2026, by @WNP: Verify exported payment amounts use the configured IDR code and Indonesian separators.
+    // Verify exported payment amounts use the configured IDR code and Indonesian separators.
     public function test_payment_csv_uses_idr_currency_format(): void
     {
         $user = $this->createOpsUser();

@@ -1,7 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import AppIcon from './AppIcon';
 import Logo from './Logo';
-// Start Update 11 September 2026, by @WNP: Translate shared footer content from the global language context.
+// Translate shared footer content from the global language context.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 const defaultLinks = [

@@ -1,13 +1,13 @@
 import { router, usePage } from '@inertiajs/react';
 import { AdminLayout, PageHeader, Card, Badge, AppIcon } from '@/Components';
-// Start Update 12 September 2026, by @WNP: Translate static rule-management controls without translating rule data.
+// Translate static rule-management controls without translating rule data.
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 15 September 2026, by @WNP: Localize only compliance rules defined by VMS master data.
+// Localize only compliance rules defined by VMS master data.
 import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 
 export default function ComplianceRules({ rules = [] }) {
-    // Start Update 12 September 2026, by @WNP: Keep user-facing labels reactive to the selected language.
-    // Start Update 15 September 2026, by @WNP: Read the selected language for rule master data.
+    // Keep user-facing labels reactive to the selected language.
+    // Read the selected language for rule master data.
     const { language, t } = useLanguage();
     const { auth } = usePage().props;
     const can = auth?.can || {};
@@ -30,7 +30,7 @@ export default function ComplianceRules({ rules = [] }) {
 
     return (
         <AdminLayout title="Compliance Rules" activeNav="Compliance" header={header}>
-            {/* Start Update 12 September 2026, by @WNP: Localize rule-management controls while preserving stored names and descriptions. */}
+            {/* Localize rule-management controls while preserving stored names and descriptions. */}
             <div className="space-y-6">
                 {rules.map((rule) => (
                     <Card key={rule.id}>
@@ -38,7 +38,7 @@ export default function ComplianceRules({ rules = [] }) {
                             <div className="flex items-start justify-between mb-4">
                                 <div>
                                     <h3 className="text-lg font-semibold text-(--color-text-primary)">
-                                        {/* Start Update 15 September 2026, by @WNP: Translate known rule labels and preserve custom rules. */}
+                                        {/* Translate known rule labels and preserve custom rules. */}
                                         {translateSystemMasterDataField(
                                             language,
                                             'compliance_rules',
@@ -48,7 +48,7 @@ export default function ComplianceRules({ rules = [] }) {
                                         )}
                                     </h3>
                                     <p className="text-sm text-(--color-text-tertiary) mt-1">
-                                        {/* Start Update 15 September 2026, by @WNP: Translate only the system-defined rule description. */}
+                                        {/* Translate only the system-defined rule description. */}
                                         {translateSystemMasterDataField(
                                             language,
                                             'compliance_rules',
@@ -56,7 +56,7 @@ export default function ComplianceRules({ rules = [] }) {
                                             'description'
                                         )}
                                     </p>
-                                    {/* Start Update 13 September 2026, by @WNP: Translate the rule-type enum label, not its editable name or description. */}
+                                    {/* Translate the rule-type enum label, not its editable name or description. */}
                                     <Badge status={rule.type} className="mt-2" />
                                 </div>
                                 <div className="flex items-center gap-2">

@@ -8,13 +8,13 @@ const source = readFileSync(
     'utf8'
 );
 
-// Start Update 16 September 2026, by @WNP: Verify optional lifecycle comments have bilingual labels.
+// Verify optional lifecycle comments have bilingual labels.
 test('optional lifecycle comment label is localized', () => {
     assert.equal(translateMessage('en', 'Comment (Optional)'), 'Comment (Optional)');
     assert.equal(translateMessage('id', 'Comment (Optional)'), 'Komentar (Opsional)');
 });
 
-// Start Update 16 September 2026, by @WNP: Guard required actions and prevent duplicate manual asterisks.
+// Guard required actions and prevent duplicate manual asterisks.
 test('vendor lifecycle comment requirement matches backend rules', () => {
     assert.match(
         source,
@@ -25,7 +25,7 @@ test('vendor lifecycle comment requirement matches backend rules', () => {
     assert.doesNotMatch(source, /label=(?:"[^"\n]*\*"|\{`[^`\n]*\*[^`\n]*`\})/);
 });
 
-// Start Update 16 September 2026, by @WNP: Guard evaluation and lifecycle actions against overlapping submissions.
+// Guard evaluation and lifecycle actions against overlapping submissions.
 test('vendor actions are disabled while evaluation or lifecycle requests are processing', () => {
     assert.match(source, /const evaluationForm = useForm\(\{\}\)/);
     assert.match(

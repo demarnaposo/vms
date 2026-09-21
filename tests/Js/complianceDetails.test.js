@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { translateComplianceDetails } from '../../resources/js/i18n/complianceDetails.js';
 
-// Start Update 16 September 2026, by @WNP: Verify known automatic compliance details translate with dynamic values intact.
+// Verify known automatic compliance details translate with dynamic values intact.
 test('translates system-generated compliance result details', () => {
     assert.equal(
         translateComplianceDetails(
@@ -71,7 +71,7 @@ test('translates system-generated compliance result details', () => {
     );
 });
 
-// Start Update 16 September 2026, by @WNP: Preserve English output, custom rules, and unrecognized stored detail text.
+// Preserve English output, custom rules, and unrecognized stored detail text.
 test('preserves custom and unknown compliance details verbatim', () => {
     const manualDetail = 'Reviewed manually by the compliance team.';
     const automaticDetail = 'All mandatory documents are verified.';
@@ -90,7 +90,7 @@ test('preserves custom and unknown compliance details verbatim', () => {
     );
 });
 
-// Start Update 16 September 2026, by @WNP: Guard every compliance-result surface that displays automatic details.
+// Guard every compliance-result surface that displays automatic details.
 test('compliance pages use the centralized detail translator', () => {
     const files = [
         'Pages/Vendor/Compliance.jsx',

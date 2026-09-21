@@ -56,7 +56,7 @@
 
 ### 2.1 Vendor Onboarding Tests
 
-<!-- Start Update 11 September 2026, by @WNP: Use Indonesian bank code terminology in onboarding test cases. -->
+<!-- Use Indonesian bank code terminology in onboarding test cases. -->
 | Test ID | Test Case | Precondition | Test Steps | Expected Result | Priority |
 |---------|-----------|--------------|------------|-----------------|----------|
 | VND-001 | Complete Step 1 - Basic Info | Vendor logged in | 1. Go to `/vendor/onboarding` 2. Fill company name, Business Identification Number (NIB), Taxpayer Identification Number (NPWP), and deed number 3. Next | Data saved to session, proceed to Step 2 | High |

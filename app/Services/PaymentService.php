@@ -48,7 +48,7 @@ class PaymentService
                 'reference_number' => $this->generateReferenceNumber(),
                 'invoice_number' => $invoiceNumber,
                 'amount' => $amount,
-                // Start Update 11 September 2026, by @WNP: Persist the configured default currency on every new payment request.
+                // Persist the configured default currency on every new payment request.
                 'currency' => config('currency.code', 'IDR'),
                 'description' => $description,
                 'due_date' => $dueDate,
@@ -258,7 +258,7 @@ class PaymentService
         }
 
         if (! $vendor->isCompliant() && $vendor->compliance_status !== Vendor::COMPLIANCE_PENDING) {
-            // Start Update 13 September 2026, by @WNP: Localize the system status label in payment alerts without changing its stored code.
+            // Localize the system status label in payment alerts without changing its stored code.
             throw new \Exception(__('alerts.vendor_not_compliant', [
                 'status' => __('compliance.statuses.'.$vendor->compliance_status),
             ]));

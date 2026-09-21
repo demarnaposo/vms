@@ -1,6 +1,7 @@
 import { Link, router, useForm, usePage } from '@inertiajs/react';
-// Start Update 16 September 2026, by @WNP: Guard vendor actions immediately before React processing state is rendered.
-import { useRef, useState } from 'react';
+// Guard vendor actions immediately before React processing state is rendered.
+import { useId, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
     AdminLayout,
     PageHeader,
@@ -15,25 +16,94 @@ import {
 } from '@/Components';
 import { DocumentViewer } from '@/Components/DocumentViewer';
 import { formatDate, formatDateTime } from '@/utils/dateFormatters';
-// Start Update 12 September 2026, by @WNP: Translate vendor detail tabs and its document review panel.
+// Translate vendor detail tabs and its document review panel.
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 13 September 2026, by @WNP: Translate only known automatic vendor timeline comments.
+// Translate only known automatic vendor timeline comments.
 import { translateTimelineComment } from '@/i18n/timelineComments';
-// Start Update 15 September 2026, by @WNP: Translate only fixed document types in vendor details.
+// Translate only fixed document types in vendor details.
 import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
-// Start Update 15 September 2026, by @WNP: Localize recognized compliance master labels in the vendor tab.
+// Localize recognized compliance master labels in the vendor tab.
 import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
-// Start Update 16 September 2026, by @WNP: Reuse automatic compliance-detail translations in the vendor tab.
+// Reuse automatic compliance-detail translations in the vendor tab.
 import { translateComplianceDetails } from '@/i18n/complianceDetails';
-// Start Update 16 September 2026, by @WNP: Render fixed business-type codes as localized display labels.
+// Render fixed business-type codes as localized display labels.
 import { translateBusinessType } from '@/i18n/businessTypes';
+
+function DisabledActionTooltip({ disabled, content, children }) {
+    const tooltipId = useId();
+    const anchorRef = useRef(null);
+    const tooltipRef = useRef(null);
+    const [visible, setVisible] = useState(false);
+    const [position, setPosition] = useState({ top: 0, left: 0, placement: 'top' });
+
+    useLayoutEffect(() => {
+        if (!visible || !disabled || !anchorRef.current || !tooltipRef.current) return;
+
+        const anchor = anchorRef.current.getBoundingClientRect();
+        const tooltip = tooltipRef.current.getBoundingClientRect();
+        const gap = 8;
+        const viewportPadding = 16;
+        const placeBelow = anchor.top < tooltip.height + gap + viewportPadding;
+        const left = Math.min(
+            Math.max(anchor.right - tooltip.width, viewportPadding),
+            window.innerWidth - tooltip.width - viewportPadding
+        );
+
+        setPosition({
+            top: placeBelow ? anchor.bottom + gap : anchor.top - tooltip.height - gap,
+            left,
+            placement: placeBelow ? 'bottom' : 'top',
+        });
+    }, [disabled, visible, content]);
+
+    const showTooltip = () => {
+        if (disabled) setVisible(true);
+    };
+
+    const hideTooltip = () => setVisible(false);
+
+    return (
+        <span
+            ref={anchorRef}
+            className="inline-flex"
+            tabIndex={disabled ? 0 : undefined}
+            aria-disabled={disabled || undefined}
+            aria-describedby={disabled ? tooltipId : undefined}
+            onMouseEnter={showTooltip}
+            onMouseLeave={hideTooltip}
+            onFocus={showTooltip}
+            onBlur={hideTooltip}
+            onKeyDown={(event) => {
+                if (event.key === 'Escape') hideTooltip();
+            }}
+        >
+            {children}
+            {disabled &&
+                visible &&
+                createPortal(
+                    <div
+                        ref={tooltipRef}
+                        id={tooltipId}
+                        role="tooltip"
+                        data-placement={position.placement}
+                        className="fixed z-[100] w-72 max-w-[calc(100vw-2rem)] rounded-lg bg-gray-900 p-3 text-left text-xs text-white shadow-xl pointer-events-none"
+                        style={{ top: position.top, left: position.left }}
+                    >
+                        {content}
+                    </div>,
+                    document.body
+                )}
+        </span>
+    );
+}
 
 export default function VendorShow({
     vendor,
     docVerificationStatus = [],
     allMandatoryDocsVerified = true,
+    activationReadiness = { allowed: false, reasons: [], minimum_compliance_score: 80 },
 }) {
-    // Start Update 12 September 2026, by @WNP: Use the active language for document-related detail copy.
+    // Use the active language for document-related detail copy.
     const { language, t } = useLanguage();
     const dateLocale = language === 'id' ? 'id-ID' : 'en-IN';
     const { auth } = usePage().props;
@@ -52,14 +122,14 @@ export default function VendorShow({
     const [docRejectReason, setDocRejectReason] = useState('');
 
     const actionForm = useForm({ comment: '' });
-    // Start Update 16 September 2026, by @WNP: Track evaluation requests so repeated clicks cannot submit concurrently.
+    // Track evaluation requests so repeated clicks cannot submit concurrently.
     const evaluationForm = useForm({});
     const notesForm = useForm({ internal_notes: vendor?.internal_notes || '' });
     const isVendorActionProcessing = actionForm.processing || evaluationForm.processing;
-    // Start Update 16 September 2026, by @WNP: Block rapid duplicate requests within the same render cycle.
+    // Block rapid duplicate requests within the same render cycle.
     const vendorActionInFlight = useRef(false);
 
-    // Start Update 14 September 2026, by @WNP: Keep VMS lifecycle errors scoped to the active confirmation modal.
+    // Keep VMS lifecycle errors scoped to the active confirmation modal.
     const closeActionModal = () => {
         actionForm.clearErrors();
         setShowActionModal(null);
@@ -72,7 +142,7 @@ export default function VendorShow({
         setShowActionModal(action);
     };
 
-    // Start Update 16 September 2026, by @WNP: Release the immediate request lock after every lifecycle response.
+    // Release the immediate request lock after every lifecycle response.
     const handleAction = (action) => {
         if (vendorActionInFlight.current || isVendorActionProcessing) return;
 
@@ -102,7 +172,7 @@ export default function VendorShow({
         });
     };
 
-    // Start Update 16 September 2026, by @WNP: Submit one compliance evaluation at a time and keep the current tab visible.
+    // Submit one compliance evaluation at a time and keep the current tab visible.
     const runComplianceEvaluation = () => {
         if (!vendor?.id || vendorActionInFlight.current || isVendorActionProcessing) return;
 
@@ -153,9 +223,16 @@ export default function VendorShow({
     const canReject =
         can.reject_vendors && (vendor?.status === 'submitted' || vendor?.status === 'under_review');
 
-    // We will show the button if approved/suspended, but we'll conditionally disable it inline or show warnings.
-    const isReadyForActivation =
-        allMandatoryDocsVerified && vendor?.compliance_status === 'compliant';
+    const isReadyForActivation = activationReadiness.allowed === true;
+    const activationReasonLabels = {
+        documents: 'All mandatory documents must be verified and valid before activation.',
+        compliance:
+            'The vendor must be compliant with a score of at least :score before activation.',
+        flags: 'Resolve all open compliance issues before activation.',
+    };
+    const activationReasons = activationReadiness.reasons
+        .map((reason) => activationReasonLabels[reason])
+        .filter(Boolean);
     const canActivate = can.activate_vendors && ['approved', 'suspended'].includes(vendor?.status);
     const canSuspend = can.suspend_vendors && vendor?.status === 'active';
     const canTerminate = can.terminate_vendors && ['active', 'suspended'].includes(vendor?.status);
@@ -195,7 +272,20 @@ export default function VendorShow({
                 </Button>
             )}
             {canActivate && (
-                <div className="relative group">
+                <DisabledActionTooltip
+                    disabled={!isReadyForActivation}
+                    content={
+                        <ul className="space-y-1" aria-label={t('Activation requirements')}>
+                            {activationReasons.map((reason) => (
+                                <li key={reason}>
+                                    {t(reason, {
+                                        score: activationReadiness.minimum_compliance_score,
+                                    })}
+                                </li>
+                            ))}
+                        </ul>
+                    }
+                >
                     <Button
                         onClick={() => openActionModal('activate')}
                         disabled={!isReadyForActivation || isVendorActionProcessing}
@@ -203,14 +293,7 @@ export default function VendorShow({
                     >
                         Activate
                     </Button>
-                    {!isReadyForActivation && (
-                        <div className="absolute hidden group-hover:block bottom-full mb-2 right-0 w-64 p-2 bg-gray-800 text-white text-xs rounded shadow-lg z-50">
-                            {t(
-                                'Vendor must have all mandatory documents verified and a passing compliance score to be activated.'
-                            )}
-                        </div>
-                    )}
-                </div>
+                </DisabledActionTooltip>
             )}
             {canSuspend && (
                 <Button
@@ -288,16 +371,16 @@ export default function VendorShow({
                         <div className="p-6 space-y-3 text-sm">
                             {[
                                 ['Company Name', vendor?.company_name],
-                                // Start Update 16 September 2026, by @WNP: Display Indonesian vendor identifiers in the admin summary.
-                                // Start Update 16 September 2026, by @WNP: Use complete identifier labels in the company summary.
+                                // Display Indonesian vendor identifiers in the admin summary.
+                                // Use complete identifier labels in the company summary.
                                 [
                                     'Business Identification Number (NIB)',
                                     vendor?.registration_number || '-',
                                 ],
                                 ['Taxpayer Identification Number (NPWP)', vendor?.tax_id || '-'],
-                                // Start Update 16 September 2026, by @WNP: Show the submitted deed number on the staff summary.
+                                // Show the submitted deed number on the staff summary.
                                 ['Deed of Establishment Number', vendor?.deed_number || '-'],
-                                // Start Update 16 September 2026, by @WNP: Keep the stored code stable while showing its business label.
+                                // Keep the stored code stable while showing its business label.
                                 [
                                     'Business Type',
                                     translateBusinessType(language, vendor?.business_type),
@@ -318,7 +401,7 @@ export default function VendorShow({
                                 ['Contact Person', vendor?.contact_person],
                                 ['Email', vendor?.contact_email],
                                 ['Phone', vendor?.contact_phone],
-                                // Start Update 11 September 2026, by @WNP: Tampilkan alamat Indonesia lengkap pada detail vendor admin.
+                                // Tampilkan alamat Indonesia lengkap pada detail vendor admin.
                                 [
                                     'Address',
                                     [
@@ -348,7 +431,7 @@ export default function VendorShow({
                             {[
                                 ['Bank Name', vendor?.bank_name],
                                 ['Account No.', vendor?.bank_account_number],
-                                // Start Update 11 September 2026, by @WNP: Display Indonesian bank code terminology for admins.
+                                // Display Indonesian bank code terminology for admins.
                                 ['Bank Code', vendor?.bank_ifsc],
                                 ['Branch', vendor?.bank_branch || '-'],
                             ].map(([label, value]) => (
@@ -433,7 +516,7 @@ export default function VendorShow({
                                             >
                                                 <span className="w-2 h-2 rounded-full bg-(--color-danger) shrink-0" />
                                                 <span className="text-(--color-text-secondary)">
-                                                    {/* Start Update 15 September 2026, by @WNP: Localize recognized master labels in verification readiness. */}
+                                                    {/* Localize recognized master labels in verification readiness. */}
                                                     {translateDocumentTypeLabel(
                                                         language,
                                                         d.document_type
@@ -475,7 +558,7 @@ export default function VendorShow({
                                     >
                                         <td className="p-4 text-(--color-text-primary)">
                                             <div>
-                                                {/* Start Update 15 September 2026, by @WNP: Translate fixed master labels and preserve custom names. */}
+                                                {/* Translate fixed master labels and preserve custom names. */}
                                                 {translateDocumentTypeLabel(
                                                     language,
                                                     doc.document_type
@@ -582,7 +665,7 @@ export default function VendorShow({
                             <div className="flex items-center justify-between">
                                 <div>
                                     <div className="text-(--color-text-primary) font-medium">
-                                        {/* Start Update 15 September 2026, by @WNP: Translate system rule labels and preserve custom names. */}
+                                        {/* Translate system rule labels and preserve custom names. */}
                                         {translateSystemMasterDataField(
                                             language,
                                             'compliance_rules',
@@ -592,7 +675,7 @@ export default function VendorShow({
                                         )}
                                     </div>
                                     <div className="text-sm text-(--color-text-secondary)">
-                                        {/* Start Update 16 September 2026, by @WNP: Translate known system details and retain custom database text. */}
+                                        {/* Translate known system details and retain custom database text. */}
                                         {translateComplianceDetails(
                                             language,
                                             result.rule,
@@ -642,7 +725,7 @@ export default function VendorShow({
                                     </div>
                                     {log.comment && (
                                         <div className="text-sm text-(--color-text-secondary) mt-2">
-                                            {/* Start Update 13 September 2026, by @WNP: Keep free-text comments raw and localize verified system comments. */}
+                                            {/* Keep free-text comments raw and localize verified system comments. */}
                                             {translateTimelineComment(language, log)}
                                         </div>
                                     )}
@@ -697,7 +780,7 @@ export default function VendorShow({
                     </>
                 }
             >
-                {/* Start Update 16 September 2026, by @WNP: Let the shared field render a single required marker. */}
+                {/* Let the shared field render a single required marker. */}
                 <FormTextarea
                     label="Reason for Rejection"
                     value={docRejectReason}
@@ -731,7 +814,7 @@ export default function VendorShow({
                     </>
                 }
             >
-                {/* Start Update 16 September 2026, by @WNP: Match lifecycle comment labels to backend required rules without duplicate markers. */}
+                {/* Match lifecycle comment labels to backend required rules without duplicate markers. */}
                 <FormTextarea
                     label={isCommentRequired ? 'Comment' : 'Comment (Optional)'}
                     value={actionForm.data.comment}
@@ -739,7 +822,7 @@ export default function VendorShow({
                     placeholder={t('Add a comment...')}
                     required={isCommentRequired}
                 />
-                {/* Start Update 14 September 2026, by @WNP: Surface VMS activation, suspension, and termination failures in the modal. */}
+                {/* Surface VMS activation, suspension, and termination failures in the modal. */}
                 {Object.entries(actionForm.errors).map(([field, message]) => (
                     <p
                         key={field}

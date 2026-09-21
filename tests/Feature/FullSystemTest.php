@@ -63,16 +63,16 @@ class FullSystemTest extends TestCase
         $response->assertRedirect('/vendor/onboarding');
 
         // 4. Step 1: Company Info
-        // Start Update 11 September 2026, by @WNP: Gunakan lokasi dan kode pos Indonesia pada alur onboarding penuh.
+        // Gunakan lokasi dan kode pos Indonesia pada alur onboarding penuh.
         $companyData = [
             'company_name' => 'Test Corp Ltd',
-            // Start Update 16 September 2026, by @WNP: Use NIB and NPWP in the complete onboarding flow.
+            // Use NIB and NPWP in the complete onboarding flow.
             'registration_number' => '1234567890123',
             'tax_id' => '0123456789012345',
             'deed_number' => 'DEED-000001',
             'business_type' => 'pvt_ltd',
             'contact_person' => 'John Doe',
-            // Start Update 14 September 2026, by @WNP: Use a valid Indonesian mobile number in the VMS onboarding flow.
+            // Use a valid Indonesian mobile number in the VMS onboarding flow.
             'contact_phone' => '081234567890',
             'address' => '123 Tech Park',
             'city' => 'Kota Bandung',
@@ -90,9 +90,9 @@ class FullSystemTest extends TestCase
         ]);
 
         // 5. Step 2: Bank Info
-        // Start Update 11 September 2026, by @WNP: Gunakan nama cabang Indonesia pada fixture onboarding.
+        // Gunakan nama cabang Indonesia pada fixture onboarding.
         $bankData = [
-            // Start Update 11 September 2026, by @WNP: Use Indonesian bank information in the full onboarding fixture.
+            // Use Indonesian bank information in the full onboarding fixture.
             'bank_name' => 'Bank Mandiri',
             'bank_account_number' => '123456789012',
             'bank_ifsc' => '008',

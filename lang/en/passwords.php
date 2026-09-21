@@ -1,6 +1,6 @@
 <?php
 
-// Start Update 12 September 2026, by @WNP: Provide English password-reset feedback for the existing status keys.
+// Provide English password-reset feedback for the existing status keys.
 return [
     'reset' => 'Your password has been reset.',
     'sent' => 'We have emailed your password reset link.',

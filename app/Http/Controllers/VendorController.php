@@ -201,9 +201,9 @@ class VendorController extends Controller
         /** @var \App\Models\User $user */
         $vendor = $user->vendor;
 
-        // Start Update 16 September 2026, by @WNP: Expose only current Indonesian tax and bank identifiers on the vendor's own profile.
+
         if ($vendor) {
-            // Start Update 16 September 2026, by @WNP: Expose the protected deed number to its owning vendor profile.
+            // Expose the protected deed number to its owning vendor profile.
             $vendor->makeVisible(['tax_id', 'deed_number', 'bank_account_number', 'bank_ifsc']);
         }
 
@@ -350,7 +350,7 @@ class VendorController extends Controller
         /** @var \App\Models\User $user */
         $this->notificationService->markAllAsRead($user);
 
-        // Start Update 15 September 2026, by @WNP: Return localized vendor notification success feedback.
+        // Return localized vendor notification success feedback.
         return back()->with('success', __('alerts.notifications_marked_read'));
     }
 }

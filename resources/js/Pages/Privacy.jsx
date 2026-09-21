@@ -1,9 +1,9 @@
 import GuestLayout from '@/Components/GuestLayout';
-// Start Update 15 September 2026, by @WNP: Resolve the static privacy-policy copy through the shared bilingual dictionary.
+// Resolve the static privacy-policy copy through the shared bilingual dictionary.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function Privacy() {
-    // Start Update 15 September 2026, by @WNP: Keep English as the source copy while allowing Indonesian display text.
+    // Keep English as the source copy while allowing Indonesian display text.
     const { t } = useLanguage();
     const sections = [
         { id: 'collection', title: 'Information We Collect' },
@@ -24,7 +24,7 @@ export default function Privacy() {
     };
 
     return (
-        <GuestLayout title={`${t('Privacy Policy')} - VMS`}>
+        <GuestLayout title="Privacy Policy">
             <div className="bg-(--color-bg-primary) min-h-screen">
                 {/* Header */}
                 <div className="bg-(--color-bg-secondary) border-b border-(--color-border-secondary)">
@@ -321,7 +321,7 @@ export default function Privacy() {
                                                 <div className="text-xs font-bold text-(--color-text-muted) uppercase tracking-wider mb-1">
                                                     {t('Address')}
                                                 </div>
-                                                {/* Start Update 11 September 2026, by @WNP: Use the Indonesian office location consistently. */}
+                                                {/* Use the Indonesian office location consistently. */}
                                                 <div className="text-(--color-text-primary)">
                                                     Jakarta, Indonesia
                                                 </div>

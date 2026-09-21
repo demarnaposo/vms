@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-// Start Update 11 September 2026, by @WNP: Use the centralized currency formatter in payment alerts.
+// Use the centralized currency formatter in payment alerts.
 use App\Support\Currency;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -32,7 +32,7 @@ class PaymentDelayAlert extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
-        // Start Update 11 September 2026, by @WNP: Format delayed totals as Indonesian Rupiah.
+        // Format delayed totals as Indonesian Rupiah.
         $formattedAmount = Currency::format($this->totalAmount);
 
         $message = $this->vendorFacing

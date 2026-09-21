@@ -2,10 +2,10 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 import AppIcon from './AppIcon';
 import Logo from './Logo';
-// Start Update 11 September 2026, by @WNP: Translate sidebar content and expose the global language switch.
+// Translate sidebar content and expose the global language switch.
 import LanguageSwitcher from './LanguageSwitcher';
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 15 September 2026, by @WNP: Resolve authenticated role codes through VMS master-data labels.
+// Resolve authenticated role codes through VMS master-data labels.
 import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 
 // =====================================
@@ -264,7 +264,7 @@ export default function Sidebar({
     onClose = () => {},
 }) {
     const { auth } = usePage().props;
-    // Start Update 15 September 2026, by @WNP: Read the selected language for sidebar labels and role master data.
+    // Read the selected language for sidebar labels and role master data.
     const { language, t } = useLanguage();
     const user = auth?.user;
     const can = auth?.can || {};
@@ -290,7 +290,7 @@ export default function Sidebar({
             badge: badges[item.name] || null,
         }));
 
-    // Start Update 15 September 2026, by @WNP: Translate fixed roles and retain unknown role codes as readable fallbacks.
+    // Translate fixed roles and retain unknown role codes as readable fallbacks.
     const roleDisplay =
         roles.length > 0
             ? roles
@@ -363,7 +363,7 @@ export default function Sidebar({
 
                 {/* User Section */}
                 <div className="p-3 border-t border-(--color-border-primary)">
-                    {/* Start Update 11 September 2026, by @WNP: Make language switching available in admin and vendor portals. */}
+                    {/* Make language switching available in admin and vendor portals. */}
                     <div className="mb-3 flex justify-center">
                         <LanguageSwitcher />
                     </div>

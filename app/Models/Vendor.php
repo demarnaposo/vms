@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 class Vendor extends Model
@@ -20,7 +22,7 @@ class Vendor extends Model
         'company_name',
         'registration_number',
         'tax_id',
-        // Start Update 16 September 2026, by @WNP: Store the vendor deed number under its actual business meaning.
+        // Store the vendor deed number under its actual business meaning.
         'deed_number',
         'business_type',
         'contact_person',
@@ -81,6 +83,12 @@ class Vendor extends Model
     const STATUS_TERMINATED = 'terminated';
 
     const STATUS_REJECTED = 'rejected';
+
+    public const ACCESS_BLOCKED_STATUSES = [
+        self::STATUS_SUSPENDED,
+        self::STATUS_TERMINATED,
+        self::STATUS_REJECTED,
+    ];
 
     // Compliance status constants
     const COMPLIANCE_PENDING = 'pending';
@@ -204,7 +212,7 @@ class Vendor extends Model
     /**
      * Transition to a new status.
      */
-    // Start Update 13 September 2026, by @WNP: Tag new timeline comments as system or user-authored without changing their stored text.
+    // Tag new timeline comments as system or user-authored without changing their stored text.
     public function transitionTo(string $newStatus, User $user, ?string $comment = null, ?string $reasonCode = null, bool $automaticComment = false): bool
     {
         if (! $this->canTransitionTo($newStatus)) {
@@ -215,7 +223,7 @@ class Vendor extends Model
             throw new InvalidArgumentException('A comment is required when rejecting, suspending, or terminating a vendor.');
         }
 
-        // Start Update 13 September 2026, by @WNP: Carry comment provenance into the immutable state log.
+        // Carry comment provenance into the immutable state log.
         return \Illuminate\Support\Facades\DB::transaction(function () use ($newStatus, $user, $comment, $reasonCode, $automaticComment) {
             $oldStatus = $this->status;
             $this->status = $newStatus;
@@ -234,15 +242,23 @@ class Vendor extends Model
                 $this->approved_by = $user->id;
             }
 
-            // Action: Revoke user access if terminated or rejected/dismissed
-            if (in_array($newStatus, [self::STATUS_TERMINATED, self::STATUS_REJECTED], true) && $this->user) {
-                $this->user->update(['is_active' => false]);
+            $blocksAccess = in_array($newStatus, self::ACCESS_BLOCKED_STATUSES, true);
+            $previouslyBlockedAccess = in_array($oldStatus, self::ACCESS_BLOCKED_STATUSES, true);
+
+            if ($blocksAccess && $this->user) {
+                $this->user->is_active = false;
+                $this->user->setRememberToken(Str::random(60));
+                $this->user->save();
+
+                if (config('session.driver') === 'database') {
+                    DB::connection(config('session.connection'))
+                        ->table(config('session.table', 'sessions'))
+                        ->where('user_id', $this->user->id)
+                        ->delete();
+                }
             }
 
-            // Action: Reactivate user access if bouncing back from a terminated/rejected state
-            if (in_array($oldStatus, [self::STATUS_TERMINATED, self::STATUS_REJECTED], true) &&
-                ! in_array($newStatus, [self::STATUS_TERMINATED, self::STATUS_REJECTED], true) &&
-                $this->user) {
+            if ($previouslyBlockedAccess && ! $blocksAccess && $this->user) {
                 $this->user->update(['is_active' => true]);
             }
 
@@ -256,7 +272,7 @@ class Vendor extends Model
                 'to_status' => $newStatus,
                 'comment' => $comment,
                 'reason_code' => $reasonCode,
-                // Start Update 13 September 2026, by @WNP: Keep language-neutral provenance separate from user-entered comment content.
+                // Keep language-neutral provenance separate from user-entered comment content.
                 'metadata' => ['comment_source' => $automaticComment ? 'system' : 'user'],
             ]);
 
@@ -302,6 +318,11 @@ class Vendor extends Model
     public function isActive(): bool
     {
         return $this->status === self::STATUS_ACTIVE;
+    }
+
+    public function blocksUserAccess(): bool
+    {
+        return in_array($this->status, self::ACCESS_BLOCKED_STATUSES, true);
     }
 
     public function isCompliant(): bool

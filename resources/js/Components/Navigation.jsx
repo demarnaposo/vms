@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
 import AppIcon from './AppIcon';
-// Start Update 11 September 2026, by @WNP: Translate reusable navigation controls and search placeholders.
+// Translate reusable navigation controls and search placeholders.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 function renderIcon(icon, className = 'h-4 w-4') {

@@ -8,6 +8,7 @@ use App\Models\AuditLog;
 use App\Models\ContactMessage;
 use App\Services\ContactMessageService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class ContactController extends Controller
@@ -19,9 +20,17 @@ class ContactController extends Controller
      */
     public function store(StoreContactMessageRequest $request)
     {
-        $this->contactMessageService->create($request->validated());
+        try {
+            $this->contactMessageService->create($request->validated());
+        } catch (\Throwable $exception) {
+            Log::error('Contact message submission failed', [
+                'exception' => $exception::class,
+            ]);
 
-        return back()->with('success', 'Thank you for your message! We\'ll get back to you soon.');
+            return back()->with('error', __('alerts.contact_message_failed'));
+        }
+
+        return back()->with('success', __('alerts.contact_message_sent'));
     }
 
     /**

@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    // Start Update 11 September 2026, by @WNP: Change the vendor country default without rewriting historical addresses.
+    // Change the vendor country default without rewriting historical addresses.
     public function up(): void
     {
         Schema::table('vendors', function (Blueprint $table) {
@@ -14,7 +14,7 @@ return new class extends Migration
         });
     }
 
-    // Start Update 11 September 2026, by @WNP: Restore the previous schema default when rolling back.
+    // Restore the previous schema default when rolling back.
     public function down(): void
     {
         Schema::table('vendors', function (Blueprint $table) {

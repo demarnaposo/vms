@@ -7,7 +7,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Start Update 16 September 2026, by @WNP: Expand VMS-owned document labels without changing stable keys or relations.
+        // Expand VMS-owned document labels without changing stable keys or relations.
         DB::table('document_types')
             ->where('name', 'gst_certificate')
             ->update([
@@ -25,6 +25,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        // Start Update 16 September 2026, by @WNP: Keep expanded master labels during rollback.
+        // Keep expanded master labels during rollback.
     }
 };

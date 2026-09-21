@@ -11,19 +11,19 @@ import {
     FormSelect,
 } from '@/Components';
 import { formatDate } from '@/utils/dateFormatters';
-// Start Update 11 September 2026, by @WNP: Use the centralized Indonesian province and regency/city dataset.
+// Use the centralized Indonesian province and regency/city dataset.
 import { INDONESIAN_PROVINCES, getRegenciesForProvince } from '@/data/indonesianProvincesAndCities';
-// Start Update 11 September 2026, by @WNP: Resolve Indonesian bank names locally from three-digit transfer codes.
+// Resolve Indonesian bank names locally from three-digit transfer codes.
 import { findIndonesianBankByCode } from '@/data/indonesianBanks';
-// Start Update 11 September 2026, by @WNP: Translate vendor profile tabs, fields, and actions.
+// Translate vendor profile tabs, fields, and actions.
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 14 September 2026, by @WNP: Match VMS profile phone input to Indonesian onboarding rules.
+// Match VMS profile phone input to Indonesian onboarding rules.
 import {
     sanitizeIndonesianMobileInput,
     validateIndonesianMobileNumber as validatePhoneNumber,
 } from '@/utils/indonesianMobilePhone';
 
-// Start Update 11 September 2026, by @WNP: Use Indonesia's three-digit bank transfer code format.
+// Use Indonesia's three-digit bank transfer code format.
 const BANK_CODE_REGEX = /^[0-9]{3}$/;
 
 export default function Profile({ vendor }) {
@@ -38,7 +38,7 @@ export default function Profile({ vendor }) {
         company_name: vendor?.company_name || '',
         registration_number: vendor?.registration_number || '',
         tax_id: vendor?.tax_id || '',
-        // Start Update 16 September 2026, by @WNP: Display the submitted deed number with other locked company details.
+        // Display the submitted deed number with other locked company details.
         deed_number: vendor?.deed_number || '',
         business_type: vendor?.business_type || '',
         contact_person: vendor?.contact_person || '',
@@ -54,9 +54,9 @@ export default function Profile({ vendor }) {
         bank_branch: vendor?.bank_branch || '',
     });
 
-    // Start Update 11 September 2026, by @WNP: Derive regency/city options only when the selected province changes.
+    // Derive regency/city options only when the selected province changes.
     const cityOptions = useMemo(() => getRegenciesForProvince(form.data.state), [form.data.state]);
-    // Start Update 11 September 2026, by @WNP: Derive Indonesian bank resolution without extra state or external requests.
+    // Derive Indonesian bank resolution without extra state or external requests.
     const resolvedBank = findIndonesianBankByCode(form.data.bank_ifsc);
 
     // --- Contact Validations ---
@@ -81,7 +81,7 @@ export default function Profile({ vendor }) {
     };
 
     const validatePincode = (value) => {
-        // Start Update 11 September 2026, by @WNP: Validate Indonesia's five-digit postal code format.
+        // Validate Indonesia's five-digit postal code format.
         if (!value || value.trim() === '') return 'Postal code is required.';
         if (!/^[0-9]{5}$/.test(value)) return 'Postal code must be exactly 5 digits.';
         return '';
@@ -99,7 +99,7 @@ export default function Profile({ vendor }) {
         return '';
     };
 
-    // Start Update 11 September 2026, by @WNP: Validate Indonesian three-digit bank codes.
+    // Validate Indonesian three-digit bank codes.
     const validateBankCode = (value) => {
         if (!value || value.trim() === '') return 'Bank Code is required.';
         if (!BANK_CODE_REGEX.test(value)) return 'Bank Code must be exactly 3 digits.';
@@ -130,7 +130,7 @@ export default function Profile({ vendor }) {
         if (activeTab === 'bank') {
             newErrors.bank_name = validateBankName(form.data.bank_name);
             newErrors.bank_account_number = validateAccountNumber(form.data.bank_account_number);
-            // Start Update 11 September 2026, by @WNP: Validate the Indonesian bank code on profile submission.
+            // Validate the Indonesian bank code on profile submission.
             newErrors.bank_ifsc = validateBankCode(form.data.bank_ifsc);
             newErrors.bank_branch = validateBranch(form.data.bank_branch);
             hasError = Object.values(newErrors).some((e) => e !== '');
@@ -224,7 +224,7 @@ export default function Profile({ vendor }) {
                                     required
                                     disabled={true}
                                 />
-                                {/* Start Update 16 September 2026, by @WNP: Display Indonesian company identifiers on the vendor profile. */}
+                                {/* Display Indonesian company identifiers on the vendor profile. */}
                                 <FormInput
                                     label="Business Identification Number (NIB)"
                                     value={form.data.registration_number}
@@ -336,7 +336,7 @@ export default function Profile({ vendor }) {
                                         {t('Phone Number / Mobile')}{' '}
                                         <span className="text-(--color-danger)">*</span>
                                     </label>
-                                    {/* Start Update 14 September 2026, by @WNP: Support 08 and +628 mobile entry with matching length limits. */}
+                                    {/* Support 08 and +628 mobile entry with matching length limits. */}
                                     <input
                                         type="tel"
                                         inputMode="tel"
@@ -425,7 +425,6 @@ export default function Profile({ vendor }) {
                                     )}
                                 </div>
 
-                                {/* Start Update 11 September 2026, by @WNP: Replace the Indian state dropdown with Indonesian provinces. */}
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-(--color-text-secondary)">
                                         {t('Province')}{' '}
@@ -454,7 +453,7 @@ export default function Profile({ vendor }) {
                                     />
                                 </div>
 
-                                {/* Start Update 11 September 2026, by @WNP: Replace the city dropdown with Indonesian regencies and cities. */}
+                                {/* Replace the city dropdown with Indonesian regencies and cities. */}
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-(--color-text-secondary)">
                                         {t('Regency / City')}{' '}
@@ -482,7 +481,7 @@ export default function Profile({ vendor }) {
                                     />
                                 </div>
 
-                                {/* Start Update 11 September 2026, by @WNP: Use Indonesia's postal code label and five-digit input rules. */}
+                                {/* Use Indonesia's postal code label and five-digit input rules. */}
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-(--color-text-secondary)">
                                         {t('Postal Code')}{' '}
@@ -528,7 +527,7 @@ export default function Profile({ vendor }) {
                     {activeTab === 'bank' && (
                         <Card title="Bank Details">
                             <div className="grid md:grid-cols-2 gap-6 p-6">
-                                {/* Start Update 11 September 2026, by @WNP: Use Indonesian bank naming and local bank-code resolution. */}
+                                {/* Use Indonesian bank naming and local bank-code resolution. */}
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-(--color-text-secondary)">
                                         {t('Bank Name')}{' '}
@@ -609,7 +608,7 @@ export default function Profile({ vendor }) {
                                     )}
                                 </div>
 
-                                {/* Start Update 11 September 2026, by @WNP: Use an Indonesian bank code field with local name lookup. */}
+                                {/* Use an Indonesian bank code field with local name lookup. */}
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-(--color-text-secondary)">
                                         {t('Bank Code')}{' '}
@@ -685,7 +684,7 @@ export default function Profile({ vendor }) {
                                     )}
                                 </div>
 
-                                {/* Start Update 11 September 2026, by @WNP: Keep branch manual because Indonesian bank codes do not identify an individual branch. */}
+                                {/* Keep branch manual because Indonesian bank codes do not identify an individual branch. */}
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-(--color-text-secondary)">
                                         {t('Branch Name')}{' '}
@@ -792,7 +791,7 @@ export default function Profile({ vendor }) {
                     {/* Action Buttons - Only show on editable tabs */}
                     {isEditing && (activeTab === 'contact' || activeTab === 'bank') && (
                         <div className="flex justify-end gap-3 mt-6">
-                            {/* Start Update 11 September 2026, by @WNP: Reset form data without obsolete external bank lookup state. */}
+                            {/* Reset form data without obsolete external bank lookup state. */}
                             <Button
                                 variant="outline"
                                 onClick={() => {

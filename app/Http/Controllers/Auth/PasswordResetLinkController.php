@@ -41,7 +41,7 @@ class PasswordResetLinkController extends Controller
                 Vendor::STATUS_TERMINATED,
             ], true)) {
                 return back()->withErrors([
-                    // Start Update 12 September 2026, by @WNP: Localize the reset restriction while preserving the vendor status code.
+                    // Localize the reset restriction while preserving the vendor status code.
                     'email' => __('alerts.vendor_account_status', ['status' => $vendor->status]),
                 ]);
             }

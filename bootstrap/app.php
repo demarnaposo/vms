@@ -11,10 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Start Update 12 September 2026, by @WNP: Accept the plain, non-sensitive locale cookie written by the browser language switcher.
+        // Accept the plain, non-sensitive locale cookie written by the browser language switcher.
         $middleware->encryptCookies(except: ['vms_locale']);
 
-        // Start Update 11 September 2026, by @WNP: Resolve the selected language before Inertia builds page responses.
+        // Resolve the selected language before Inertia builds page responses.
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\HandleInertiaRequests::class,

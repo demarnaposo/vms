@@ -1,6 +1,6 @@
 import { translateMessage } from './translations.js';
 
-// Start Update 15 September 2026, by @WNP: Define translatable VMS master records by stable category and name.
+// Define translatable VMS master records by stable category and name.
 export const SYSTEM_MASTER_DATA = Object.freeze({
     roles: {
         super_admin: {
@@ -59,17 +59,17 @@ export const SYSTEM_MASTER_DATA = Object.freeze({
             description: 'Certificate of incorporation or business registration',
         },
         gst_certificate: {
-            // Start Update 16 September 2026, by @WNP: Localize the stable master key with the complete taxpayer identifier label.
+            // Localize the stable master key with the complete taxpayer identifier label.
             display_name: 'Taxpayer Identification Number (NPWP) Document',
             description: 'Taxpayer identification document',
         },
         pan_card: {
-            // Start Update 16 September 2026, by @WNP: Localize the stable master key with the complete business identifier label.
+            // Localize the stable master key with the complete business identifier label.
             display_name: 'Business Identification Number (NIB) Document',
             description: 'Business identification document',
         },
         cancelled_cheque: {
-            // Start Update 16 September 2026, by @WNP: Present bank-account proof instead of a cheque-specific document.
+            // Present bank-account proof instead of a cheque-specific document.
             display_name: 'Bank Account Proof',
             description: 'Bank account ownership proof for payment verification',
         },
@@ -120,7 +120,7 @@ export const SYSTEM_MASTER_DATA = Object.freeze({
     },
 });
 
-// Start Update 15 September 2026, by @WNP: Translate only recognized master fields and preserve custom database records verbatim.
+// Translate only recognized master fields and preserve custom database records verbatim.
 export function translateSystemMasterDataField(
     language,
     category,

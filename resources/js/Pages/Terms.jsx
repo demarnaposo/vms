@@ -1,9 +1,9 @@
 import GuestLayout from '@/Components/GuestLayout';
-// Start Update 15 September 2026, by @WNP: Resolve the static terms-of-service copy through the shared bilingual dictionary.
+// Resolve the static terms-of-service copy through the shared bilingual dictionary.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function Terms() {
-    // Start Update 15 September 2026, by @WNP: Keep English as the source copy while allowing Indonesian display text.
+    // Keep English as the source copy while allowing Indonesian display text.
     const { t } = useLanguage();
     const sections = [
         { id: 'acceptance', title: '1. Acceptance of Terms' },
@@ -26,7 +26,7 @@ export default function Terms() {
     };
 
     return (
-        <GuestLayout title={`${t('Terms of Service')} - VMS`}>
+        <GuestLayout title="Terms of Service">
             <div className="bg-(--color-bg-primary) min-h-screen">
                 {/* Header */}
                 <div className="bg-(--color-bg-secondary) border-b border-(--color-border-secondary)">
@@ -239,7 +239,7 @@ export default function Terms() {
                                     <h3 className="font-bold text-(--color-text-primary) mb-2">
                                         {t('10. Governing Law')}
                                     </h3>
-                                    {/* Start Update 11 September 2026, by @WNP: Align governing law with the application's Indonesian operating context. */}
+                                    {/* Align governing law with the application's Indonesian operating context. */}
                                     <p className="text-sm text-(--color-text-tertiary) mb-0">
                                         {t(
                                             'These Terms shall be governed and construed in accordance with the laws of the Republic of Indonesia, without regard to its conflict of law provisions. Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights.'
@@ -273,7 +273,7 @@ export default function Terms() {
                                                 <div className="text-xs font-bold text-(--color-text-muted) uppercase tracking-wider mb-1">
                                                     {t('Office')}
                                                 </div>
-                                                {/* Start Update 11 September 2026, by @WNP: Use the Indonesian office location consistently. */}
+                                                {/* Use the Indonesian office location consistently. */}
                                                 <div className="text-(--color-text-primary)">
                                                     Jakarta, Indonesia
                                                 </div>

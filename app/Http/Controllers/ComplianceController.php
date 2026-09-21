@@ -66,13 +66,13 @@ class ComplianceController extends Controller
         try {
             $result = $this->complianceService->evaluateVendor($vendor);
 
-            // Start Update 13 September 2026, by @WNP: Localize the system status label in the alert without changing the stored status code.
+            // Localize the system status label in the alert without changing the stored status code.
             return back()->with('success', __('compliance.evaluated', [
                 'score' => $result['score'],
                 'status' => __('compliance.statuses.'.$result['status']),
             ]));
         } catch (\Throwable $e) {
-            // Start Update 16 September 2026, by @WNP: Keep evaluation failures on the vendor page with visible feedback.
+            // Keep evaluation failures on the vendor page with visible feedback.
             Log::error('Compliance evaluation failed', [
                 'vendor_id' => $vendor->id,
                 'error' => $e->getMessage(),
@@ -91,7 +91,7 @@ class ComplianceController extends Controller
 
         $results = $this->complianceService->evaluateAllVendors();
 
-        // Start Update 12 September 2026, by @WNP: Localize the bulk evaluation alert using the active request locale.
+        // Localize the bulk evaluation alert using the active request locale.
         return back()->with('success', __('compliance.evaluation_completed', [
             'count' => count($results),
         ]));

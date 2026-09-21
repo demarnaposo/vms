@@ -6,7 +6,7 @@ use App\Interfaces\VendorRepositoryInterface;
 use App\Models\DocumentVersion;
 use App\Models\User;
 use App\Models\Vendor;
-// Start Update 11 September 2026, by @WNP: Persist the Indonesian country value with onboarding location data.
+// Persist the Indonesian country value with onboarding location data.
 use App\Support\IndonesiaRegions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
@@ -168,7 +168,7 @@ class VendorService
                 $data['step1'] ?? [],
                 $data['step2'] ?? []
             );
-            // Start Update 11 September 2026, by @WNP: Keep new and resubmitted vendor profiles aligned with Indonesian regions.
+            // Keep new and resubmitted vendor profiles aligned with Indonesian regions.
             $vendorData['country'] = IndonesiaRegions::country();
 
             // If vendor doesn't exist, create as DRAFT first.
@@ -205,7 +205,7 @@ class VendorService
                         // If file not found in temp, check if it's already in final path (re-submission case)
                         if (! Storage::disk('private')->exists($newPath)) {
                             // CRITICAL: Fail the transaction if a document is missing
-                            // Start Update 12 September 2026, by @WNP: Localize the upload error without translating the provided filename.
+                            // Localize the upload error without translating the provided filename.
                             throw new \Exception(__('alerts.document_upload_missing', ['file' => $doc['file_name']]));
                         }
                     }
@@ -241,7 +241,7 @@ class VendorService
             // 4. Perform State Transition (Logs & Audit included)
             // This sets status to SUBMITTED, sets submitted_at, logs change, etc.
             if ($vendor->status !== Vendor::STATUS_SUBMITTED) {
-                // Start Update 13 September 2026, by @WNP: Mark the fixed onboarding timeline comment as application-generated.
+                // Mark the fixed onboarding timeline comment as application-generated.
                 $vendor->transitionTo(Vendor::STATUS_SUBMITTED, $user, 'Vendor application submitted for review', automaticComment: true);
             }
 

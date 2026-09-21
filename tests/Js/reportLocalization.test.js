@@ -9,7 +9,7 @@ const readReport = (fileName) =>
         'utf8'
     );
 
-// Start Update 16 September 2026, by @WNP: Verify remaining static report copy is bilingual.
+// Verify remaining static report copy is bilingual.
 test('report dashboard and detail copy is localized', () => {
     const examples = [
         ['Vendor Summary', 'Ringkasan Vendor'],
@@ -33,7 +33,7 @@ test('report dashboard and detail copy is localized', () => {
     }
 });
 
-// Start Update 16 September 2026, by @WNP: Guard interpolated report frames and calculated day labels.
+// Guard interpolated report frames and calculated day labels.
 test('report count and duration frames preserve their dynamic values', () => {
     assert.equal(
         translateMessage('id', 'Compliance Overview (:count shown)', { count: 4 }),
@@ -50,7 +50,7 @@ test('report count and duration frames preserve their dynamic values', () => {
     assert.equal(translateMessage('id', ':count days', { count: 12 }), '12 hari');
 });
 
-// Start Update 16 September 2026, by @WNP: Ensure report pages translate static frames while retaining database fields.
+// Ensure report pages translate static frames while retaining database fields.
 test('report pages route static copy through the translator and preserve record values', () => {
     const index = readReport('Index.jsx');
     const compliance = readReport('ComplianceReport.jsx');

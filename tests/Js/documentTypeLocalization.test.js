@@ -5,11 +5,11 @@ import {
     translateDocumentTypeLabel,
 } from '../../resources/js/i18n/documentTypes.js';
 
-// Start Update 15 September 2026, by @WNP: Verify fixed system document types follow the selected display language.
+// Verify fixed system document types follow the selected display language.
 test('translates document types sourced from system master data', () => {
     const examples = [
         ['company_registration', 'Sertifikat Pendaftaran Perusahaan'],
-        // Start Update 16 September 2026, by @WNP: Expect Indonesian identification and bank-proof master labels.
+        // Expect Indonesian identification and bank-proof master labels.
         ['gst_certificate', 'Dokumen Nomor Pokok Wajib Pajak (NPWP)'],
         ['pan_card', 'Dokumen Nomor Induk Berusaha (NIB)'],
         ['cancelled_cheque', 'Bukti Rekening Bank'],
@@ -38,7 +38,7 @@ test('translates document types sourced from system master data', () => {
     );
 });
 
-// Start Update 15 September 2026, by @WNP: Preserve administrator-created document types and descriptions verbatim.
+// Preserve administrator-created document types and descriptions verbatim.
 test('does not translate custom database document types', () => {
     const customType = {
         name: 'regional_permit',

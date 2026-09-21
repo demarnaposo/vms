@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-// Start Update 16 September 2026, by @WNP: Cover shared NIB and NPWP sanitization and validation rules.
+// Cover shared NIB and NPWP sanitization and validation rules.
 import {
     sanitizeBusinessIdentifier,
     validateNib,

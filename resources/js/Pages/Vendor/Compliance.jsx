@@ -1,14 +1,14 @@
 import { VendorLayout, PageHeader, Card, Badge, AppIcon } from '@/Components';
-// Start Update 12 September 2026, by @WNP: Translate vendor compliance UI while keeping stored rule data unchanged.
+// Translate vendor compliance UI while keeping stored rule data unchanged.
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 15 September 2026, by @WNP: Localize fixed compliance master records for vendors.
+// Localize fixed compliance master records for vendors.
 import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
-// Start Update 16 September 2026, by @WNP: Translate only known automatic compliance-result details.
+// Translate only known automatic compliance-result details.
 import { translateComplianceDetails } from '@/i18n/complianceDetails';
 
 export default function Compliance({ vendor, complianceResults = [], rules = [] }) {
-    // Start Update 12 September 2026, by @WNP: Resolve only static score, status, and guidance copy.
-    // Start Update 15 September 2026, by @WNP: Read the selected language for compliance master data.
+    // Resolve only static score, status, and guidance copy.
+    // Read the selected language for compliance master data.
     const { language, t } = useLanguage();
     const complianceScore = vendor?.compliance_score || 0;
     const passedRules = complianceResults.filter((r) => r.status === 'pass').length;
@@ -21,7 +21,7 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
         return 'text-(--color-danger)';
     };
 
-    // Start Update 13 September 2026, by @WNP: Translate the fixed compliance enum label without altering its stored value.
+    // Translate the fixed compliance enum label without altering its stored value.
     const header = (
         <PageHeader
             title="Compliance"
@@ -32,7 +32,7 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
 
     return (
         <VendorLayout title="Compliance" activeNav="Compliance" header={header} vendor={vendor}>
-            {/* Start Update 12 September 2026, by @WNP: Translate fixed score guidance and labels while leaving rule records verbatim. */}
+            {/* Translate fixed score guidance and labels while leaving rule records verbatim. */}
             <div className="space-y-8">
                 <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl p-8 shadow-token-sm">
                     <div className="flex flex-col md:flex-row items-center gap-8">
@@ -161,7 +161,7 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2">
                                                     <h3 className="font-semibold text-(--color-text-primary)">
-                                                        {/* Start Update 15 September 2026, by @WNP: Translate recognized system rule labels. */}
+                                                        {/* Translate recognized system rule labels. */}
                                                         {translateSystemMasterDataField(
                                                             language,
                                                             'compliance_rules',
@@ -172,7 +172,7 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
                                                     </h3>
                                                 </div>
                                                 <p className="text-sm text-(--color-text-tertiary) mt-1">
-                                                    {/* Start Update 15 September 2026, by @WNP: Keep custom descriptions raw. */}
+                                                    {/* Keep custom descriptions raw. */}
                                                     {translateSystemMasterDataField(
                                                         language,
                                                         'compliance_rules',
@@ -188,7 +188,7 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
                                                                 : 'text-(--color-text-muted)'
                                                         }`}
                                                     >
-                                                        {/* Start Update 16 September 2026, by @WNP: Preserve custom details and localize verified system patterns. */}
+                                                        {/* Preserve custom details and localize verified system patterns. */}
                                                         {translateComplianceDetails(
                                                             language,
                                                             rule,
@@ -241,7 +241,7 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
                                         </li>
                                         <li>
                                             {t(
-                                                // Start Update 16 September 2026, by @WNP: Guide vendors using Indonesian company documents.
+                                                // Guide vendors using Indonesian company documents.
                                                 'Keep your Business Identification Number (NIB) and Taxpayer Identification Number (NPWP) documents up to date'
                                             )}
                                         </li>

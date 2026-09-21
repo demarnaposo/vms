@@ -4,11 +4,11 @@ import '../css/app.css';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
 import { Suspense, Component, useEffect } from 'react';
-// Start Update 11 September 2026, by @WNP: Provide persistent bilingual state to every Inertia page and layout.
+// Provide persistent bilingual state to every Inertia page and layout.
 import { LanguageProvider, useLanguage } from '@/Contexts/LanguageContext';
 
 // Loading component for lazy-loaded pages - Light theme
-// Start Update 11 September 2026, by @WNP: Translate the global lazy-page loading state.
+// Translate the global lazy-page loading state.
 const PageLoader = () => {
     const { t } = useLanguage();
 
@@ -36,7 +36,7 @@ function AppWrapper({ children }) {
     return children;
 }
 
-// Start Update 16 September 2026, by @WNP: Localize the global React error fallback through the shared language context.
+// Localize the global React error fallback through the shared language context.
 function GlobalErrorFallback() {
     const { t } = useLanguage();
 
@@ -102,7 +102,7 @@ class ErrorBoundary extends Component {
 
     render() {
         if (this.state.hasError) {
-            // Start Update 16 September 2026, by @WNP: Render the translated functional fallback from the class boundary.
+            // Render the translated functional fallback from the class boundary.
             return <GlobalErrorFallback />;
         }
 
@@ -130,7 +130,7 @@ createInertiaApp({
     resolve: (name) => resolvePageComponent(name),
     setup({ el, App, props }) {
         const root = createRoot(el);
-        // Start Update 11 September 2026, by @WNP: Mount one language provider above all errors, suspense boundaries, and pages.
+        // Mount one language provider above all errors, suspense boundaries, and pages.
         root.render(
             <LanguageProvider>
                 <ErrorBoundary>

@@ -51,7 +51,7 @@ class DocumentVerificationWorkflowTest extends TestCase
             'compliance_score' => 0,
             'deed_number' => 'DEED-000001',
             'address' => '123 QA Street',
-            // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia.
+            // Gunakan fixture lokasi Indonesia.
             'city' => 'Kota Bandung',
             'state' => 'Jawa Barat',
             'pincode' => '40115',
@@ -59,7 +59,7 @@ class DocumentVerificationWorkflowTest extends TestCase
 
         $this->documentType = DocumentType::create([
             'name' => 'pan_card',
-            // Start Update 16 September 2026, by @WNP: Use the Indonesian NIB document label for the stable master key.
+            // Use the Indonesian NIB document label for the stable master key.
             'display_name' => 'Business Identification Number (NIB) Document',
             'description' => 'Deed verification',
             'is_mandatory' => true,
@@ -125,7 +125,7 @@ class DocumentVerificationWorkflowTest extends TestCase
         $this->assertNull($document->verified_at);
     }
 
-    // Start Update 16 September 2026, by @WNP: Verify alerts localize known VMS master document labels.
+    // Verify alerts localize known VMS master document labels.
     public function test_document_actions_localize_system_master_document_type(): void
     {
         $verifiedDocument = $this->createDocument(VendorDocument::STATUS_PENDING, 'localize-verify-pan.pdf');
@@ -142,7 +142,7 @@ class DocumentVerificationWorkflowTest extends TestCase
             ->assertSessionHas('success', 'Dokumen Nomor Induk Berusaha (NIB) ditolak.');
     }
 
-    // Start Update 16 September 2026, by @WNP: Preserve custom database document labels inside localized alerts.
+    // Preserve custom database document labels inside localized alerts.
     public function test_document_alert_preserves_custom_document_type_label(): void
     {
         $this->documentType = DocumentType::create([

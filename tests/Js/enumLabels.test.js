@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { translateMessage } from '../../resources/js/i18n/translations.js';
 
-// Start Update 13 September 2026, by @WNP: Cover migration-backed enum labels without translating persisted codes or manual text.
+// Cover migration-backed enum labels without translating persisted codes or manual text.
 test('Indonesian labels cover UI-visible migration enums', () => {
     const codes = [
         'draft',
@@ -52,7 +52,7 @@ test('Indonesian labels cover UI-visible migration enums', () => {
     }
 });
 
-// Start Update 13 September 2026, by @WNP: Unknown database content must remain untouched by the shared translator.
+// Unknown database content must remain untouched by the shared translator.
 test('manual input and seeded descriptions remain verbatim without an exact static key', () => {
     for (const text of [
         'Contract approved after legal review',

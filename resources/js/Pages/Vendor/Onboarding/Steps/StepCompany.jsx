@@ -1,16 +1,16 @@
 import { useForm } from '@inertiajs/react';
 import { FormSelect } from '@/Components/index.jsx';
 import { useState, useMemo } from 'react';
-// Start Update 11 September 2026, by @WNP: Use the centralized Indonesian province and regency/city dataset.
+// Use the centralized Indonesian province and regency/city dataset.
 import { INDONESIAN_PROVINCES, getRegenciesForProvince } from '@/data/indonesianProvincesAndCities';
-// Start Update 11 September 2026, by @WNP: Translate the company onboarding step through the global language context.
+// Translate the company onboarding step through the global language context.
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 14 September 2026, by @WNP: Reuse VMS Indonesian mobile-number input and validation rules.
+// Reuse VMS Indonesian mobile-number input and validation rules.
 import {
     sanitizeIndonesianMobileInput,
     validateIndonesianMobileNumber as validatePhoneNumber,
 } from '@/utils/indonesianMobilePhone';
-// Start Update 16 September 2026, by @WNP: Reuse Indonesian NIB and NPWP input rules during onboarding.
+// Reuse Indonesian NIB and NPWP input rules during onboarding.
 import {
     sanitizeBusinessIdentifier,
     validateNib,
@@ -24,7 +24,7 @@ export default function StepCompany({ vendor, sessionData }) {
         company_name: step1Session.company_name || vendor?.company_name || '',
         registration_number: step1Session.registration_number || vendor?.registration_number || '',
         tax_id: step1Session.tax_id || vendor?.tax_id || '',
-        // Start Update 16 September 2026, by @WNP: Collect the vendor deed number during company onboarding.
+        // Collect the vendor deed number during company onboarding.
         deed_number: step1Session.deed_number || vendor?.deed_number || '',
         business_type: step1Session.business_type || vendor?.business_type || '',
         contact_person: step1Session.contact_person || vendor?.contact_person || '',
@@ -37,7 +37,7 @@ export default function StepCompany({ vendor, sessionData }) {
 
     const [clientErrors, setClientErrors] = useState({});
 
-    // Start Update 16 September 2026, by @WNP: Validate every required company field before stopping the client-side submission.
+    // Validate every required company field before stopping the client-side submission.
     const validateCompanyName = (value) => {
         if (!value || value.trim() === '') {
             return 'Company Name is required.';
@@ -82,7 +82,7 @@ export default function StepCompany({ vendor, sessionData }) {
         return '';
     };
 
-    // Start Update 11 September 2026, by @WNP: Validate Indonesia's five-digit postal code format in the onboarding form.
+    // Validate Indonesia's five-digit postal code format in the onboarding form.
     const validatePostalCode = (value) => {
         if (!value || value.trim() === '') {
             return 'Postal code is required.';
@@ -100,7 +100,7 @@ export default function StepCompany({ vendor, sessionData }) {
         return '';
     };
 
-    // Start Update 16 September 2026, by @WNP: Require a concise deed number before advancing onboarding.
+    // Require a concise deed number before advancing onboarding.
     const validateDeedNumber = (value) => {
         if (!value || value.trim() === '') {
             return 'Deed of Establishment Number is required.';
@@ -111,13 +111,13 @@ export default function StepCompany({ vendor, sessionData }) {
         return '';
     };
 
-    // Start Update 11 September 2026, by @WNP: Derive regency/city options only when the selected province changes.
+    // Derive regency/city options only when the selected province changes.
     const cityOptions = useMemo(() => getRegenciesForProvince(data.state), [data.state]);
 
     const submit = (e) => {
         e.preventDefault();
 
-        // Start Update 16 September 2026, by @WNP: Validate all required company fields before submitting company data.
+        // Validate all required company fields before submitting company data.
         const companyNameError = validateCompanyName(data.company_name);
         const nibError = validateNib(data.registration_number);
         const npwpError = validateNpwp(data.tax_id);
@@ -127,7 +127,7 @@ export default function StepCompany({ vendor, sessionData }) {
         const addressError = validateAddress(data.address);
         const stateError = validateState(data.state);
         const cityError = validateCity(data.city);
-        // Start Update 11 September 2026, by @WNP: Include postal code validation before submitting onboarding data.
+        // Include postal code validation before submitting onboarding data.
         const postalCodeError = validatePostalCode(data.pincode);
         const bizError = validateBusinessType(data.business_type);
 
@@ -208,7 +208,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             placeholder={t('Legal Entity Name')}
                             maxLength={255}
                         />
-                        {/* Start Update 16 September 2026, by @WNP: Show company-name validation from both client and server checks. */}
+                        {/* Show company-name validation from both client and server checks. */}
                         {(clientErrors.company_name || errors.company_name) && (
                             <p className="text-sm text-(--color-danger)">
                                 {t(clientErrors.company_name || errors.company_name)}
@@ -245,7 +245,7 @@ export default function StepCompany({ vendor, sessionData }) {
 
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {/* Start Update 16 September 2026, by @WNP: Show the complete business identifier label. */}
+                            {/* Show the complete business identifier label. */}
                             {t('Business Identification Number (NIB)')}{' '}
                             <span className="text-(--color-danger)">*</span>
                         </label>
@@ -253,7 +253,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="text"
                             value={data.registration_number}
                             onChange={(e) => {
-                                // Start Update 16 September 2026, by @WNP: Accept pasted NIB separators while storing digits only.
+                                // Accept pasted NIB separators while storing digits only.
                                 const val = sanitizeBusinessIdentifier(e.target.value, 13);
                                 setData('registration_number', val);
                                 if (clientErrors.registration_number) {
@@ -278,7 +278,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             inputMode="numeric"
                             maxLength={13}
                         />
-                        {/* Start Update 12 September 2026, by @WNP: Localize registration-number validation feedback. */}
+                        {/* Localize registration-number validation feedback. */}
                         {(clientErrors.registration_number || errors.registration_number) && (
                             <p className="text-sm text-(--color-danger)">
                                 {t(clientErrors.registration_number || errors.registration_number)}
@@ -288,7 +288,7 @@ export default function StepCompany({ vendor, sessionData }) {
 
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {/* Start Update 16 September 2026, by @WNP: Show the complete taxpayer identifier label. */}
+                            {/* Show the complete taxpayer identifier label. */}
                             {t('Taxpayer Identification Number (NPWP)')}{' '}
                             <span className="text-(--color-danger)">*</span>
                         </label>
@@ -296,7 +296,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             type="text"
                             value={data.tax_id}
                             onChange={(e) => {
-                                // Start Update 16 September 2026, by @WNP: Normalize formatted NPWP input to digits only.
+                                // Normalize formatted NPWP input to digits only.
                                 const val = sanitizeBusinessIdentifier(e.target.value, 16);
                                 setData('tax_id', val);
                                 if (clientErrors.tax_id) {
@@ -321,7 +321,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             inputMode="numeric"
                             maxLength={16}
                         />
-                        {/* Start Update 12 September 2026, by @WNP: Localize tax-number validation feedback. */}
+                        {/* Localize tax-number validation feedback. */}
                         {(clientErrors.tax_id || errors.tax_id) && (
                             <p className="text-sm text-(--color-danger)">
                                 {t(clientErrors.tax_id || errors.tax_id)}
@@ -329,7 +329,7 @@ export default function StepCompany({ vendor, sessionData }) {
                         )}
                     </div>
 
-                    {/* Start Update 16 September 2026, by @WNP: Match the deed-number field width to the other company identifiers. */}
+                    {/* Match the deed-number field width to the other company identifiers. */}
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-(--color-text-secondary)">
                             {t('Deed of Establishment Number')}{' '}
@@ -399,7 +399,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             placeholder={t('Full name of contact person')}
                             maxLength={255}
                         />
-                        {/* Start Update 12 September 2026, by @WNP: Localize contact-person validation feedback. */}
+                        {/* Localize contact-person validation feedback. */}
                         {(clientErrors.contact_person || errors.contact_person) && (
                             <p className="text-sm text-(--color-danger)">
                                 {t(clientErrors.contact_person || errors.contact_person)}
@@ -412,7 +412,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             {t('Phone Number / Mobile')}{' '}
                             <span className="text-(--color-danger)">*</span>
                         </label>
-                        {/* Start Update 14 September 2026, by @WNP: Guide Indonesian mobile input without blocking the +62 alternative. */}
+                        {/* Guide Indonesian mobile input without blocking the +62 alternative. */}
                         <input
                             type="tel"
                             inputMode="tel"
@@ -444,7 +444,7 @@ export default function StepCompany({ vendor, sessionData }) {
                         <p className="text-xs text-(--color-text-tertiary)">
                             {t('Use 08... or +628... for a mobile number.')}
                         </p>
-                        {/* Start Update 12 September 2026, by @WNP: Localize contact-phone validation feedback. */}
+                        {/* Localize contact-phone validation feedback. */}
                         {(clientErrors.contact_phone || errors.contact_phone) && (
                             <p className="text-sm text-(--color-danger)">
                                 {t(clientErrors.contact_phone || errors.contact_phone)}
@@ -483,7 +483,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             placeholder={t('Full street address')}
                             maxLength={500}
                         ></textarea>
-                        {/* Start Update 16 September 2026, by @WNP: Show registered-address validation from both client and server checks. */}
+                        {/* Show registered-address validation from both client and server checks. */}
                         {(clientErrors.address || errors.address) && (
                             <p className="text-sm text-(--color-danger)">
                                 {t(clientErrors.address || errors.address)}
@@ -493,7 +493,7 @@ export default function StepCompany({ vendor, sessionData }) {
 
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {/* Start Update 11 September 2026, by @WNP: Use Indonesian address terminology for province selection. */}
+                            {/* Use Indonesian address terminology for province selection. */}
                             {t('Province')} <span className="text-(--color-danger)">*</span>
                         </label>
                         <FormSelect
@@ -516,7 +516,7 @@ export default function StepCompany({ vendor, sessionData }) {
 
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {/* Start Update 11 September 2026, by @WNP: Include both Indonesian regencies and cities. */}
+                            {/* Include both Indonesian regencies and cities. */}
                             {t('Regency / City')} <span className="text-(--color-danger)">*</span>
                         </label>
                         <FormSelect
@@ -541,7 +541,7 @@ export default function StepCompany({ vendor, sessionData }) {
 
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {/* Start Update 11 September 2026, by @WNP: Use Indonesia's postal code label and five-digit input rules. */}
+                            {/* Use Indonesia's postal code label and five-digit input rules. */}
                             {t('Postal Code')} <span className="text-(--color-danger)">*</span>
                         </label>
                         <input
@@ -564,7 +564,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             title="Exactly 5 digits"
                             placeholder="40115"
                         />
-                        {/* Start Update 12 September 2026, by @WNP: Localize postal-code validation feedback. */}
+                        {/* Localize postal-code validation feedback. */}
                         {(clientErrors.pincode || errors.pincode) && (
                             <p className="text-sm text-(--color-danger)">
                                 {t(clientErrors.pincode || errors.pincode)}

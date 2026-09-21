@@ -1,5 +1,5 @@
 import AppIcon from './AppIcon';
-// Start Update 11 September 2026, by @WNP: Translate reusable feedback and empty-state components.
+// Translate reusable feedback and empty-state components.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 // Alert/Notification Components - Light Theme

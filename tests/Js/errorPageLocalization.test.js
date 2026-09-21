@@ -9,7 +9,7 @@ const errorPageSource = readFileSync(
 );
 const appSource = readFileSync(new URL('../../resources/js/app.jsx', import.meta.url), 'utf8');
 
-// Start Update 16 September 2026, by @WNP: Verify every static HTTP error-page message has Indonesian coverage.
+// Verify every static HTTP error-page message has Indonesian coverage.
 test('all shared HTTP error-page copy has Indonesian translations', () => {
     const messages = [
         'Access Denied',
@@ -33,7 +33,7 @@ test('all shared HTTP error-page copy has Indonesian translations', () => {
     }
 });
 
-// Start Update 16 September 2026, by @WNP: Prevent the React runtime fallback from returning to hardcoded English copy.
+// Prevent the React runtime fallback from returning to hardcoded English copy.
 test('global React error fallback routes all visible copy through the translator', () => {
     const messages = [
         'Something went wrong',

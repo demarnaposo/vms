@@ -1,17 +1,17 @@
-// Start Update 11 September 2026, by @WNP: Read centralized currency settings on the login page.
+// Read centralized currency settings on the login page.
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import Logo from '@/Components/Logo';
-// Start Update 15 September 2026, by @WNP: Reuse the accessible password visibility input on login.
+// Reuse the accessible password visibility input on login.
 import PasswordInput from '@/Components/PasswordInput';
-// Start Update 11 September 2026, by @WNP: Enable bilingual login content and language selection.
+// Enable bilingual login content and language selection.
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 11 September 2026, by @WNP: Reuse the centralized Indonesian currency formatter.
+// Reuse the centralized Indonesian currency formatter.
 import { formatCurrency } from '@/utils/currencyFormatters';
 
 export default function Login() {
     const { t } = useLanguage();
-    // Start Update 11 September 2026, by @WNP: Use the default currency shared by Laravel.
+    // Use the default currency shared by Laravel.
     const { currency } = usePage().props;
 
     const form = useForm({
@@ -27,9 +27,9 @@ export default function Login() {
 
     return (
         <>
-            <Head title={`${t('Login')} - VMS`} />
+            <Head title={t('Login')} />
             <div className="min-h-screen flex">
-                {/* Start Update 11 September 2026, by @WNP: Keep language selection available on the login page. */}
+                {/* Keep language selection available on the login page. */}
                 <div className="fixed right-4 top-4 z-50">
                     <LanguageSwitcher />
                 </div>
@@ -89,7 +89,7 @@ export default function Login() {
                                     </div>
                                 </div>
                                 <div>
-                                    {/* Start Update 11 September 2026, by @WNP: Replace crore notation with the full Indonesian-formatted amount. */}
+                                    {/* Replace crore notation with the full Indonesian-formatted amount. */}
                                     <div className="text-3xl font-bold">
                                         {formatCurrency(100000000, currency)}+
                                     </div>
@@ -128,7 +128,7 @@ export default function Login() {
                                 <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
                                     {t('Email')}
                                 </label>
-                                {/* Start Update 15 September 2026, by @WNP: Localize the static email example on the login form. */}
+                                {/* Localize the static email example on the login form. */}
                                 <input
                                     type="email"
                                     value={form.data.email}
@@ -148,7 +148,7 @@ export default function Login() {
                                 <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
                                     {t('Password')}
                                 </label>
-                                {/* Start Update 15 September 2026, by @WNP: Let users show or hide the login password without changing its value. */}
+                                {/* Let users show or hide the login password without changing its value. */}
                                 <PasswordInput
                                     value={form.data.password}
                                     onChange={(e) => form.setData('password', e.target.value)}
@@ -208,7 +208,7 @@ export default function Login() {
                                 <p className="text-xs font-medium text-(--color-text-tertiary) mb-2">
                                     {t('Demo Accounts')}
                                 </p>
-                                {/* Start Update 15 September 2026, by @WNP: Translate demo role labels without altering the actual credentials. */}
+                                {/* Translate demo role labels without altering the actual credentials. */}
                                 <div className="grid gap-1 text-xs text-(--color-text-muted)">
                                     <div>{t('Admin')}: admin@vendorflow.com / password</div>
                                     <div>{t('Ops')}: ops@vendorflow.com / password</div>

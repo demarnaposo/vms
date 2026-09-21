@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SetLocale
 {
-    // Start Update 11 September 2026, by @WNP: Apply only supported language cookies to every web request.
+    // Apply only supported language cookies to every web request.
     public function handle(Request $request, Closure $next): Response
     {
         $locale = (string) $request->cookie('vms_locale', config('app.locale'));

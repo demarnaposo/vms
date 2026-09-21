@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import AppIcon from './AppIcon';
-// Start Update 11 September 2026, by @WNP: Translate reusable form labels, placeholders, options, and errors.
+// Translate reusable form labels, placeholders, options, and errors.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export function FormInput({
@@ -20,7 +20,7 @@ export function FormInput({
 }) {
     const id = useId();
     const { t } = useLanguage();
-    // Start Update 15 September 2026, by @WNP: Add reusable password visibility state for profile and staff forms.
+    // Add reusable password visibility state for profile and staff forms.
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const isPassword = type === 'password';
     const resolvedType = isPassword && isPasswordVisible ? 'text' : type;
@@ -72,7 +72,7 @@ export function FormInput({
                         ${error ? 'border-(--color-danger) focus:border-(--color-danger) focus:ring-(--color-danger)/10' : ''}
                     `}
                 />
-                {/* Start Update 15 September 2026, by @WNP: Keep password toggles non-submitting, bilingual, and accessible. */}
+                {/* Keep password toggles non-submitting, bilingual, and accessible. */}
                 {isPassword && (
                     <button
                         type="button"
@@ -151,7 +151,7 @@ export function FormSelect({
     value,
     onChange,
     options = [],
-    // Start Update 12 September 2026, by @WNP: Allow database-backed option labels to bypass UI translation.
+    // Allow database-backed option labels to bypass UI translation.
     translateOptions = true,
     error = null,
     placeholder = 'Select...',
@@ -317,7 +317,7 @@ export function FormSelect({
                                       : 'text-(--color-text-secondary) hover:bg-(--color-bg-secondary)'
                               }`}
                           >
-                              {/* Start Update 12 September 2026, by @WNP: Preserve original database labels when option translation is disabled. */}
+                              {/* Preserve original database labels when option translation is disabled. */}
                               <span>{translateOptions ? t(option.label) : option.label}</span>
                               {optionSelected && (
                                   <svg
@@ -380,7 +380,7 @@ export function FormSelect({
                             : 'text-(--color-text-placeholder)'
                     }
                 >
-                    {/* Start Update 12 September 2026, by @WNP: Translate the placeholder but keep selected database values unchanged. */}
+                    {/* Translate the placeholder but keep selected database values unchanged. */}
                     {selectedOption && !translateOptions ? selectedLabel : t(selectedLabel)}
                 </span>
                 <svg

@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 import AppIcon from './AppIcon';
-// Start Update 11 September 2026, by @WNP: Translate reusable table, card, and pagination labels globally.
+// Translate reusable table, card, and pagination labels globally.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 const decodePaginationLabel = (label) => {

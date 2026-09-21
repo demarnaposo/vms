@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import AppIcon from './AppIcon';
 import Logo from './Logo';
 import ThemeSwitcher from './ThemeSwitcher';
-// Start Update 11 September 2026, by @WNP: Add the bilingual switch to public navigation.
+// Add the bilingual switch to public navigation.
 import LanguageSwitcher from './LanguageSwitcher';
 import { useLanguage } from '@/Contexts/LanguageContext';
 
@@ -104,7 +104,7 @@ export default function Navbar({
     className = '',
 }) {
     const { auth } = usePage().props;
-    // Start Update 11 September 2026, by @WNP: Translate public navigation from centralized messages.
+    // Translate public navigation from centralized messages.
     const { t } = useLanguage();
     const user = auth?.user;
     const [isMobileOpen, setIsMobileOpen] = useState(false);

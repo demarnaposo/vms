@@ -1,5 +1,5 @@
 {
-    "_comment": "Start Update 11 September 2026, by @WNP: Replace the Indian state and city dataset with the Kepmendagri 2025 Indonesian administrative regions snapshot.",
+    "_comment": "Replace the Indian state and city dataset with the Kepmendagri 2025 Indonesian administrative regions snapshot.",
     "country": "Indonesia",
     "source": "Keputusan Menteri Dalam Negeri Nomor 300.2.2-2138 Tahun 2025",
     "provinces": {

@@ -8,7 +8,7 @@ const source = readFileSync(
     'utf8'
 );
 
-// Start Update 16 September 2026, by @WNP: Verify all fixed system-health labels are bilingual.
+// Verify all fixed system-health labels are bilingual.
 test('system health static copy is localized', () => {
     const examples = [
         ['System Health', 'Kesehatan Sistem'],
@@ -31,7 +31,7 @@ test('system health static copy is localized', () => {
     }
 });
 
-// Start Update 16 September 2026, by @WNP: Guard UI translation while preserving technical log data verbatim.
+// Guard UI translation while preserving technical log data verbatim.
 test('system health translates static controls and preserves job log fields', () => {
     assert.match(source, /const \{ t \} = useLanguage\(\)/);
     assert.match(source, /\{t\('Job Name'\)\}/);

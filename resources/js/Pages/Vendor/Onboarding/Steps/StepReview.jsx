@@ -2,13 +2,13 @@ import { useMemo, useState } from 'react';
 import { router } from '@inertiajs/react';
 import { AppIcon } from '@/Components';
 import { formatDate } from '@/utils/dateFormatters';
-// Start Update 11 September 2026, by @WNP: Translate the onboarding review through the global language context.
+// Translate the onboarding review through the global language context.
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 15 September 2026, by @WNP: Reuse selective master document label localization in the review step.
+// Reuse selective master document label localization in the review step.
 import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
 
 export default function StepReview({ vendor, sessionData, documentTypes }) {
-    // Start Update 15 September 2026, by @WNP: Read the active language for fixed document labels.
+    // Read the active language for fixed document labels.
     const { language, t } = useLanguage();
     const step1Session = sessionData?.step1 || {};
     const step2Session = sessionData?.step2 || {};
@@ -67,7 +67,7 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                                 {step1Session.company_name || vendor?.company_name}
                             </span>
                         </div>
-                        {/* Start Update 16 September 2026, by @WNP: Review Indonesian NIB and NPWP values instead of legacy identifiers. */}
+                        {/* Review Indonesian NIB and NPWP values instead of legacy identifiers. */}
                         <div>
                             <span className="text-(--color-text-tertiary)">
                                 {t('Business Identification Number (NIB)')}:
@@ -106,7 +106,7 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                                 {step1Session.contact_phone || vendor?.contact_phone}
                             </span>
                         </div>
-                        {/* Start Update 11 September 2026, by @WNP: Gunakan istilah lokasi Indonesia pada ringkasan onboarding. */}
+                        {/* Gunakan istilah lokasi Indonesia pada ringkasan onboarding. */}
                         <div>
                             <span className="text-(--color-text-tertiary)">
                                 {t('Regency / City')}:
@@ -160,7 +160,7 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                                 )?.slice(-4)}
                             </span>
                         </div>
-                        {/* Start Update 11 September 2026, by @WNP: Display Indonesian bank code terminology in onboarding review. */}
+                        {/* Display Indonesian bank code terminology in onboarding review. */}
                         <div>
                             <span className="text-(--color-text-tertiary)">{t('Bank Code')}:</span>{' '}
                             <span className="text-(--color-text-primary) ml-2 font-medium">
@@ -194,7 +194,7 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                                 const type = documentTypesById.get(
                                     normalizeDocumentTypeId(doc.document_type_id)
                                 );
-                                // Start Update 15 September 2026, by @WNP: Translate a known master type and preserve session fallbacks verbatim.
+                                // Translate a known master type and preserve session fallbacks verbatim.
                                 const displayName =
                                     translateDocumentTypeLabel(language, type) ||
                                     doc?.document_type_name ||

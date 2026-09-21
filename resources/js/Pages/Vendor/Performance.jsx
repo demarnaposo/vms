@@ -1,12 +1,12 @@
 import { AppIcon, Card, PageHeader, VendorLayout } from '@/Components';
 import { formatDate } from '@/utils/dateFormatters';
-// Start Update 13 September 2026, by @WNP: Localize fixed vendor performance guidance while preserving stored metric data.
+// Localize fixed vendor performance guidance while preserving stored metric data.
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 15 September 2026, by @WNP: Localize fixed performance metric master records for vendors.
+// Localize fixed performance metric master records for vendors.
 import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 
 export default function Performance({ vendor, performanceScores = [], metrics = [] }) {
-    // Start Update 13 September 2026, by @WNP: Use the selected UI locale for labels and score-period dates.
+    // Use the selected UI locale for labels and score-period dates.
     const { language, t } = useLanguage();
     const dateLocale = language === 'id' ? 'id-ID' : 'en-IN';
     const overallScore = Number(vendor?.performance_score || 0);
@@ -49,7 +49,7 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                               : 'bg-(--color-danger-light) text-(--color-danger-dark)'
                     }`}
                 >
-                    {/* Start Update 13 September 2026, by @WNP: Translate the fixed score band label. */}
+                    {/* Translate the fixed score band label. */}
                     {t(getScoreLabel(overallScore))}
                 </div>
             }
@@ -66,7 +66,7 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                         <div className="flex flex-col md:flex-row items-center gap-8">
                             <div className="text-center">
                                 <div className="text-7xl font-bold mb-2">{overallScore}</div>
-                                {/* Start Update 13 September 2026, by @WNP: Translate the fixed score scale label. */}
+                                {/* Translate the fixed score scale label. */}
                                 <div className="text-lg opacity-90">{t('out of 100')}</div>
                             </div>
 
@@ -90,7 +90,7 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
 
                     <div className="p-6">
                         <p className="text-(--color-text-tertiary)">
-                            {/* Start Update 13 September 2026, by @WNP: Translate only system-generated score guidance. */}
+                            {/* Translate only system-generated score guidance. */}
                             {t(
                                 overallScore >= 80
                                     ? 'Great job. Your performance is above average.'
@@ -109,7 +109,7 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                                 <div className="text-4xl mb-4 inline-flex justify-center w-full">
                                     <AppIcon name="metrics" className="h-10 w-10" />
                                 </div>
-                                {/* Start Update 13 September 2026, by @WNP: Translate the fixed empty state. */}
+                                {/* Translate the fixed empty state. */}
                                 <p>{t('No performance metrics defined yet.')}</p>
                                 <p className="text-sm mt-2">
                                     {t(
@@ -134,7 +134,7 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                                         <div className="flex items-center justify-between mb-3">
                                             <div>
                                                 <h3 className="font-semibold text-(--color-text-primary)">
-                                                    {/* Start Update 15 September 2026, by @WNP: Translate known metric labels and retain custom values. */}
+                                                    {/* Translate known metric labels and retain custom values. */}
                                                     {translateSystemMasterDataField(
                                                         language,
                                                         'performance_metrics',
@@ -143,7 +143,7 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                                                     )}
                                                 </h3>
                                                 <p className="text-sm text-(--color-text-tertiary)">
-                                                    {/* Start Update 15 September 2026, by @WNP: Translate only fixed master metric descriptions. */}
+                                                    {/* Translate only fixed master metric descriptions. */}
                                                     {translateSystemMasterDataField(
                                                         language,
                                                         'performance_metrics',
@@ -178,7 +178,7 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                                 <div className="text-4xl mb-4 inline-flex justify-center w-full">
                                     <AppIcon name="trend" className="h-10 w-10" />
                                 </div>
-                                {/* Start Update 13 September 2026, by @WNP: Translate the fixed empty history state. */}
+                                {/* Translate the fixed empty history state. */}
                                 <p>{t('No performance history available yet.')}</p>
                                 <p className="text-sm mt-2">
                                     {t('Performance scores will appear here once evaluated.')}
@@ -197,7 +197,7 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                                         >
                                             <div>
                                                 <div className="font-medium text-(--color-text-primary)">
-                                                    {/* Start Update 15 September 2026, by @WNP: Translate fixed master metrics in history and preserve custom names. */}
+                                                    {/* Translate fixed master metrics in history and preserve custom names. */}
                                                     {translateSystemMasterDataField(
                                                         language,
                                                         'performance_metrics',
@@ -259,11 +259,11 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                                     </span>
                                     <div>
                                         <h4 className="font-semibold text-(--color-text-primary)">
-                                            {/* Start Update 13 September 2026, by @WNP: Tip copy is static application text. */}
+                                            {/* Tip copy is static application text. */}
                                             {t(tip.title)}
                                         </h4>
                                         <p className="text-sm text-(--color-text-tertiary)">
-                                            {/* Start Update 13 September 2026, by @WNP: Tip descriptions are static application text. */}
+                                            {/* Tip descriptions are static application text. */}
                                             {t(tip.desc)}
                                         </p>
                                     </div>

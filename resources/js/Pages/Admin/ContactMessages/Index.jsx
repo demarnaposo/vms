@@ -2,11 +2,11 @@ import { Link, usePage, router } from '@inertiajs/react';
 import { AdminLayout, DataTable, Badge, PageHeader, Button } from '@/Components';
 import { formatDateTime } from '@/utils/dateFormatters';
 import { useState } from 'react';
-// Start Update 13 September 2026, by @WNP: Translate fixed contact-status filters without touching message content.
+// Translate fixed contact-status filters without touching message content.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function Index() {
-    // Start Update 15 September 2026, by @WNP: Use the selected language for static message labels and received dates.
+    // Use the selected language for static message labels and received dates.
     const { language, t } = useLanguage();
     const dateLocale = language === 'id' ? 'id-ID' : 'en-IN';
     const { messages, stats, filters } = usePage().props;
@@ -53,7 +53,7 @@ export default function Index() {
             header: 'Received',
             render: (row) => (
                 <span className="text-(--color-text-secondary)">
-                    {/* Start Update 15 September 2026, by @WNP: Format received timestamps in the active UI locale. */}
+                    {/* Format received timestamps in the active UI locale. */}
                     {formatDateTime(row.created_at, dateLocale)}
                 </span>
             ),
@@ -79,7 +79,7 @@ export default function Index() {
             subtitle="Manage and respond to customer inquiries"
             actions={
                 <form onSubmit={handleSearch} className="flex gap-2">
-                    {/* Start Update 15 September 2026, by @WNP: Localize the fixed message-search placeholder. */}
+                    {/* Localize the fixed message-search placeholder. */}
                     <input
                         type="text"
                         value={search}
@@ -101,7 +101,7 @@ export default function Index() {
                     <div className="card p-5 rounded-2xl border-2 border-(--color-text-tertiary)">
                         <div className="flex items-center justify-between">
                             <div>
-                                {/* Start Update 15 September 2026, by @WNP: Localize the fixed total summary label. */}
+                                {/* Localize the fixed total summary label. */}
                                 <p className="text-sm text-(--color-text-tertiary) mb-1">
                                     {t('Total')}
                                 </p>
@@ -129,7 +129,7 @@ export default function Index() {
                     <div className="card p-5 rounded-2xl border-2 border-(--color-info)">
                         <div className="flex items-center justify-between">
                             <div>
-                                {/* Start Update 13 September 2026, by @WNP: Localize the fixed new-status summary label. */}
+                                {/* Localize the fixed new-status summary label. */}
                                 <p className="text-sm text-(--color-info) mb-1">{t('new')}</p>
                                 <p className="text-2xl font-bold text-(--color-info)">
                                     {stats?.new || 0}
@@ -155,7 +155,7 @@ export default function Index() {
                     <div className="card p-5 rounded-2xl border-2 border-(--color-success)">
                         <div className="flex items-center justify-between">
                             <div>
-                                {/* Start Update 13 September 2026, by @WNP: Localize the fixed replied-status summary label. */}
+                                {/* Localize the fixed replied-status summary label. */}
                                 <p className="text-sm text-(--color-success) mb-1">
                                     {t('replied')}
                                 </p>
@@ -183,7 +183,7 @@ export default function Index() {
                     <div className="card p-5 rounded-2xl border-2 border-(--color-text-primary)">
                         <div className="flex items-center justify-between">
                             <div>
-                                {/* Start Update 13 September 2026, by @WNP: Localize the fixed read-status summary label. */}
+                                {/* Localize the fixed read-status summary label. */}
                                 <p className="text-sm text-(--color-text-tertiary) mb-1">
                                     {t('read')}
                                 </p>
@@ -228,7 +228,7 @@ export default function Index() {
                                     : 'text-(--color-text-tertiary) hover:text-(--color-text-primary) hover:bg-(--color-bg-primary)'
                             }`}
                         >
-                            {/* Start Update 13 September 2026, by @WNP: Keep the filter URL code intact and localize its label. */}
+                            {/* Keep the filter URL code intact and localize its label. */}
                             {t(status)}
                         </Link>
                     ))}

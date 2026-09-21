@@ -91,14 +91,14 @@ class DocumentExpiryWorkflowTest extends TestCase
                     'contact_phone' => '9999999999',
                     'deed_number' => 'DEED-000001',
                     'address' => 'Address',
-                    // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia pada data aplikasi.
+                    // Gunakan fixture lokasi Indonesia pada data aplikasi.
                     'city' => 'Kota Bandung',
                     'state' => 'Jawa Barat',
                     'pincode' => '40115',
                     'contact_email' => $user->email,
                 ],
                 'step2' => [
-                    // Start Update 11 September 2026, by @WNP: Use Indonesian bank information in the application fixture.
+                    // Use Indonesian bank information in the application fixture.
                     'bank_name' => 'Bank Mandiri',
                     'bank_account_number' => '1234567890',
                     'bank_ifsc' => '008',
@@ -143,7 +143,7 @@ class DocumentExpiryWorkflowTest extends TestCase
             'status' => Vendor::STATUS_ACTIVE,
             'deed_number' => 'DEED-000002',
             'address' => 'Address',
-            // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia pada vendor pertama.
+            // Gunakan fixture lokasi Indonesia pada vendor pertama.
             'city' => 'Kota Bandung',
             'state' => 'Jawa Barat',
             'pincode' => '40115',
@@ -181,7 +181,7 @@ class DocumentExpiryWorkflowTest extends TestCase
             'status' => Vendor::STATUS_ACTIVE,
             'deed_number' => 'DEED-000003',
             'address' => 'Address',
-            // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia pada vendor kedua.
+            // Gunakan fixture lokasi Indonesia pada vendor kedua.
             'city' => 'Kota Bandung',
             'state' => 'Jawa Barat',
             'pincode' => '40115',

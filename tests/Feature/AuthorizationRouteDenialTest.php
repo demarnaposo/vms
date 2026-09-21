@@ -36,7 +36,7 @@ class AuthorizationRouteDenialTest extends TestCase
             'compliance_score' => 95,
             'deed_number' => 'DEED-000001',
             'address' => '123 St',
-            // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia untuk vendor pertama.
+            // Gunakan fixture lokasi Indonesia untuk vendor pertama.
             'city' => 'Kota Bandung',
             'state' => 'Jawa Barat',
             'pincode' => '40115',
@@ -86,7 +86,7 @@ class AuthorizationRouteDenialTest extends TestCase
             'compliance_score' => 95,
             'deed_number' => 'DEED-000002',
             'address' => '123 St',
-            // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia untuk vendor kedua.
+            // Gunakan fixture lokasi Indonesia untuk vendor kedua.
             'city' => 'Kota Bandung',
             'state' => 'Jawa Barat',
             'pincode' => '40115',
@@ -127,7 +127,7 @@ class AuthorizationRouteDenialTest extends TestCase
             'compliance_score' => 95,
             'deed_number' => 'DEED-000003',
             'address' => '123 St',
-            // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia untuk vendor ketiga.
+            // Gunakan fixture lokasi Indonesia untuk vendor ketiga.
             'city' => 'Kota Bandung',
             'state' => 'Jawa Barat',
             'pincode' => '40115',

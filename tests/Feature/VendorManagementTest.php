@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
-// Start Update 14 September 2026, by @WNP: Cover VMS activation feedback when compliance flags block the action.
+// Cover VMS activation feedback when compliance flags block the action.
 use App\Models\ComplianceFlag;
+use App\Models\DocumentType;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Models\VendorDocument;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -50,7 +52,7 @@ class VendorManagementTest extends TestCase
             'compliance_score' => 90,
             'submitted_at' => now(),
             // Minimum required fields based on model/migrations
-            // Start Update 16 September 2026, by @WNP: Use Indonesian company and bank identifiers in vendor-detail coverage.
+            // Use Indonesian company and bank identifiers in vendor-detail coverage.
             'registration_number' => '1234567890123',
             'tax_id' => '0123456789012345',
             'deed_number' => 'DEED-000001',
@@ -59,7 +61,7 @@ class VendorManagementTest extends TestCase
             'bank_ifsc' => '008',
             'bank_branch' => 'KCP Jakarta Menteng',
             'address' => '123 St',
-            // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia.
+            // Gunakan fixture lokasi Indonesia.
             'city' => 'Kota Bandung',
             'state' => 'Jawa Barat',
             'pincode' => '40115',
@@ -89,7 +91,7 @@ class VendorManagementTest extends TestCase
             fn ($page) => $page
                 ->component('Admin/Vendors/Show')
                 ->where('vendor.id', $this->vendor->id)
-                // Start Update 16 September 2026, by @WNP: Confirm authorized staff receive decrypted summary identifiers.
+                // Confirm authorized staff receive decrypted summary identifiers.
                 ->where('vendor.registration_number', '1234567890123')
                 ->where('vendor.tax_id', '0123456789012345')
                 ->where('vendor.deed_number', 'DEED-000001')
@@ -98,7 +100,7 @@ class VendorManagementTest extends TestCase
         );
     }
 
-    // Start Update 13 September 2026, by @WNP: Ensure timeline payload preserves raw comments and exposes reason codes for selective localization.
+    // Ensure timeline payload preserves raw comments and exposes reason codes for selective localization.
     public function test_vendor_detail_keeps_raw_timeline_comments_and_reason_codes()
     {
         $this->vendor->stateLogs()->create([
@@ -107,7 +109,7 @@ class VendorManagementTest extends TestCase
             'to_status' => Vendor::STATUS_UNDER_REVIEW,
             'comment' => 'Admin reviewed termination appeal and restored access.',
             'reason_code' => 'APPEAL_APPROVED',
-            // Start Update 13 September 2026, by @WNP: Preserve explicit system provenance in the timeline response.
+            // Preserve explicit system provenance in the timeline response.
             'metadata' => ['comment_source' => 'system'],
         ]);
 
@@ -122,7 +124,7 @@ class VendorManagementTest extends TestCase
             );
     }
 
-    // Start Update 13 September 2026, by @WNP: Confirm new automatic timeline comments carry a source marker.
+    // Confirm new automatic timeline comments carry a source marker.
     public function test_default_approval_comment_is_marked_as_system_generated()
     {
         $this->actingAs($this->adminUser)
@@ -137,7 +139,7 @@ class VendorManagementTest extends TestCase
         }
     }
 
-    // Start Update 13 September 2026, by @WNP: A matching comment typed by a user must remain identifiable as user-authored.
+    // A matching comment typed by a user must remain identifiable as user-authored.
     public function test_user_approval_comment_matching_default_is_marked_as_user_authored()
     {
         $this->actingAs($this->adminUser)
@@ -201,7 +203,7 @@ class VendorManagementTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        // Start Update 14 September 2026, by @WNP: Keep successful VMS activation visible through the admin flash alert.
+        // Keep successful VMS activation visible through the admin flash alert.
         $response->assertSessionHas('success', 'Vendor activated!');
 
         $this->assertDatabaseHas('vendors', [
@@ -217,7 +219,7 @@ class VendorManagementTest extends TestCase
         ]);
     }
 
-    // Start Update 16 September 2026, by @WNP: Confirm activation comments remain optional as indicated by the lifecycle form.
+    // Confirm activation comments remain optional as indicated by the lifecycle form.
     public function test_admin_can_activate_approved_vendor_without_comment(): void
     {
         $this->vendor->update([
@@ -231,7 +233,114 @@ class VendorManagementTest extends TestCase
         $this->assertSame(Vendor::STATUS_ACTIVE, $this->vendor->fresh()->status);
     }
 
-    // Start Update 16 September 2026, by @WNP: Ensure repeated activation cannot create a duplicate state transition.
+    public function test_vendor_detail_exposes_the_same_activation_readiness_as_the_backend(): void
+    {
+        $this->vendor->update(['status' => Vendor::STATUS_APPROVED]);
+        $documentType = DocumentType::create([
+            'name' => 'activation_license',
+            'display_name' => 'Activation License',
+            'is_mandatory' => true,
+            'has_expiry' => true,
+            'is_active' => true,
+        ]);
+        VendorDocument::create([
+            'vendor_id' => $this->vendor->id,
+            'document_type_id' => $documentType->id,
+            'file_name' => 'activation-license.pdf',
+            'file_path' => 'vendor-documents/activation-license.pdf',
+            'file_hash' => hash('sha256', 'activation-license'),
+            'file_size' => 1024,
+            'mime_type' => 'application/pdf',
+            'is_current' => true,
+            'verification_status' => VendorDocument::STATUS_VERIFIED,
+            'expiry_date' => now()->addYear()->toDateString(),
+            'verified_by' => $this->adminUser->id,
+            'verified_at' => now(),
+        ]);
+
+        $this->actingAs($this->adminUser)
+            ->get(route('admin.vendors.show', $this->vendor))
+            ->assertInertia(
+                fn ($page) => $page
+                    ->where('allMandatoryDocsVerified', true)
+                    ->where('activationReadiness.allowed', true)
+                    ->where('activationReadiness.reasons', [])
+                    ->where('activationReadiness.minimum_compliance_score', 80)
+            );
+
+        $this->actingAs($this->adminUser)
+            ->post(route('admin.vendors.activate', $this->vendor))
+            ->assertSessionHas('success', 'Vendor activated!');
+    }
+
+    public function test_expiry_required_document_without_expiry_blocks_ui_and_direct_activation(): void
+    {
+        $this->vendor->update(['status' => Vendor::STATUS_APPROVED]);
+        $documentType = DocumentType::create([
+            'name' => 'expiring_license',
+            'display_name' => 'Expiring License',
+            'is_mandatory' => true,
+            'has_expiry' => true,
+            'is_active' => true,
+        ]);
+        VendorDocument::create([
+            'vendor_id' => $this->vendor->id,
+            'document_type_id' => $documentType->id,
+            'file_name' => 'expiring-license.pdf',
+            'file_path' => 'vendor-documents/expiring-license.pdf',
+            'file_hash' => hash('sha256', 'expiring-license'),
+            'file_size' => 1024,
+            'mime_type' => 'application/pdf',
+            'is_current' => true,
+            'verification_status' => VendorDocument::STATUS_VERIFIED,
+            'expiry_date' => null,
+            'verified_by' => $this->adminUser->id,
+            'verified_at' => now(),
+        ]);
+
+        $this->actingAs($this->adminUser)
+            ->get(route('admin.vendors.show', $this->vendor))
+            ->assertInertia(
+                fn ($page) => $page
+                    ->where('allMandatoryDocsVerified', false)
+                    ->where('activationReadiness.allowed', false)
+                    ->where('activationReadiness.reasons', ['documents'])
+            );
+
+        $this->actingAs($this->adminUser)
+            ->post(route('admin.vendors.activate', $this->vendor))
+            ->assertSessionHasErrors([
+                'status' => __('alerts.documents_required_for_activation'),
+            ]);
+
+        $this->assertSame(Vendor::STATUS_APPROVED, $this->vendor->fresh()->status);
+    }
+
+    public function test_open_flag_disables_activation_in_props_and_direct_requests(): void
+    {
+        $this->vendor->update(['status' => Vendor::STATUS_APPROVED]);
+        ComplianceFlag::create([
+            'vendor_id' => $this->vendor->id,
+            'severity' => 'medium',
+            'status' => 'open',
+            'reason' => 'Unresolved activation review.',
+            'flagged_at' => now(),
+        ]);
+
+        $this->actingAs($this->adminUser)
+            ->get(route('admin.vendors.show', $this->vendor))
+            ->assertInertia(
+                fn ($page) => $page
+                    ->where('activationReadiness.allowed', false)
+                    ->where('activationReadiness.reasons', ['flags'])
+            );
+
+        $this->actingAs($this->adminUser)
+            ->post(route('admin.vendors.activate', $this->vendor))
+            ->assertSessionHasErrors(['status' => __('alerts.flags_block_activation')]);
+    }
+
+    // Ensure repeated activation cannot create a duplicate state transition.
     public function test_repeated_activation_keeps_one_successful_transition(): void
     {
         $this->vendor->update(['status' => Vendor::STATUS_APPROVED]);
@@ -272,7 +381,7 @@ class VendorManagementTest extends TestCase
         ]);
     }
 
-    // Start Update 14 September 2026, by @WNP: Return a visible error when an approved vendor still has an open compliance flag.
+    // Return a visible error when an approved vendor still has an open compliance flag.
     public function test_activation_returns_status_error_for_open_compliance_flag(): void
     {
         $this->vendor->update(['status' => Vendor::STATUS_APPROVED]);
@@ -291,7 +400,7 @@ class VendorManagementTest extends TestCase
         $this->assertSame(Vendor::STATUS_APPROVED, $this->vendor->fresh()->status);
     }
 
-    // Start Update 14 September 2026, by @WNP: Keep VMS suspension feedback and required-comment errors observable.
+    // Keep VMS suspension feedback and required-comment errors observable.
     public function test_suspension_returns_success_or_comment_error(): void
     {
         $this->vendor->update(['status' => Vendor::STATUS_ACTIVE]);
@@ -320,7 +429,7 @@ class VendorManagementTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        // Start Update 14 September 2026, by @WNP: Keep successful VMS termination visible through the admin flash alert.
+        // Keep successful VMS termination visible through the admin flash alert.
         $response->assertSessionHas('success', 'Vendor terminated.');
 
         $this->assertDatabaseHas('vendors', [
@@ -336,7 +445,7 @@ class VendorManagementTest extends TestCase
         ]);
     }
 
-    // Start Update 14 September 2026, by @WNP: Return a field error if a VMS termination reason is missing.
+    // Return a field error if a VMS termination reason is missing.
     public function test_termination_returns_comment_error_when_reason_is_missing(): void
     {
         $this->vendor->update(['status' => Vendor::STATUS_ACTIVE]);
@@ -348,7 +457,7 @@ class VendorManagementTest extends TestCase
         $this->assertSame(Vendor::STATUS_ACTIVE, $this->vendor->fresh()->status);
     }
 
-    // Start Update 14 September 2026, by @WNP: Confirm suspension and termination use the Indonesian comment field name.
+    // Confirm suspension and termination use the Indonesian comment field name.
     public function test_indonesian_suspension_and_termination_require_komentar(): void
     {
         $this->vendor->update(['status' => Vendor::STATUS_ACTIVE]);

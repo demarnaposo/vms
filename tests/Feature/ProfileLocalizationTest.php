@@ -10,7 +10,7 @@ class ProfileLocalizationTest extends TestCase
 {
     use RefreshDatabase;
 
-    // Start Update 15 September 2026, by @WNP: Verify an invalid current password uses Indonesian feedback.
+    // Verify an invalid current password uses Indonesian feedback.
     public function test_current_password_validation_is_localized_in_indonesian(): void
     {
         $user = User::factory()->create();
@@ -29,7 +29,7 @@ class ProfileLocalizationTest extends TestCase
         ]);
     }
 
-    // Start Update 15 September 2026, by @WNP: Verify profile validation uses Indonesian field names.
+    // Verify profile validation uses Indonesian field names.
     public function test_profile_field_validation_is_localized_in_indonesian(): void
     {
         $user = User::factory()->create();

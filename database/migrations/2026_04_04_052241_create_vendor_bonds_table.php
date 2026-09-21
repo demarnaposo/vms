@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('vendor_id')->constrained()->cascadeOnDelete();
             $table->decimal('total_amount', 12, 2);
             $table->decimal('current_balance', 12, 2);
-            // Start Update 11 September 2026, by @WNP: Use IDR as the vendor bond currency default for fresh installations.
+            // Use IDR as the vendor bond currency default for fresh installations.
             $table->string('currency', 3)->default('IDR');
             $table->enum('status', ['PENDING', 'PAID', 'PARTIALLY_FORFEITED', 'REFUNDED', 'FORFEITED'])->default('PENDING');
             $table->timestamp('valid_until')->nullable();

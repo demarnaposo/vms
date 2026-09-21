@@ -65,7 +65,7 @@ class DashboardService
 
     public function pendingDocuments(): Collection
     {
-        // Start Update 15 September 2026, by @WNP: Include the stable document type key for selective UI localization.
+        // Include the stable document type key for selective UI localization.
         return VendorDocument::with(['vendor:id,company_name', 'documentType:id,name,display_name'])
             ->select(['id', 'vendor_id', 'document_type_id', 'created_at'])
             ->where('verification_status', VendorDocument::STATUS_PENDING)
@@ -76,7 +76,7 @@ class DashboardService
                 return [
                     'id' => $doc->id,
                     'vendor_name' => $doc->vendor?->company_name,
-                    // Start Update 15 September 2026, by @WNP: Keep master identity alongside its stored display name.
+                    // Keep master identity alongside its stored display name.
                     'document_type' => $doc->documentType?->only(['name', 'display_name']),
                     'uploaded_at' => $doc->created_at?->format('M d, Y'),
                 ];

@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { AdminLayout, PageHeader, Card, StatCard, Button, FormSelect, AppIcon } from '@/Components';
-// Start Update 16 September 2026, by @WNP: Translate static report cards and scheduled-job descriptions.
+// Translate static report cards and scheduled-job descriptions.
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 11 September 2026, by @WNP: Reuse the centralized Indonesian currency formatter.
+// Reuse the centralized Indonesian currency formatter.
 import { formatCurrency } from '@/utils/currencyFormatters';
 
 export default function ReportsIndex({ stats = {} }) {
     const [dateRange, setDateRange] = useState('this_month');
-    // Start Update 16 September 2026, by @WNP: Resolve report dashboard copy using the selected language.
+    // Resolve report dashboard copy using the selected language.
     const { t } = useLanguage();
-    // Start Update 11 September 2026, by @WNP: Read the shared IDR settings supplied by Laravel.
+    // Read the shared IDR settings supplied by Laravel.
     const { auth, currency } = usePage().props;
     const can = auth?.can || {};
 
@@ -114,7 +114,6 @@ export default function ReportsIndex({ stats = {} }) {
                         icon="clock"
                         color="warning"
                     />
-                    {/* Start Update 11 September 2026, by @WNP: Replace Indian lakh notation with a complete IDR value. */}
                     <StatCard
                         label="Total Paid"
                         value={formatCurrency(stats.total_paid, currency)}
@@ -146,7 +145,7 @@ export default function ReportsIndex({ stats = {} }) {
                                         </div>
                                         <div className="flex-1">
                                             <h3 className="text-(--color-text-primary) font-semibold mb-1">
-                                                {/* Start Update 16 September 2026, by @WNP: Translate fixed report names without changing route identifiers. */}
+                                                {/* Translate fixed report names without changing route identifiers. */}
                                                 {t(report.title)}
                                             </h3>
                                             <p className="text-sm text-(--color-text-tertiary)">
@@ -181,7 +180,7 @@ export default function ReportsIndex({ stats = {} }) {
                         </div>
                     ) : (
                         <div className="p-8 text-center text-(--color-text-tertiary)">
-                            {/* Start Update 16 September 2026, by @WNP: Localize the static report permission empty state. */}
+                            {/* Localize the static report permission empty state. */}
                             {t('No reports available for your role.')}
                         </div>
                     )}
@@ -191,7 +190,7 @@ export default function ReportsIndex({ stats = {} }) {
                 <Card title="Scheduled Jobs">
                     <div className="p-4">
                         <p className="text-(--color-text-tertiary) text-sm mb-4">
-                            {/* Start Update 16 September 2026, by @WNP: Translate scheduled-job guidance while retaining command text. */}
+                            {/* Translate scheduled-job guidance while retaining command text. */}
                             {t(
                                 'These commands run automatically but can also be triggered manually:'
                             )}
@@ -203,7 +202,7 @@ export default function ReportsIndex({ stats = {} }) {
                                     style={{ background: 'var(--gradient-primary)' }}
                                 />
                                 <div className="relative z-10 text-(--color-text-primary)">
-                                    {/* Start Update 16 September 2026, by @WNP: Translate fixed scheduled-job labels only. */}
+                                    {/* Translate fixed scheduled-job labels only. */}
                                     <div className="font-semibold mb-1">
                                         {t('Compliance Evaluation')}
                                     </div>
@@ -221,7 +220,7 @@ export default function ReportsIndex({ stats = {} }) {
                                     style={{ background: 'var(--gradient-success)' }}
                                 />
                                 <div className="relative z-10 text-(--color-text-primary)">
-                                    {/* Start Update 16 September 2026, by @WNP: Translate fixed scheduled-job labels only. */}
+                                    {/* Translate fixed scheduled-job labels only. */}
                                     <div className="font-semibold mb-1">
                                         {t('Expiry Reminders')}
                                     </div>
@@ -239,7 +238,7 @@ export default function ReportsIndex({ stats = {} }) {
                                     style={{ background: 'var(--gradient-warning)' }}
                                 />
                                 <div className="relative z-10 text-(--color-text-primary)">
-                                    {/* Start Update 16 September 2026, by @WNP: Translate fixed scheduled-job labels only. */}
+                                    {/* Translate fixed scheduled-job labels only. */}
                                     <div className="font-semibold mb-1">{t('Weekly Summary')}</div>
                                     <div className="text-xs text-(--color-text-secondary) mb-2">
                                         {t('Runs every Monday')}

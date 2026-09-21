@@ -2,14 +2,14 @@
 
 namespace Tests\Feature;
 
-// Start Update 16 September 2026, by @WNP: Verify localized performance rating validation copy.
+// Verify localized performance rating validation copy.
 use App\Http\Requests\Admin\StorePerformanceRatingRequest;
-// Start Update 15 September 2026, by @WNP: Verify localized contact-message validation attributes.
+// Verify localized contact-message validation attributes.
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
 use Tests\TestCase;
 
-// Start Update 11 September 2026, by @WNP: Verify the supported language list and server-side Indonesian validation locale.
+// Verify the supported language list and server-side Indonesian validation locale.
 class LanguageLocalizationTest extends TestCase
 {
     public function test_application_supports_english_and_indonesian(): void
@@ -21,7 +21,7 @@ class LanguageLocalizationTest extends TestCase
     public function test_indonesian_cookie_localizes_backend_validation_messages(): void
     {
         $response = $this
-            // Start Update 14 September 2026, by @WNP: Send the renamed plain locale cookie produced by the browser switcher.
+            // Send the renamed plain locale cookie produced by the browser switcher.
             ->withUnencryptedCookie('vms_locale', 'id')
             ->from('/register')
             ->post('/register', []);
@@ -35,7 +35,7 @@ class LanguageLocalizationTest extends TestCase
     public function test_unsupported_language_cookie_falls_back_to_english(): void
     {
         $response = $this
-            // Start Update 14 September 2026, by @WNP: Verify unsupported values in the renamed cookie still fall back to English.
+            // Verify unsupported values in the renamed cookie still fall back to English.
             ->withUnencryptedCookie('vms_locale', 'xx')
             ->from('/register')
             ->post('/register', []);
@@ -44,7 +44,7 @@ class LanguageLocalizationTest extends TestCase
         $this->assertSame('The name field is required.', session('errors')->get('name')[0]);
     }
 
-    // Start Update 15 September 2026, by @WNP: Keep contact-message validation labels in Indonesian without modifying note content.
+    // Keep contact-message validation labels in Indonesian without modifying note content.
     public function test_contact_message_internal_note_attribute_is_localized(): void
     {
         App::setLocale('id');
@@ -60,7 +60,7 @@ class LanguageLocalizationTest extends TestCase
         );
     }
 
-    // Start Update 16 September 2026, by @WNP: Keep performance period and maximum-score validation in the selected language.
+    // Keep performance period and maximum-score validation in the selected language.
     public function test_performance_rating_validation_is_localized(): void
     {
         App::setLocale('id');

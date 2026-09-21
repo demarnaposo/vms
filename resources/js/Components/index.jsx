@@ -4,7 +4,7 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
 import AppIconComponent from './AppIcon';
-// Start Update 11 September 2026, by @WNP: Translate shared button labels and tooltips.
+// Translate shared button labels and tooltips.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export { default as AdminLayout } from './AdminLayout';

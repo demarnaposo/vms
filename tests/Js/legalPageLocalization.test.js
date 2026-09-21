@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { translateMessage } from '../../resources/js/i18n/translations.js';
 
-// Start Update 15 September 2026, by @WNP: Verify the public privacy and terms headings follow the selected language.
+// Verify the public privacy and terms headings follow the selected language.
 test('public legal page headings are localized', () => {
     const examples = [
         ['Privacy Policy', 'Kebijakan Privasi'],
@@ -35,7 +35,7 @@ test('public legal page headings are localized', () => {
     }
 });
 
-// Start Update 15 September 2026, by @WNP: Guard VMS naming and centralized translation usage on both legal pages.
+// Guard VMS naming and centralized translation usage on both legal pages.
 test('public legal pages use the shared translator and VMS application name', () => {
     for (const page of ['Privacy.jsx', 'Terms.jsx']) {
         const source = readFileSync(

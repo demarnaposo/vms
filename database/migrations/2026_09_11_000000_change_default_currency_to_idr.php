@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    // Start Update 11 September 2026, by @WNP: Change currency defaults safely without rewriting historical transaction data.
+    // Change currency defaults safely without rewriting historical transaction data.
     public function up(): void
     {
         Schema::table('payment_requests', function (Blueprint $table) {
@@ -22,7 +22,7 @@ return new class extends Migration
         });
     }
 
-    // Start Update 11 September 2026, by @WNP: Restore only schema defaults when rolling back, leaving stored records untouched.
+    // Restore only schema defaults when rolling back, leaving stored records untouched.
     public function down(): void
     {
         Schema::table('payment_requests', function (Blueprint $table) {

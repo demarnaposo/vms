@@ -1,18 +1,21 @@
 <?php
 
-// Start Update 12 September 2026, by @WNP: Keep dynamic alert copy separate from database and user-provided values.
+// Keep dynamic alert copy separate from database and user-provided values.
 return [
     'notification_sent' => 'Notification sent to :count recipient(s).',
-    // Start Update 15 September 2026, by @WNP: Centralize notification-center success feedback.
+    'contact_message_sent' => 'Thank you for your message! We\'ll get back to you soon.',
+    'contact_message_failed' => 'Your message could not be sent. Please try again.',
+    // Centralize notification-center success feedback.
     'notifications_marked_read' => 'All notifications marked as read.',
-    // Start Update 16 September 2026, by @WNP: Explain throttled form actions without leaving the current page.
+    // Explain throttled form actions without leaving the current page.
     'too_many_requests' => 'Too many actions were submitted. Please wait a moment and try again.',
     'document_verified' => ':document verified successfully.',
     'document_rejected' => ':document rejected.',
     'vendor_account_status' => 'Your vendor account is currently :status. Please contact support.',
+    'user_account_inactive' => 'Your account is inactive. Please contact support.',
     'vendor_not_compliant' => 'Vendor is not compliant (Status: :status). Please resolve compliance issues first.',
     'vendor_transition' => 'Vendor cannot be :action from :status state.',
-    // Start Update 12 September 2026, by @WNP: Keep lifecycle action and readiness alert copy translatable.
+    // Keep lifecycle action and readiness alert copy translatable.
     'actions' => [
         'approved' => 'approved',
         'rejected' => 'rejected',

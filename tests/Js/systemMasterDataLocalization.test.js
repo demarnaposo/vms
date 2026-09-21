@@ -6,7 +6,7 @@ import {
 } from '../../resources/js/i18n/systemMasterData.js';
 import { translateMessage } from '../../resources/js/i18n/translations.js';
 
-// Start Update 15 September 2026, by @WNP: Verify every display-oriented VMS master-data category is registered centrally.
+// Verify every display-oriented VMS master-data category is registered centrally.
 test('registers all display-oriented system master-data categories', () => {
     assert.deepEqual(Object.keys(SYSTEM_MASTER_DATA), [
         'roles',
@@ -24,7 +24,7 @@ test('registers all display-oriented system master-data categories', () => {
     assert.equal(Object.keys(SYSTEM_MASTER_DATA.performance_metrics).length, 4);
 });
 
-// Start Update 15 September 2026, by @WNP: Ensure every registered master label and description has an Indonesian display value.
+// Ensure every registered master label and description has an Indonesian display value.
 test('all registered master-data text has Indonesian coverage', () => {
     const intentionallySharedTerms = new Set(['Vendor']);
 
@@ -44,7 +44,7 @@ test('all registered master-data text has Indonesian coverage', () => {
     }
 });
 
-// Start Update 15 September 2026, by @WNP: Verify representative fixed records translate by stable name without changing their codes.
+// Verify representative fixed records translate by stable name without changing their codes.
 test('translates fixed records from every master-data category', () => {
     const examples = [
         ['roles', 'ops_manager', 'display_name', 'Manajer Operasional'],
@@ -79,7 +79,7 @@ test('translates fixed records from every master-data category', () => {
     }
 });
 
-// Start Update 15 September 2026, by @WNP: Keep custom records, technical mappings, and user-entered values outside automatic translation.
+// Keep custom records, technical mappings, and user-entered values outside automatic translation.
 test('preserves unknown database master records verbatim', () => {
     const customMetric = {
         name: 'custom_metric',

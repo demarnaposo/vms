@@ -8,10 +8,10 @@ import {
     FormSelect,
     PageHeader,
 } from '@/Components';
-// Start Update 13 September 2026, by @WNP: Localize fixed staff role options and creation dates without translating user records.
+// Localize fixed staff role options and creation dates without translating user records.
 import { useLanguage } from '@/Contexts/LanguageContext';
 import { translateStaffRoleOption } from '@/i18n/staffRoles';
-// Start Update 15 September 2026, by @WNP: Translate recognized role master records in the staff table.
+// Translate recognized role master records in the staff table.
 import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 import { formatDateTime } from '@/utils/dateFormatters';
 
@@ -24,7 +24,7 @@ const INITIAL_FORM_DATA = {
 };
 
 export default function StaffIndex({ staffUsers = [], availableRoles = [] }) {
-    // Start Update 13 September 2026, by @WNP: Resolve only fixed UI labels from the selected language.
+    // Resolve only fixed UI labels from the selected language.
     const { language } = useLanguage();
     const dateLocale = language === 'id' ? 'id-ID' : 'en-IN';
     const { data, setData, post, processing, errors, clearErrors } = useForm(INITIAL_FORM_DATA);
@@ -43,7 +43,7 @@ export default function StaffIndex({ staffUsers = [], availableRoles = [] }) {
         });
     };
 
-    // Start Update 13 September 2026, by @WNP: Translate whitelisted role choices; keep their submitted codes and database row labels unchanged.
+    // Translate whitelisted role choices; keep their submitted codes and database row labels unchanged.
     const roleOptions = availableRoles.map((role) => ({
         value: role.value,
         label: translateStaffRoleOption(language, role),
@@ -64,7 +64,7 @@ export default function StaffIndex({ staffUsers = [], availableRoles = [] }) {
             header: 'Roles',
             render: (row) => (
                 <span className="text-(--color-text-secondary)">
-                    {/* Start Update 15 September 2026, by @WNP: Preserve custom roles and localize fixed master roles. */}
+                    {/* Preserve custom roles and localize fixed master roles. */}
                     {(row.role_items || [])
                         .map((role) =>
                             translateSystemMasterDataField(language, 'roles', role, 'display_name')
@@ -75,7 +75,7 @@ export default function StaffIndex({ staffUsers = [], availableRoles = [] }) {
         },
         {
             header: 'Created',
-            // Start Update 13 September 2026, by @WNP: Format the creation timestamp without modifying its stored value.
+            // Format the creation timestamp without modifying its stored value.
             render: (row) => (
                 <span className="text-(--color-text-tertiary)">
                     {formatDateTime(row.created_at, dateLocale)}
@@ -131,7 +131,7 @@ export default function StaffIndex({ staffUsers = [], availableRoles = [] }) {
                             required
                         />
 
-                        {/* Start Update 13 September 2026, by @WNP: Show localized fixed role choices while preserving original role codes. */}
+                        {/* Show localized fixed role choices while preserving original role codes. */}
                         <FormSelect
                             label="Role"
                             value={data.role}

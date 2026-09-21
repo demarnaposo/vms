@@ -1,11 +1,11 @@
 import { Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { AdminLayout, PageHeader, DataTable, Badge, Button } from '@/Components';
-// Start Update 12 September 2026, by @WNP: Translate vendor filters while retaining backend status values.
+// Translate vendor filters while retaining backend status values.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function VendorsIndex({ vendors = {}, currentStatus = 'all', search = '' }) {
-    // Start Update 12 September 2026, by @WNP: Resolve visible vendor filter labels from the shared dictionary.
+    // Resolve visible vendor filter labels from the shared dictionary.
     const { t } = useLanguage();
     const [searchQuery, setSearchQuery] = useState(search);
 
@@ -107,7 +107,7 @@ export default function VendorsIndex({ vendors = {}, currentStatus = 'all', sear
                                     : 'text-(--color-text-tertiary) hover:text-(--color-text-primary) hover:bg-(--color-bg-primary)'
                             }`}
                         >
-                            {/* Start Update 12 September 2026, by @WNP: Translate status labels without changing filter query parameters. */}
+                            {/* Translate status labels without changing filter query parameters. */}
                             {t(status.replaceAll('_', ' '))}
                         </Link>
                     ))}

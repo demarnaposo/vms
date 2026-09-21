@@ -11,12 +11,12 @@ import {
     StatCard,
     StatGrid,
 } from '@/Components';
-// Start Update 16 September 2026, by @WNP: Translate static system-health labels and pagination controls.
+// Translate static system-health labels and pagination controls.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 const formatPaginationLabel = (label) =>
     String(label || '')
-        // Start Update 16 September 2026, by @WNP: Decode Laravel pagination entities for exact translation keys.
+        // Decode Laravel pagination entities for exact translation keys.
         .replace(/&laquo;/g, '\u00AB')
         .replace(/&raquo;/g, '\u00BB')
         .replace(/<[^>]*>/g, '')
@@ -41,7 +41,7 @@ function mapJobStatus(status) {
 }
 
 export default function SystemHealthIndex({ jobs = {}, stats = {}, filters = {} }) {
-    // Start Update 16 September 2026, by @WNP: Resolve fixed health-monitoring copy in the selected language.
+    // Resolve fixed health-monitoring copy in the selected language.
     const { t } = useLanguage();
     const rows = jobs?.data ?? [];
     const [statusFilter, setStatusFilter] = useState(filters?.status || 'all');
@@ -148,7 +148,7 @@ export default function SystemHealthIndex({ jobs = {}, stats = {}, filters = {} 
                     >
                         <label className="block min-w-0">
                             <span className="text-xs uppercase tracking-wide text-(--color-text-tertiary)">
-                                {/* Start Update 16 September 2026, by @WNP: Translate fixed system-health filter labels. */}
+                                {/* Translate fixed system-health filter labels. */}
                                 {t('Status')}
                             </span>
                             <FormSelect
@@ -167,7 +167,7 @@ export default function SystemHealthIndex({ jobs = {}, stats = {}, filters = {} 
 
                         <label className="block min-w-0">
                             <span className="text-xs uppercase tracking-wide text-(--color-text-tertiary)">
-                                {/* Start Update 16 September 2026, by @WNP: Translate the label without altering command values. */}
+                                {/* Translate the label without altering command values. */}
                                 {t('Job Name')}
                             </span>
                             <input
@@ -210,7 +210,7 @@ export default function SystemHealthIndex({ jobs = {}, stats = {}, filters = {} 
                                         : 'bg-(--color-bg-primary) text-(--color-text-secondary) border-(--color-border-primary) disabled:opacity-40'
                                 }`}
                             >
-                                {/* Start Update 16 September 2026, by @WNP: Translate pagination text while retaining page numbers. */}
+                                {/* Translate pagination text while retaining page numbers. */}
                                 {t(formatPaginationLabel(link.label))}
                             </button>
                         ))}

@@ -61,7 +61,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('sensitive-action', function (Request $request) {
-            // Start Update 16 September 2026, by @WNP: Keep rate-limited form actions on their current page with visible feedback.
+            // Keep rate-limited form actions on their current page with visible feedback.
             return Limit::perMinute(10)
                 ->by($request->user()?->id.'|'.$request->ip())
                 ->response(fn (Request $request, array $headers) => back()

@@ -14,7 +14,7 @@ export default function VerifyEmail({ email, status }) {
 
     return (
         <>
-            <Head title={`${t('Verify Email Address')} - VMS`} />
+            <Head title={t('Verify Email Address')} />
             <div className="min-h-screen flex items-center justify-center p-8 bg-(--color-bg-secondary)">
                 <div className="fixed right-4 top-4 z-50">
                     <LanguageSwitcher />

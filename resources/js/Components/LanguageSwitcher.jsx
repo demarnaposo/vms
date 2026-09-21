@@ -1,7 +1,7 @@
-// Start Update 11 September 2026, by @WNP: Consume the global language state in a reusable accessible switch.
+// Consume the global language state in a reusable accessible switch.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
-// Start Update 11 September 2026, by @WNP: Keep static language options outside render for stable reuse.
+// Keep static language options outside render for stable reuse.
 const LANGUAGE_OPTIONS = Object.freeze([
     { code: 'en', label: 'EN', title: 'English' },
     { code: 'id', label: 'ID', title: 'Indonesian' },

@@ -1,7 +1,7 @@
 import { SYSTEM_MASTER_DATA } from './systemMasterData.js';
 import { translateMessage } from './translations.js';
 
-// Start Update 16 September 2026, by @WNP: Resolve only fixed document master labels embedded in automatic compliance details.
+// Resolve only fixed document master labels embedded in automatic compliance details.
 const DOCUMENT_LABELS = new Map(
     Object.values(SYSTEM_MASTER_DATA.document_types).map((definition) => [
         definition.display_name,
@@ -9,7 +9,7 @@ const DOCUMENT_LABELS = new Map(
     ])
 );
 
-// Start Update 16 September 2026, by @WNP: Normalize legacy automatic document labels to the complete identifier labels.
+// Normalize legacy automatic document labels to the complete identifier labels.
 DOCUMENT_LABELS.set('NPWP Document', 'Taxpayer Identification Number (NPWP) Document');
 DOCUMENT_LABELS.set('NIB Document', 'Business Identification Number (NIB) Document');
 
@@ -24,7 +24,7 @@ const translateDocumentList = (language, documentList) =>
         )
         .join(', ');
 
-// Start Update 16 September 2026, by @WNP: Translate known system-generated result patterns and preserve unknown database details verbatim.
+// Translate known system-generated result patterns and preserve unknown database details verbatim.
 export function translateComplianceDetails(language, rule, details) {
     if (typeof details !== 'string' || !rule?.name) return details;
 

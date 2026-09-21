@@ -89,7 +89,6 @@ class AdminNotificationController extends Controller
                 'recipient_count' => $recipientCount,
             ]);
 
-            // Start Update 12 September 2026, by @WNP: Localize the notification count alert for the selected language.
             return back()->with('success', __('alerts.notification_sent', ['count' => $recipientCount]));
         } catch (\Throwable $e) {
             Log::error('Admin notification send failed', ['error' => $e->getMessage()]);

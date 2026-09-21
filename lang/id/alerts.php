@@ -1,18 +1,21 @@
 <?php
 
-// Start Update 12 September 2026, by @WNP: Translate dynamic alerts while preserving names, status codes, and counts verbatim.
+// Translate dynamic alerts while preserving names, status codes, and counts verbatim.
 return [
     'notification_sent' => 'Notifikasi berhasil dikirim kepada :count penerima.',
-    // Start Update 15 September 2026, by @WNP: Localize notification-center success feedback.
+    'contact_message_sent' => 'Terima kasih atas pesan Anda! Kami akan segera menghubungi Anda.',
+    'contact_message_failed' => 'Pesan Anda tidak dapat dikirim. Silakan coba lagi.',
+    // Localize notification-center success feedback.
     'notifications_marked_read' => 'Semua notifikasi telah ditandai dibaca.',
-    // Start Update 16 September 2026, by @WNP: Show clear feedback when form actions are temporarily limited.
+    // Show clear feedback when form actions are temporarily limited.
     'too_many_requests' => 'Terlalu banyak tindakan dikirim. Tunggu sebentar lalu coba lagi.',
     'document_verified' => ':document berhasil diverifikasi.',
     'document_rejected' => ':document ditolak.',
     'vendor_account_status' => 'Akun vendor Anda saat ini berstatus :status. Silakan hubungi dukungan.',
+    'user_account_inactive' => 'Akun Anda tidak aktif. Silakan hubungi dukungan.',
     'vendor_not_compliant' => 'Vendor tidak patuh (Status: :status). Silakan selesaikan masalah kepatuhan terlebih dahulu.',
     'vendor_transition' => 'Vendor tidak dapat :action dari status :status.',
-    // Start Update 12 September 2026, by @WNP: Localize lifecycle action and readiness alerts without changing status data.
+    // Localize lifecycle action and readiness alerts without changing status data.
     'actions' => [
         'approved' => 'disetujui',
         'rejected' => 'ditolak',

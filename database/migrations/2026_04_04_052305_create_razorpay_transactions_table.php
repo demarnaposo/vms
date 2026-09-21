@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('razorpay_payment_id')->nullable();
             $table->string('razorpay_signature')->nullable();
             $table->decimal('amount', 12, 2);
-            // Start Update 11 September 2026, by @WNP: Use IDR as the transaction currency default for fresh installations.
+            // Use IDR as the transaction currency default for fresh installations.
             $table->string('currency', 3)->default('IDR');
             $table->enum('type', ['PAYMENT', 'REFUND'])->default('PAYMENT');
             $table->enum('status', ['CREATED', 'AUTHORIZED', 'CAPTURED', 'FAILED', 'REFUNDED'])->default('CREATED');

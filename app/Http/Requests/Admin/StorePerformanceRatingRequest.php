@@ -38,7 +38,7 @@ class StorePerformanceRatingRequest extends FormRequest
      *
      * @return array<string, string>
      */
-    // Start Update 16 September 2026, by @WNP: Localize performance period and rating field names in validation feedback.
+    // Localize performance period and rating field names in validation feedback.
     public function attributes(): array
     {
         return [
@@ -56,7 +56,7 @@ class StorePerformanceRatingRequest extends FormRequest
      *
      * @return array<string, string>
      */
-    // Start Update 16 September 2026, by @WNP: Localize the rating period ordering validation message.
+    // Localize the rating period ordering validation message.
     public function messages(): array
     {
         return [
@@ -89,7 +89,7 @@ class StorePerformanceRatingRequest extends FormRequest
                 if ($maxScore > 0 && $score > $maxScore) {
                     $validator->errors()->add(
                         "ratings.{$index}.score",
-                        // Start Update 16 September 2026, by @WNP: Localize the custom maximum-score validation response.
+                        // Localize the custom maximum-score validation response.
                         __('performance.validation.score_max', ['max' => $maxScore])
                     );
                 }

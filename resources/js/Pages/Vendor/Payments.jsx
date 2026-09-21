@@ -1,4 +1,4 @@
-// Start Update 11 September 2026, by @WNP: Read shared currency settings alongside the existing payment form.
+// Read shared currency settings alongside the existing payment form.
 import { useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import {
@@ -13,18 +13,18 @@ import {
     PageHeader,
     VendorLayout,
 } from '@/Components';
-// Start Update 11 September 2026, by @WNP: Reuse the centralized Indonesian currency formatter.
+// Reuse the centralized Indonesian currency formatter.
 import { formatCurrency } from '@/utils/currencyFormatters';
 import { formatDate } from '@/utils/dateFormatters';
-// Start Update 12 September 2026, by @WNP: Translate payment request feedback through the existing language provider.
+// Translate payment request feedback through the existing language provider.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function Payments({ vendor, payments = { data: [] } }) {
-    // Start Update 13 September 2026, by @WNP: Localize fixed payment labels and dates, not descriptions or references.
+    // Localize fixed payment labels and dates, not descriptions or references.
     const { language, t } = useLanguage();
     const dateLocale = language === 'id' ? 'id-ID' : 'en-IN';
     const [showRequestModal, setShowRequestModal] = useState(false);
-    // Start Update 11 September 2026, by @WNP: Use the default currency shared by Laravel.
+    // Use the default currency shared by Laravel.
     const { currency } = usePage().props;
 
     const requestForm = useForm({
@@ -74,7 +74,7 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                 ['active', 'approved'].includes(vendor?.status) && (
                     <Button onClick={() => setShowRequestModal(true)}>
                         <AppIcon name="payments" className="h-4 w-4" />
-                        {/* Start Update 13 September 2026, by @WNP: Translate the fixed icon-button label. */}
+                        {/* Translate the fixed icon-button label. */}
                         {t('Request Payment')}
                     </Button>
                 )
@@ -90,7 +90,7 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                         <div className="absolute top-0 right-0 w-32 h-32 bg-(--color-warning-light)/50 rounded-full blur-3xl -mr-10 -mt-10 transition-all duration-500 group-hover:bg-(--color-warning-light)/70" />
                         <div className="flex items-center justify-between mb-4 relative z-10">
                             <span className="text-sm font-medium text-(--color-text-tertiary)">
-                                {/* Start Update 13 September 2026, by @WNP: Translate the fixed summary label. */}
+                                {/* Translate the fixed summary label. */}
                                 {t('Pending Amount')}
                             </span>
                             <span className="inline-flex p-2 bg-(--color-warning-light) rounded-lg text-(--color-warning-dark)">
@@ -98,7 +98,7 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                             </span>
                         </div>
                         <div className="text-3xl font-bold text-(--color-text-primary) relative z-10">
-                            {/* Start Update 11 September 2026, by @WNP: Format pending totals as IDR. */}
+                            {/* Format pending totals as IDR. */}
                             {formatCurrency(totalPending, currency)}
                         </div>
                     </div>
@@ -107,7 +107,7 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                         <div className="absolute top-0 right-0 w-32 h-32 bg-(--color-success-light)/50 rounded-full blur-3xl -mr-10 -mt-10 transition-all duration-500 group-hover:bg-(--color-success-light)/70" />
                         <div className="flex items-center justify-between mb-4 relative z-10">
                             <span className="text-sm font-medium text-(--color-text-tertiary)">
-                                {/* Start Update 13 September 2026, by @WNP: Translate the fixed summary label. */}
+                                {/* Translate the fixed summary label. */}
                                 {t('Total Paid')}
                             </span>
                             <span className="inline-flex p-2 bg-(--color-success-light) rounded-lg text-(--color-success-dark)">
@@ -115,7 +115,7 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                             </span>
                         </div>
                         <div className="text-3xl font-bold text-(--color-text-primary) relative z-10">
-                            {/* Start Update 11 September 2026, by @WNP: Format paid totals as IDR. */}
+                            {/* Format paid totals as IDR. */}
                             {formatCurrency(totalPaid, currency)}
                         </div>
                     </div>
@@ -124,7 +124,7 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                         <div className="absolute top-0 right-0 w-32 h-32 bg-(--color-brand-primary-light)/40 rounded-full blur-3xl -mr-10 -mt-10 transition-all duration-500 group-hover:bg-(--color-brand-primary-light)/60" />
                         <div className="flex items-center justify-between mb-4 relative z-10">
                             <span className="text-sm font-medium text-(--color-text-tertiary)">
-                                {/* Start Update 13 September 2026, by @WNP: Translate the fixed summary label. */}
+                                {/* Translate the fixed summary label. */}
                                 {t('Total Requests')}
                             </span>
                             <span className="inline-flex p-2 bg-(--color-brand-primary-light) rounded-lg text-(--color-brand-primary-dark)">
@@ -144,11 +144,11 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                                 <AppIcon name="payments" className="h-8 w-8" />
                             </div>
                             <h3 className="text-lg font-medium text-(--color-text-primary) mb-1">
-                                {/* Start Update 13 September 2026, by @WNP: Translate the fixed empty-state heading. */}
+                                {/* Translate the fixed empty-state heading. */}
                                 {t('No payment requests yet')}
                             </h3>
                             <p className="mb-6">
-                                {/* Start Update 13 September 2026, by @WNP: Translate the fixed empty-state guidance. */}
+                                {/* Translate the fixed empty-state guidance. */}
                                 {t('Create your first payment request to get started.')}
                             </p>
                             {['active', 'approved'].includes(vendor?.status) && (
@@ -163,7 +163,7 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                                 <thead>
                                     <tr className="border-b border-(--color-border-primary) bg-(--color-bg-secondary)/50">
                                         <th className="text-left p-4 text-xs font-semibold text-(--color-text-tertiary) uppercase tracking-wider">
-                                            {/* Start Update 13 September 2026, by @WNP: Translate fixed table headings only. */}
+                                            {/* Translate fixed table headings only. */}
                                             {t('Reference')}
                                         </th>
                                         <th className="text-left p-4 text-xs font-semibold text-(--color-text-tertiary) uppercase tracking-wider">
@@ -197,7 +197,7 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                                             </td>
                                             <td className="p-4 text-right">
                                                 <span className="text-(--color-text-primary) font-bold">
-                                                    {/* Start Update 11 September 2026, by @WNP: Format payment history amounts as IDR. */}
+                                                    {/* Format payment history amounts as IDR. */}
                                                     {formatCurrency(payment.amount, currency)}
                                                 </span>
                                             </td>
@@ -206,12 +206,12 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                                                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[payment.status] || 'bg-(--color-bg-tertiary) text-(--color-text-primary)'}`}
                                                 >
                                                     <span className="w-1.5 h-1.5 rounded-full mr-1.5 bg-current" />
-                                                    {/* Start Update 13 September 2026, by @WNP: Translate the status enum label, not its stored code. */}
+                                                    {/* Translate the status enum label, not its stored code. */}
                                                     {t(payment.status?.replaceAll('_', ' '))}
                                                 </span>
                                             </td>
                                             <td className="p-4 text-(--color-text-tertiary) text-sm">
-                                                {/* Start Update 13 September 2026, by @WNP: Display transaction dates in the selected locale. */}
+                                                {/* Display transaction dates in the selected locale. */}
                                                 {formatDate(payment.created_at, dateLocale)}
                                             </td>
                                         </tr>
@@ -243,12 +243,12 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                 <div className="space-y-5">
                     {requestForm.errors.submit && (
                         <div className="bg-(--color-danger-light) border border-(--color-danger) text-(--color-danger-dark) px-4 py-3 rounded-xl text-sm font-medium">
-                            {/* Start Update 12 September 2026, by @WNP: Localize payment request errors while preserving database values. */}
+                            {/* Localize payment request errors while preserving database values. */}
                             {t(requestForm.errors.submit)}
                         </div>
                     )}
 
-                    {/* Start Update 13 September 2026, by @WNP: Translate the amount label while preserving the configured currency code. */}
+                    {/* Translate the amount label while preserving the configured currency code. */}
                     <FormInput
                         label={t('Amount (:code)', { code: currency?.code || 'IDR' })}
                         type="number"

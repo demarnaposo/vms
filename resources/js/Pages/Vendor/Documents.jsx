@@ -14,13 +14,13 @@ import {
 } from '@/Components';
 import { DocumentViewer } from '@/Components/DocumentViewer';
 import { formatDate, formatDateTime } from '@/utils/dateFormatters';
-// Start Update 12 September 2026, by @WNP: Translate the vendor document list and upload flow.
+// Translate the vendor document list and upload flow.
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 15 September 2026, by @WNP: Reuse selective document master-data localization across the list and form.
+// Reuse selective document master-data localization across the list and form.
 import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
 
 export default function Documents({ vendor, documents = [], documentTypes = [] }) {
-    // Start Update 12 September 2026, by @WNP: Keep document copy reactive to the global language switch.
+    // Keep document copy reactive to the global language switch.
     const { language, t } = useLanguage();
     const dateLocale = language === 'id' ? 'id-ID' : 'en-IN';
     const [showUploadModal, setShowUploadModal] = useState(false);
@@ -199,7 +199,7 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                     </div>
                 </div>
 
-                {/* Start Update 12 September 2026, by @WNP: Localize the document count without changing its numeric value. */}
+                {/* Localize the document count without changing its numeric value. */}
                 <Card title={t('All Documents (:count)', { count: displayDocuments.length })}>
                     {displayDocuments.length === 0 ? (
                         <div className="p-8 text-center text-(--color-text-tertiary)">
@@ -222,7 +222,7 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                                             </div>
                                             <div className="min-w-0">
                                                 <div className="text-(--color-text-primary) font-medium">
-                                                    {/* Start Update 15 September 2026, by @WNP: Translate fixed master labels while retaining custom names verbatim. */}
+                                                    {/* Translate fixed master labels while retaining custom names verbatim. */}
                                                     {translateDocumentTypeLabel(
                                                         language,
                                                         doc.document_type,
@@ -313,7 +313,7 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                 }
             >
                 <div className="space-y-4">
-                    {/* Start Update 15 September 2026, by @WNP: Localize only system-defined document options. */}
+                    {/* Localize only system-defined document options. */}
                     <FormSelect
                         label="Document Type"
                         value={uploadForm.data.document_type_id}
@@ -381,7 +381,7 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                             </p>
                         )}
                     </div>
-                    {/* Start Update 12 September 2026, by @WNP: Localize document upload errors from the application. */}
+                    {/* Localize document upload errors from the application. */}
                     {uploadForm.errors.upload && (
                         <p className="text-sm text-(--color-danger)">
                             {t(uploadForm.errors.upload)}

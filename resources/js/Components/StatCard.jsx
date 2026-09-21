@@ -1,5 +1,5 @@
 import AppIcon from './AppIcon';
-// Start Update 11 September 2026, by @WNP: Translate reusable dashboard statistic labels.
+// Translate reusable dashboard statistic labels.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 // Professional StatCard Component with refined styling

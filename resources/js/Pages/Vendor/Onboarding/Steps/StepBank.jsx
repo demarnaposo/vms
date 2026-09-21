@@ -1,11 +1,11 @@
 import { useForm, router } from '@inertiajs/react';
 import { useState } from 'react';
-// Start Update 11 September 2026, by @WNP: Resolve Indonesian bank names locally from three-digit transfer codes.
+// Resolve Indonesian bank names locally from three-digit transfer codes.
 import { findIndonesianBankByCode } from '@/data/indonesianBanks';
-// Start Update 11 September 2026, by @WNP: Translate the bank onboarding step through the global language context.
+// Translate the bank onboarding step through the global language context.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
-// Start Update 11 September 2026, by @WNP: Use Indonesia's three-digit bank transfer code format.
+// Use Indonesia's three-digit bank transfer code format.
 const BANK_CODE_REGEX = /^[0-9]{3}$/;
 
 export default function StepBank({ vendor, sessionData }) {
@@ -19,7 +19,7 @@ export default function StepBank({ vendor, sessionData }) {
     });
 
     const [clientErrors, setClientErrors] = useState({});
-    // Start Update 11 September 2026, by @WNP: Derive bank resolution during render without extra state or external requests.
+    // Derive bank resolution during render without extra state or external requests.
     const resolvedBank = findIndonesianBankByCode(data.bank_ifsc);
 
     const validateBankName = (value) => {
@@ -33,7 +33,7 @@ export default function StepBank({ vendor, sessionData }) {
         return '';
     };
 
-    // Start Update 11 September 2026, by @WNP: Validate Indonesian three-digit bank codes.
+    // Validate Indonesian three-digit bank codes.
     const validateBankCode = (value) => {
         if (!value || value.trim() === '') return 'Bank Code is required.';
         if (!BANK_CODE_REGEX.test(value)) return 'Bank Code must be exactly 3 digits.';
@@ -45,7 +45,7 @@ export default function StepBank({ vendor, sessionData }) {
         return '';
     };
 
-    // Start Update 11 September 2026, by @WNP: Auto-fill a known Indonesian bank name locally while keeping branch entry manual.
+    // Auto-fill a known Indonesian bank name locally while keeping branch entry manual.
     const handleBankCodeChange = (e) => {
         const code = e.target.value.replace(/\D/g, '').slice(0, 3);
         const bank = findIndonesianBankByCode(code);
@@ -114,7 +114,7 @@ export default function StepBank({ vendor, sessionData }) {
                         <label className="text-sm font-medium text-(--color-text-secondary)">
                             {t('Bank Name')} <span className="text-(--color-danger)">*</span>
                         </label>
-                        {/* Start Update 11 September 2026, by @WNP: Use an Indonesian bank example and lock locally resolved names. */}
+                        {/* Use an Indonesian bank example and lock locally resolved names. */}
                         <input
                             type="text"
                             value={data.bank_name}
@@ -182,7 +182,7 @@ export default function StepBank({ vendor, sessionData }) {
 
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {/* Start Update 11 September 2026, by @WNP: Use Indonesian Bank Code terminology. */}
+                            {/* Use Indonesian Bank Code terminology. */}
                             {t('Bank Code')} <span className="text-(--color-danger)">*</span>
                         </label>
                         <div className="relative">
@@ -230,7 +230,7 @@ export default function StepBank({ vendor, sessionData }) {
                         <label className="text-sm font-medium text-(--color-text-secondary)">
                             {t('Branch Name')} <span className="text-(--color-danger)">*</span>
                         </label>
-                        {/* Start Update 11 September 2026, by @WNP: Keep branch manual because Indonesian bank codes identify banks, not individual branches. */}
+                        {/* Keep branch manual because Indonesian bank codes identify banks, not individual branches. */}
                         <input
                             type="text"
                             value={data.bank_branch}

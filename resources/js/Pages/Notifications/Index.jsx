@@ -9,11 +9,11 @@ import {
     AppIcon,
 } from '@/Components';
 import { formatDateTime } from '@/utils/dateFormatters';
-// Start Update 15 September 2026, by @WNP: Translate the shared notification-center interface without altering database content.
+// Translate the shared notification-center interface without altering database content.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function NotificationsIndex({ notifications, unreadCount }) {
-    // Start Update 15 September 2026, by @WNP: Use the selected language for fixed copy and notification timestamps.
+    // Use the selected language for fixed copy and notification timestamps.
     const { language, t } = useLanguage();
     const dateLocale = language === 'id' ? 'id-ID' : 'en-US';
     const { auth } = usePage().props;
@@ -46,7 +46,7 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
         unreadCount ?? displayNotifications.filter((n) => !n.read_at).length;
 
     const header = (
-        // Start Update 15 September 2026, by @WNP: Localize the unread count while preserving its dynamic value.
+        // Localize the unread count while preserving its dynamic value.
         <PageHeader
             title="Notifications"
             subtitle={t(':count unread', { count: resolvedUnreadCount })}

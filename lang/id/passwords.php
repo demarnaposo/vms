@@ -1,6 +1,6 @@
 <?php
 
-// Start Update 12 September 2026, by @WNP: Localize password-reset status and error alerts.
+// Localize password-reset status and error alerts.
 return [
     'reset' => 'Kata sandi Anda berhasil diatur ulang.',
     'sent' => 'Tautan pengaturan ulang kata sandi telah dikirim melalui email.',

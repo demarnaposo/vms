@@ -93,7 +93,7 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
-    // Start Update 15 September 2026, by @WNP: Verify login failures follow the Indonesian locale cookie.
+    // Verify login failures follow the Indonesian locale cookie.
     public function test_invalid_login_feedback_is_localized_in_indonesian()
     {
         $user = User::factory()->create();
@@ -109,7 +109,7 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
-    // Start Update 15 September 2026, by @WNP: Verify registration validation uses Indonesian field labels.
+    // Verify registration validation uses Indonesian field labels.
     public function test_registration_validation_feedback_is_localized_in_indonesian()
     {
         $response = $this->withUnencryptedCookie('vms_locale', 'id')->post('/register', []);

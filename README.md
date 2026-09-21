@@ -1,10 +1,10 @@
-# Vendor Management System | Enterprise Vendor Lifecycle Management (VLM)
+# VMS (Vendor Management System)
 
-**Vendor Management System** is a next-generation Vendor Management System (VMS) engineered to optimize procurement lifecycles, enforce stringent regulatory governance, and unify supply chain operations. Built on a bleeding-edge technology stack, it facilitates frictionless collaboration between enterprises and their vendor ecosystems.
+**VMS** is a vendor management platform engineered to optimize procurement lifecycles, enforce regulatory governance, and unify supply chain operations. It facilitates collaboration between enterprises and their vendor ecosystems.
 
 ## Executive Summary
 
-Navigating complex regulatory landscapes requires robust digital infrastructure. Vendor Management System delivers a centralized governance framework that automates vendor onboarding, validates statutory compliance in real-time, and orchestrates multi-tier payment workflows—ensuring operational transparency and audit capability.
+Navigating complex regulatory landscapes requires robust digital infrastructure. VMS delivers a centralized governance framework that automates vendor onboarding, validates statutory compliance in real time, and orchestrates multi-tier payment workflows—ensuring operational transparency and audit capability.
 
 ## Core Capabilities
 
@@ -30,7 +30,7 @@ Navigating complex regulatory landscapes requires robust digital infrastructure.
 
 ## Technical Architecture
 
-Vendor Management System is architected for high availability and scalability, utilizing the latest innovations in the ecosystem:
+VMS is architected for high availability and scalability, utilizing the latest innovations in the ecosystem:
 
 -   **Backend Core**: **Laravel 12.x** (Bleeding Edge) - Leveraging the latest PHP capabilities for robust, secure API architecture.
 -   **Frontend Experience**: **React 19** + **Inertia.js 2.0** - Delivering a monolithic-like developer experience with Single Page Application (SPA) performance.

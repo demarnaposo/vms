@@ -14,7 +14,7 @@ class RazorpayConfigurationTest extends TestCase
 {
     use RefreshDatabase;
 
-    // Start Update 16 September 2026, by @WNP: Verify the retained legacy gateway stays disabled and has no HTTP endpoint.
+    // Verify the retained legacy gateway stays disabled and has no HTTP endpoint.
     public function test_razorpay_is_disabled_and_not_exposed_by_route(): void
     {
         $this->assertFalse((bool) config('services.razorpay.enabled'));
@@ -26,7 +26,7 @@ class RazorpayConfigurationTest extends TestCase
         $this->assertFalse($hasRazorpayRoute);
     }
 
-    // Start Update 16 September 2026, by @WNP: Preserve the migrated bond relationship for historical records or future reactivation.
+    // Preserve the migrated bond relationship for historical records or future reactivation.
     public function test_legacy_razorpay_transaction_relationship_remains_intact(): void
     {
         $user = User::factory()->create();

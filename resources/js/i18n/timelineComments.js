@@ -1,6 +1,6 @@
 import { translateMessage } from './translations.js';
 
-// Start Update 13 September 2026, by @WNP: Identify only known application-generated history comments and their transitions.
+// Identify only known application-generated history comments and their transitions.
 const AUTOMATIC_COMMENTS = new Map([
     ['Vendor application submitted for review', { statuses: ['submitted'], reasonCode: null }],
     [
@@ -16,12 +16,12 @@ const AUTOMATIC_COMMENTS = new Map([
     ],
 ]);
 
-// Start Update 13 September 2026, by @WNP: Translate only exact system-comment matches; preserve user-authored history verbatim.
+// Translate only exact system-comment matches; preserve user-authored history verbatim.
 export function translateTimelineComment(language, log) {
     const comment = log?.comment;
     if (typeof comment !== 'string') return comment;
 
-    // Start Update 13 September 2026, by @WNP: Never translate comments explicitly marked as user-authored in new logs.
+    // Never translate comments explicitly marked as user-authored in new logs.
     const commentSource = log.metadata?.comment_source;
     if (commentSource && commentSource !== 'system') return comment;
 

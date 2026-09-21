@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { translateMessage } from '../../resources/js/i18n/translations.js';
 
-// Start Update 15 September 2026, by @WNP: Verify static login and registration examples and role labels are bilingual.
+// Verify static login and registration examples and role labels are bilingual.
 test('authentication form examples and demo labels are localized', () => {
     const examples = [
         ['you@company.com', 'anda@perusahaan.com'],
@@ -12,6 +12,10 @@ test('authentication form examples and demo labels are localized', () => {
         ['Repeat password', 'Ulangi kata sandi'],
         ['Ops', 'Operasional'],
         ['Finance', 'Keuangan'],
+        [
+            'Your account is inactive. Please contact support.',
+            'Akun Anda tidak aktif. Silakan hubungi dukungan.',
+        ],
     ];
 
     for (const [source, translated] of examples) {
@@ -20,7 +24,7 @@ test('authentication form examples and demo labels are localized', () => {
     }
 });
 
-// Start Update 15 September 2026, by @WNP: Ensure static placeholders and role labels use the shared translator while credentials remain literal.
+// Ensure static placeholders and role labels use the shared translator while credentials remain literal.
 test('authentication pages route remaining static copy through the translator', () => {
     const login = readFileSync(
         new URL('../../resources/js/Pages/Auth/Login.jsx', import.meta.url),

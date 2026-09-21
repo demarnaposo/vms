@@ -1,4 +1,4 @@
-// Start Update 14 September 2026, by @WNP: Share Indonesian mobile input limits and validation across VMS forms.
+// Share Indonesian mobile input limits and validation across VMS forms.
 export const INDONESIAN_MOBILE_INPUT_MAX_LENGTH = 15;
 export const INDONESIAN_MOBILE_ERROR =
     'Enter a valid mobile number (e.g. 081234567890 or +6281234567890).';

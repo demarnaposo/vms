@@ -166,7 +166,7 @@ class PerformanceService
 
             $breakdown[] = [
                 'metric_id' => $metric->id,
-                // Start Update 15 September 2026, by @WNP: Include the stable metric key for selective frontend localization.
+                // Include the stable metric key for selective frontend localization.
                 'metric' => $metric->only(['name', 'display_name']),
                 'metric_name' => $metric->display_name,
                 'weight' => $metric->weight,

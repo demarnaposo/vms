@@ -10,11 +10,11 @@ import {
     DataTable,
     FormInput,
 } from '@/Components';
-// Start Update 13 September 2026, by @WNP: Translate static performance report labels while retaining stored vendor values.
+// Translate static performance report labels while retaining stored vendor values.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function PerformanceReport({ vendors, stats, filters }) {
-    // Start Update 13 September 2026, by @WNP: Resolve fixed score-band and ranking labels in the selected language.
+    // Resolve fixed score-band and ranking labels in the selected language.
     const { t } = useLanguage();
     const { auth } = usePage().props;
     const can = auth?.can || {};
@@ -33,7 +33,7 @@ export default function PerformanceReport({ vendors, stats, filters }) {
     };
 
     const getPerformanceBadge = (score) => {
-        // Start Update 13 September 2026, by @WNP: Translate only calculated category labels, not score values.
+        // Translate only calculated category labels, not score values.
         if (score >= 80)
             return (
                 <Badge variant="success">
@@ -69,7 +69,7 @@ export default function PerformanceReport({ vendors, stats, filters }) {
         {
             key: 'status',
             label: 'Status',
-            // Start Update 13 September 2026, by @WNP: Translate the lifecycle enum label without changing its stored code.
+            // Translate the lifecycle enum label without changing its stored code.
             render: (row) => (
                 <Badge variant="success">{row.status?.replaceAll('_', ' ') || 'Unknown'}</Badge>
             ),
@@ -127,7 +127,7 @@ export default function PerformanceReport({ vendors, stats, filters }) {
                                 {stats.high_performers}
                             </div>
                             <div className="text-sm text-(--color-text-secondary)">
-                                {/* Start Update 13 September 2026, by @WNP: Translate the fixed distribution bucket. */}
+                                {/* Translate the fixed distribution bucket. */}
                                 {t('High Performers (>=80%)')}
                             </div>
                         </div>
@@ -136,7 +136,7 @@ export default function PerformanceReport({ vendors, stats, filters }) {
                                 {stats.medium_performers}
                             </div>
                             <div className="text-sm text-(--color-text-secondary)">
-                                {/* Start Update 13 September 2026, by @WNP: Translate the fixed distribution bucket. */}
+                                {/* Translate the fixed distribution bucket. */}
                                 {t('Medium Performers (50-79%)')}
                             </div>
                         </div>
@@ -145,7 +145,7 @@ export default function PerformanceReport({ vendors, stats, filters }) {
                                 {stats.low_performers}
                             </div>
                             <div className="text-sm text-(--color-text-secondary)">
-                                {/* Start Update 13 September 2026, by @WNP: Translate the fixed distribution bucket. */}
+                                {/* Translate the fixed distribution bucket. */}
                                 {t('Low Performers (<50%)')}
                             </div>
                         </div>
@@ -157,7 +157,7 @@ export default function PerformanceReport({ vendors, stats, filters }) {
                     <div className="p-4 flex flex-wrap items-end gap-4">
                         <div className="flex-1 min-w-[150px]">
                             <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
-                                {/* Start Update 16 September 2026, by @WNP: Translate the fixed minimum-score filter label. */}
+                                {/* Translate the fixed minimum-score filter label. */}
                                 {t('Minimum Score')}
                             </label>
                             <FormInput
@@ -183,7 +183,7 @@ export default function PerformanceReport({ vendors, stats, filters }) {
                 </Card>
 
                 {/* Data Table */}
-                {/* Start Update 13 September 2026, by @WNP: Localize the fixed ranking count frame. */}
+                {/* Localize the fixed ranking count frame. */}
                 <Card
                     title={t('Performance Rankings (:count shown)', {
                         count: vendors?.data?.length || 0,

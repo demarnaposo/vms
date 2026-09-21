@@ -7,7 +7,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Start Update 16 September 2026, by @WNP: Update only VMS-owned master records while preserving document relations and uploads.
+        // Update only VMS-owned master records while preserving document relations and uploads.
         $documents = [
             'gst_certificate' => [
                 'display_name' => 'Taxpayer Identification Number (NPWP) Document',
@@ -32,6 +32,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        // Start Update 16 September 2026, by @WNP: Avoid restoring obsolete labels during rollback.
+        // Avoid restoring obsolete labels during rollback.
     }
 };

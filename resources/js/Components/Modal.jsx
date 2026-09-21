@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import AppIcon from './AppIcon';
-// Start Update 11 September 2026, by @WNP: Translate reusable modal titles and actions.
+// Translate reusable modal titles and actions.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function Modal({ isOpen, onClose, title, children, footer = null, size = 'md' }) {

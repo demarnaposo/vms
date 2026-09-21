@@ -3,11 +3,11 @@
 namespace App\Http\Requests\Vendor;
 
 use App\Models\Vendor;
-// Start Update 16 September 2026, by @WNP: Normalize draft NIB and NPWP consistently with onboarding.
+// Normalize draft NIB and NPWP consistently with onboarding.
 use App\Support\IndonesianBusinessIdentifier;
-// Start Update 14 September 2026, by @WNP: Reuse Indonesian mobile-number rules for VMS profile edits.
+// Reuse Indonesian mobile-number rules for VMS profile edits.
 use App\Support\IndonesianMobilePhone;
-// Start Update 11 September 2026, by @WNP: Validate profile locations against the shared Indonesian region dataset.
+// Validate profile locations against the shared Indonesian region dataset.
 use App\Support\IndonesiaRegions;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -15,10 +15,10 @@ use Illuminate\Validation\Rule;
 
 class UpdateProfileRequest extends FormRequest
 {
-    // Start Update 16 September 2026, by @WNP: Normalize profile identifiers and contact numbers consistently with onboarding.
+    // Normalize profile identifiers and contact numbers consistently with onboarding.
     protected function prepareForValidation(): void
     {
-        // Start Update 16 September 2026, by @WNP: Normalize identifiers only when company fields are present in the request.
+        // Normalize identifiers only when company fields are present in the request.
         $identifierData = [];
         if ($this->has('registration_number')) {
             $identifierData['registration_number'] = IndonesianBusinessIdentifier::normalize($this->input('registration_number'));
@@ -53,23 +53,23 @@ class UpdateProfileRequest extends FormRequest
         /** @var \App\Models\User|null $user */
         $user = Auth::user();
         $vendor = $user?->vendor;
-        // Start Update 11 September 2026, by @WNP: Resolve valid regencies and cities from the submitted Indonesian province.
+        // Resolve valid regencies and cities from the submitted Indonesian province.
         $province = (string) $this->input('state');
 
         if ($vendor && $vendor->status !== Vendor::STATUS_DRAFT) {
             // After submission, contact + bank fields are editable (not company details).
             return [
                 'contact_person' => 'required|string|max:255',
-                // Start Update 14 September 2026, by @WNP: Validate submitted vendor contact numbers in Indonesian mobile format.
+                // Validate submitted vendor contact numbers in Indonesian mobile format.
                 'contact_phone' => ['required', 'string', 'regex:'.IndonesianMobilePhone::LOCAL_REGEX],
                 'address' => 'required|string|max:500',
-                // Start Update 11 September 2026, by @WNP: Enforce Indonesian location values for submitted vendor profiles.
+                // Enforce Indonesian location values for submitted vendor profiles.
                 'city' => ['required', 'string', 'max:100', Rule::in(IndonesiaRegions::citiesFor($province))],
                 'state' => ['required', 'string', 'max:100', Rule::in(IndonesiaRegions::provinces())],
                 'pincode' => ['required', 'string', 'regex:/^[0-9]{5}$/'],
                 'bank_name' => 'required|string|max:255',
                 'bank_account_number' => ['required', 'string', 'regex:/^[0-9]{9,18}$/'],
-                // Start Update 11 September 2026, by @WNP: Validate Indonesian bank code for submitted vendor profiles.
+                // Validate Indonesian bank code for submitted vendor profiles.
                 'bank_ifsc' => ['required', 'string', 'regex:/^[0-9]{3}$/'],
                 'bank_branch' => 'required|string|max:255',
             ];
@@ -77,23 +77,23 @@ class UpdateProfileRequest extends FormRequest
 
         return [
             'company_name' => 'required|string|max:255',
-            // Start Update 16 September 2026, by @WNP: Validate draft company identifiers as NIB and NPWP.
+            // Validate draft company identifiers as NIB and NPWP.
             'registration_number' => ['required', 'string', 'regex:/^[0-9]{13}$/'],
             'tax_id' => ['required', 'string', 'regex:/^[0-9]{15,16}$/'],
-            // Start Update 16 September 2026, by @WNP: Keep draft company verification aligned with onboarding.
+            // Keep draft company verification aligned with onboarding.
             'deed_number' => ['required', 'string', 'max:100'],
             'business_type' => 'nullable|string|max:50',
             'contact_person' => 'required|string|max:255',
-            // Start Update 14 September 2026, by @WNP: Apply the same Indonesian mobile rule to draft profiles.
+            // Apply the same Indonesian mobile rule to draft profiles.
             'contact_phone' => ['required', 'string', 'regex:'.IndonesianMobilePhone::LOCAL_REGEX],
             'address' => 'required|string|max:500',
-            // Start Update 11 September 2026, by @WNP: Enforce Indonesian location values for draft vendor profiles.
+            // Enforce Indonesian location values for draft vendor profiles.
             'city' => ['required', 'string', 'max:100', Rule::in(IndonesiaRegions::citiesFor($province))],
             'state' => ['required', 'string', 'max:100', Rule::in(IndonesiaRegions::provinces())],
             'pincode' => ['required', 'string', 'regex:/^[0-9]{5}$/'],
             'bank_name' => 'required|string|max:255',
             'bank_account_number' => ['required', 'string', 'regex:/^[0-9]{9,18}$/'],
-            // Start Update 11 September 2026, by @WNP: Validate Indonesian bank code for draft vendor profiles.
+            // Validate Indonesian bank code for draft vendor profiles.
             'bank_ifsc' => ['required', 'string', 'regex:/^[0-9]{3}$/'],
             'bank_branch' => 'required|string|max:255',
         ];
@@ -102,21 +102,21 @@ class UpdateProfileRequest extends FormRequest
     public function messages(): array
     {
         return [
-            // Start Update 16 September 2026, by @WNP: Keep profile identifier errors aligned with onboarding.
+            // Keep profile identifier errors aligned with onboarding.
             'registration_number.required' => 'Business Identification Number (NIB) is required.',
             'registration_number.regex' => 'Business Identification Number (NIB) must be exactly 13 digits.',
             'tax_id.required' => 'Taxpayer Identification Number (NPWP) is required.',
             'tax_id.regex' => 'Taxpayer Identification Number (NPWP) must be 15 or 16 digits.',
             'deed_number.required' => 'Deed of Establishment Number is required.',
             'deed_number.max' => 'Deed of Establishment Number may not exceed 100 characters.',
-            // Start Update 14 September 2026, by @WNP: Keep the VMS mobile validation message concise.
+            // Keep the VMS mobile validation message concise.
             'contact_phone.regex' => 'Enter a valid mobile number (e.g. 081234567890 or +6281234567890).',
-            // Start Update 11 September 2026, by @WNP: Return location validation messages using Indonesian address terminology.
+            // Return location validation messages using Indonesian address terminology.
             'state.in' => 'Please select a valid Indonesian province.',
             'city.in' => 'Please select a valid regency or city for the selected province.',
             'pincode.regex' => 'Postal code must be exactly 5 digits.',
             'bank_account_number.regex' => 'Account number must be 9 to 18 digits.',
-            // Start Update 11 September 2026, by @WNP: Return Indonesian bank code terminology in validation errors.
+            // Return Indonesian bank code terminology in validation errors.
             'bank_ifsc.regex' => 'Bank Code must be exactly 3 digits.',
         ];
     }

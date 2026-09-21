@@ -1,9 +1,9 @@
 import { Link, usePage } from '@inertiajs/react';
 import AppIcon from '@/Components/AppIcon';
 import GuestLayout from '@/Components/GuestLayout';
-// Start Update 11 September 2026, by @WNP: Reuse the centralized Indonesian currency formatter.
+// Reuse the centralized Indonesian currency formatter.
 import { formatCurrency } from '@/utils/currencyFormatters';
-// Start Update 11 September 2026, by @WNP: Translate the public landing page with the global language preference.
+// Translate the public landing page with the global language preference.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 const featureCards = [
@@ -40,13 +40,13 @@ const featureCards = [
 ];
 
 export default function Welcome() {
-    // Start Update 11 September 2026, by @WNP: Read the shared IDR settings supplied by Laravel.
+    // Read the shared IDR settings supplied by Laravel.
     const { auth, currency } = usePage().props;
-    // Start Update 11 September 2026, by @WNP: Resolve prominent landing-page copy through the bilingual dictionary.
+    // Resolve prominent landing-page copy through the bilingual dictionary.
     const { t } = useLanguage();
 
     return (
-        <GuestLayout title="VMS - Clean Vendor Operations">
+        <GuestLayout title="Clean Vendor Operations">
             <section className="relative py-16 lg:py-24">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="grid lg:grid-cols-2 gap-10 items-center">
@@ -108,7 +108,7 @@ export default function Welcome() {
                                         {t('Payment Value')}
                                     </p>
                                     <p className="text-2xl font-bold text-(--color-text-primary)">
-                                        {/* Start Update 11 September 2026, by @WNP: Replace crore notation with the full Indonesian-formatted amount. */}
+                                        {/* Replace crore notation with the full Indonesian-formatted amount. */}
                                         {formatCurrency(120000000, currency)}+
                                     </p>
                                 </div>

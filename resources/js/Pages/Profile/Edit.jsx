@@ -1,6 +1,6 @@
 import { useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-// Start Update 15 September 2026, by @WNP: Translate profile settings text from the shared language state.
+// Translate profile settings text from the shared language state.
 import { useLanguage } from '@/Contexts/LanguageContext';
 import {
     VendorLayout,
@@ -17,7 +17,7 @@ import {
 } from '@/Components';
 
 export default function ProfileEdit() {
-    // Start Update 15 September 2026, by @WNP: Resolve static profile navigation labels without changing user data.
+    // Resolve static profile navigation labels without changing user data.
     const { t } = useLanguage();
     const { auth } = usePage().props;
     const user = auth?.user;
@@ -91,7 +91,7 @@ export default function ProfileEdit() {
                             <span className="inline-flex">
                                 <AppIcon name={section.icon} className="h-4 w-4" />
                             </span>
-                            {/* Start Update 15 September 2026, by @WNP: Localize only the fixed profile section label. */}
+                            {/* Localize only the fixed profile section label. */}
                             {t(section.label)}
                         </button>
                     ))}

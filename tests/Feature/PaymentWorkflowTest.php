@@ -6,7 +6,7 @@ use App\Models\PaymentRequest;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Vendor;
-// Start Update 13 September 2026, by @WNP: Exercise the payment service's localized enum label in blocked-request alerts.
+// Exercise the payment service's localized enum label in blocked-request alerts.
 use App\Services\PaymentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -51,7 +51,7 @@ class PaymentWorkflowTest extends TestCase
             'contact_phone' => '9876543210',
             'status' => Vendor::STATUS_ACTIVE,
             'compliance_status' => 'compliant',
-            // Start Update 16 September 2026, by @WNP: Provide an Indonesian transfer destination for payment detail coverage.
+            // Provide an Indonesian transfer destination for payment detail coverage.
             'registration_number' => '1234567890123',
             'tax_id' => '0123456789012345',
             'bank_name' => 'Bank Mandiri',
@@ -59,7 +59,7 @@ class PaymentWorkflowTest extends TestCase
             'bank_ifsc' => '008',
             'bank_branch' => 'KCP Jakarta Menteng',
             'address' => '123 St',
-            // Start Update 11 September 2026, by @WNP: Gunakan fixture lokasi Indonesia.
+            // Gunakan fixture lokasi Indonesia.
             'city' => 'Kota Bandung',
             'state' => 'Jawa Barat',
             'pincode' => '40115',
@@ -80,7 +80,7 @@ class PaymentWorkflowTest extends TestCase
         $this->assertDatabaseHas('payment_requests', [
             'vendor_id' => $this->vendor->id,
             'amount' => 5000,
-            // Start Update 11 September 2026, by @WNP: Verify the payment service persists the configured default currency.
+            // Verify the payment service persists the configured default currency.
             'currency' => 'IDR',
             'status' => 'pending_ops',
             'invoice_number' => 'INV-001',
@@ -107,7 +107,7 @@ class PaymentWorkflowTest extends TestCase
         ]);
     }
 
-    // Start Update 13 September 2026, by @WNP: Translate only the alert label while preserving the stored compliance status.
+    // Translate only the alert label while preserving the stored compliance status.
     public function test_non_compliant_payment_request_alert_localizes_status_label(): void
     {
         $this->vendor->update(['compliance_status' => Vendor::COMPLIANCE_AT_RISK]);
@@ -212,7 +212,7 @@ class PaymentWorkflowTest extends TestCase
         ]);
     }
 
-    // Start Update 16 September 2026, by @WNP: Expose full transfer details to Finance while keeping them hidden from Operations.
+    // Expose full transfer details to Finance while keeping them hidden from Operations.
     public function test_payment_transfer_destination_is_limited_to_disbursement_roles(): void
     {
         $payment = PaymentRequest::create([

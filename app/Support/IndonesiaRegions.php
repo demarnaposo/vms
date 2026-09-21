@@ -9,28 +9,28 @@ class IndonesiaRegions
     /** @var array<string, mixed>|null */
     private static ?array $data = null;
 
-    // Start Update 11 September 2026, by @WNP: Expose the Indonesian country default from the shared region snapshot.
+    // Expose the Indonesian country default from the shared region snapshot.
     public static function country(): string
     {
         return self::data()['country'];
     }
 
     /** @return array<int, string> */
-    // Start Update 11 September 2026, by @WNP: Provide the valid province list for server-side validation.
+    // Provide the valid province list for server-side validation.
     public static function provinces(): array
     {
         return array_keys(self::data()['provinces']);
     }
 
     /** @return array<int, string> */
-    // Start Update 11 September 2026, by @WNP: Provide valid regencies and cities for a selected province.
+    // Provide valid regencies and cities for a selected province.
     public static function citiesFor(string $province): array
     {
         return self::data()['provinces'][$province] ?? [];
     }
 
     /** @return array{country: string, provinces: array<string, array<int, string>>} */
-    // Start Update 11 September 2026, by @WNP: Load and cache the shared static region dataset safely.
+    // Load and cache the shared static region dataset safely.
     private static function data(): array
     {
         if (self::$data !== null) {

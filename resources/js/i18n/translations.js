@@ -1,4 +1,4 @@
-// Start Update 11 September 2026, by @WNP: Centralize Indonesian translations while English remains the source-language fallback.
+// Centralize Indonesian translations while English remains the source-language fallback.
 export const INDONESIAN_TRANSLATIONS = Object.freeze({
     Language: 'Bahasa',
     English: 'Inggris',
@@ -8,6 +8,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     Home: 'Beranda',
     About: 'Tentang',
     Contact: 'Kontak',
+    'Clean Vendor Operations': 'Operasional Vendor yang Rapi',
     Privacy: 'Privasi',
     Terms: 'Ketentuan',
     Company: 'Perusahaan',
@@ -21,7 +22,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     Performance: 'Kinerja',
     Payments: 'Pembayaran',
     Notifications: 'Notifikasi',
-    // Start Update 15 September 2026, by @WNP: Complete shared and vendor notification-center translations.
+    // Complete shared and vendor notification-center translations.
     ':count unread': ':count belum dibaca',
     ':count unread notification': ':count notifikasi belum dibaca',
     ':count unread notifications': ':count notifikasi belum dibaca',
@@ -156,7 +157,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Explore the platform and tailor it to your workflows.':
         'Jelajahi platform dan sesuaikan dengan alur kerja Anda.',
     'Contact Team': 'Hubungi Tim',
-    // Start Update 15 September 2026, by @WNP: Translate all static content on the public privacy-policy page.
+    // Translate all static content on the public privacy-policy page.
     'Effective Date: January 15, 2026': 'Tanggal Berlaku: 15 Januari 2026',
     Contents: 'Daftar Isi',
     'Information We Collect': 'Informasi yang Kami Kumpulkan',
@@ -249,7 +250,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
         'Kami menggunakan cookie dan teknologi pelacakan serupa untuk melacak aktivitas pada platform serta menyimpan informasi tertentu. Anda dapat mengatur peramban untuk menolak semua cookie atau memberi tahu saat cookie dikirim. Namun, jika tidak menerima cookie, Anda mungkin tidak dapat menggunakan sebagian layanan kami.',
     'If you have any questions about this Privacy Policy, please contact us. We are committed to working with you to obtain a fair resolution of any complaint or concern about privacy.':
         'Jika memiliki pertanyaan mengenai Kebijakan Privasi ini, silakan hubungi kami. Kami berkomitmen bekerja sama dengan Anda untuk memperoleh penyelesaian yang adil atas keluhan atau kekhawatiran terkait privasi.',
-    // Start Update 15 September 2026, by @WNP: Translate all static content on the public terms-of-service page.
+    // Translate all static content on the public terms-of-service page.
     'Terms of Service': 'Ketentuan Layanan',
     '1. Acceptance of Terms': '1. Penerimaan Ketentuan',
     '2. Description of Service': '2. Deskripsi Layanan',
@@ -330,7 +331,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     Uptime: 'Waktu Aktif',
     Email: 'Email',
     Password: 'Kata Sandi',
-    // Start Update 15 September 2026, by @WNP: Localize accessible password visibility controls.
+    // Localize accessible password visibility controls.
     'Show password': 'Tampilkan kata sandi',
     'Hide password': 'Sembunyikan kata sandi',
     'Remember me': 'Ingat saya',
@@ -349,7 +350,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     "Don't have an account?": 'Belum memiliki akun?',
     'Create one': 'Buat akun',
     'Demo Accounts': 'Akun Demo',
-    // Start Update 15 September 2026, by @WNP: Complete static login and registration examples and demo-role labels.
+    // Complete static login and registration examples and demo-role labels.
     'you@company.com': 'anda@perusahaan.com',
     'John Doe': 'John Doe',
     Admin: 'Admin',
@@ -396,7 +397,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     Staff: 'Staf',
     'Bank Information': 'Informasi Bank',
     'Bank Details': 'Detail Bank',
-    // Start Update 16 September 2026, by @WNP: Localize the restricted payment transfer destination card.
+    // Localize the restricted payment transfer destination card.
     'Transfer Destination': 'Tujuan Transfer',
     'Add your bank details for payment processing.':
         'Tambahkan detail rekening bank untuk proses pembayaran.',
@@ -421,24 +422,24 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Company Information': 'Informasi Perusahaan',
     'Tell us about your business entity.': 'Ceritakan tentang badan usaha Anda.',
     'Company Name': 'Nama Perusahaan',
-    // Start Update 16 September 2026, by @WNP: Localize company-field validation displayed during onboarding.
+    // Localize company-field validation displayed during onboarding.
     'Company Name is required.': 'Nama perusahaan wajib diisi.',
     'Company Name may not exceed 255 characters.':
         'Nama perusahaan tidak boleh lebih dari 255 karakter.',
     'Legal Entity Name': 'Nama badan hukum',
     'Business Type': 'Jenis Usaha',
     'Select Type': 'Pilih jenis usaha',
-    // Start Update 14 September 2026, by @WNP: Translate only the fixed VMS business-type option labels.
+    // Translate only the fixed VMS business-type option labels.
     'Sole Proprietorship': 'Usaha Perseorangan',
     Partnership: 'Kemitraan',
     LLP: 'Kemitraan Tanggung Jawab Terbatas (LLP)',
     'Private Limited': 'Perseroan Terbatas (PT)',
     'Public Limited': 'Perseroan Terbatas Terbuka (Tbk)',
-    // Start Update 16 September 2026, by @WNP: Use Indonesian business identifiers consistently in both languages.
-    // Start Update 16 September 2026, by @WNP: Localize complete business and taxpayer identifier labels.
+    // Use Indonesian business identifiers consistently in both languages.
+    // Localize complete business and taxpayer identifier labels.
     'Business Identification Number (NIB)': 'Nomor Induk Berusaha (NIB)',
     'Taxpayer Identification Number (NPWP)': 'Nomor Pokok Wajib Pajak (NPWP)',
-    // Start Update 16 September 2026, by @WNP: Localize the vendor deed-number field and its input guidance.
+    // Localize the vendor deed-number field and its input guidance.
     'Deed of Establishment Number': 'Nomor Akta Pendirian',
     'Enter deed number': 'Masukkan nomor akta pendirian',
     'Contact Person': 'Narahubung',
@@ -446,10 +447,10 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Contact Person may not exceed 255 characters.':
         'Narahubung tidak boleh lebih dari 255 karakter.',
     'Full name of contact person': 'Nama lengkap narahubung',
-    // Start Update 14 September 2026, by @WNP: Label the VMS contact field as telephone or mobile.
+    // Label the VMS contact field as telephone or mobile.
     'Phone Number / Mobile': 'Nomor Telepon / Ponsel',
     'Phone Number / Mobile is required.': 'Nomor telepon / ponsel wajib diisi.',
-    // Start Update 14 September 2026, by @WNP: Keep VMS mobile-number guidance and validation concise in both languages.
+    // Keep VMS mobile-number guidance and validation concise in both languages.
     'Enter a valid mobile number (e.g. 081234567890 or +6281234567890).':
         'Masukkan nomor ponsel yang valid (contoh: 081234567890 atau +6281234567890).',
     'Use 08... or +628... for a mobile number.': 'Gunakan 08... atau +628... untuk nomor ponsel.',
@@ -496,6 +497,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     Edit: 'Ubah',
     Save: 'Simpan',
     Cancel: 'Batal',
+    Delete: 'Hapus',
     Close: 'Tutup',
     Submit: 'Kirim',
     Search: 'Cari',
@@ -544,7 +546,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     "You don't have permission to access this page.":
         'Anda tidak memiliki izin untuk mengakses halaman ini.',
     'Page Not Found': 'Halaman Tidak Ditemukan',
-    // Start Update 16 September 2026, by @WNP: Localize the dedicated rate-limit error page.
+    // Localize the dedicated rate-limit error page.
     'Too Many Requests': 'Terlalu Banyak Permintaan',
     'Please wait a moment before trying again.': 'Tunggu sebentar sebelum mencoba kembali.',
     "The page you're looking for doesn't exist or has been moved.":
@@ -580,9 +582,11 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Account Suspended': 'Akun Ditangguhkan',
     'Your account has been suspended. Please contact support.':
         'Akun Anda telah ditangguhkan. Silakan hubungi dukungan.',
+    'Your account is inactive. Please contact support.':
+        'Akun Anda tidak aktif. Silakan hubungi dukungan.',
     'Based on delivery and quality metrics': 'Berdasarkan metrik pengiriman dan kualitas',
     'Request Payment': 'Ajukan Pembayaran',
-    // Start Update 11 September 2026, by @WNP: Cover shared admin and vendor page headers, cards, tables, and status labels.
+    // Cover shared admin and vendor page headers, cards, tables, and status labels.
     'Admin Dashboard': 'Dasbor Admin',
     'Vendor Dashboard': 'Dasbor Vendor',
     'Vendor Management': 'Manajemen Vendor',
@@ -604,7 +608,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Detailed metric breakdown and monthly trend': 'Rincian metrik dan tren bulanan',
     'Contact Messages': 'Pesan Kontak',
     'Manage and respond to customer inquiries': 'Kelola dan tanggapi pertanyaan pelanggan',
-    // Start Update 15 September 2026, by @WNP: Complete static contact-message list and detail translations.
+    // Complete static contact-message list and detail translations.
     Sender: 'Pengirim',
     Received: 'Diterima',
     Total: 'Total',
@@ -625,7 +629,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Compose Notification': 'Buat Notifikasi',
     'Broadcast notifications to vendors or staff users':
         'Kirim notifikasi kepada vendor atau pengguna staf',
-    // Start Update 15 September 2026, by @WNP: Complete static send-notification form translations.
+    // Complete static send-notification form translations.
     Title: 'Judul',
     'Notification title': 'Judul notifikasi',
     'Write your notification message...': 'Tulis pesan notifikasi Anda...',
@@ -639,12 +643,12 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     '/vendor/documents or any path': '/vendor/documents atau path lainnya',
     Clear: 'Kosongkan',
     'Internal Users': 'Pengguna Internal',
-    // Start Update 13 September 2026, by @WNP: Use full Indonesian wording for the static staff-management subtitle.
+    // Use full Indonesian wording for the static staff-management subtitle.
     'Create and manage internal Ops/Finance/Admin accounts':
         'Buat dan kelola akun internal operasional, keuangan, dan administrator',
     'Background jobs, failures, and execution visibility':
         'Pantau pekerjaan latar belakang, kegagalan, dan eksekusi',
-    // Start Update 16 September 2026, by @WNP: Complete static system-health summaries, table headings, filters, and pagination.
+    // Complete static system-health summaries, table headings, filters, and pagination.
     'Total Jobs': 'Total Pekerjaan',
     Successful: 'Berhasil',
     Job: 'Pekerjaan',
@@ -657,7 +661,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     '\u00AB Previous': '\u00AB Sebelumnya',
     'Next \u00BB': 'Lanjut \u00BB',
     'Generate and download reports': 'Buat dan unduh laporan',
-    // Start Update 16 September 2026, by @WNP: Complete static report dashboard, filters, summaries, and count-frame translations.
+    // Complete static report dashboard, filters, summaries, and count-frame translations.
     'Vendor Summary': 'Ringkasan Vendor',
     'Overview of all vendors by status, compliance, and performance':
         'Ringkasan seluruh vendor berdasarkan status, kepatuhan, dan kinerja',
@@ -703,7 +707,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Vendor performance scores and rankings': 'Skor dan peringkat kinerja vendor',
     'Profile Settings': 'Pengaturan Profil',
     'Manage your account settings': 'Kelola pengaturan akun Anda',
-    // Start Update 15 September 2026, by @WNP: Complete static profile, password, and account-deletion translations.
+    // Complete static profile, password, and account-deletion translations.
     'Profile Information': 'Informasi Profil',
     'Current Password': 'Kata Sandi Saat Ini',
     'Confirm New Password': 'Konfirmasi Kata Sandi Baru',
@@ -739,11 +743,11 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Internal Notes': 'Catatan Internal',
     'Danger Zone': 'Zona Berbahaya',
     'Document Type': 'Jenis Dokumen',
-    // Start Update 15 September 2026, by @WNP: Localize fixed document master data without modifying stored database values.
+    // Localize fixed document master data without modifying stored database values.
     'Company Registration Certificate': 'Sertifikat Pendaftaran Perusahaan',
     'Certificate of incorporation or business registration':
         'Sertifikat pendirian atau pendaftaran usaha',
-    // Start Update 16 September 2026, by @WNP: Translate the default identification and bank-proof documents.
+    // Translate the default identification and bank-proof documents.
     'Taxpayer Identification Number (NPWP) Document': 'Dokumen Nomor Pokok Wajib Pajak (NPWP)',
     'Taxpayer identification document': 'Dokumen identitas wajib pajak',
     'Business Identification Number (NIB) Document': 'Dokumen Nomor Induk Berusaha (NIB)',
@@ -794,7 +798,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     rejected: 'Ditolak',
     expired: 'Kedaluwarsa',
     requested: 'Diajukan',
-    // Start Update 13 September 2026, by @WNP: Use complete Indonesian labels for payment approval status enums.
+    // Use complete Indonesian labels for payment approval status enums.
     'pending ops': 'Menunggu Operasional',
     'pending finance': 'Menunggu Keuangan',
     paid: 'Dibayar',
@@ -810,7 +814,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     warning: 'Peringatan',
     error: 'Kesalahan',
     info: 'Informasi',
-    // Start Update 13 September 2026, by @WNP: Translate migration-backed enum labels while leaving persisted codes unchanged.
+    // Translate migration-backed enum labels while leaving persisted codes unchanged.
     cancelled: 'Dibatalkan',
     abandoned: 'Ditinggalkan',
     'document required': 'Dokumen Wajib',
@@ -858,7 +862,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'No job logs found': 'Log pekerjaan tidak ditemukan',
     'No staff users found': 'Pengguna staf tidak ditemukan',
     'No performance scores yet': 'Belum ada skor kinerja',
-    // Start Update 12 September 2026, by @WNP: Cover vendor and document filters, upload forms, and preview states.
+    // Cover vendor and document filters, upload forms, and preview states.
     all: 'Semua',
     All: 'Semua',
     'Search vendors...': 'Cari vendor...',
@@ -905,7 +909,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'All mandatory documents must be verified before approving this vendor.':
         'Semua dokumen wajib harus diverifikasi sebelum vendor ini disetujui.',
     'Reason:': 'Alasan:',
-    // Start Update 12 September 2026, by @WNP: Cover vendor detail review, timeline, and action-dialog copy.
+    // Cover vendor detail review, timeline, and action-dialog copy.
     'Scores & Status': 'Skor & Status',
     'Rate Performance': 'Nilai Kinerja',
     Approve: 'Setujui',
@@ -915,6 +919,13 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     Reactivate: 'Aktifkan Kembali',
     'Vendor must have all mandatory documents verified and a passing compliance score to be activated.':
         'Semua dokumen wajib harus terverifikasi dan skor kepatuhan vendor harus memenuhi syarat sebelum aktivasi.',
+    'Activation requirements': 'Persyaratan aktivasi',
+    'All mandatory documents must be verified and valid before activation.':
+        'Semua dokumen wajib harus terverifikasi dan masih berlaku sebelum aktivasi.',
+    'The vendor must be compliant with a score of at least :score before activation.':
+        'Vendor harus berstatus patuh dengan skor minimal :score sebelum aktivasi.',
+    'Resolve all open compliance issues before activation.':
+        'Selesaikan semua masalah kepatuhan yang masih terbuka sebelum aktivasi.',
     'No compliance results yet': 'Belum ada hasil kepatuhan',
     to: 'ke',
     by: 'oleh',
@@ -923,7 +934,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Add internal notes about this vendor...': 'Tambahkan catatan internal tentang vendor ini...',
     'Processing...': 'Memproses...',
     Comment: 'Komentar',
-    // Start Update 16 September 2026, by @WNP: Localize the optional lifecycle comment label as one reusable field label.
+    // Localize the optional lifecycle comment label as one reusable field label.
     'Comment (Optional)': 'Komentar (Opsional)',
     '(optional)': '(opsional)',
     'Add a comment...': 'Tambahkan komentar...',
@@ -932,9 +943,9 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Save Notes': 'Simpan Catatan',
     Update: 'Perbarui',
     pass: 'Lulus',
-    // Start Update 13 September 2026, by @WNP: Localize the system fail result badge without changing stored compliance results.
+    // Localize the system fail result badge without changing stored compliance results.
     fail: 'Gagal',
-    // Start Update 12 September 2026, by @WNP: Translate only static admin and vendor compliance interface copy.
+    // Translate only static admin and vendor compliance interface copy.
     Compliant: 'Patuh',
     'At Risk': 'Berisiko',
     'Non-Compliant': 'Tidak Patuh',
@@ -976,7 +987,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Critical. Immediate action required.': 'Kritis. Tindakan segera diperlukan.',
     Passed: 'Lulus',
     'No compliance rules defined yet.': 'Belum ada aturan kepatuhan yang ditetapkan.',
-    // Start Update 16 September 2026, by @WNP: Localize known automatic compliance-result details without changing stored values.
+    // Localize known automatic compliance-result details without changing stored values.
     'All mandatory documents are verified.': 'Semua dokumen wajib telah diverifikasi.',
     'Missing mandatory documents: :documents': 'Dokumen wajib yang belum terpenuhi: :documents',
     'Expired documents: :documents': 'Dokumen kedaluwarsa: :documents',
@@ -990,13 +1001,13 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Tips to improve your compliance score:': 'Tips meningkatkan skor kepatuhan Anda:',
     'Ensure all mandatory documents are uploaded and verified':
         'Pastikan semua dokumen wajib telah diunggah dan diverifikasi',
-    // Start Update 16 September 2026, by @WNP: Refer to Indonesian company documents in compliance guidance.
+    // Refer to Indonesian company documents in compliance guidance.
     'Keep your Business Identification Number (NIB) and Taxpayer Identification Number (NPWP) documents up to date':
         'Pastikan dokumen Nomor Induk Berusaha (NIB) dan Nomor Pokok Wajib Pajak (NPWP) Anda tetap berlaku',
     'Maintain valid insurance coverage': 'Pertahankan perlindungan asuransi yang berlaku',
     'Complete all required agreements and contracts':
         'Lengkapi semua perjanjian dan kontrak yang diwajibkan',
-    // Start Update 12 September 2026, by @WNP: Translate static success, error, and warning alerts across application flows.
+    // Translate static success, error, and warning alerts across application flows.
     'All notifications marked as read.': 'Semua notifikasi telah ditandai dibaca.',
     'Document uploaded successfully!': 'Dokumen berhasil diunggah!',
     'Payment request submitted successfully!': 'Permintaan pembayaran berhasil diajukan!',
@@ -1006,10 +1017,12 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Password updated successfully.': 'Kata sandi berhasil diperbarui.',
     "Thank you for your message! We'll get back to you soon.":
         'Terima kasih atas pesan Anda! Kami akan segera menghubungi Anda.',
+    'Your message could not be sent. Please try again.':
+        'Pesan Anda tidak dapat dikirim. Silakan coba lagi.',
     'Message updated successfully.': 'Pesan berhasil diperbarui.',
     'Message deleted successfully.': 'Pesan berhasil dihapus.',
     'Performance ratings recorded successfully.': 'Penilaian kinerja berhasil dicatat.',
-    // Start Update 13 September 2026, by @WNP: Localize fixed performance UI copy while preserving metric and rating records.
+    // Localize fixed performance UI copy while preserving metric and rating records.
     Progress: 'Kemajuan',
     Rate: 'Nilai',
     'Weight: :weight%': 'Bobot: :weight%',
@@ -1138,7 +1151,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Cannot approve payment: Vendor is currently Non-Compliant (Status changed after request).':
         'Pembayaran tidak dapat disetujui: vendor saat ini tidak patuh (status berubah setelah permintaan).',
     'Payment has not been approved yet.': 'Pembayaran belum disetujui.',
-    // Start Update 13 September 2026, by @WNP: Translate fixed payment-page labels while keeping transaction and free-text data intact.
+    // Translate fixed payment-page labels while keeping transaction and free-text data intact.
     Payment: 'Pembayaran',
     Reference: 'Referensi',
     Description: 'Deskripsi',
@@ -1161,7 +1174,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Select method': 'Pilih metode',
     'Select Method...': 'Pilih metode...',
     'Wire Transfer': 'Transfer Bank',
-    // Start Update 16 September 2026, by @WNP: Cover the historical fixed bank-transfer method label.
+    // Cover the historical fixed bank-transfer method label.
     'Bank Transfer': 'Transfer Bank',
     Cheque: 'Cek',
     'Transaction ID or UTR': 'ID Transaksi atau Referensi Pembayaran',
@@ -1204,7 +1217,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Payment Records (:count shown)': 'Catatan Pembayaran (:count ditampilkan)',
     'No payment records found for the selected filters.':
         'Tidak ada catatan pembayaran untuk filter yang dipilih.',
-    // Start Update 13 September 2026, by @WNP: Translate audit interface labels and known system event/entity names only.
+    // Translate audit interface labels and known system event/entity names only.
     'System activity and change history': 'Aktivitas sistem dan riwayat perubahan',
     Time: 'Waktu',
     Event: 'Peristiwa',
@@ -1221,7 +1234,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Vendor Document': 'Dokumen Vendor',
     'Payment Request': 'Permintaan Pembayaran',
     'Contact Message': 'Pesan Kontak',
-    // Start Update 13 September 2026, by @WNP: Localize fixed staff-form controls and system-defined role choices only.
+    // Localize fixed staff-form controls and system-defined role choices only.
     'Create Internal User': 'Tambah Pengguna Internal',
     Role: 'Peran',
     Roles: 'Peran',
@@ -1232,7 +1245,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Super Admin': 'Admin Utama',
     'Operations Manager': 'Manajer Operasional',
     'Finance Manager': 'Manajer Keuangan',
-    // Start Update 15 September 2026, by @WNP: Translate fixed VMS roles, permissions, states, rules, and performance master data.
+    // Translate fixed VMS roles, permissions, states, rules, and performance master data.
     'Full system access': 'Akses penuh ke sistem',
     'Vendor onboarding and document verification': 'Pendaftaran vendor dan verifikasi dokumen',
     'Payment approvals and financial history': 'Persetujuan pembayaran dan riwayat keuangan',
@@ -1281,13 +1294,13 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
         'Setelah akun dihapus, semua data Anda akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.',
     'This action is irreversible. All your data will be permanently deleted.':
         'Tindakan ini tidak dapat dibatalkan. Semua data Anda akan dihapus secara permanen.',
-    // Start Update 12 September 2026, by @WNP: Cover application-authored validation alerts used by onboarding and notification forms.
+    // Cover application-authored validation alerts used by onboarding and notification forms.
     'Please select a recipient.': 'Silakan pilih penerima.',
     'The selected recipient does not exist.': 'Penerima yang dipilih tidak ditemukan.',
     'Please select a valid Indonesian province.': 'Silakan pilih provinsi Indonesia yang valid.',
     'Please select a valid regency or city for the selected province.':
         'Silakan pilih kabupaten atau kota yang valid untuk provinsi tersebut.',
-    // Start Update 16 September 2026, by @WNP: Localize Indonesian NIB and NPWP validation feedback.
+    // Localize Indonesian NIB and NPWP validation feedback.
     'Business Identification Number (NIB) is required.': 'Nomor Induk Berusaha (NIB) wajib diisi.',
     'Business Identification Number (NIB) must be exactly 13 digits.':
         'Nomor Induk Berusaha (NIB) harus tepat 13 digit.',
@@ -1299,10 +1312,10 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Deed of Establishment Number may not exceed 100 characters.':
         'Nomor akta pendirian tidak boleh lebih dari 100 karakter.',
     'Business Type is required.': 'Jenis usaha wajib dipilih.',
-    // Start Update 12 September 2026, by @WNP: Translate the document-step expiry alert from client-side validation.
+    // Translate the document-step expiry alert from client-side validation.
     'Expiry date is required for this document type.':
         'Tanggal kedaluwarsa wajib diisi untuk jenis dokumen ini.',
-    // Start Update 12 September 2026, by @WNP: Complete static admin dashboard card, empty-state, and action translations.
+    // Complete static admin dashboard card, empty-state, and action translations.
     'Total Vendors': 'Total Vendor',
     'Pending Vendor Applications': 'Pengajuan Vendor Tertunda',
     'Documents Pending Verification': 'Dokumen Menunggu Verifikasi',
@@ -1312,7 +1325,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Compliance Check': 'Periksa Kepatuhan',
     'Approve Payments': 'Setujui Pembayaran',
     'View Payments': 'Lihat Pembayaran',
-    // Start Update 13 September 2026, by @WNP: Translate only known system-generated vendor timeline comments.
+    // Translate only known system-generated vendor timeline comments.
     'Vendor application submitted for review': 'Pengajuan vendor dikirim untuk ditinjau',
     'Vendor approved and activated': 'Vendor disetujui dan diaktifkan',
     'Vendor approved': 'Vendor disetujui',
@@ -1322,7 +1335,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
         'Admin meninjau banding penghentian dan memulihkan akses.',
 });
 
-// Start Update 11 September 2026, by @WNP: Interpolate named values without introducing a translation dependency.
+// Interpolate named values without introducing a translation dependency.
 export function translateMessage(language, message, replacements = {}) {
     if (typeof message !== 'string') return message;
 

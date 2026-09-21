@@ -1,4 +1,4 @@
-// Start Update 11 September 2026, by @WNP: Centralize the default IDR settings used by all React currency displays.
+// Centralize the default IDR settings used by all React currency displays.
 export const DEFAULT_CURRENCY = Object.freeze({
     code: 'IDR',
     symbol: 'Rp',
@@ -6,7 +6,7 @@ export const DEFAULT_CURRENCY = Object.freeze({
     fraction_digits: 0,
 });
 
-// Start Update 11 September 2026, by @WNP: Format nominal values with Indonesian grouping and a consistent Rupiah symbol.
+// Format nominal values with Indonesian grouping and a consistent Rupiah symbol.
 export function formatCurrency(value, currency = DEFAULT_CURRENCY) {
     const settings = { ...DEFAULT_CURRENCY, ...currency };
     const numericValue = Number.parseFloat(value);

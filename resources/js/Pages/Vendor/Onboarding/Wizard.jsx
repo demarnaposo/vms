@@ -6,7 +6,7 @@ import StepCompany from './Steps/StepCompany';
 import StepDocuments from './Steps/StepDocuments';
 import StepReview from './Steps/StepReview';
 import Logo from '../../../Components/Logo.jsx';
-// Start Update 11 September 2026, by @WNP: Enable bilingual onboarding navigation and progress labels.
+// Enable bilingual onboarding navigation and progress labels.
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { useLanguage } from '@/Contexts/LanguageContext';
 

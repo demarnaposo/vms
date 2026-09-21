@@ -8,7 +8,7 @@ const source = readFileSync(
     'utf8'
 );
 
-// Start Update 16 September 2026, by @WNP: Guard visible client and server errors for every required company field.
+// Guard visible client and server errors for every required company field.
 test('all required company fields render their validation errors', () => {
     const requiredFields = [
         'company_name',
@@ -29,7 +29,7 @@ test('all required company fields render their validation errors', () => {
     }
 });
 
-// Start Update 16 September 2026, by @WNP: Verify newly completed company validation messages are bilingual.
+// Verify newly completed company validation messages are bilingual.
 test('company and address validation messages follow the selected language', () => {
     const examples = [
         ['Company Name is required.', 'Nama perusahaan wajib diisi.'],
@@ -47,7 +47,7 @@ test('company and address validation messages follow the selected language', () 
     }
 });
 
-// Start Update 16 September 2026, by @WNP: Keep complete identifier labels visible and bilingual on company onboarding.
+// Keep complete identifier labels visible and bilingual on company onboarding.
 test('business and taxpayer identifiers use their complete labels', () => {
     const labels = [
         ['Business Identification Number (NIB)', 'Nomor Induk Berusaha (NIB)'],

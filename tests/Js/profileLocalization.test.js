@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { translateMessage } from '../../resources/js/i18n/translations.js';
 
-// Start Update 15 September 2026, by @WNP: Verify all fixed profile settings labels and feedback are bilingual.
+// Verify all fixed profile settings labels and feedback are bilingual.
 test('profile settings static copy is localized', () => {
     const examples = [
         ['Profile Settings', 'Pengaturan Profil'],
@@ -29,7 +29,7 @@ test('profile settings static copy is localized', () => {
     }
 });
 
-// Start Update 15 September 2026, by @WNP: Guard profile tab localization while leaving account data untouched.
+// Guard profile tab localization while leaving account data untouched.
 test('profile tabs use the shared translator', () => {
     const source = readFileSync(
         new URL('../../resources/js/Pages/Profile/Edit.jsx', import.meta.url),

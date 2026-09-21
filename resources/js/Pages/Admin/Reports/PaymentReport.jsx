@@ -11,17 +11,17 @@ import {
     FormInput,
     FormSelect,
 } from '@/Components';
-// Start Update 11 September 2026, by @WNP: Reuse the centralized Indonesian currency formatter.
+// Reuse the centralized Indonesian currency formatter.
 import { formatCurrency } from '@/utils/currencyFormatters';
 import { formatDate } from '@/utils/dateFormatters';
-// Start Update 13 September 2026, by @WNP: Localize fixed report labels and dates while retaining payment records.
+// Localize fixed report labels and dates while retaining payment records.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function PaymentReport({ payments, stats, filters }) {
-    // Start Update 13 September 2026, by @WNP: Use the selected language for report copy and date display.
+    // Use the selected language for report copy and date display.
     const { language, t } = useLanguage();
     const dateLocale = language === 'id' ? 'id-ID' : 'en-IN';
-    // Start Update 11 September 2026, by @WNP: Read the shared IDR settings supplied by Laravel.
+    // Read the shared IDR settings supplied by Laravel.
     const { auth, currency } = usePage().props;
     const can = auth?.can || {};
 
@@ -66,13 +66,13 @@ export default function PaymentReport({ payments, stats, filters }) {
         { key: 'id', label: 'ID', render: (row) => `#${row.id}` },
         { key: 'vendor', label: 'Vendor', render: (row) => row.vendor?.company_name || 'N/A' },
         { key: 'invoice_number', label: 'Invoice #', render: (row) => row.invoice_number || '-' },
-        // Start Update 11 September 2026, by @WNP: Format report row values using centralized IDR settings.
+        // Format report row values using centralized IDR settings.
         { key: 'amount', label: 'Amount', render: (row) => formatCurrency(row.amount, currency) },
         { key: 'status', label: 'Status', render: (row) => getStatusBadge(row.status) },
         {
             key: 'created_at',
             label: 'Requested',
-            // Start Update 13 September 2026, by @WNP: Format stored request dates using the selected locale.
+            // Format stored request dates using the selected locale.
             render: (row) => formatDate(row.created_at, dateLocale),
         },
     ];
@@ -93,7 +93,7 @@ export default function PaymentReport({ payments, stats, filters }) {
         <AdminLayout title="Payment Report" activeNav="Reports" header={header}>
             <div className="space-y-6">
                 {/* Summary Stats */}
-                {/* Start Update 11 September 2026, by @WNP: Format every payment summary amount with shared IDR settings. */}
+                {/* Format every payment summary amount with shared IDR settings. */}
                 <div className="grid md:grid-cols-4 gap-4">
                     <StatCard
                         label="Total Amount"
@@ -126,7 +126,7 @@ export default function PaymentReport({ payments, stats, filters }) {
                     <div className="p-4 flex flex-wrap items-end gap-4">
                         <div className="flex-1 min-w-[150px]">
                             <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
-                                {/* Start Update 13 September 2026, by @WNP: Translate the fixed date-filter label. */}
+                                {/* Translate the fixed date-filter label. */}
                                 {t('Start Date')}
                             </label>
                             <FormInput
@@ -139,7 +139,7 @@ export default function PaymentReport({ payments, stats, filters }) {
                         </div>
                         <div className="flex-1 min-w-[150px]">
                             <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
-                                {/* Start Update 13 September 2026, by @WNP: Translate the fixed date-filter label. */}
+                                {/* Translate the fixed date-filter label. */}
                                 {t('End Date')}
                             </label>
                             <FormInput
@@ -152,7 +152,7 @@ export default function PaymentReport({ payments, stats, filters }) {
                         </div>
                         <div className="flex-1 min-w-[150px]">
                             <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
-                                {/* Start Update 13 September 2026, by @WNP: Translate the fixed status-filter label. */}
+                                {/* Translate the fixed status-filter label. */}
                                 {t('Status')}
                             </label>
                             <FormSelect
@@ -175,7 +175,7 @@ export default function PaymentReport({ payments, stats, filters }) {
                 </Card>
 
                 {/* Data Table */}
-                {/* Start Update 13 September 2026, by @WNP: Translate only the fixed report-count frame. */}
+                {/* Translate only the fixed report-count frame. */}
                 <Card
                     title={t('Payment Records (:count shown)', {
                         count: payments?.data?.length || 0,

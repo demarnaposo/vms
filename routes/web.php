@@ -16,6 +16,7 @@ use App\Http\Controllers\PerformanceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\VendorOnboardingController;
+use App\Http\Middleware\EnsureVendorAccountIsActive;
 use App\Http\Middleware\EnsureVendorEmailIsVerified;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -33,7 +34,7 @@ Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'store'
 Route::get('/privacy', fn () => Inertia::render('Privacy'))->name('privacy');
 Route::get('/terms', fn () => Inertia::render('Terms'))->name('terms');
 
-Route::middleware(['auth', EnsureVendorEmailIsVerified::class])->group(function () {
+Route::middleware(['auth', EnsureVendorAccountIsActive::class, EnsureVendorEmailIsVerified::class])->group(function () {
     // Default Dashboard - redirects based on role
     Route::get('/dashboard', DashboardRedirectController::class)->name('dashboard');
 

@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\VendorApplication;
 use App\Models\VendorProposal;
-// Start Update 11 September 2026, by @WNP: Use the centralized currency formatter for generated proposals.
+// Use the centralized currency formatter for generated proposals.
 use App\Support\Currency;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -23,7 +23,7 @@ class ProposalGenerationService
             'application' => $application,
             'vendor_name' => $application->data['company_name'] ?? 'Vendor',
             'date' => Carbon::now()->format('F j, Y'),
-            // Start Update 11 September 2026, by @WNP: Provide a fully formatted IDR bond amount to the PDF template.
+            // Provide a fully formatted IDR bond amount to the PDF template.
             'bond_amount' => Currency::format($bondAmountRequired),
             'commission_rate' => $commissionRate,
             'platform_name' => config('app.name', 'VMS'),

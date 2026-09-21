@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'VMS'),
 
     /*
     |--------------------------------------------------------------------------
@@ -82,7 +82,7 @@ return [
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
-    // Start Update 11 September 2026, by @WNP: Restrict the application language switch to English and Indonesian.
+    // Restrict the application language switch to English and Indonesian.
     'supported_locales' => ['en', 'id'],
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),

@@ -22,7 +22,7 @@
         
         <ul>
             <li><span class="label">Platform Commission Rate:</span> {{ $commission_rate }}% per successful transaction.</li>
-            {{-- Start Update 11 September 2026, by @WNP: Render the proposal bond amount using the centralized IDR formatter output. --}}
+            {{-- Render the proposal bond amount using the centralized IDR formatter output. --}}
             <li><span class="label">Security Bond Requirement:</span> {{ $bond_amount }}</li>
             <li><span class="label">Status Requirements:</span> You must maintain compliance metrics above 80% to remain active.</li>
         </ul>

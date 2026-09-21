@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-// Start Update 13 September 2026, by @WNP: Exercise a rule that produces the reported score of 80.
+// Exercise a rule that produces the reported score of 80.
 use App\Models\ComplianceRule;
 use App\Models\Role;
 use App\Models\User;
@@ -10,7 +10,7 @@ use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-// Start Update 12 September 2026, by @WNP: Verify compliance evaluation alerts follow the selected language without altering status data.
+// Verify compliance evaluation alerts follow the selected language without altering status data.
 class ComplianceEvaluationLocalizationTest extends TestCase
 {
     use RefreshDatabase;
@@ -21,7 +21,7 @@ class ComplianceEvaluationLocalizationTest extends TestCase
         Vendor::factory()->create(['status' => Vendor::STATUS_ACTIVE]);
 
         $this->actingAs($admin)
-            // Start Update 12 September 2026, by @WNP: Reproduce the plain cookie sent by the language switcher.
+            // Reproduce the plain cookie sent by the language switcher.
             ->withUnencryptedCookie('vms_locale', 'id')
             ->post('/admin/compliance/evaluate-all')
             ->assertRedirect()
@@ -38,11 +38,11 @@ class ComplianceEvaluationLocalizationTest extends TestCase
             ->assertSessionHas('success', 'Compliance evaluation completed for 0 vendors.');
     }
 
-    // Start Update 13 September 2026, by @WNP: Verify the alert label is Indonesian while the database status code stays unchanged.
+    // Verify the alert label is Indonesian while the database status code stays unchanged.
     public function test_single_vendor_alert_localizes_status_label_without_changing_status_code(): void
     {
         $admin = $this->operationsUser();
-        // Start Update 13 September 2026, by @WNP: Produce a nonblocking 20-point penalty while retaining the compliant status code.
+        // Produce a nonblocking 20-point penalty while retaining the compliant status code.
         $vendor = Vendor::factory()->create(['performance_score' => 0]);
         ComplianceRule::create([
             'name' => 'Performance Threshold',
@@ -57,7 +57,7 @@ class ComplianceEvaluationLocalizationTest extends TestCase
         ]);
 
         $this->actingAs($admin)
-            // Start Update 12 September 2026, by @WNP: Verify the single-vendor alert with the real browser cookie format.
+            // Verify the single-vendor alert with the real browser cookie format.
             ->withUnencryptedCookie('vms_locale', 'id')
             ->post("/admin/compliance/evaluate/{$vendor->id}")
             ->assertRedirect()
@@ -67,7 +67,7 @@ class ComplianceEvaluationLocalizationTest extends TestCase
         $this->assertSame(80, $vendor->fresh()->compliance_score);
     }
 
-    // Start Update 16 September 2026, by @WNP: Verify repeated evaluations return visible feedback instead of a not-found page.
+    // Verify repeated evaluations return visible feedback instead of a not-found page.
     public function test_repeated_evaluation_returns_rate_limit_alert_on_current_flow(): void
     {
         $admin = $this->operationsUser();
@@ -90,7 +90,7 @@ class ComplianceEvaluationLocalizationTest extends TestCase
 
     private function operationsUser(): User
     {
-        // Start Update 12 September 2026, by @WNP: Create an authorized operations user for evaluation route tests.
+        // Create an authorized operations user for evaluation route tests.
         $role = Role::firstOrCreate(['name' => 'ops_manager'], ['display_name' => 'Ops Manager']);
         $user = User::factory()->create();
         $user->roles()->attach($role);

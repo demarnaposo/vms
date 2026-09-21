@@ -1,11 +1,10 @@
-import { useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import { router, useForm, usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 import AppIcon from '@/Components/AppIcon';
 import GuestLayout from '@/Components/GuestLayout';
-// Start Update 11 September 2026, by @WNP: Translate the contact experience with the global language state.
+// Translate the contact experience with the global language state.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
-// Start Update 11 September 2026, by @WNP: Replace legacy India contact details with Indonesian operational details.
 const contactCards = [
     {
         title: 'Email',
@@ -28,8 +27,9 @@ const contactCards = [
 ];
 
 export default function Contact() {
-    // Start Update 11 September 2026, by @WNP: Resolve contact labels, validation feedback, and actions bilingually.
+    // Resolve contact labels, validation feedback, and actions bilingually.
     const { t } = useLanguage();
+    const { flash = {} } = usePage().props;
     const form = useForm({
         name: '',
         email: '',
@@ -38,13 +38,32 @@ export default function Contact() {
     });
 
     const [emailError, setEmailError] = useState('');
+    const [feedback, setFeedback] = useState(() => {
+        if (flash.success) return { type: 'success', message: flash.success };
+        if (flash.error) return { type: 'error', message: flash.error };
+
+        return null;
+    });
 
     // Validate email requires a proper domain with TLD (e.g., user@example.com)
     const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
 
+    useEffect(
+        () =>
+            router.on('exception', (event) => {
+                event.preventDefault();
+                setFeedback({
+                    type: 'error',
+                    message: t('Your message could not be sent. Please try again.'),
+                });
+            }),
+        [t]
+    );
+
     const handleSubmit = (event) => {
         event.preventDefault();
         setEmailError('');
+        setFeedback(null);
 
         if (!isValidEmail(form.data.email)) {
             setEmailError(t('Please enter a valid email address (e.g., user@example.com).'));
@@ -52,12 +71,28 @@ export default function Contact() {
         }
 
         form.post('/contact', {
-            onSuccess: () => form.reset(),
+            preserveScroll: true,
+            onSuccess: (page) => {
+                if (page.props.flash?.success) {
+                    form.reset();
+                    setFeedback({ type: 'success', message: page.props.flash.success });
+                } else if (page.props.flash?.error) {
+                    setFeedback({ type: 'error', message: page.props.flash.error });
+                }
+            },
+            onError: (errors) => {
+                if (Object.keys(errors).length === 0) {
+                    setFeedback({
+                        type: 'error',
+                        message: t('Your message could not be sent. Please try again.'),
+                    });
+                }
+            },
         });
     };
 
     return (
-        <GuestLayout title="Contact - VMS">
+        <GuestLayout title="Contact">
             <section className="py-16 lg:py-24">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="grid lg:grid-cols-2 gap-10">
@@ -109,6 +144,24 @@ export default function Contact() {
                                 {t('Fields marked here are required.')}
                             </p>
 
+                            {feedback?.type === 'success' && (
+                                <div
+                                    className="mt-5 rounded-xl border border-(--color-success) bg-(--color-success-light) p-4 text-sm font-medium text-(--color-success-dark)"
+                                    role="status"
+                                >
+                                    {t(feedback.message)}
+                                </div>
+                            )}
+
+                            {feedback?.type === 'error' && (
+                                <div
+                                    className="mt-5 rounded-xl border border-(--color-danger) bg-(--color-danger-light) p-4 text-sm font-medium text-(--color-danger-dark)"
+                                    role="alert"
+                                >
+                                    {t(feedback.message)}
+                                </div>
+                            )}
+
                             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                                 <div className="grid sm:grid-cols-2 gap-4">
                                     <div className="space-y-1">
@@ -126,7 +179,10 @@ export default function Contact() {
                                             required
                                         />
                                         {form.errors.name && (
-                                            <p className="text-sm text-(--color-danger)">
+                                            <p
+                                                className="text-sm text-(--color-danger)"
+                                                role="alert"
+                                            >
                                                 {t(form.errors.name)}
                                             </p>
                                         )}
@@ -151,7 +207,10 @@ export default function Contact() {
                                             required
                                         />
                                         {(emailError || form.errors.email) && (
-                                            <p className="text-sm text-(--color-danger)">
+                                            <p
+                                                className="text-sm text-(--color-danger)"
+                                                role="alert"
+                                            >
                                                 {emailError || t(form.errors.email)}
                                             </p>
                                         )}
@@ -173,7 +232,7 @@ export default function Contact() {
                                         required
                                     />
                                     {form.errors.subject && (
-                                        <p className="text-sm text-(--color-danger)">
+                                        <p className="text-sm text-(--color-danger)" role="alert">
                                             {t(form.errors.subject)}
                                         </p>
                                     )}
@@ -194,7 +253,7 @@ export default function Contact() {
                                         required
                                     />
                                     {form.errors.message && (
-                                        <p className="text-sm text-(--color-danger)">
+                                        <p className="text-sm text-(--color-danger)" role="alert">
                                             {t(form.errors.message)}
                                         </p>
                                     )}

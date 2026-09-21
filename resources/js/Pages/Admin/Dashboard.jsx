@@ -1,10 +1,10 @@
 import { Link, usePage } from '@inertiajs/react';
 import { AdminLayout, AppIcon, Card, PageHeader, StatCard, StatGrid } from '@/Components';
-// Start Update 11 September 2026, by @WNP: Reuse the centralized Indonesian currency formatter.
+// Reuse the centralized Indonesian currency formatter.
 import { formatCurrency } from '@/utils/currencyFormatters';
-// Start Update 11 September 2026, by @WNP: Translate admin dashboard actions and empty states.
+// Translate admin dashboard actions and empty states.
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 15 September 2026, by @WNP: Localize fixed document master labels on the dashboard.
+// Localize fixed document master labels on the dashboard.
 import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
 
 export default function AdminDashboard({
@@ -13,9 +13,9 @@ export default function AdminDashboard({
     pendingDocuments = [],
     pendingPayments = [],
 }) {
-    // Start Update 15 September 2026, by @WNP: Read the language used for system document types.
+    // Read the language used for system document types.
     const { language, t } = useLanguage();
-    // Start Update 11 September 2026, by @WNP: Read the shared IDR settings supplied by Laravel.
+    // Read the shared IDR settings supplied by Laravel.
     const { auth, currency } = usePage().props;
 
     const user = auth?.user;
@@ -54,7 +54,7 @@ export default function AdminDashboard({
         },
         {
             label: 'Approved Amount',
-            // Start Update 11 September 2026, by @WNP: Format the approved amount with Indonesian separators.
+            // Format the approved amount with Indonesian separators.
             value: formatCurrency(stats.approved_payments, currency),
             icon: 'payments',
             color: 'success',
@@ -98,7 +98,7 @@ export default function AdminDashboard({
                                     <span className="mr-2 inline-flex align-middle">
                                         <AppIcon name="reports" className="h-4 w-4" />
                                     </span>
-                                    {/* Start Update 12 September 2026, by @WNP: Translate the custom card title beside its icon. */}
+                                    {/* Translate the custom card title beside its icon. */}
                                     {t('Pending Vendor Applications')}
                                 </>
                             }
@@ -161,7 +161,7 @@ export default function AdminDashboard({
                                     <span className="mr-2 inline-flex align-middle">
                                         <AppIcon name="documents" className="h-4 w-4" />
                                     </span>
-                                    {/* Start Update 12 September 2026, by @WNP: Translate the custom document card title. */}
+                                    {/* Translate the custom document card title. */}
                                     {t('Documents Pending Verification')}
                                 </>
                             }
@@ -187,7 +187,7 @@ export default function AdminDashboard({
                                                 </div>
                                                 <div>
                                                     <div className="font-semibold text-(--color-text-primary)">
-                                                        {/* Start Update 15 September 2026, by @WNP: Translate only recognized system document types. */}
+                                                        {/* Translate only recognized system document types. */}
                                                         {translateDocumentTypeLabel(
                                                             language,
                                                             doc.document_type
@@ -223,7 +223,7 @@ export default function AdminDashboard({
                                     <span className="mr-2 inline-flex align-middle">
                                         <AppIcon name="payments" className="h-4 w-4" />
                                     </span>
-                                    {/* Start Update 12 September 2026, by @WNP: Translate the custom finance card title. */}
+                                    {/* Translate the custom finance card title. */}
                                     {t('Pending Payment Approvals')}
                                 </>
                             }
@@ -253,7 +253,7 @@ export default function AdminDashboard({
                                                         {payment.vendor_name}
                                                     </div>
                                                     <div className="text-sm text-(--color-text-secondary)">
-                                                        {/* Start Update 11 September 2026, by @WNP: Format pending payment amounts as IDR. */}
+                                                        {/* Format pending payment amounts as IDR. */}
                                                         {formatCurrency(payment.amount, currency)} -{' '}
                                                         <span className="capitalize">
                                                             {payment.status.replaceAll('_', ' ')}
@@ -265,7 +265,7 @@ export default function AdminDashboard({
                                                 href={`/admin/payments/${payment.id}`}
                                                 className="inline-flex items-center px-4 py-2 bg-(--color-brand-primary) text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all"
                                             >
-                                                {/* Start Update 12 September 2026, by @WNP: Translate the payment review action. */}
+                                                {/* Translate the payment review action. */}
                                                 {t('Review')}
                                             </Link>
                                         </div>
@@ -275,7 +275,7 @@ export default function AdminDashboard({
                                         <span className="text-4xl mb-3 inline-flex justify-center w-full">
                                             <AppIcon name="success" className="h-10 w-10" />
                                         </span>
-                                        {/* Start Update 12 September 2026, by @WNP: Translate the empty payment queue state. */}
+                                        {/* Translate the empty payment queue state. */}
                                         <p className="font-medium">{t('No pending payments')}</p>
                                     </div>
                                 )}
@@ -297,7 +297,7 @@ export default function AdminDashboard({
                                         <AppIcon name="reports" className="h-6 w-6" />
                                     </span>
                                     <span className="text-sm font-bold tracking-wide uppercase opacity-95 text-center">
-                                        {/* Start Update 12 September 2026, by @WNP: Translate the application shortcut. */}
+                                        {/* Translate the application shortcut. */}
                                         {t('Review Applications')}
                                     </span>
                                 </Link>
@@ -311,7 +311,7 @@ export default function AdminDashboard({
                                         <AppIcon name="compliance" className="h-6 w-6" />
                                     </span>
                                     <span className="text-sm font-bold tracking-wide uppercase opacity-95 text-center">
-                                        {/* Start Update 12 September 2026, by @WNP: Translate the compliance shortcut. */}
+                                        {/* Translate the compliance shortcut. */}
                                         {t('Compliance Check')}
                                     </span>
                                 </Link>
@@ -324,7 +324,7 @@ export default function AdminDashboard({
                                     <AppIcon name="payments" className="h-6 w-6" />
                                 </span>
                                 <span className="text-sm font-bold tracking-wide uppercase opacity-95 text-center">
-                                    {/* Start Update 12 September 2026, by @WNP: Translate role-specific payment shortcuts. */}
+                                    {/* Translate role-specific payment shortcuts. */}
                                     {t(can.approve_payments ? 'Approve Payments' : 'View Payments')}
                                 </span>
                             </Link>
@@ -336,7 +336,7 @@ export default function AdminDashboard({
                                     <AppIcon name="notifications" className="h-6 w-6" />
                                 </span>
                                 <span className="text-sm font-bold tracking-wide uppercase opacity-95 text-center">
-                                    {/* Start Update 12 September 2026, by @WNP: Translate the notifications shortcut. */}
+                                    {/* Translate the notifications shortcut. */}
                                     {t('Notifications')}
                                 </span>
                             </Link>

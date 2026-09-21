@@ -9,7 +9,7 @@
  * @param {string|Date|null} value
  * @returns {string}
  */
-// Start Update 12 September 2026, by @WNP: Accept an optional UI locale for bilingual document dates.
+// Accept an optional UI locale for bilingual document dates.
 export function formatDate(value, locale = 'en-IN') {
     if (!value) return '-';
     let date;
@@ -32,7 +32,7 @@ export function formatDate(value, locale = 'en-IN') {
  * @param {string|Date|null} value
  * @returns {string}
  */
-// Start Update 12 September 2026, by @WNP: Accept an optional UI locale for bilingual upload timestamps.
+// Accept an optional UI locale for bilingual upload timestamps.
 export function formatDateTime(value, locale = 'en-IN') {
     if (!value) return '-';
     const date = new Date(value);
@@ -52,7 +52,7 @@ export function formatDateTime(value, locale = 'en-IN') {
  * @param {string|Date} value
  * @returns {string}
  */
-// Start Update 15 September 2026, by @WNP: Format notification relative time with the selected UI locale.
+// Format notification relative time with the selected UI locale.
 export function formatRelativeTime(value, locale = 'en-US') {
     if (!value) return '-';
     const date = new Date(value);

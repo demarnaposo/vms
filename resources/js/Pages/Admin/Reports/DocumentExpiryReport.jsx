@@ -10,12 +10,12 @@ import {
     DataTable,
     FormInput,
 } from '@/Components';
-// Start Update 15 September 2026, by @WNP: Translate fixed document master labels in the expiry report.
+// Translate fixed document master labels in the expiry report.
 import { useLanguage } from '@/Contexts/LanguageContext';
 import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
 
 export default function DocumentExpiryReport({ documents, stats, filters }) {
-    // Start Update 15 September 2026, by @WNP: Read the selected language for master document labels.
+    // Read the selected language for master document labels.
     const { language, t } = useLanguage();
     const { auth } = usePage().props;
     const can = auth?.can || {};
@@ -37,7 +37,7 @@ export default function DocumentExpiryReport({ documents, stats, filters }) {
     const getExpiryBadge = (daysUntil) => {
         if (daysUntil === null) return <Badge variant="default">Unknown</Badge>;
         if (daysUntil < 0) return <Badge variant="danger">Expired</Badge>;
-        // Start Update 16 September 2026, by @WNP: Localize calculated day counts without translating document data.
+        // Localize calculated day counts without translating document data.
         const daysLabel = t(':count days', { count: daysUntil });
         if (daysUntil <= 7) return <Badge variant="danger">{daysLabel}</Badge>;
         if (daysUntil <= 30) return <Badge variant="warning">{daysLabel}</Badge>;
@@ -59,7 +59,7 @@ export default function DocumentExpiryReport({ documents, stats, filters }) {
             label: 'Document Type',
             render: (row) => (
                 <span className="text-(--color-text-secondary)">
-                    {/* Start Update 15 September 2026, by @WNP: Translate recognized master types and retain custom report values. */}
+                    {/* Translate recognized master types and retain custom report values. */}
                     {translateDocumentTypeLabel(language, row.document_type, 'N/A')}
                 </span>
             ),
@@ -131,7 +131,7 @@ export default function DocumentExpiryReport({ documents, stats, filters }) {
                     <div className="p-4 flex flex-wrap items-end gap-4">
                         <div className="flex-1 min-w-[150px]">
                             <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
-                                {/* Start Update 16 September 2026, by @WNP: Translate fixed date-filter labels. */}
+                                {/* Translate fixed date-filter labels. */}
                                 {t('Start Date')}
                             </label>
                             <FormInput
@@ -144,7 +144,7 @@ export default function DocumentExpiryReport({ documents, stats, filters }) {
                         </div>
                         <div className="flex-1 min-w-[150px]">
                             <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
-                                {/* Start Update 16 September 2026, by @WNP: Translate fixed date-filter labels. */}
+                                {/* Translate fixed date-filter labels. */}
                                 {t('End Date')}
                             </label>
                             <FormInput
@@ -167,7 +167,7 @@ export default function DocumentExpiryReport({ documents, stats, filters }) {
                 </Card>
 
                 {/* Data Table */}
-                {/* Start Update 16 September 2026, by @WNP: Translate the document count frame while retaining its numeric value. */}
+                {/* Translate the document count frame while retaining its numeric value. */}
                 <Card
                     title={t('Expiring Documents (:count shown)', {
                         count: documents?.data?.length || 0,

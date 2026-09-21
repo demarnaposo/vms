@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\PaymentRequest;
 use App\Models\Vendor;
 use App\Models\VendorDocument;
-// Start Update 11 September 2026, by @WNP: Use centralized currency metadata and formatting in payment exports.
+// Use centralized currency metadata and formatting in payment exports.
 use App\Support\Currency;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -112,7 +112,7 @@ class ReportService
 
         $payments = $query->orderBy('created_at', 'desc')->get();
 
-        // Start Update 11 September 2026, by @WNP: Label and format exported payment amounts using the configured currency.
+        // Label and format exported payment amounts using the configured currency.
         $headers = ['ID', 'Vendor', 'Invoice Number', 'Amount ('.Currency::code().')', 'Status', 'Requested Date', 'Notes'];
         $rows = [];
 

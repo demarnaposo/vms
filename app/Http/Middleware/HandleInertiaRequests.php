@@ -42,7 +42,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => fn () => $this->getAuthData($user),
-            // Start Update 11 September 2026, by @WNP: Share the centralized currency settings with every Inertia page.
+            // Share the centralized currency settings with every Inertia page.
             'currency' => fn () => config('currency'),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { translateMessage } from '../../resources/js/i18n/translations.js';
 
-// Start Update 15 September 2026, by @WNP: Verify password visibility labels follow the selected language.
+// Verify password visibility labels follow the selected language.
 test('password visibility labels are localized', () => {
     assert.equal(translateMessage('id', 'Show password'), 'Tampilkan kata sandi');
     assert.equal(translateMessage('id', 'Hide password'), 'Sembunyikan kata sandi');
@@ -11,7 +11,7 @@ test('password visibility labels are localized', () => {
     assert.equal(translateMessage('en', 'Hide password'), 'Hide password');
 });
 
-// Start Update 15 September 2026, by @WNP: Guard the toggle behavior and non-submitting accessible button semantics.
+// Guard the toggle behavior and non-submitting accessible button semantics.
 test('password input starts hidden and exposes an accessible toggle', () => {
     const source = readFileSync(
         new URL('../../resources/js/Components/PasswordInput.jsx', import.meta.url),
@@ -26,7 +26,7 @@ test('password input starts hidden and exposes an accessible toggle', () => {
     assert.match(source, /isVisible \? 'eye-off' : 'eye'/);
 });
 
-// Start Update 15 September 2026, by @WNP: Ensure login and both registration password fields use the shared control.
+// Ensure login and both registration password fields use the shared control.
 test('login and registration use the shared password input', () => {
     const login = readFileSync(
         new URL('../../resources/js/Pages/Auth/Login.jsx', import.meta.url),
@@ -43,7 +43,7 @@ test('login and registration use the shared password input', () => {
     assert.equal(register.match(/autoComplete="new-password"/g)?.length, 2);
 });
 
-// Start Update 15 September 2026, by @WNP: Verify reusable form password fields receive the same accessible visibility behavior.
+// Verify reusable form password fields receive the same accessible visibility behavior.
 test('reusable form password inputs expose an accessible toggle', () => {
     const source = readFileSync(
         new URL('../../resources/js/Components/FormInputs.jsx', import.meta.url),
@@ -58,7 +58,7 @@ test('reusable form password inputs expose an accessible toggle', () => {
     assert.match(source, /isPasswordVisible \? 'eye-off' : 'eye'/);
 });
 
-// Start Update 15 September 2026, by @WNP: Guard all profile and staff password fields that rely on the centralized form input.
+// Guard all profile and staff password fields that rely on the centralized form input.
 test('profile and staff password fields use the reusable form input', () => {
     const profile = readFileSync(
         new URL('../../resources/js/Pages/Profile/Edit.jsx', import.meta.url),

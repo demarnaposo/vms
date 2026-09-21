@@ -32,7 +32,7 @@ class ReactivateVendor extends Command
 
         $this->info("Currently status: {$user->vendor->status}. is_active: ".($user->is_active ? 'True' : 'False'));
 
-        // Start Update 13 September 2026, by @WNP: Mark this command-generated appeal note for selective timeline localization.
+        // Mark this command-generated appeal note for selective timeline localization.
         $user->vendor->transitionTo('under_review', $admin, 'Admin reviewed termination appeal and restored access.', 'APPEAL_APPROVED', automaticComment: true);
 
         $user->refresh();

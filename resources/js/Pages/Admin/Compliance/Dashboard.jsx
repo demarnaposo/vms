@@ -14,15 +14,15 @@ import {
     StatGrid,
 } from '@/Components';
 import { formatDateTime } from '@/utils/dateFormatters';
-// Start Update 12 September 2026, by @WNP: Translate compliance dashboard UI while preserving database result content.
+// Translate compliance dashboard UI while preserving database result content.
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 15 September 2026, by @WNP: Localize recognized compliance rule master records.
+// Localize recognized compliance rule master records.
 import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
-// Start Update 16 September 2026, by @WNP: Reuse automatic compliance-detail translations in recent failures.
+// Reuse automatic compliance-detail translations in recent failures.
 import { translateComplianceDetails } from '@/i18n/complianceDetails';
 
 export default function ComplianceDashboard({ stats, atRiskVendors, recentResults, rules }) {
-    // Start Update 12 September 2026, by @WNP: Resolve only static dashboard labels through the shared language context.
+    // Resolve only static dashboard labels through the shared language context.
     const { language, t } = useLanguage();
     const dateLocale = language === 'id' ? 'id-ID' : 'en-IN';
     const { auth } = usePage().props;
@@ -53,7 +53,7 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
 
     return (
         <AdminLayout title="Compliance Dashboard" activeNav="Compliance" header={header}>
-            {/* Start Update 12 September 2026, by @WNP: Localize only dashboard labels and controls, not compliance data from the database. */}
+            {/* Localize only dashboard labels and controls, not compliance data from the database. */}
             <div className="space-y-8">
                 {/* Stats */}
                 <StatGrid>
@@ -107,7 +107,7 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                                                 </div>
                                             </div>
                                         </div>
-                                        {/* Start Update 13 September 2026, by @WNP: Translate only the migration-backed compliance enum label. */}
+                                        {/* Translate only the migration-backed compliance enum label. */}
                                         <Badge status={vendor.compliance_status} />
                                     </Link>
                                 ))
@@ -137,7 +137,7 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                                             </div>
                                         </div>
                                         <div className="text-sm text-(--color-danger) mt-1">
-                                            {/* Start Update 15 September 2026, by @WNP: Translate system rules and preserve custom rules. */}
+                                            {/* Translate system rules and preserve custom rules. */}
                                             {translateSystemMasterDataField(
                                                 language,
                                                 'compliance_rules',
@@ -147,7 +147,7 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                                             )}
                                         </div>
                                         <div className="text-sm text-(--color-text-tertiary) mt-1">
-                                            {/* Start Update 16 September 2026, by @WNP: Translate known system details and retain custom database text. */}
+                                            {/* Translate known system details and retain custom database text. */}
                                             {translateComplianceDetails(
                                                 language,
                                                 result.rule,
@@ -207,7 +207,7 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                                         >
                                             <td className="p-4">
                                                 <div className="text-(--color-text-primary) font-medium">
-                                                    {/* Start Update 15 September 2026, by @WNP: Resolve the fixed rule label from its stable name. */}
+                                                    {/* Resolve the fixed rule label from its stable name. */}
                                                     {translateSystemMasterDataField(
                                                         language,
                                                         'compliance_rules',
@@ -217,7 +217,7 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                                                     )}
                                                 </div>
                                                 <div className="text-xs text-(--color-text-tertiary)">
-                                                    {/* Start Update 15 September 2026, by @WNP: Translate only master rule descriptions. */}
+                                                    {/* Translate only master rule descriptions. */}
                                                     {translateSystemMasterDataField(
                                                         language,
                                                         'compliance_rules',
@@ -227,7 +227,7 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                                                 </div>
                                             </td>
                                             <td className="p-4">
-                                                {/* Start Update 13 September 2026, by @WNP: Translate only the migration-backed severity enum label. */}
+                                                {/* Translate only the migration-backed severity enum label. */}
                                                 <Badge status={rule.severity} />
                                             </td>
                                             <td className="p-4 text-center text-(--color-text-primary) font-medium">

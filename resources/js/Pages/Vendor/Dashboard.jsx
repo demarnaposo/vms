@@ -1,16 +1,16 @@
 import { Link, usePage } from '@inertiajs/react';
 import { AppIcon, Badge, Card, LinkButton, PageHeader, VendorLayout } from '@/Components';
-// Start Update 11 September 2026, by @WNP: Reuse the centralized Indonesian currency formatter.
+// Reuse the centralized Indonesian currency formatter.
 import { formatCurrency } from '@/utils/currencyFormatters';
-// Start Update 11 September 2026, by @WNP: Translate vendor dashboard status and actions.
+// Translate vendor dashboard status and actions.
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 15 September 2026, by @WNP: Localize fixed document master labels on the vendor dashboard.
+// Localize fixed document master labels on the vendor dashboard.
 import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
 
 export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) {
-    // Start Update 15 September 2026, by @WNP: Read the language used for system document types.
+    // Read the language used for system document types.
     const { language, t } = useLanguage();
-    // Start Update 11 September 2026, by @WNP: Read the shared IDR settings supplied by Laravel.
+    // Read the shared IDR settings supplied by Laravel.
     const { auth, currency } = usePage().props;
     const user = auth?.user;
 
@@ -57,7 +57,7 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
 
     const currentStatus = statusMessages[displayVendor.status] || statusMessages.draft;
 
-    // Start Update 13 September 2026, by @WNP: Translate the fixed vendor-status enum label in the dashboard header.
+    // Translate the fixed vendor-status enum label in the dashboard header.
     const header = (
         <PageHeader
             title="Dashboard"
@@ -97,7 +97,7 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                             variant="primary"
                             className="inline-flex items-center gap-2"
                         >
-                            {/* Start Update 12 September 2026, by @WNP: Translate only the static onboarding action. */}
+                            {/* Translate only the static onboarding action. */}
                             {t(currentStatus.action)}
                             <svg
                                 className="w-4 h-4"
@@ -180,7 +180,7 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                                 </span>
                             </div>
                             <div className="text-4xl font-bold mb-2 text-(--color-text-primary)">
-                                {/* Start Update 11 September 2026, by @WNP: Format pending payments as IDR. */}
+                                {/* Format pending payments as IDR. */}
                                 {formatCurrency(stats.pending_payments, currency)}
                             </div>
                             {displayVendor.status === 'active' && (
@@ -189,7 +189,7 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                                     variant="primary"
                                     className="w-full mt-4 text-center justify-center block"
                                 >
-                                    {/* Start Update 12 September 2026, by @WNP: Translate the payment request action. */}
+                                    {/* Translate the payment request action. */}
                                     {t('Request Payment')}
                                 </LinkButton>
                             )}
@@ -224,7 +224,7 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                                                 {doc.file_name}
                                             </div>
                                             <div className="text-xs text-(--color-text-tertiary)">
-                                                {/* Start Update 15 September 2026, by @WNP: Preserve custom types while translating master labels. */}
+                                                {/* Preserve custom types while translating master labels. */}
                                                 {translateDocumentTypeLabel(
                                                     language,
                                                     doc.document_type
@@ -232,7 +232,7 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                                             </div>
                                         </div>
                                     </div>
-                                    {/* Start Update 13 September 2026, by @WNP: Translate only the document verification enum label. */}
+                                    {/* Translate only the document verification enum label. */}
                                     <Badge status={doc.verification_status} />
                                 </div>
                             ))}

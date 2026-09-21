@@ -1,9 +1,9 @@
 import { Link, useForm } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
 import Logo from '@/Components/Logo';
-// Start Update 15 September 2026, by @WNP: Reuse the accessible password visibility input on registration.
+// Reuse the accessible password visibility input on registration.
 import PasswordInput from '@/Components/PasswordInput';
-// Start Update 11 September 2026, by @WNP: Enable bilingual registration content and language selection.
+// Enable bilingual registration content and language selection.
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { useLanguage } from '@/Contexts/LanguageContext';
 
@@ -24,9 +24,9 @@ export default function Register() {
 
     return (
         <>
-            <Head title={`${t('Sign Up')} - VMS`} />
+            <Head title={t('Sign Up')} />
             <div className="min-h-screen flex">
-                {/* Start Update 11 September 2026, by @WNP: Keep language selection available on the registration page. */}
+                {/* Keep language selection available on the registration page. */}
                 <div className="fixed right-4 top-4 z-50">
                     <LanguageSwitcher />
                 </div>
@@ -107,7 +107,7 @@ export default function Register() {
                                 <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
                                     {t('Full Name')}
                                 </label>
-                                {/* Start Update 15 September 2026, by @WNP: Localize the static full-name example on registration. */}
+                                {/* Localize the static full-name example on registration. */}
                                 <input
                                     type="text"
                                     value={form.data.name}
@@ -127,7 +127,7 @@ export default function Register() {
                                 <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
                                     {t('Email')}
                                 </label>
-                                {/* Start Update 15 September 2026, by @WNP: Localize the static email example on registration. */}
+                                {/* Localize the static email example on registration. */}
                                 <input
                                     type="email"
                                     value={form.data.email}
@@ -147,7 +147,7 @@ export default function Register() {
                                 <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
                                     {t('Password')}
                                 </label>
-                                {/* Start Update 15 September 2026, by @WNP: Let users show or hide their new registration password. */}
+                                {/* Let users show or hide their new registration password. */}
                                 <PasswordInput
                                     value={form.data.password}
                                     onChange={(e) => form.setData('password', e.target.value)}
@@ -167,7 +167,7 @@ export default function Register() {
                                 <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
                                     {t('Confirm Password')}
                                 </label>
-                                {/* Start Update 15 September 2026, by @WNP: Give password confirmation its own independent visibility control. */}
+                                {/* Give password confirmation its own independent visibility control. */}
                                 <PasswordInput
                                     value={form.data.password_confirmation}
                                     onChange={(e) =>

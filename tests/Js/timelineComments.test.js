@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { translateTimelineComment } from '../../resources/js/i18n/timelineComments.js';
 
-// Start Update 13 September 2026, by @WNP: Verify known automatic comments translate without modifying source log values.
+// Verify known automatic comments translate without modifying source log values.
 test('translates automatic vendor timeline comments in Indonesian', () => {
     const examples = [
         [
@@ -32,7 +32,7 @@ test('translates automatic vendor timeline comments in Indonesian', () => {
         assert.equal(translateTimelineComment('en', log), comment);
     }
 
-    // Start Update 13 September 2026, by @WNP: Support legacy automatic logs that predate source metadata.
+    // Support legacy automatic logs that predate source metadata.
     assert.equal(
         translateTimelineComment('id', {
             comment: 'Vendor approved',
@@ -43,7 +43,7 @@ test('translates automatic vendor timeline comments in Indonesian', () => {
     );
 });
 
-// Start Update 13 September 2026, by @WNP: Keep manual comments verbatim even when their wording resembles a system comment.
+// Keep manual comments verbatim even when their wording resembles a system comment.
 test('preserves free-text and nonmatching timeline comments', () => {
     assert.equal(
         translateTimelineComment('id', {
@@ -69,7 +69,7 @@ test('preserves free-text and nonmatching timeline comments', () => {
         }),
         'Vendor approved'
     );
-    // Start Update 13 September 2026, by @WNP: A user-entered exact match must not be mistaken for a system comment.
+    // A user-entered exact match must not be mistaken for a system comment.
     assert.equal(
         translateTimelineComment('id', {
             comment: 'Vendor approved',
@@ -81,7 +81,7 @@ test('preserves free-text and nonmatching timeline comments', () => {
     );
 });
 
-// Start Update 13 September 2026, by @WNP: Require the existing appeal reason code for command-generated history text.
+// Require the existing appeal reason code for command-generated history text.
 test('distinguishes automatic appeal text from an ordinary comment', () => {
     const comment = 'Admin reviewed termination appeal and restored access.';
 

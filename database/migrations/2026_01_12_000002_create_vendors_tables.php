@@ -19,7 +19,7 @@ return new class extends Migration
             // Company Information
             $table->string('company_name');
             $table->string('registration_number')->nullable();
-            // Start Update 16 September 2026, by @WNP: Document current Indonesian use while retaining the legacy column for historical data.
+            // Document current Indonesian use while retaining the legacy column for historical data.
             $table->string('tax_id')->nullable(); // NPWP
             $table->string('pan_number')->nullable(); // Legacy identifier; no longer collected
             $table->string('business_type')->nullable(); // sole_proprietor, partnership, pvt_ltd, etc.
@@ -31,7 +31,7 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->string('city')->nullable();
             $table->string('state')->nullable();
-            // Start Update 11 September 2026, by @WNP: Use Indonesia as the country default for new vendor profiles.
+            // Use Indonesia as the country default for new vendor profiles.
             $table->string('country')->default('Indonesia');
             $table->string('pincode')->nullable();
 

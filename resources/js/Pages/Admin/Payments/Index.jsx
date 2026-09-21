@@ -13,15 +13,15 @@ import {
     StatCard,
     StatGrid,
 } from '@/Components';
-// Start Update 11 September 2026, by @WNP: Reuse the centralized Indonesian currency formatter.
+// Reuse the centralized Indonesian currency formatter.
 import { formatCurrency } from '@/utils/currencyFormatters';
-// Start Update 13 September 2026, by @WNP: Translate fixed payment controls without changing stored transaction data.
+// Translate fixed payment controls without changing stored transaction data.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function PaymentsIndex({ payments, stats, currentStatus }) {
-    // Start Update 13 September 2026, by @WNP: Resolve only static payment labels and status enums.
+    // Resolve only static payment labels and status enums.
     const { t } = useLanguage();
-    // Start Update 11 September 2026, by @WNP: Read the shared IDR settings supplied by Laravel.
+    // Read the shared IDR settings supplied by Laravel.
     const { auth, currency } = usePage().props;
     const can = auth?.can || {};
 
@@ -96,7 +96,7 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
         { label: 'Approved', value: stats?.approved || 0, icon: 'success', color: 'success' },
         {
             label: 'Total Paid',
-            // Start Update 11 September 2026, by @WNP: Format aggregate paid values as IDR.
+            // Format aggregate paid values as IDR.
             value: formatCurrency(stats?.paid, currency),
             icon: 'payments',
             color: 'primary',
@@ -114,7 +114,7 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                     </div>
                     {row.is_duplicate_flagged && (
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-(--color-warning-light) text-(--color-warning-dark)">
-                            {/* Start Update 13 September 2026, by @WNP: Translate the fixed duplicate indicator. */}
+                            {/* Translate the fixed duplicate indicator. */}
                             {t('Duplicate Flag')}
                         </span>
                     )}
@@ -132,7 +132,7 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
             align: 'right',
             render: (row) => (
                 <span className="text-(--color-text-primary) font-bold">
-                    {/* Start Update 11 September 2026, by @WNP: Format payment row values as IDR. */}
+                    {/* Format payment row values as IDR. */}
                     {formatCurrency(row.amount, currency)}
                 </span>
             ),
@@ -210,19 +210,19 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                         {['requested', 'pending_ops'].includes(row.status) &&
                             !can.validate_payments && (
                                 <span className="text-xs text-(--color-text-tertiary) italic">
-                                    {/* Start Update 13 September 2026, by @WNP: Translate the fixed workflow hint. */}
+                                    {/* Translate the fixed workflow hint. */}
                                     {t('Waiting for Ops')}
                                 </span>
                             )}
                         {row.status === 'pending_finance' && !can.approve_payments && (
                             <span className="text-xs text-(--color-text-tertiary) italic">
-                                {/* Start Update 13 September 2026, by @WNP: Translate the fixed workflow hint. */}
+                                {/* Translate the fixed workflow hint. */}
                                 {t('Waiting for Finance')}
                             </span>
                         )}
                         {row.status === 'approved' && !can.mark_paid && (
                             <span className="text-xs text-(--color-text-tertiary) italic">
-                                {/* Start Update 13 September 2026, by @WNP: Translate the fixed workflow hint. */}
+                                {/* Translate the fixed workflow hint. */}
                                 {t('Ready for Payment')}
                             </span>
                         )}
@@ -266,7 +266,7 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                                     : 'text-(--color-text-tertiary) hover:text-(--color-text-primary) hover:bg-(--color-bg-primary)/50'
                             }`}
                         >
-                            {/* Start Update 13 September 2026, by @WNP: Translate filter labels while preserving URL enum codes. */}
+                            {/* Translate filter labels while preserving URL enum codes. */}
                             {t(status.replaceAll('_', ' '))}
                         </Link>
                     ))}
@@ -296,7 +296,7 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                 <div className="space-y-4">
                     <div>
                         <label className="text-sm font-medium text-(--color-text-secondary) mb-2 block">
-                            {/* Start Update 13 September 2026, by @WNP: Translate the fixed field label, not its typed value. */}
+                            {/* Translate the fixed field label, not its typed value. */}
                             {t('Payment Reference *')}
                         </label>
                         <input
@@ -309,7 +309,7 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                     </div>
                     <div>
                         <label className="text-sm font-medium text-(--color-text-secondary) mb-2 block">
-                            {/* Start Update 13 September 2026, by @WNP: Translate only the method field label. */}
+                            {/* Translate only the method field label. */}
                             {t('Payment Method')}
                         </label>
                         <select
@@ -317,13 +317,13 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                             onChange={(e) => setPaymentMethod(e.target.value)}
                             className="input-field w-full"
                         >
-                            {/* Start Update 13 September 2026, by @WNP: Keep payment-method option values unchanged. */}
+                            {/* Keep payment-method option values unchanged. */}
                             <option value="">{t('Select method')}</option>
                             <option value="NEFT">NEFT</option>
                             <option value="RTGS">RTGS</option>
                             <option value="IMPS">IMPS</option>
                             <option value="UPI">UPI</option>
-                            {/* Start Update 13 September 2026, by @WNP: Translate the fixed method label, not its stored value. */}
+                            {/* Translate the fixed method label, not its stored value. */}
                             <option value="Cheque">{t('Cheque')}</option>
                         </select>
                     </div>

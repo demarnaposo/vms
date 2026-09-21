@@ -15,7 +15,7 @@ class CurrencyConfigurationTest extends TestCase
 {
     use RefreshDatabase;
 
-    // Start Update 11 September 2026, by @WNP: Verify all monetary tables default new records to IDR without requiring callers to set currency.
+    // Verify all monetary tables default new records to IDR without requiring callers to set currency.
     public function test_monetary_records_use_idr_as_the_database_default(): void
     {
         $user = User::factory()->create();
@@ -45,7 +45,7 @@ class CurrencyConfigurationTest extends TestCase
         $this->assertSame('IDR', $transaction->fresh()->currency);
     }
 
-    // Start Update 11 September 2026, by @WNP: Verify Rupiah output follows Indonesian digit grouping with no decimal places.
+    // Verify Rupiah output follows Indonesian digit grouping with no decimal places.
     public function test_currency_formatter_uses_indonesian_rupiah_format(): void
     {
         $this->assertSame('IDR', Currency::code());

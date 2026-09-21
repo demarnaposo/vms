@@ -7,7 +7,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Notifications\VendorApplicationSubmitted;
-// Start Update 11 September 2026, by @WNP: Verifikasi snapshot wilayah Indonesia yang digunakan frontend dan backend.
+// Verifikasi snapshot wilayah Indonesia yang digunakan frontend dan backend.
 use App\Support\IndonesiaRegions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -44,7 +44,7 @@ class VendorOnboardingTest extends TestCase
         // Create Document Type
         $this->documentType = DocumentType::create([
             'name' => 'pan_card',
-            // Start Update 16 September 2026, by @WNP: Use the NIB document label for onboarding coverage.
+            // Use the NIB document label for onboarding coverage.
             'display_name' => 'Business Identification Number (NIB) Document',
             'is_mandatory' => true,
             'is_active' => true,
@@ -55,17 +55,17 @@ class VendorOnboardingTest extends TestCase
 
     public function test_vendor_can_save_step_1_company_info()
     {
-        // Start Update 11 September 2026, by @WNP: Gunakan pasangan provinsi, kota, dan kode pos Indonesia yang valid.
+        // Gunakan pasangan provinsi, kota, dan kode pos Indonesia yang valid.
         $response = $this->actingAs($this->vendorUser)
             ->post(route('vendor.onboarding.step1'), [
                 'company_name' => 'Test Company',
-                // Start Update 16 September 2026, by @WNP: Exercise Indonesian NIB and NPWP onboarding values.
+                // Exercise Indonesian NIB and NPWP onboarding values.
                 'registration_number' => '1234567890123',
                 'tax_id' => '0123456789012345',
                 'deed_number' => 'DEED-000001',
                 'business_type' => 'pvt_ltd',
                 'contact_person' => 'Test Person',
-                // Start Update 14 September 2026, by @WNP: Submit an Indonesian mobile number during VMS onboarding.
+                // Submit an Indonesian mobile number during VMS onboarding.
                 'contact_phone' => '081234567890',
                 'address' => '123 Test St',
                 'city' => 'Kota Bandung',
@@ -88,7 +88,7 @@ class VendorOnboardingTest extends TestCase
         $this->assertSame('081234567890', $application->data['step1']['contact_phone']);
     }
 
-    // Start Update 16 September 2026, by @WNP: Keep backend required-field messages aligned with the onboarding form.
+    // Keep backend required-field messages aligned with the onboarding form.
     public function test_step_1_returns_specific_errors_for_all_required_company_fields(): void
     {
         $this->actingAs($this->vendorUser)
@@ -108,7 +108,7 @@ class VendorOnboardingTest extends TestCase
             ]);
     }
 
-    // Start Update 16 September 2026, by @WNP: Accept formatted identifiers and reject invalid NIB or NPWP lengths.
+    // Accept formatted identifiers and reject invalid NIB or NPWP lengths.
     public function test_vendor_company_identifiers_follow_indonesian_formats(): void
     {
         $validPayload = [
@@ -140,7 +140,7 @@ class VendorOnboardingTest extends TestCase
             ]))
             ->assertSessionHasErrors(['registration_number', 'tax_id']);
 
-        // Start Update 16 September 2026, by @WNP: Reject an application without the required deed number.
+        // Reject an application without the required deed number.
         $this->actingAs($this->vendorUser)
             ->post(route('vendor.onboarding.step1'), array_merge($validPayload, [
                 'deed_number' => '',
@@ -148,7 +148,7 @@ class VendorOnboardingTest extends TestCase
             ->assertSessionHasErrors(['deed_number']);
     }
 
-    // Start Update 14 September 2026, by @WNP: Pastikan lokasi yang tidak didukung dan kode pos enam digit ditolak oleh backend.
+    // Pastikan lokasi yang tidak didukung dan kode pos enam digit ditolak oleh backend.
     public function test_vendor_cannot_save_indian_location_or_six_digit_postal_code(): void
     {
         $response = $this->actingAs($this->vendorUser)
@@ -160,7 +160,7 @@ class VendorOnboardingTest extends TestCase
                 'deed_number' => 'DEED-000001',
                 'business_type' => 'pvt_ltd',
                 'contact_person' => 'Test Person',
-                // Start Update 14 September 2026, by @WNP: Keep the contact number valid while testing address errors.
+                // Keep the contact number valid while testing address errors.
                 'contact_phone' => '081234567890',
                 'address' => '123 Test St',
                 'city' => 'Mumbai',
@@ -173,7 +173,7 @@ class VendorOnboardingTest extends TestCase
             ->assertSessionHasErrors(['city', 'state', 'pincode']);
     }
 
-    // Start Update 14 September 2026, by @WNP: Normalize an accepted +62 mobile number before saving the VMS application.
+    // Normalize an accepted +62 mobile number before saving the VMS application.
     public function test_vendor_can_save_international_mobile_number_as_local_format(): void
     {
         $this->actingAs($this->vendorUser)
@@ -196,7 +196,7 @@ class VendorOnboardingTest extends TestCase
         $this->assertSame('081234567890', $application->data['step1']['contact_phone']);
     }
 
-    // Start Update 14 September 2026, by @WNP: Reject unsupported prefixes and mobile numbers beyond the input limit.
+    // Reject unsupported prefixes and mobile numbers beyond the input limit.
     public function test_vendor_cannot_save_invalid_mobile_number(): void
     {
         foreach (['9876543210', '081234567', '08123456789012', '+62081234567890'] as $number) {
@@ -209,7 +209,7 @@ class VendorOnboardingTest extends TestCase
         }
     }
 
-    // Start Update 14 September 2026, by @WNP: Apply the same mobile normalization when editing a submitted VMS profile.
+    // Apply the same mobile normalization when editing a submitted VMS profile.
     public function test_submitted_vendor_profile_normalizes_international_mobile_number(): void
     {
         $vendor = Vendor::factory()->create([
@@ -236,7 +236,7 @@ class VendorOnboardingTest extends TestCase
         $this->assertSame('081234567890', $this->vendorUser->fresh()->phone);
     }
 
-    // Start Update 11 September 2026, by @WNP: Pastikan snapshot wilayah memuat 38 provinsi dan 514 kabupaten/kota.
+    // Pastikan snapshot wilayah memuat 38 provinsi dan 514 kabupaten/kota.
     public function test_indonesian_region_snapshot_is_complete(): void
     {
         $provinces = IndonesiaRegions::provinces();
@@ -264,7 +264,7 @@ class VendorOnboardingTest extends TestCase
 
         $response = $this->actingAs($this->vendorUser)
             ->post(route('vendor.onboarding.step2'), [
-                // Start Update 11 September 2026, by @WNP: Use Indonesian bank information in step two validation.
+                // Use Indonesian bank information in step two validation.
                 'bank_name' => 'Bank Mandiri',
                 'bank_account_number' => '1234567890',
                 'bank_ifsc' => '008',
@@ -278,7 +278,6 @@ class VendorOnboardingTest extends TestCase
         $this->assertEquals(3, $application->current_step);
     }
 
-    // Start Update 11 September 2026, by @WNP: Ensure India-only IFSC values are rejected by Indonesian bank validation.
     public function test_vendor_cannot_save_an_ifsc_as_an_indonesian_bank_code(): void
     {
         \App\Models\VendorApplication::create([
@@ -348,15 +347,15 @@ class VendorOnboardingTest extends TestCase
             'current_step' => 4,
             'status' => 'draft',
             'data' => [
-                // Start Update 11 September 2026, by @WNP: Simpan lokasi vendor Indonesia saat aplikasi dikirim.
+                // Simpan lokasi vendor Indonesia saat aplikasi dikirim.
                 'step1' => [
                     'company_name' => 'Test Company',
-                    // Start Update 16 September 2026, by @WNP: Persist Indonesian identifiers during final application submission.
+                    // Persist Indonesian identifiers during final application submission.
                     'registration_number' => '1234567890123',
                     'tax_id' => '0123456789012345',
                     'deed_number' => 'DEED-000001',
                     'contact_person' => 'Test Person',
-                    // Start Update 14 September 2026, by @WNP: Use an Indonesian mobile number in the VMS submission fixture.
+                    // Use an Indonesian mobile number in the VMS submission fixture.
                     'contact_phone' => '081234567890',
                     'address' => '123 Test St',
                     'city' => 'Kota Bandung',
@@ -364,7 +363,7 @@ class VendorOnboardingTest extends TestCase
                     'pincode' => '40115',
                     'contact_email' => $this->vendorUser->email,
                 ],
-                // Start Update 11 September 2026, by @WNP: Persist Indonesian bank information on submission.
+                // Persist Indonesian bank information on submission.
                 'step2' => [
                     'bank_name' => 'Bank Mandiri',
                     'bank_account_number' => '1234567890',

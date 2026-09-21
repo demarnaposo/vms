@@ -8,7 +8,7 @@ use App\Models\PaymentRequest;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Notifications\WeeklySummaryGenerated;
-// Start Update 11 September 2026, by @WNP: Use the centralized formatter for weekly payment totals.
+// Use the centralized formatter for weekly payment totals.
 use App\Support\Currency;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -100,7 +100,6 @@ class GenerateWeeklySummary extends Command
                 [
                     ['Requested', $summary['payments']['requested']],
                     ['Approved', $summary['payments']['approved']],
-                    // Start Update 11 September 2026, by @WNP: Display weekly paid totals in Indonesian Rupiah format.
                     ['Paid Amount', Currency::format($summary['payments']['paid_amount'])],
                     ['Rejected', $summary['payments']['rejected']],
                 ]

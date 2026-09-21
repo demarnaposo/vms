@@ -10,7 +10,7 @@ trait Auditable
      * Fields to exclude from audit logging (sensitive data).
      */
     protected static array $auditExcludeFields = [
-        // Start Update 16 September 2026, by @WNP: Keep the vendor deed number out of audit payloads with other protected identifiers.
+        // Keep the vendor deed number out of audit payloads with other protected identifiers.
         'tax_id', 'deed_number', 'bank_account_number', 'bank_ifsc', 'password', 'remember_token',
     ];
 

@@ -1,6 +1,6 @@
 <?php
 
-// Start Update 11 September 2026, by @WNP: Centralize the application's default currency and Indonesian formatting settings.
+// Centralize the application's default currency and Indonesian formatting settings.
 return [
     'code' => env('CURRENCY_CODE', 'IDR'),
     'symbol' => env('CURRENCY_SYMBOL', 'Rp'),

@@ -1,7 +1,7 @@
 import { Link, useForm } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
 import Logo from '@/Components/Logo';
-// Start Update 11 September 2026, by @WNP: Enable bilingual password recovery and language selection.
+// Enable bilingual password recovery and language selection.
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { useLanguage } from '@/Contexts/LanguageContext';
 
@@ -18,9 +18,9 @@ export default function ForgotPassword({ status }) {
 
     return (
         <>
-            <Head title={`${t('Forgot Password')} - VMS`} />
+            <Head title={t('Forgot Password')} />
             <div className="min-h-screen flex items-center justify-center p-8 bg-(--color-bg-secondary)">
-                {/* Start Update 11 September 2026, by @WNP: Keep language selection available during password recovery. */}
+                {/* Keep language selection available during password recovery. */}
                 <div className="fixed right-4 top-4 z-50">
                     <LanguageSwitcher />
                 </div>

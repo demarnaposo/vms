@@ -1,12 +1,12 @@
 import { Link } from '@inertiajs/react';
 import { AdminLayout, Badge, Card, DataTable, PageHeader, StatCard, StatGrid } from '@/Components';
-// Start Update 13 September 2026, by @WNP: Translate fixed performance detail copy while retaining vendor and metric data.
+// Translate fixed performance detail copy while retaining vendor and metric data.
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 15 September 2026, by @WNP: Localize recognized performance master metric labels.
+// Localize recognized performance master metric labels.
 import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 
 export default function PerformanceShow({ vendor, breakdown = [], history = [] }) {
-    // Start Update 13 September 2026, by @WNP: Keep the company name outside translation lookup.
+    // Keep the company name outside translation lookup.
     const { language, t } = useLanguage();
     const currentScore = Number(vendor?.performance_score || 0);
     const averageMetricScore =
@@ -28,7 +28,7 @@ export default function PerformanceShow({ vendor, breakdown = [], history = [] }
             header: 'Metric',
             render: (row) => (
                 <span className="font-medium text-(--color-text-primary)">
-                    {/* Start Update 15 September 2026, by @WNP: Translate fixed metric labels and retain custom names. */}
+                    {/* Translate fixed metric labels and retain custom names. */}
                     {translateSystemMasterDataField(
                         language,
                         'performance_metrics',
@@ -73,7 +73,7 @@ export default function PerformanceShow({ vendor, breakdown = [], history = [] }
         },
     ];
 
-    // Start Update 13 September 2026, by @WNP: Localize the heading around the original company name.
+    // Localize the heading around the original company name.
     const header = (
         <PageHeader
             title={
@@ -90,14 +90,14 @@ export default function PerformanceShow({ vendor, breakdown = [], history = [] }
                         href={`/admin/performance/${vendor?.id}/rate`}
                         className="px-4 py-2 rounded-lg bg-(--color-brand-primary) text-white text-sm font-medium hover:bg-(--color-brand-primary-hover) transition-colors"
                     >
-                        {/* Start Update 13 September 2026, by @WNP: Translate the fixed rating action. */}
+                        {/* Translate the fixed rating action. */}
                         {t('Add Rating')}
                     </Link>
                     <Link
                         href="/admin/performance"
                         className="px-4 py-2 rounded-lg border border-(--color-border-primary) text-(--color-text-secondary) text-sm font-medium hover:bg-(--color-bg-secondary) transition-colors"
                     >
-                        {/* Start Update 13 September 2026, by @WNP: Translate the fixed back action. */}
+                        {/* Translate the fixed back action. */}
                         {t('Back')}
                     </Link>
                 </div>
@@ -137,7 +137,7 @@ export default function PerformanceShow({ vendor, breakdown = [], history = [] }
 
                 <Card title="Compliance Status">
                     <div className="p-4">
-                        {/* Start Update 13 September 2026, by @WNP: Translate only the fixed compliance-status enum label. */}
+                        {/* Translate only the fixed compliance-status enum label. */}
                         <Badge status={vendor?.compliance_status || 'info'}>
                             {vendor?.compliance_status
                                 ? t(vendor.compliance_status.replaceAll('_', ' '))
@@ -158,7 +158,7 @@ export default function PerformanceShow({ vendor, breakdown = [], history = [] }
                     <div className="p-4 space-y-3">
                         {history.length === 0 && (
                             <p className="text-(--color-text-tertiary)">
-                                {/* Start Update 13 September 2026, by @WNP: Translate the fixed empty history message. */}
+                                {/* Translate the fixed empty history message. */}
                                 {t('No monthly history available.')}
                             </p>
                         )}
@@ -173,7 +173,7 @@ export default function PerformanceShow({ vendor, breakdown = [], history = [] }
                                         {entry.month}
                                     </div>
                                     <div className="text-xs text-(--color-text-tertiary)">
-                                        {/* Start Update 13 September 2026, by @WNP: Localize the fixed count label, not the recorded scores. */}
+                                        {/* Localize the fixed count label, not the recorded scores. */}
                                         {t('Metrics recorded: :count', {
                                             count: entry.scores?.length || 0,
                                         })}

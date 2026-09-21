@@ -2,7 +2,7 @@ import { useState } from 'react';
 import AppIcon from '@/Components/AppIcon';
 import { useLanguage } from '@/Contexts/LanguageContext';
 
-// Start Update 15 September 2026, by @WNP: Provide a reusable accessible password visibility control for authentication forms.
+// Provide a reusable accessible password visibility control for authentication forms.
 export default function PasswordInput({
     value,
     onChange,
@@ -17,7 +17,7 @@ export default function PasswordInput({
 
     return (
         <div className="relative">
-            {/* Start Update 15 September 2026, by @WNP: Translate only the static password placeholder while preserving the entered value. */}
+            {/* Translate only the static password placeholder while preserving the entered value. */}
             <input
                 type={isVisible ? 'text' : 'password'}
                 value={value}

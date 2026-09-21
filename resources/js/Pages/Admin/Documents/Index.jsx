@@ -12,11 +12,11 @@ import {
     FormTextarea,
 } from '@/Components';
 import { DocumentViewer } from '@/Components/DocumentViewer';
-// Start Update 12 September 2026, by @WNP: Use shared language state for document filters and actions.
+// Use shared language state for document filters and actions.
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 15 September 2026, by @WNP: Resolve fixed master document labels through one shared helper.
+// Resolve fixed master document labels through one shared helper.
 import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
-// Start Update 12 September 2026, by @WNP: Format admin document upload dates in the selected locale.
+// Format admin document upload dates in the selected locale.
 import { formatDate, formatDateTime } from '@/utils/dateFormatters';
 
 const statusFilters = [
@@ -28,7 +28,7 @@ const statusFilters = [
 ];
 
 export default function DocumentsIndex({ documents, currentStatus = 'pending' }) {
-    // Start Update 12 September 2026, by @WNP: Translate document-specific labels and expiry descriptions.
+    // Translate document-specific labels and expiry descriptions.
     const { language, t } = useLanguage();
     const dateLocale = language === 'id' ? 'id-ID' : 'en-IN';
     const { auth } = usePage().props;
@@ -127,7 +127,7 @@ export default function DocumentsIndex({ documents, currentStatus = 'pending' })
             header: 'Document Type',
             render: (row) => (
                 <span className="text-(--color-text-secondary)">
-                    {/* Start Update 15 September 2026, by @WNP: Translate system master labels without translating custom database values. */}
+                    {/* Translate system master labels without translating custom database values. */}
                     {translateDocumentTypeLabel(language, row.document_type)}
                 </span>
             ),
@@ -241,7 +241,7 @@ export default function DocumentsIndex({ documents, currentStatus = 'pending' })
                             }`}
                             preserveScroll
                         >
-                            {/* Start Update 12 September 2026, by @WNP: Translate the document status tab, not its URL value. */}
+                            {/* Translate the document status tab, not its URL value. */}
                             {t(status.label)}
                         </Link>
                     ))}

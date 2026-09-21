@@ -2,11 +2,11 @@ import { router } from '@inertiajs/react';
 import { useState } from 'react';
 import { VendorLayout, PageHeader, Card, Button, AppIcon } from '@/Components';
 import { formatRelativeTime } from '@/utils/dateFormatters';
-// Start Update 15 September 2026, by @WNP: Translate vendor notification controls without altering stored notification content.
+// Translate vendor notification controls without altering stored notification content.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function Notifications({ vendor, notifications = { data: [] } }) {
-    // Start Update 15 September 2026, by @WNP: Use the selected language for static labels and relative timestamps.
+    // Use the selected language for static labels and relative timestamps.
     const { language, t } = useLanguage();
     const dateLocale = language === 'id' ? 'id-ID' : 'en-US';
     const [filter, setFilter] = useState('all');
@@ -75,7 +75,7 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
     };
 
     const header = (
-        // Start Update 15 September 2026, by @WNP: Localize singular and plural unread counts.
+        // Localize singular and plural unread counts.
         <PageHeader
             title="Notifications"
             subtitle={t(
@@ -119,7 +119,7 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                                     : 'bg-(--color-bg-secondary) text-(--color-text-secondary) hover:bg-(--color-bg-hover)'
                             }`}
                         >
-                            {/* Start Update 15 September 2026, by @WNP: Translate fixed filter labels while preserving filter codes. */}
+                            {/* Translate fixed filter labels while preserving filter codes. */}
                             {t(f.label)}
                             {f.count !== undefined && (
                                 <span
@@ -207,7 +207,7 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                                                         href={notification.data.action_url}
                                                         className="inline-flex items-center gap-1 text-sm text-(--color-brand-primary) hover:underline mt-2"
                                                     >
-                                                        {/* Start Update 15 September 2026, by @WNP: Preserve stored action text and translate only the system fallback. */}
+                                                        {/* Preserve stored action text and translate only the system fallback. */}
                                                         {notification.data.action_text ||
                                                             t('View Details')}
                                                     </a>

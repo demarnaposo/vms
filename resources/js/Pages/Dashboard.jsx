@@ -9,7 +9,7 @@ import {
     StatGrid,
     VendorLayout,
 } from '@/Components';
-// Start Update 11 September 2026, by @WNP: Translate dashboard content through the global language context.
+// Translate dashboard content through the global language context.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function Dashboard() {

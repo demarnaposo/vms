@@ -2,7 +2,7 @@ import { Head, usePage } from '@inertiajs/react';
 import React from 'react';
 import AppIcon from './AppIcon';
 import Sidebar from './Sidebar';
-// Start Update 11 September 2026, by @WNP: Translate vendor layout titles and status banners globally.
+// Translate vendor layout titles and status banners globally.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 // =====================================
@@ -137,7 +137,7 @@ export default function VendorLayout({
                                             strokeWidth={2.2}
                                         />
                                     </span>
-                                    {/* Start Update 11 September 2026, by @WNP: Translate known server flash messages before display. */}
+                                    {/* Translate known server flash messages before display. */}
                                     <span className="font-medium text-sm">{t(flash.success)}</span>
                                 </div>
                             )}
@@ -150,7 +150,7 @@ export default function VendorLayout({
                                             strokeWidth={2.2}
                                         />
                                     </span>
-                                    {/* Start Update 11 September 2026, by @WNP: Translate known server flash errors before display. */}
+                                    {/* Translate known server flash errors before display. */}
                                     <span className="font-medium text-sm">{t(flash.error)}</span>
                                 </div>
                             )}

@@ -12,13 +12,13 @@ const serviceProvider = readFileSync(
     'utf8'
 );
 
-// Start Update 16 September 2026, by @WNP: Keep throttled sensitive actions on the current page with feedback.
+// Keep throttled sensitive actions on the current page with feedback.
 test('sensitive-action throttling redirects back with a visible error', () => {
     assert.match(serviceProvider, /->with\('error', __\('alerts\.too_many_requests'\)\)/);
     assert.match(serviceProvider, /->withHeaders\(\$headers\)/);
 });
 
-// Start Update 16 September 2026, by @WNP: Ensure generic rate limits never use the not-found message.
+// Ensure generic rate limits never use the not-found message.
 test('the error page represents HTTP 429 accurately in both languages', () => {
     assert.match(errorPage, /429:\s*\{/);
     assert.match(errorPage, /title: 'Too Many Requests'/);

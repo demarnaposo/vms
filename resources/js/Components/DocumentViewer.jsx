@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import AppIcon from './AppIcon';
 import { formatDate } from '@/utils/dateFormatters';
-// Start Update 12 September 2026, by @WNP: Translate shared document preview controls for admin and vendor pages.
+// Translate shared document preview controls for admin and vendor pages.
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 15 September 2026, by @WNP: Translate only fixed master document type labels in previews.
+// Translate only fixed master document type labels in previews.
 import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
 
 export function DocumentViewer({ document, isOpen, onClose }) {
-    // Start Update 12 September 2026, by @WNP: Resolve preview labels using the active language.
+    // Resolve preview labels using the active language.
     const { language, t } = useLanguage();
     const dateLocale = language === 'id' ? 'id-ID' : 'en-IN';
     const viewUrl = document?.preview_url || (document ? `/documents/${document.id}/view` : '');
@@ -85,7 +85,7 @@ export function DocumentViewer({ document, isOpen, onClose }) {
                         </span>
                         <div className="min-w-0">
                             <h3 className="font-semibold text-(--color-text-primary) truncate max-w-md">
-                                {/* Start Update 15 September 2026, by @WNP: Localize fixed master labels and preserve custom document names. */}
+                                {/* Localize fixed master labels and preserve custom document names. */}
                                 {translateDocumentTypeLabel(
                                     language,
                                     document.document_type,

@@ -1,4 +1,4 @@
-// Start Update 11 September 2026, by @WNP: Translate reusable status badges consistently.
+// Translate reusable status badges consistently.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 const statusColors = {
@@ -41,7 +41,7 @@ const statusColors = {
     info: 'bg-(--color-info-light) text-(--color-info-dark)',
 };
 
-// Start Update 12 September 2026, by @WNP: Let database-backed status badges opt out of UI translation.
+// Let database-backed status badges opt out of UI translation.
 export default function Badge({
     status,
     variant,
@@ -54,7 +54,7 @@ export default function Badge({
     const resolvedStatus = status ?? variant ?? 'default';
     const colorClass =
         statusColors[resolvedStatus] || 'bg-(--color-bg-tertiary) text-(--color-text-tertiary)';
-    // Start Update 12 September 2026, by @WNP: Keep opt-out badges byte-for-byte with their stored status codes.
+    // Keep opt-out badges byte-for-byte with their stored status codes.
     const displayText =
         children || (translateLabel ? resolvedStatus?.replace(/_/g, ' ') : resolvedStatus);
 

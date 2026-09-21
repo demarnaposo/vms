@@ -85,13 +85,13 @@ class DocumentController extends Controller
         );
 
         $document->loadMissing('documentType');
-        // Start Update 16 September 2026, by @WNP: Translate only known VMS master document types in alerts.
+        // Translate only known VMS master document types in alerts.
         $documentType = $this->documentTypeLabel(
             $document->documentType->name,
             $document->documentType->display_name
         );
 
-        // Start Update 16 September 2026, by @WNP: Build the verification alert with the selectively localized document label.
+        // Build the verification alert with the selectively localized document label.
         return back()->with('success', __('alerts.document_verified', ['document' => $documentType]));
     }
 
@@ -129,13 +129,13 @@ class DocumentController extends Controller
         );
 
         $document->loadMissing('documentType');
-        // Start Update 16 September 2026, by @WNP: Preserve custom document names while localizing known master records.
+        // Preserve custom document names while localizing known master records.
         $documentType = $this->documentTypeLabel(
             $document->documentType->name,
             $document->documentType->display_name
         );
 
-        // Start Update 16 September 2026, by @WNP: Build the rejection alert with the selectively localized document label.
+        // Build the rejection alert with the selectively localized document label.
         return back()->with('success', __('alerts.document_rejected', ['document' => $documentType]));
     }
 
@@ -231,7 +231,7 @@ class DocumentController extends Controller
         return $resolvedPath;
     }
 
-    // Start Update 16 September 2026, by @WNP: Resolve localized master labels by stable key with a verbatim database fallback.
+    // Resolve localized master labels by stable key with a verbatim database fallback.
     private function documentTypeLabel(string $name, string $fallback): string
     {
         $translationKey = "master_data.document_types.{$name}";

@@ -1,13 +1,13 @@
 import { Link, useForm } from '@inertiajs/react';
 import { AdminLayout, PageHeader, Card, Button } from '@/Components';
-// Start Update 13 September 2026, by @WNP: Translate rating controls while keeping metric records and typed notes unchanged.
+// Translate rating controls while keeping metric records and typed notes unchanged.
 import { useLanguage } from '@/Contexts/LanguageContext';
-// Start Update 15 September 2026, by @WNP: Localize fixed performance metric master records in the rating form.
+// Localize fixed performance metric master records in the rating form.
 import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 
 export default function RateVendor({ vendor, metrics = [] }) {
-    // Start Update 13 September 2026, by @WNP: Resolve only fixed rating copy through the current UI language.
-    // Start Update 15 September 2026, by @WNP: Read the selected language for metric labels and descriptions.
+    // Resolve only fixed rating copy through the current UI language.
+    // Read the selected language for metric labels and descriptions.
     const { language, t } = useLanguage();
     const form = useForm({
         ratings: metrics.map((m) => ({
@@ -18,7 +18,7 @@ export default function RateVendor({ vendor, metrics = [] }) {
         period_start: new Date().toISOString().split('T')[0].slice(0, 7) + '-01',
         period_end: new Date().toISOString().split('T')[0],
     });
-    // Start Update 16 September 2026, by @WNP: Surface localized nested rating errors without duplicating messages.
+    // Surface localized nested rating errors without duplicating messages.
     const validationErrors = [...new Set(Object.values(form.errors).filter(Boolean))];
 
     const updateRating = (metricId, field, value) => {
@@ -33,7 +33,7 @@ export default function RateVendor({ vendor, metrics = [] }) {
         form.post(`/admin/performance/${vendor.id}/rate`);
     };
 
-    // Start Update 13 September 2026, by @WNP: Keep the database company name outside the translator.
+    // Keep the database company name outside the translator.
     const header = (
         <PageHeader
             title="Rate Performance"
@@ -48,7 +48,7 @@ export default function RateVendor({ vendor, metrics = [] }) {
                 {/* Validation Errors */}
                 {validationErrors.length > 0 && (
                     <div className="p-4 rounded-xl bg-(--color-danger-light) border border-(--color-danger) text-(--color-danger-dark) text-sm space-y-1">
-                        {/* Start Update 16 September 2026, by @WNP: Render every localized validation message, including metric-level errors. */}
+                        {/* Render every localized validation message, including metric-level errors. */}
                         {validationErrors.map((message) => (
                             <p key={message}>{message}</p>
                         ))}
@@ -61,7 +61,7 @@ export default function RateVendor({ vendor, metrics = [] }) {
                         <div className="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label className="text-sm font-medium text-(--color-text-secondary) mb-2 block">
-                                    {/* Start Update 16 September 2026, by @WNP: Localize the performance period start label. */}
+                                    {/* Localize the performance period start label. */}
                                     {t('Start Date')}
                                 </label>
                                 <input
@@ -73,7 +73,7 @@ export default function RateVendor({ vendor, metrics = [] }) {
                             </div>
                             <div>
                                 <label className="text-sm font-medium text-(--color-text-secondary) mb-2 block">
-                                    {/* Start Update 16 September 2026, by @WNP: Localize the performance period end label. */}
+                                    {/* Localize the performance period end label. */}
                                     {t('End Date')}
                                 </label>
                                 <input
@@ -91,7 +91,7 @@ export default function RateVendor({ vendor, metrics = [] }) {
                 <Card title="Performance Ratings">
                     <div className="p-6">
                         <p className="text-sm text-(--color-text-secondary) mb-6">
-                            {/* Start Update 13 September 2026, by @WNP: Translate fixed guidance, not scored metric values. */}
+                            {/* Translate fixed guidance, not scored metric values. */}
                             {t(
                                 'Rate each metric from 0 up to that metric max score. Scores are immutable once submitted.'
                             )}
@@ -109,7 +109,7 @@ export default function RateVendor({ vendor, metrics = [] }) {
                                         <div className="flex items-start justify-between mb-3">
                                             <div>
                                                 <div className="text-(--color-text-primary) font-medium">
-                                                    {/* Start Update 15 September 2026, by @WNP: Preserve custom metric labels and translate fixed ones. */}
+                                                    {/* Preserve custom metric labels and translate fixed ones. */}
                                                     {translateSystemMasterDataField(
                                                         language,
                                                         'performance_metrics',
@@ -118,7 +118,7 @@ export default function RateVendor({ vendor, metrics = [] }) {
                                                     )}
                                                 </div>
                                                 <div className="text-sm text-(--color-text-secondary)">
-                                                    {/* Start Update 15 September 2026, by @WNP: Translate only the recognized master description. */}
+                                                    {/* Translate only the recognized master description. */}
                                                     {translateSystemMasterDataField(
                                                         language,
                                                         'performance_metrics',
@@ -127,7 +127,7 @@ export default function RateVendor({ vendor, metrics = [] }) {
                                                     )}
                                                 </div>
                                                 <span className="text-xs text-(--color-brand-primary) mt-1 inline-block">
-                                                    {/* Start Update 13 September 2026, by @WNP: Translate the fixed weight label only. */}
+                                                    {/* Translate the fixed weight label only. */}
                                                     {t('Weight: :weight%', {
                                                         weight: (metric.weight * 100).toFixed(0),
                                                     })}
@@ -151,7 +151,7 @@ export default function RateVendor({ vendor, metrics = [] }) {
                                             }
                                             className="w-full h-2 bg-(--color-bg-tertiary) rounded-lg appearance-none cursor-pointer accent-(--color-brand-primary) mb-2"
                                         />
-                                        {/* Start Update 13 September 2026, by @WNP: Localize placeholder without modifying typed notes. */}
+                                        {/* Localize placeholder without modifying typed notes. */}
                                         <input
                                             type="text"
                                             value={rating?.notes || ''}

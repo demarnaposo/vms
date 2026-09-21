@@ -9,11 +9,11 @@ import {
     FormTextarea,
     FormSelect,
 } from '@/Components';
-// Start Update 12 September 2026, by @WNP: Translate notification delivery errors through the shared language context.
+// Translate notification delivery errors through the shared language context.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function SendNotification({ vendors = [], staffUsers = [] }) {
-    // Start Update 12 September 2026, by @WNP: Resolve static alert messages without translating recipient data.
+    // Resolve static alert messages without translating recipient data.
     const { t } = useLanguage();
     const form = useForm({
         title: '',
@@ -118,7 +118,7 @@ export default function SendNotification({ vendors = [], staffUsers = [] }) {
                             />
                         </div>
 
-                        {/* Start Update 12 September 2026, by @WNP: Preserve database recipient names in notification targeting. */}
+                        {/* Preserve database recipient names in notification targeting. */}
                         {showRecipientPicker && (
                             <FormSelect
                                 label="Select Recipient"
@@ -140,7 +140,7 @@ export default function SendNotification({ vendors = [], staffUsers = [] }) {
                             error={form.errors.action_url}
                         />
 
-                        {/* Start Update 12 September 2026, by @WNP: Localize the notification failure alert. */}
+                        {/* Localize the notification failure alert. */}
                         {form.errors.send && (
                             <p className="text-sm text-(--color-danger)">{t(form.errors.send)}</p>
                         )}

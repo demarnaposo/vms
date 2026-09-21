@@ -10,11 +10,11 @@ import {
     ModalPrimaryButton,
 } from '@/Components';
 import { formatDateTime } from '@/utils/dateFormatters';
-// Start Update 13 September 2026, by @WNP: Translate fixed contact-status choices, not user-entered messages or notes.
+// Translate fixed contact-status choices, not user-entered messages or notes.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function Show({ message }) {
-    // Start Update 15 September 2026, by @WNP: Resolve static labels and dates while retaining stored message content.
+    // Resolve static labels and dates while retaining stored message content.
     const { language, t } = useLanguage();
     const dateLocale = language === 'id' ? 'id-ID' : 'en-IN';
     const { data, setData, put, processing, errors } = useForm({
@@ -33,7 +33,7 @@ export default function Show({ message }) {
         router.delete(`/admin/contact-messages/${message.id}`);
     };
 
-    // Start Update 15 September 2026, by @WNP: Translate the static frame around the original sender name.
+    // Translate the static frame around the original sender name.
     const header = (
         <PageHeader
             title="Message Details"
@@ -51,7 +51,7 @@ export default function Show({ message }) {
         />
     );
 
-    // Start Update 15 September 2026, by @WNP: Localize the page title without translating the sender name.
+    // Localize the page title without translating the sender name.
     return (
         <AdminLayout
             title={t('Message from :name', { name: message.name })}
@@ -102,7 +102,7 @@ export default function Show({ message }) {
                     <div className="card">
                         <div className="p-6 border-b border-(--color-border-primary)">
                             <h3 className="text-lg font-semibold text-(--color-text-primary)">
-                                {/* Start Update 15 September 2026, by @WNP: Localize the fixed status action heading. */}
+                                {/* Localize the fixed status action heading. */}
                                 {t('Update Status')}
                             </h3>
                         </div>
@@ -116,7 +116,7 @@ export default function Show({ message }) {
                                     onChange={(e) => setData('status', e.target.value)}
                                     className="input-field w-full"
                                 >
-                                    {/* Start Update 13 September 2026, by @WNP: Keep canonical contact-status values for submissions. */}
+                                    {/* Keep canonical contact-status values for submissions. */}
                                     <option value="new">{t('new')}</option>
                                     <option value="read">{t('read')}</option>
                                     <option value="replied">{t('replied')}</option>
@@ -135,7 +135,7 @@ export default function Show({ message }) {
                                     className="input-field w-full resize-none"
                                     placeholder={t('Add notes for your team...')}
                                 />
-                                {/* Start Update 15 September 2026, by @WNP: Surface localized server validation while preserving typed notes. */}
+                                {/* Surface localized server validation while preserving typed notes. */}
                                 {errors.admin_notes && (
                                     <p className="text-sm text-(--color-danger) mt-1" role="alert">
                                         {t(errors.admin_notes)}
@@ -157,7 +157,7 @@ export default function Show({ message }) {
                     {/* Sender Info */}
                     <div className="card p-6">
                         <h3 className="text-sm font-semibold text-(--color-text-tertiary) uppercase tracking-wider mb-4">
-                            {/* Start Update 15 September 2026, by @WNP: Localize the fixed sender information heading. */}
+                            {/* Localize the fixed sender information heading. */}
                             {t('Sender Details')}
                         </h3>
                         <div className="space-y-4">
@@ -210,7 +210,7 @@ export default function Show({ message }) {
                                 </svg>
                             </div>
                             <h4 className="font-semibold text-(--color-text-primary)">
-                                {/* Start Update 15 September 2026, by @WNP: Localize quick-reply controls without changing the recipient. */}
+                                {/* Localize quick-reply controls without changing the recipient. */}
                                 {t('Quick Reply')}
                             </h4>
                         </div>

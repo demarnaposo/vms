@@ -60,15 +60,15 @@ class VendorManagementController extends Controller
     {
         $this->authorize('view', $vendor);
 
-        // Start Update 16 September 2026, by @WNP: Explicitly expose Indonesian tax and bank identifiers on the authorized staff summary.
-        // Start Update 16 September 2026, by @WNP: Expose the protected deed number on the authorized staff summary.
+
+        // Expose the protected deed number on the authorized staff summary.
         $vendor->makeVisible(['tax_id', 'deed_number', 'bank_account_number', 'bank_ifsc']);
 
         $vendor->load([
             'documents:id,vendor_id,document_type_id,file_name,verification_status,verification_notes,expiry_date,is_current,created_at' => [
                 'documentType:id,name,display_name',
             ],
-            // Start Update 13 September 2026, by @WNP: Include reason and provenance metadata for selective timeline comment localization.
+            // Include reason and provenance metadata for selective timeline comment localization.
             'stateLogs:id,vendor_id,user_id,from_status,to_status,comment,reason_code,metadata,created_at' => [
                 'user:id,name',
             ],
@@ -99,20 +99,20 @@ class VendorManagementController extends Controller
         // Compute mandatory document verification readiness (Feature 3)
         $mandatoryDocTypes = DocumentType::where('is_mandatory', true)
             ->where('is_active', true)
-            ->get(['id', 'name', 'display_name']);
+            ->get(['id', 'name', 'display_name', 'has_expiry']);
 
         $currentDocs = $vendor->documents->where('is_current', true);
 
         $docVerificationStatus = $mandatoryDocTypes->map(function ($docType) use ($currentDocs) {
             $doc = $currentDocs->where('document_type_id', $docType->id)->first();
 
-            $isVerified = $doc?->verification_status === 'verified';
-            if ($isVerified && $doc->expiry_date && \Carbon\Carbon::parse($doc->expiry_date)->startOfDay()->isPast()) {
-                $isVerified = false;
-            }
+            $isVerified = $doc?->verification_status === 'verified'
+                && ($doc->expiry_date
+                    ? ! \Carbon\Carbon::parse($doc->expiry_date)->startOfDay()->isPast()
+                    : ! $docType->has_expiry);
 
             return [
-                // Start Update 15 September 2026, by @WNP: Expose the stable master key so the UI translates only system document types.
+                // Expose the stable master key so the UI translates only system document types.
                 'document_type' => $docType->only(['name', 'display_name']),
                 'is_uploaded' => $doc !== null,
                 'verification_status' => $doc === null ? 'missing' : $doc->verification_status,
@@ -126,6 +126,7 @@ class VendorManagementController extends Controller
             'vendor' => $vendor,
             'docVerificationStatus' => $docVerificationStatus->values(),
             'allMandatoryDocsVerified' => $allMandatoryDocsVerified,
+            'activationReadiness' => $this->lifecycleService->activationReadiness($vendor),
         ]);
     }
 

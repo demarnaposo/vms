@@ -1,6 +1,6 @@
 <?php
 
-// Start Update 16 September 2026, by @WNP: Centralize English performance form validation labels and messages.
+// Centralize English performance form validation labels and messages.
 return [
     'fields' => [
         'ratings' => 'ratings',

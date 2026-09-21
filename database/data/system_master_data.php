@@ -102,7 +102,7 @@ return [
         ],
         [
             'name' => 'gst_certificate',
-            // Start Update 16 September 2026, by @WNP: Keep the stable key while presenting the complete taxpayer identifier label.
+            // Keep the stable key while presenting the complete taxpayer identifier label.
             'display_name' => 'Taxpayer Identification Number (NPWP) Document',
             'description' => 'Taxpayer identification document',
             'is_mandatory' => true,
@@ -113,7 +113,7 @@ return [
         ],
         [
             'name' => 'pan_card',
-            // Start Update 16 September 2026, by @WNP: Keep the stable key while presenting the complete business identifier label.
+            // Keep the stable key while presenting the complete business identifier label.
             'display_name' => 'Business Identification Number (NIB) Document',
             'description' => 'Business identification document',
             'is_mandatory' => true,
@@ -124,7 +124,7 @@ return [
         ],
         [
             'name' => 'cancelled_cheque',
-            // Start Update 16 September 2026, by @WNP: Use bank-account ownership proof for Indonesian transfers.
+            // Use bank-account ownership proof for Indonesian transfers.
             'display_name' => 'Bank Account Proof',
             'description' => 'Bank account ownership proof for payment verification',
             'is_mandatory' => true,
