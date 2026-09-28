@@ -14,13 +14,13 @@ export default function StepBank({ vendor, sessionData }) {
     const { data, setData, post, processing, errors } = useForm({
         bank_name: step2Session.bank_name || vendor?.bank_name || '',
         bank_account_number: step2Session.bank_account_number || vendor?.bank_account_number || '',
-        bank_ifsc: step2Session.bank_ifsc || vendor?.bank_ifsc || '',
+        code_bank: step2Session.code_bank || vendor?.code_bank || '',
         bank_branch: step2Session.bank_branch || vendor?.bank_branch || '',
     });
 
     const [clientErrors, setClientErrors] = useState({});
     // Derive bank resolution during render without extra state or external requests.
-    const resolvedBank = findIndonesianBankByCode(data.bank_ifsc);
+    const resolvedBank = findIndonesianBankByCode(data.code_bank);
 
     const validateBankName = (value) => {
         if (!value || value.trim() === '') return 'Bank Name is required.';
@@ -51,21 +51,21 @@ export default function StepBank({ vendor, sessionData }) {
         const bank = findIndonesianBankByCode(code);
         setData((prev) => ({
             ...prev,
-            bank_ifsc: code,
+            code_bank: code,
             bank_name: bank?.name || (resolvedBank ? '' : prev.bank_name),
         }));
 
-        if (clientErrors.bank_ifsc) {
+        if (clientErrors.code_bank) {
             setClientErrors((prev) => ({
                 ...prev,
-                bank_ifsc: validateBankCode(code),
+                code_bank: validateBankCode(code),
             }));
         }
     };
 
     const handleBankCodeBlur = () => {
-        const bankCodeError = validateBankCode(data.bank_ifsc);
-        setClientErrors((prev) => ({ ...prev, bank_ifsc: bankCodeError }));
+        const bankCodeError = validateBankCode(data.code_bank);
+        setClientErrors((prev) => ({ ...prev, code_bank: bankCodeError }));
     };
 
     const submit = (e) => {
@@ -73,14 +73,14 @@ export default function StepBank({ vendor, sessionData }) {
 
         const nameErr = validateBankName(data.bank_name);
         const accErr = validateAccountNumber(data.bank_account_number);
-        const bankCodeError = validateBankCode(data.bank_ifsc);
+        const bankCodeError = validateBankCode(data.code_bank);
         const branchErr = validateBranch(data.bank_branch);
 
         if (nameErr || accErr || bankCodeError || branchErr) {
             setClientErrors({
                 bank_name: nameErr,
                 bank_account_number: accErr,
-                bank_ifsc: bankCodeError,
+                code_bank: bankCodeError,
                 bank_branch: branchErr,
             });
             return;
@@ -110,6 +110,51 @@ export default function StepBank({ vendor, sessionData }) {
 
             <form onSubmit={submit} className="space-y-8">
                 <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-(--color-text-secondary)">
+                            {t('Bank Code')} <span className="text-(--color-danger)">*</span>
+                        </label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={data.code_bank}
+                                onChange={handleBankCodeChange}
+                                onBlur={handleBankCodeBlur}
+                                className={`${fieldClass('code_bank')} pr-10`}
+                                placeholder={t('e.g., 008')}
+                                inputMode="numeric"
+                                maxLength={3}
+                            />
+                            {resolvedBank && (
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                    <svg
+                                        className="h-5 w-5 text-(--color-success)"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M5 13l4 4L19 7"
+                                        />
+                                    </svg>
+                                </div>
+                            )}
+                        </div>
+                        <p className="text-xs text-(--color-text-tertiary)">
+                            {t(
+                                'Bank name is filled automatically for recognized Indonesian bank codes.'
+                            )}
+                        </p>
+                        {(clientErrors.code_bank || errors.code_bank) && (
+                            <p className="text-sm text-(--color-danger)">
+                                {t(clientErrors.code_bank || errors.code_bank)}
+                            </p>
+                        )}
+                    </div>
+
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-(--color-text-secondary)">
                             {t('Bank Name')} <span className="text-(--color-danger)">*</span>
@@ -170,58 +215,12 @@ export default function StepBank({ vendor, sessionData }) {
                                 }));
                             }}
                             className={fieldClass('bank_account_number')}
-                            placeholder={t('9-18 digit account number')}
+                            placeholder={t('e.g., 1234567890')}
                             maxLength={18}
                         />
                         {(clientErrors.bank_account_number || errors.bank_account_number) && (
                             <p className="text-sm text-(--color-danger)">
                                 {t(clientErrors.bank_account_number || errors.bank_account_number)}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {/* Use Indonesian Bank Code terminology. */}
-                            {t('Bank Code')} <span className="text-(--color-danger)">*</span>
-                        </label>
-                        <div className="relative">
-                            <input
-                                type="text"
-                                value={data.bank_ifsc}
-                                onChange={handleBankCodeChange}
-                                onBlur={handleBankCodeBlur}
-                                className={`${fieldClass('bank_ifsc')} pr-10`}
-                                placeholder="008"
-                                inputMode="numeric"
-                                maxLength={3}
-                            />
-                            {resolvedBank && (
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                    <svg
-                                        className="h-5 w-5 text-(--color-success)"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M5 13l4 4L19 7"
-                                        />
-                                    </svg>
-                                </div>
-                            )}
-                        </div>
-                        <p className="text-xs text-(--color-text-tertiary)">
-                            {t(
-                                'Bank name is filled automatically for recognized Indonesian bank codes.'
-                            )}
-                        </p>
-                        {(clientErrors.bank_ifsc || errors.bank_ifsc) && (
-                            <p className="text-sm text-(--color-danger)">
-                                {t(clientErrors.bank_ifsc || errors.bank_ifsc)}
                             </p>
                         )}
                     </div>

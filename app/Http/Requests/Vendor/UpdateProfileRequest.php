@@ -20,8 +20,8 @@ class UpdateProfileRequest extends FormRequest
     {
         // Normalize identifiers only when company fields are present in the request.
         $identifierData = [];
-        if ($this->has('registration_number')) {
-            $identifierData['registration_number'] = IndonesianBusinessIdentifier::normalize($this->input('registration_number'));
+        if ($this->has('business_identification_number')) {
+            $identifierData['business_identification_number'] = IndonesianBusinessIdentifier::normalize($this->input('business_identification_number'));
         }
         if ($this->has('tax_id')) {
             $identifierData['tax_id'] = IndonesianBusinessIdentifier::normalize($this->input('tax_id'));
@@ -30,9 +30,6 @@ class UpdateProfileRequest extends FormRequest
             $this->merge($identifierData);
         }
 
-        if (is_string($this->input('contact_phone'))) {
-            $this->merge(['contact_phone' => IndonesianMobilePhone::normalize($this->input('contact_phone'))]);
-        }
     }
 
     /**
@@ -70,7 +67,7 @@ class UpdateProfileRequest extends FormRequest
                 'bank_name' => 'required|string|max:255',
                 'bank_account_number' => ['required', 'string', 'regex:/^[0-9]{9,18}$/'],
                 // Validate Indonesian bank code for submitted vendor profiles.
-                'bank_ifsc' => ['required', 'string', 'regex:/^[0-9]{3}$/'],
+                'code_bank' => ['required', 'string', 'regex:/^[0-9]{3}$/'],
                 'bank_branch' => 'required|string|max:255',
             ];
         }
@@ -78,7 +75,7 @@ class UpdateProfileRequest extends FormRequest
         return [
             'company_name' => 'required|string|max:255',
             // Validate draft company identifiers as NIB and NPWP.
-            'registration_number' => ['required', 'string', 'regex:/^[0-9]{13}$/'],
+            'business_identification_number' => ['required', 'string', 'regex:/^[0-9]{13}$/'],
             'tax_id' => ['required', 'string', 'regex:/^[0-9]{15,16}$/'],
             // Keep draft company verification aligned with onboarding.
             'deed_number' => ['required', 'string', 'max:100'],
@@ -94,7 +91,7 @@ class UpdateProfileRequest extends FormRequest
             'bank_name' => 'required|string|max:255',
             'bank_account_number' => ['required', 'string', 'regex:/^[0-9]{9,18}$/'],
             // Validate Indonesian bank code for draft vendor profiles.
-            'bank_ifsc' => ['required', 'string', 'regex:/^[0-9]{3}$/'],
+            'code_bank' => ['required', 'string', 'regex:/^[0-9]{3}$/'],
             'bank_branch' => 'required|string|max:255',
         ];
     }
@@ -103,21 +100,21 @@ class UpdateProfileRequest extends FormRequest
     {
         return [
             // Keep profile identifier errors aligned with onboarding.
-            'registration_number.required' => 'Business Identification Number (NIB) is required.',
-            'registration_number.regex' => 'Business Identification Number (NIB) must be exactly 13 digits.',
+            'business_identification_number.required' => 'Business Identification Number (NIB) is required.',
+            'business_identification_number.regex' => 'Business Identification Number (NIB) must be exactly 13 digits.',
             'tax_id.required' => 'Taxpayer Identification Number (NPWP) is required.',
             'tax_id.regex' => 'Taxpayer Identification Number (NPWP) must be 15 or 16 digits.',
             'deed_number.required' => 'Deed of Establishment Number is required.',
             'deed_number.max' => 'Deed of Establishment Number may not exceed 100 characters.',
-            // Keep the VMS mobile validation message concise.
-            'contact_phone.regex' => 'Enter a valid mobile number (e.g. 081234567890 or +6281234567890).',
+            'contact_phone.required' => 'WhatsApp Number is required.',
+            'contact_phone.regex' => 'WhatsApp Number must start with 08 and contain digits only.',
             // Return location validation messages using Indonesian address terminology.
             'state.in' => 'Please select a valid Indonesian province.',
             'city.in' => 'Please select a valid regency or city for the selected province.',
             'pincode.regex' => 'Postal code must be exactly 5 digits.',
             'bank_account_number.regex' => 'Account number must be 9 to 18 digits.',
             // Return Indonesian bank code terminology in validation errors.
-            'bank_ifsc.regex' => 'Bank Code must be exactly 3 digits.',
+            'code_bank.regex' => 'Bank Code must be exactly 3 digits.',
         ];
     }
 }

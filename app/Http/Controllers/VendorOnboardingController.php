@@ -7,6 +7,7 @@ use App\Http\Requests\Vendor\StoreStep2Request;
 use App\Http\Requests\Vendor\StoreStep3Request;
 use App\Models\DocumentType;
 use App\Models\Vendor;
+use App\Models\VendorCategory;
 use App\Services\VendorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -39,11 +40,19 @@ class VendorOnboardingController extends Controller
             return redirect()->route('vendor.dashboard');
         }
 
-        $documentTypes = DocumentType::where('is_active', true)->get();
+        $documentTypes = DocumentType::query()->get();
 
         // Get draft application data from DB
         $application = $this->vendorService->getDraftApplication($user);
         $sessionData = $application->data ?? [];
+        $vendorCategories = VendorCategory::query()->where('is_active', true)->orderBy('display_name')->get(['id', 'code', 'display_name']);
+        $selectedId = $sessionData['step1']['category_id'] ?? $vendor?->category_id;
+        if ($selectedId && ! $vendorCategories->contains('id', (int) $selectedId)) {
+            $selectedCategory = VendorCategory::find($selectedId, ['id', 'code', 'display_name', 'is_active']);
+            if ($selectedCategory) {
+                $vendorCategories->push($selectedCategory);
+            }
+        }
 
         // Logic: current_step in DB is the max step reached.
         if ($step > $application->current_step && $step > 1) {
@@ -55,6 +64,7 @@ class VendorOnboardingController extends Controller
             'vendor' => $vendor,
             'documentTypes' => $documentTypes,
             'sessionData' => $sessionData,
+            'vendorCategories' => $vendorCategories,
         ]);
     }
 
@@ -111,12 +121,12 @@ class VendorOnboardingController extends Controller
         }
         $existingDocuments = $data['step3']['documents'] ?? [];
 
-        if (empty($incomingDocuments) && empty($existingDocuments)) {
+        if (empty($incomingDocuments) && empty($existingDocuments) && DocumentType::active()->mandatory()->exists()) {
             return redirect()->route('vendor.onboarding', ['step' => 3])
                 ->withErrors(['documents' => 'Please upload at least one document before continuing.']);
         }
 
-        $this->vendorService->storeOnboardingStep3($incomingDocuments);
+        $this->vendorService->storeOnboardingStep3($incomingDocuments, $request->validated('removed_document_type_ids', []));
 
         return redirect()->route('vendor.onboarding', ['step' => 4]);
     }
@@ -167,7 +177,7 @@ class VendorOnboardingController extends Controller
         }
 
         // Check mandatory documents
-        $mandatoryTypes = DocumentType::where('is_mandatory', true)->pluck('id')->toArray();
+        $mandatoryTypes = DocumentType::active()->where('is_mandatory', true)->pluck('id')->toArray();
         $uploadedTypes = collect($data['step3']['documents'] ?? [])->pluck('document_type_id')->toArray();
         $missingDocs = array_diff($mandatoryTypes, $uploadedTypes);
 
@@ -200,6 +210,8 @@ class VendorOnboardingController extends Controller
             $this->vendorService->submitApplication($user);
 
             return redirect()->route('vendor.dashboard')->with('success', 'Application submitted successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->route('vendor.onboarding', ['step' => array_key_exists('category_id', $e->errors()) ? 1 : 3])->withErrors($e->errors());
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Application submission failed', [
                 'user_id' => $user->id,

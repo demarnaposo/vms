@@ -66,7 +66,7 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
             };
         }
 
-        if (diffDays <= 30) {
+        if (diffDays <= (doc.document_type?.expiry_warning_days ?? 30)) {
             return {
                 text: t(
                     diffDays === 1
@@ -317,7 +317,15 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                     <FormSelect
                         label="Document Type"
                         value={uploadForm.data.document_type_id}
-                        onChange={(val) => uploadForm.setData('document_type_id', val)}
+                        onChange={(val) => {
+                            uploadForm.setData({
+                                ...uploadForm.data,
+                                document_type_id: val,
+                                expiry_date: '',
+                                file: null,
+                            });
+                            if (fileInputRef.current) fileInputRef.current.value = '';
+                        }}
                         translateOptions={false}
                         options={documentTypes.map((type) => ({
                             value: type.id,
@@ -328,11 +336,11 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                     />
                     {uploadForm.errors.document_type_id && (
                         <p className="text-sm text-(--color-danger)">
-                            {uploadForm.errors.document_type_id}
+                            {t(uploadForm.errors.document_type_id)}
                         </p>
                     )}
 
-                    <div>
+                    <div hidden={!requiresExpiryDate}>
                         <label className="text-sm font-medium text-(--color-text-secondary) mb-2 block">
                             {t('Expiry Date')} {requiresExpiryDate ? '' : t('(Optional)')}
                         </label>
@@ -355,7 +363,7 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                         </p>
                         {uploadForm.errors.expiry_date && (
                             <p className="text-sm text-(--color-danger) mt-1">
-                                {uploadForm.errors.expiry_date}
+                                {t(uploadForm.errors.expiry_date)}
                             </p>
                         )}
                     </div>
@@ -369,15 +377,36 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                             ref={fileInputRef}
                             onChange={(e) => uploadForm.setData('file', e.target.files[0])}
                             className="w-full bg-(--color-bg-primary) border-2 border-(--color-border-primary) rounded-xl px-4 py-3 text-(--color-text-primary) file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-(--color-brand-primary)/10 file:text-(--color-brand-primary) hover:file:bg-(--color-brand-primary)/20 transition-all"
-                            accept=".pdf,.jpg,.jpeg,.png"
+                            accept={(
+                                selectedDocumentType?.allowed_extensions || [
+                                    'pdf',
+                                    'jpg',
+                                    'jpeg',
+                                    'png',
+                                ]
+                            )
+                                .map((extension) => `.${extension}`)
+                                .join(',')}
                             required
                         />
                         <p className="text-xs text-(--color-text-muted) mt-1">
-                            {t('PDF, JPG, PNG up to 10MB')}
+                            {t('Allowed: :formats. Maximum: :size MB.', {
+                                formats: (
+                                    selectedDocumentType?.allowed_extensions || [
+                                        'pdf',
+                                        'jpg',
+                                        'jpeg',
+                                        'png',
+                                    ]
+                                )
+                                    .join(', ')
+                                    .toUpperCase(),
+                                size: selectedDocumentType?.max_file_size_mb || 10,
+                            })}
                         </p>
                         {uploadForm.errors.file && (
                             <p className="text-sm text-(--color-danger) mt-1">
-                                {uploadForm.errors.file}
+                                {t(uploadForm.errors.file)}
                             </p>
                         )}
                     </div>

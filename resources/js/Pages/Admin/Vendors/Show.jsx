@@ -23,11 +23,11 @@ import { translateTimelineComment } from '@/i18n/timelineComments';
 // Translate only fixed document types in vendor details.
 import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
 // Localize recognized compliance master labels in the vendor tab.
-import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 // Reuse automatic compliance-detail translations in the vendor tab.
 import { translateComplianceDetails } from '@/i18n/complianceDetails';
 // Render fixed business-type codes as localized display labels.
 import { translateBusinessType } from '@/i18n/businessTypes';
+import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 
 function DisabledActionTooltip({ disabled, content, children }) {
     const tooltipId = useId();
@@ -370,12 +370,13 @@ export default function VendorShow({
                     <Card title="Company Information">
                         <div className="p-6 space-y-3 text-sm">
                             {[
+                                ['Vendor ID', vendor?.vendor_number || '-'],
                                 ['Company Name', vendor?.company_name],
                                 // Display Indonesian vendor identifiers in the admin summary.
                                 // Use complete identifier labels in the company summary.
                                 [
                                     'Business Identification Number (NIB)',
-                                    vendor?.registration_number || '-',
+                                    vendor?.business_identification_number || '-',
                                 ],
                                 ['Taxpayer Identification Number (NPWP)', vendor?.tax_id || '-'],
                                 // Show the submitted deed number on the staff summary.
@@ -385,6 +386,8 @@ export default function VendorShow({
                                     'Business Type',
                                     translateBusinessType(language, vendor?.business_type),
                                 ],
+                                ['Category', vendor?.vendor_category?.display_name || '-'],
+                                ['Experience', vendor?.experience || '-'],
                             ].map(([label, value]) => (
                                 <div key={label} className="flex justify-between">
                                     <span className="text-(--color-text-secondary)">
@@ -400,7 +403,7 @@ export default function VendorShow({
                             {[
                                 ['Contact Person', vendor?.contact_person],
                                 ['Email', vendor?.contact_email],
-                                ['Phone', vendor?.contact_phone],
+                                ['WhatsApp Number', vendor?.contact_phone],
                                 // Tampilkan alamat Indonesia lengkap pada detail vendor admin.
                                 [
                                     'Address',
@@ -432,7 +435,7 @@ export default function VendorShow({
                                 ['Bank Name', vendor?.bank_name],
                                 ['Account No.', vendor?.bank_account_number],
                                 // Display Indonesian bank code terminology for admins.
-                                ['Bank Code', vendor?.bank_ifsc],
+                                ['Bank Code', vendor?.code_bank],
                                 ['Branch', vendor?.bank_branch || '-'],
                             ].map(([label, value]) => (
                                 <div key={label} className="flex justify-between">

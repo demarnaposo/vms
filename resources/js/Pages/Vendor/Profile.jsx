@@ -17,6 +17,7 @@ import { INDONESIAN_PROVINCES, getRegenciesForProvince } from '@/data/indonesian
 import { findIndonesianBankByCode } from '@/data/indonesianBanks';
 // Translate vendor profile tabs, fields, and actions.
 import { useLanguage } from '@/Contexts/LanguageContext';
+import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 // Match VMS profile phone input to Indonesian onboarding rules.
 import {
     sanitizeIndonesianMobileInput,
@@ -27,7 +28,7 @@ import {
 const BANK_CODE_REGEX = /^[0-9]{3}$/;
 
 export default function Profile({ vendor }) {
-    const { t } = useLanguage();
+    const { language, t } = useLanguage();
     const { auth } = usePage().props;
     const user = auth.user;
     const [isEditing, setIsEditing] = useState(false);
@@ -36,11 +37,12 @@ export default function Profile({ vendor }) {
 
     const form = useForm({
         company_name: vendor?.company_name || '',
-        registration_number: vendor?.registration_number || '',
+        business_identification_number: vendor?.business_identification_number || '',
         tax_id: vendor?.tax_id || '',
         // Display the submitted deed number with other locked company details.
         deed_number: vendor?.deed_number || '',
         business_type: vendor?.business_type || '',
+        experience: vendor?.experience || '',
         contact_person: vendor?.contact_person || '',
         contact_phone: vendor?.contact_phone || '',
         contact_email: vendor?.contact_email || user?.email || '',
@@ -50,14 +52,23 @@ export default function Profile({ vendor }) {
         pincode: vendor?.pincode || '',
         bank_name: vendor?.bank_name || '',
         bank_account_number: vendor?.bank_account_number || '',
-        bank_ifsc: vendor?.bank_ifsc || '',
+        code_bank: vendor?.code_bank || '',
         bank_branch: vendor?.bank_branch || '',
     });
 
     // Derive regency/city options only when the selected province changes.
     const cityOptions = useMemo(() => getRegenciesForProvince(form.data.state), [form.data.state]);
     // Derive Indonesian bank resolution without extra state or external requests.
-    const resolvedBank = findIndonesianBankByCode(form.data.bank_ifsc);
+    const resolvedBank = findIndonesianBankByCode(form.data.code_bank);
+    const categoryLabel = vendor?.vendor_category?.display_name || '-';
+    const vendorStatus = vendor?.status || 'draft';
+    const vendorStatusLabel = translateSystemMasterDataField(
+        language,
+        'vendor_states',
+        { name: vendorStatus },
+        'display_name',
+        vendorStatus.replaceAll('_', ' ')
+    );
 
     // --- Contact Validations ---
     const validateContactPerson = (value) => {
@@ -131,7 +142,7 @@ export default function Profile({ vendor }) {
             newErrors.bank_name = validateBankName(form.data.bank_name);
             newErrors.bank_account_number = validateAccountNumber(form.data.bank_account_number);
             // Validate the Indonesian bank code on profile submission.
-            newErrors.bank_ifsc = validateBankCode(form.data.bank_ifsc);
+            newErrors.code_bank = validateBankCode(form.data.code_bank);
             newErrors.bank_branch = validateBranch(form.data.bank_branch);
             hasError = Object.values(newErrors).some((e) => e !== '');
         }
@@ -162,7 +173,9 @@ export default function Profile({ vendor }) {
             subtitle="Manage your company information"
             actions={
                 <div className="flex items-center gap-3">
-                    <Badge status={vendor?.status || 'draft'} size="lg" />
+                    <Badge status={vendorStatus} size="lg" translateLabel={false}>
+                        {vendorStatusLabel}
+                    </Badge>
                     {!isEditing &&
                         vendor?.status !== 'draft' &&
                         activeTab !== 'company' &&
@@ -218,6 +231,12 @@ export default function Profile({ vendor }) {
                         <Card title="Company Details">
                             <div className="grid md:grid-cols-2 gap-6 p-6">
                                 <FormInput
+                                    label="Vendor ID"
+                                    value={vendor?.vendor_number || '-'}
+                                    onChange={() => {}}
+                                    disabled={true}
+                                />
+                                <FormInput
                                     label="Company Name"
                                     value={form.data.company_name}
                                     onChange={() => {}}
@@ -227,7 +246,7 @@ export default function Profile({ vendor }) {
                                 {/* Display Indonesian company identifiers on the vendor profile. */}
                                 <FormInput
                                     label="Business Identification Number (NIB)"
-                                    value={form.data.registration_number}
+                                    value={form.data.business_identification_number}
                                     onChange={() => {}}
                                     disabled={true}
                                 />
@@ -260,6 +279,20 @@ export default function Profile({ vendor }) {
                                         ]}
                                         disabled={true}
                                     />
+                                </div>
+                                <FormInput
+                                    label="Category"
+                                    value={categoryLabel}
+                                    onChange={() => {}}
+                                    disabled={true}
+                                />
+                                <div className="md:col-span-2">
+                                    <label className="text-sm font-medium text-(--color-text-secondary)">
+                                        {t('Experience')}
+                                    </label>
+                                    <p className="mt-2 min-h-[80px] whitespace-pre-wrap rounded-lg border border-(--color-border-primary) bg-(--color-bg-secondary) px-4 py-3 text-sm text-(--color-text-primary)">
+                                        {form.data.experience || '-'}
+                                    </p>
                                 </div>
                                 <div className="md:col-span-2 p-4 bg-(--color-bg-secondary) rounded-xl">
                                     <p className="text-sm text-(--color-text-tertiary) flex items-center gap-2">
@@ -330,13 +363,12 @@ export default function Profile({ vendor }) {
                                     )}
                                 </div>
 
-                                {/* Phone Number / Mobile */}
+                                {/* WhatsApp Number */}
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-(--color-text-secondary)">
-                                        {t('Phone Number / Mobile')}{' '}
+                                        {t('WhatsApp Number')}{' '}
                                         <span className="text-(--color-danger)">*</span>
                                     </label>
-                                    {/* Support 08 and +628 mobile entry with matching length limits. */}
                                     <input
                                         type="tel"
                                         inputMode="tel"
@@ -366,11 +398,12 @@ export default function Profile({ vendor }) {
                                         }}
                                         className={inputClass('contact_phone')}
                                         placeholder="081234567890"
+                                        maxLength={13}
                                         disabled={!isEditing}
                                     />
                                     {isEditing && (
                                         <p className="text-xs text-(--color-text-tertiary)">
-                                            {t('Use 08... or +628... for a mobile number.')}
+                                            {t('Use the 08xxxxxxxxxx format and digits only.')}
                                         </p>
                                     )}
                                     {getError('contact_phone') && (
@@ -617,7 +650,7 @@ export default function Profile({ vendor }) {
                                     <div className="relative">
                                         <input
                                             type="text"
-                                            value={form.data.bank_ifsc}
+                                            value={form.data.code_bank}
                                             onChange={(e) => {
                                                 const code = e.target.value
                                                     .replace(/\D/g, '')
@@ -625,30 +658,30 @@ export default function Profile({ vendor }) {
                                                 const bank = findIndonesianBankByCode(code);
                                                 form.setData((prev) => ({
                                                     ...prev,
-                                                    bank_ifsc: code,
+                                                    code_bank: code,
                                                     bank_name:
                                                         bank?.name ||
                                                         (resolvedBank ? '' : prev.bank_name),
                                                 }));
-                                                if (clientErrors.bank_ifsc) {
+                                                if (clientErrors.code_bank) {
                                                     setClientErrors((prev) => ({
                                                         ...prev,
-                                                        bank_ifsc: validateBankCode(code),
+                                                        code_bank: validateBankCode(code),
                                                     }));
                                                 }
                                             }}
                                             onBlur={() => {
                                                 if (isEditing) {
                                                     const bankCodeError = validateBankCode(
-                                                        form.data.bank_ifsc
+                                                        form.data.code_bank
                                                     );
                                                     setClientErrors((prev) => ({
                                                         ...prev,
-                                                        bank_ifsc: bankCodeError,
+                                                        code_bank: bankCodeError,
                                                     }));
                                                 }
                                             }}
-                                            className={`${inputClass('bank_ifsc')} pr-10`}
+                                            className={`${inputClass('code_bank')} pr-10`}
                                             placeholder="008"
                                             inputMode="numeric"
                                             maxLength={3}
@@ -677,9 +710,9 @@ export default function Profile({ vendor }) {
                                             'Bank name is filled automatically for recognized Indonesian bank codes.'
                                         )}
                                     </p>
-                                    {getError('bank_ifsc') && (
+                                    {getError('code_bank') && (
                                         <p className="text-sm text-(--color-danger)">
-                                            {getError('bank_ifsc')}
+                                            {getError('code_bank')}
                                         </p>
                                     )}
                                 </div>
@@ -739,11 +772,17 @@ export default function Profile({ vendor }) {
                                             <div className="text-sm text-(--color-text-tertiary)">
                                                 {t('Current Status')}
                                             </div>
-                                            <div className="text-lg font-semibold text-(--color-text-primary) capitalize mt-1">
-                                                {vendor?.status?.replaceAll('_', ' ') || 'Draft'}
+                                            <div className="text-lg font-semibold text-(--color-text-primary) mt-1">
+                                                {vendorStatusLabel}
                                             </div>
                                         </div>
-                                        <Badge status={vendor?.status || 'draft'} size="lg" />
+                                        <Badge
+                                            status={vendorStatus}
+                                            size="lg"
+                                            translateLabel={false}
+                                        >
+                                            {vendorStatusLabel}
+                                        </Badge>
                                     </div>
 
                                     <div className="grid md:grid-cols-2 gap-4">

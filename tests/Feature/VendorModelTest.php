@@ -2,14 +2,44 @@
 
 namespace Tests\Feature;
 
+use App\Models\AuditLog;
 use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class VendorModelTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_vendor_schema_factory_and_sensitive_casts_use_current_fields(): void
+    {
+        $vendor = Vendor::factory()->create();
+
+        $this->assertTrue(Schema::hasColumn('vendors', 'business_identification_number'));
+        $this->assertFalse(Schema::hasColumn('vendors', 'registration_number'));
+        $this->assertMatchesRegularExpression(
+            '/^[0-9]{13}$/',
+            $vendor->business_identification_number
+        );
+        $this->assertTrue(Schema::hasColumn('vendors', 'code_bank'));
+        $this->assertFalse(Schema::hasColumn('vendors', 'bank_ifsc'));
+        $this->assertSame('008', $vendor->code_bank);
+        $this->assertSame(
+            '008',
+            DB::table('vendors')->where('id', $vendor->id)->value('code_bank')
+        );
+        $this->assertArrayNotHasKey('code_bank', $vendor->toArray());
+
+        $auditLog = AuditLog::where('auditable_type', Vendor::class)
+            ->where('auditable_id', $vendor->id)
+            ->where('event', AuditLog::EVENT_CREATED)
+            ->firstOrFail();
+        $this->assertArrayNotHasKey('business_identification_number', $auditLog->new_values);
+        $this->assertArrayNotHasKey('code_bank', $auditLog->new_values);
+    }
 
     /**
      * Test vendor status helper methods.

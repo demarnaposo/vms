@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\VendorApplication;
+use App\Models\VendorCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -71,6 +72,11 @@ class DocumentExpiryWorkflowTest extends TestCase
     public function test_onboarding_submission_persists_document_expiry_date(): void
     {
         $user = $this->createVendorUser();
+        $category = VendorCategory::create([
+            'code' => 'test_services',
+            'display_name' => 'Test Services',
+            'is_active' => true,
+        ]);
 
         $documentType = DocumentType::create([
             'name' => 'service_agreement',
@@ -87,6 +93,7 @@ class DocumentExpiryWorkflowTest extends TestCase
             'data' => [
                 'step1' => [
                     'company_name' => 'Expiry Persist Co',
+                    'category_id' => $category->id,
                     'contact_person' => 'Owner',
                     'contact_phone' => '9999999999',
                     'deed_number' => 'DEED-000001',
@@ -101,13 +108,13 @@ class DocumentExpiryWorkflowTest extends TestCase
                     // Use Indonesian bank information in the application fixture.
                     'bank_name' => 'Bank Mandiri',
                     'bank_account_number' => '1234567890',
-                    'bank_ifsc' => '008',
+                    'code_bank' => '008',
                 ],
             ],
         ]);
 
         $expiryDate = now()->addDays(45)->format('Y-m-d');
-        $file = UploadedFile::fake()->create('agreement.pdf', 120);
+        $file = UploadedFile::fake()->createWithContent('agreement.pdf', "%PDF-1.4\n%%EOF");
 
         $this->actingAs($user)->post(route('vendor.onboarding.step3'), [
             'documents' => [
@@ -168,7 +175,7 @@ class DocumentExpiryWorkflowTest extends TestCase
         $this->assertNotNull($vendor);
     }
 
-    public function test_vendor_document_upload_allows_optional_expiry_for_non_expiry_document_type(): void
+    public function test_vendor_document_upload_rejects_expiry_for_non_expiry_document_type(): void
     {
         $user = $this->createVendorUser();
 
@@ -202,13 +209,8 @@ class DocumentExpiryWorkflowTest extends TestCase
             'document_type_id' => $documentType->id,
             'file' => $file,
             'expiry_date' => $expiryDate,
-        ])->assertSessionHasNoErrors();
+        ])->assertSessionHasErrors('expiry_date');
 
-        $document = $vendor->documents()
-            ->where('document_type_id', $documentType->id)
-            ->latest('id')
-            ->firstOrFail();
-
-        $this->assertSame($expiryDate, $document->expiry_date?->toDateString());
+        $this->assertDatabaseMissing('vendor_documents', ['vendor_id' => $vendor->id, 'document_type_id' => $documentType->id]);
     }
 }

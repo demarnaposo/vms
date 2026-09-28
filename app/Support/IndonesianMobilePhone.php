@@ -9,6 +9,6 @@ final class IndonesianMobilePhone
 
     public static function normalize(string $number): string
     {
-        return str_starts_with($number, '+62') ? '0'.substr($number, 3) : $number;
+        return $number;
     }
 }

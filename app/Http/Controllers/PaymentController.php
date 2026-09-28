@@ -47,7 +47,7 @@ class PaymentController extends Controller
 
         // Expose transfer account details only to staff authorized to disburse payments.
         if ($request->user()?->can('markPaid', $payment)) {
-            $payment->vendor?->makeVisible(['bank_account_number', 'bank_ifsc']);
+            $payment->vendor?->makeVisible(['bank_account_number', 'code_bank']);
         }
 
         return Inertia::render('Admin/Payments/Show', [

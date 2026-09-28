@@ -89,7 +89,7 @@ class VendorController extends Controller
     }
 
     /**
-     * Get active document types without caching empty results.
+     * Get active document types with commit-invalidated caching.
      */
     protected function getActiveDocumentTypes()
     {
@@ -125,6 +125,8 @@ class VendorController extends Controller
             );
 
             return back()->with('success', 'Document uploaded successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors());
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Document upload failed', [
                 'vendor_id' => $vendor->id,
@@ -201,10 +203,10 @@ class VendorController extends Controller
         /** @var \App\Models\User $user */
         $vendor = $user->vendor;
 
-
         if ($vendor) {
+            $vendor->load('vendorCategory');
             // Expose the protected deed number to its owning vendor profile.
-            $vendor->makeVisible(['tax_id', 'deed_number', 'bank_account_number', 'bank_ifsc']);
+            $vendor->makeVisible(['tax_id', 'deed_number', 'bank_account_number', 'code_bank']);
         }
 
         return Inertia::render('Vendor/Profile', [
@@ -235,7 +237,7 @@ class VendorController extends Controller
                 'pincode',
                 'bank_name',
                 'bank_account_number',
-                'bank_ifsc',
+                'code_bank',
                 'bank_branch',
             ];
             $attempted = array_diff(array_keys($request->validated()), $allowedFields);

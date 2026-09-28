@@ -10,7 +10,14 @@ import Logo from '../../../Components/Logo.jsx';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { useLanguage } from '@/Contexts/LanguageContext';
 
-export default function Wizard({ auth, currentStep = 1, vendor, documentTypes, sessionData = {} }) {
+export default function Wizard({
+    auth,
+    currentStep = 1,
+    vendor,
+    documentTypes,
+    vendorCategories = [],
+    sessionData = {},
+}) {
     const { t } = useLanguage();
     const [step, setStep] = useState(currentStep);
 
@@ -103,7 +110,13 @@ export default function Wizard({ auth, currentStep = 1, vendor, documentTypes, s
                 </div>
 
                 {/* Steps Content */}
-                {step === 1 && <StepCompany vendor={vendor} sessionData={sessionData} />}
+                {step === 1 && (
+                    <StepCompany
+                        vendor={vendor}
+                        sessionData={sessionData}
+                        vendorCategories={vendorCategories}
+                    />
+                )}
                 {step === 2 && <StepBank vendor={vendor} sessionData={sessionData} />}
                 {step === 3 && (
                     <StepDocuments documentTypes={documentTypes} sessionData={sessionData} />
@@ -113,6 +126,7 @@ export default function Wizard({ auth, currentStep = 1, vendor, documentTypes, s
                         vendor={vendor}
                         sessionData={sessionData}
                         documentTypes={documentTypes}
+                        vendorCategories={vendorCategories}
                     />
                 )}
             </main>

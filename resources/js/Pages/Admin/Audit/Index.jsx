@@ -2,7 +2,11 @@ import { AdminLayout, PageHeader, DataTable, Badge, Card } from '@/Components';
 import { formatDateTime } from '@/utils/dateFormatters';
 // Translate known audit codes while preserving user-entered audit content.
 import { useLanguage } from '@/Contexts/LanguageContext';
-import { translateAuditEntity, translateAuditEvent } from '@/i18n/auditLabels';
+import {
+    translateAuditDescription,
+    translateAuditEntity,
+    translateAuditEvent,
+} from '@/i18n/auditLabels';
 
 export default function AuditIndex({ logs = {} }) {
     // Use the selected locale for fixed labels and recorded timestamps.
@@ -49,8 +53,10 @@ export default function AuditIndex({ logs = {} }) {
             header: 'Description',
             render: (row) => (
                 <span className="text-(--color-text-secondary) text-sm">
-                    {/* Leave reasons and descriptions verbatim; translate only the empty fallback. */}
-                    {row.reason || row.description || t('No details')}
+                    {/* Localize VMS descriptions while preserving staff-entered reasons. */}
+                    {row.reason || row.description
+                        ? translateAuditDescription(language, row.reason || row.description)
+                        : t('No details')}
                 </span>
             ),
         },

@@ -5,12 +5,13 @@ namespace App\Models;
 use App\Notifications\VendorEmailVerification;
 use App\Traits\HasRoles;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements HasLocalePreference, MustVerifyEmail
 {
     use HasFactory, HasRoles, Notifiable;
 
@@ -25,6 +26,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'phone',
         'password',
         'is_active',
+        'preferred_locale',
     ];
 
     /**
@@ -72,5 +74,14 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new VendorEmailVerification);
+    }
+
+    public function preferredLocale(): string
+    {
+        $locale = $this->preferred_locale;
+
+        return in_array($locale, config('app.supported_locales', ['en']), true)
+            ? $locale
+            : app()->getLocale();
     }
 }

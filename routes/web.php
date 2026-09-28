@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\StaffUserController;
 use App\Http\Controllers\Admin\SystemHealthController;
+use App\Http\Controllers\Admin\VendorCategoryController;
 use App\Http\Controllers\Admin\VendorManagementController;
 use App\Http\Controllers\ComplianceController;
 use App\Http\Controllers\DashboardRedirectController;
@@ -33,6 +34,8 @@ Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'store'
     ->name('contact.store');
 Route::get('/privacy', fn () => Inertia::render('Privacy'))->name('privacy');
 Route::get('/terms', fn () => Inertia::render('Terms'))->name('terms');
+
+Route::post('/locale', fn () => response()->noContent())->name('locale.update');
 
 Route::middleware(['auth', EnsureVendorAccountIsActive::class, EnsureVendorEmailIsVerified::class])->group(function () {
     // Default Dashboard - redirects based on role
@@ -213,6 +216,15 @@ Route::middleware(['auth', EnsureVendorAccountIsActive::class, EnsureVendorEmail
     // SUPER ADMIN ONLY ROUTES
     // ==========================================
     Route::middleware(['role:super_admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/document-types', [\App\Http\Controllers\Admin\DocumentTypeController::class, 'index'])->name('document-types.index');
+        Route::post('/document-types', [\App\Http\Controllers\Admin\DocumentTypeController::class, 'store'])->name('document-types.store');
+        Route::put('/document-types/{documentType}', [\App\Http\Controllers\Admin\DocumentTypeController::class, 'update'])->name('document-types.update');
+        Route::delete('/document-types/{documentType}', [\App\Http\Controllers\Admin\DocumentTypeController::class, 'destroy'])->name('document-types.destroy');
+
+        Route::get('/vendor-categories', [VendorCategoryController::class, 'index'])->name('vendor-categories.index');
+        Route::post('/vendor-categories', [VendorCategoryController::class, 'store'])->name('vendor-categories.store');
+        Route::put('/vendor-categories/{vendorCategory}', [VendorCategoryController::class, 'update'])->name('vendor-categories.update');
+        Route::delete('/vendor-categories/{vendorCategory}', [VendorCategoryController::class, 'destroy'])->name('vendor-categories.destroy');
         Route::get('/audit', [AuditLogController::class, 'index'])->name('audit.index');
         Route::patch('/compliance/rules/{rule}', [ComplianceController::class, 'updateRule'])
             ->middleware('throttle:sensitive-action')

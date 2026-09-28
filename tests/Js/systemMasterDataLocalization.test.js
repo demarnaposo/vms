@@ -105,3 +105,32 @@ test('preserves unknown database master records verbatim', () => {
         'Manual Prototype-like Name'
     );
 });
+
+test('preserves admin-managed vendor category names verbatim', () => {
+    const category = { name: 'it_multimedia', display_name: 'Admin Category Name' };
+    assert.equal(
+        translateSystemMasterDataField('id', 'vendor_categories', category),
+        'Admin Category Name'
+    );
+});
+
+test('document type labels and descriptions edited by admin remain verbatim', () => {
+    const name = Object.keys(SYSTEM_MASTER_DATA.document_types)[0];
+    assert.equal(
+        translateSystemMasterDataField('id', 'document_types', {
+            name,
+            display_name: 'Custom label',
+            description: 'Custom description',
+        }),
+        'Custom label'
+    );
+    assert.equal(
+        translateSystemMasterDataField(
+            'id',
+            'document_types',
+            { name, description: 'Custom description' },
+            'description'
+        ),
+        'Custom description'
+    );
+});

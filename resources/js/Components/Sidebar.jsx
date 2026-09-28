@@ -1,5 +1,5 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import AppIcon from './AppIcon';
 import Logo from './Logo';
 // Translate sidebar content and expose the global language switch.
@@ -13,6 +13,31 @@ import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 // =====================================
 const adminNavConfig = [
     { name: 'Dashboard', icon: 'dashboard', href: '/admin/dashboard' },
+    {
+        name: 'Master Data',
+        icon: 'metrics',
+        allowedRoles: ['super_admin'],
+        children: [
+            {
+                name: 'Vendor Categories',
+                icon: 'vendors',
+                href: '/admin/vendor-categories',
+                allowedRoles: ['super_admin'],
+            },
+            {
+                name: 'Document Types',
+                icon: 'documents',
+                href: '/admin/document-types',
+                allowedRoles: ['super_admin'],
+            },
+            {
+                name: 'Staff Users',
+                icon: 'staff',
+                href: '/admin/staff-users',
+                permission: 'view_audit',
+            },
+        ],
+    },
     { name: 'Vendors', icon: 'vendors', href: '/admin/vendors' },
     {
         name: 'Documents',
@@ -37,12 +62,6 @@ const adminNavConfig = [
     },
     { name: 'Payments', icon: 'payments', href: '/admin/payments' },
     { name: 'Audit Logs', icon: 'audit', href: '/admin/audit', permission: 'view_audit' },
-    {
-        name: 'Staff Users',
-        icon: 'staff',
-        href: '/admin/staff-users',
-        permission: 'view_audit',
-    },
     {
         name: 'Messages',
         icon: 'messages',
@@ -252,6 +271,49 @@ function NavItem({ item, isActive }) {
     );
 }
 
+function NavGroup({ item, activeItem }) {
+    const { t } = useLanguage();
+    const panelId = useId();
+    const hasActiveChild = item.children.some((child) => child.name === activeItem);
+    const [isOpen, setIsOpen] = useState(hasActiveChild);
+
+    return (
+        <div>
+            <button
+                type="button"
+                aria-expanded={isOpen}
+                aria-controls={panelId}
+                onClick={() => setIsOpen((open) => !open)}
+                className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) ${
+                    hasActiveChild
+                        ? 'text-(--color-brand-primary) bg-(--color-brand-primary-light)'
+                        : 'text-(--color-text-secondary) hover:bg-(--color-bg-hover) hover:text-(--color-text-primary)'
+                }`}
+            >
+                <span className="w-6 flex justify-center">
+                    <IconRenderer icon={item.icon} />
+                </span>
+                <span>{t(item.name)}</span>
+                <AppIcon
+                    name="chevron-down"
+                    className={`ml-auto h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                />
+            </button>
+            {isOpen && (
+                <div id={panelId} className="ml-6 border-l border-(--color-border-primary) pl-2">
+                    {item.children.map((child) => (
+                        <NavItem
+                            key={child.name}
+                            item={child}
+                            isActive={activeItem === child.name}
+                        />
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
 // =====================================
 // MAIN SIDEBAR COMPONENT
 // =====================================
@@ -277,18 +339,21 @@ export default function Sidebar({
 
     const navConfig = customNav || (variant === 'vendor' ? vendorNavConfig : adminNavConfig);
 
-    const visibleItems = navConfig
-        .filter((item) => {
-            const hasPermission = !item.permission || can[item.permission];
-            const hasRoleAccess =
-                !item.allowedRoles || item.allowedRoles.some((role) => roles.includes(role));
+    const canSeeItem = (item) => {
+        const hasPermission = !item.permission || can[item.permission];
+        const hasRoleAccess =
+            !item.allowedRoles || item.allowedRoles.some((role) => roles.includes(role));
 
-            return hasPermission && hasRoleAccess;
-        })
+        return hasPermission && hasRoleAccess;
+    };
+    const visibleItems = navConfig
+        .filter(canSeeItem)
         .map((item) => ({
             ...item,
             badge: badges[item.name] || null,
-        }));
+            children: item.children?.filter(canSeeItem),
+        }))
+        .filter((item) => !item.children || item.children.length > 0);
 
     // Translate fixed roles and retain unknown role codes as readable fallbacks.
     const roleDisplay =
@@ -307,6 +372,7 @@ export default function Sidebar({
             : t('Staff');
 
     const logoText = variant === 'vendor' ? 'Vendor Portal' : 'Admin Panel';
+    const translatedLogoText = t(logoText);
 
     return (
         <>
@@ -327,7 +393,7 @@ export default function Sidebar({
                     md:translate-x-0
                     ${isOpen ? 'translate-x-0' : '-translate-x-full'}
                 `}
-                aria-label={`${t(logoText)} navigation`}
+                aria-label={`${translatedLogoText} navigation`}
             >
                 {/* Logo - matches PageHeader height */}
                 <div className="h-[73px] px-5 border-b border-(--color-border-primary) flex items-center justify-between">
@@ -336,10 +402,10 @@ export default function Sidebar({
                         <div className="h-8 w-px bg-(--color-border-primary) mx-1"></div>
                         <div className="flex flex-col justify-center">
                             <span className="text-[10px] uppercase tracking-wider font-bold text-(--color-text-muted) group-hover:text-(--color-brand-primary) transition-colors">
-                                {logoText.split(' ')[0]}
+                                {translatedLogoText.split(' ')[0]}
                             </span>
                             <span className="text-[10px] uppercase tracking-wider font-bold text-(--color-text-muted) opacity-70 group-hover:text-(--color-brand-secondary) transition-colors">
-                                {logoText.split(' ')[1]}
+                                {translatedLogoText.split(' ')[1]}
                             </span>
                         </div>
                     </Link>
@@ -356,9 +422,17 @@ export default function Sidebar({
 
                 {/* Navigation */}
                 <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-                    {visibleItems.map((item) => (
-                        <NavItem key={item.name} item={item} isActive={activeItem === item.name} />
-                    ))}
+                    {visibleItems.map((item) =>
+                        item.children ? (
+                            <NavGroup key={item.name} item={item} activeItem={activeItem} />
+                        ) : (
+                            <NavItem
+                                key={item.name}
+                                item={item}
+                                isActive={activeItem === item.name}
+                            />
+                        )
+                    )}
                 </nav>
 
                 {/* User Section */}

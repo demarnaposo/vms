@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\VendorNumberGenerator;
 use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,11 +21,13 @@ class Vendor extends Model
     protected $fillable = [
         'user_id',
         'company_name',
-        'registration_number',
+        'business_identification_number',
         'tax_id',
         // Store the vendor deed number under its actual business meaning.
         'deed_number',
         'business_type',
+        'category_id',
+        'experience',
         'contact_person',
         'contact_email',
         'contact_phone',
@@ -35,7 +38,7 @@ class Vendor extends Model
         'pincode',
         'bank_name',
         'bank_account_number',
-        'bank_ifsc',
+        'code_bank',
         'bank_branch',
         'status',
         'compliance_status',
@@ -51,7 +54,7 @@ class Vendor extends Model
         'tax_id',
         'deed_number',
         'bank_account_number',
-        'bank_ifsc',
+        'code_bank',
         'internal_notes',
     ];
 
@@ -64,8 +67,20 @@ class Vendor extends Model
         'tax_id' => 'encrypted',
         'deed_number' => 'encrypted',
         'bank_account_number' => 'encrypted',
-        'bank_ifsc' => 'encrypted',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Vendor $vendor): void {
+            $vendor->vendor_number = app(VendorNumberGenerator::class)->next();
+        });
+
+        static::updating(function (Vendor $vendor): void {
+            if ($vendor->isDirty('vendor_number')) {
+                throw new InvalidArgumentException('Vendor ID is immutable.');
+            }
+        });
+    }
 
     // Status constants
     const STATUS_DRAFT = 'draft';
@@ -123,6 +138,11 @@ class Vendor extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function vendorCategory(): BelongsTo
+    {
+        return $this->belongsTo(VendorCategory::class, 'category_id');
     }
 
     /**

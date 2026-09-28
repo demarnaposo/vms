@@ -43,6 +43,7 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'preferred_locale' => app()->getLocale(),
         ]);
 
         // Public registration is restricted to vendor role only.

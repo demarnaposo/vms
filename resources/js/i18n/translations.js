@@ -1,5 +1,44 @@
 // Centralize Indonesian translations while English remains the source-language fallback.
 export const INDONESIAN_TRANSLATIONS = Object.freeze({
+    'Your email language preference could not be saved. Please try again.':
+        'Pilihan bahasa email Anda tidak dapat disimpan. Silakan coba lagi.',
+    Mandatory: 'Wajib',
+    'Document requirements have changed. Replace the affected documents using the current requirements.':
+        'Persyaratan dokumen telah berubah. Ganti dokumen terkait mengikuti persyaratan saat ini.',
+    'A saved document is unavailable or its type is inactive. Replace or remove it in the document step.':
+        'Dokumen tersimpan tidak tersedia atau jenisnya nonaktif. Ganti atau hapus dari langkah dokumen.',
+    'This document type is inactive. Remove it from the draft to continue.':
+        'Jenis dokumen ini nonaktif. Hapus dari draf untuk melanjutkan.',
+    'Remove this document from the draft?': 'Hapus dokumen ini dari draf?',
+    'Remove from draft': 'Hapus dari draf',
+    'Allowed: :formats. Maximum: :size MB.': 'Diizinkan: :formats. Maksimum: :size MB.',
+    'e.g., Proof of current insurance coverage': 'contoh: Bukti perlindungan asuransi yang berlaku',
+    'e.g., Insurance Certificate': 'contoh: Sertifikat Asuransi',
+    'e.g., insurance_certificate': 'contoh: sertifikat_asuransi',
+    'Supported formats: PDF, JPG, JPEG, PNG. Maximum size: 10 MB.':
+        'Format yang didukung: PDF, JPG, JPEG, PNG. Ukuran maksimum: 10 MB.',
+    'Has Expiry': 'Memiliki Masa Berlaku',
+    'Allowed Extensions': 'Ekstensi yang Diizinkan',
+    'Expiry Warning Days': 'Hari Peringatan Kedaluwarsa',
+    'Maximum File Size (MB)': 'Ukuran File Maksimum (MB)',
+    'Document type deleted.': 'Jenis dokumen dihapus.',
+    'Document type updated.': 'Jenis dokumen diperbarui.',
+    'Document type created.': 'Jenis dokumen ditambahkan.',
+    'This document type is in use. Deactivate it instead.':
+        'Jenis dokumen ini sedang digunakan. Nonaktifkan jenis tersebut.',
+    'Document types used by documents, drafts or compliance cannot be deleted. Deactivate them instead.':
+        'Jenis yang digunakan dokumen, draf, atau kepatuhan tidak dapat dihapus. Nonaktifkan jenis tersebut.',
+    'Delete this document type?': 'Hapus jenis dokumen ini?',
+    'Document type codes cannot be changed after creation.':
+        'Kode jenis dokumen tidak dapat diubah setelah dibuat.',
+    'No document types yet.': 'Belum ada jenis dokumen.',
+    'Manage vendor document requirements.': 'Kelola persyaratan dokumen vendor.',
+    'Delete Document Type': 'Hapus Jenis Dokumen',
+    'Edit Document Type': 'Ubah Jenis Dokumen',
+    'Add Document Type': 'Tambah Jenis Dokumen',
+    'Document Type Code': 'Kode Jenis Dokumen',
+    'Document Type Name': 'Nama Jenis Dokumen',
+    'Document Types': 'Jenis Dokumen',
     Language: 'Bahasa',
     English: 'Inggris',
     Indonesian: 'Indonesia',
@@ -16,6 +55,33 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
         'VMS menyatukan pendaftaran vendor, kepatuhan, dokumen, dan pembayaran dalam satu ruang kerja yang rapi.',
     Dashboard: 'Dasbor',
     Vendors: 'Vendor',
+    'Vendor Categories': 'Kategori Vendor',
+    'Master Data': 'Data Master',
+    'Manage categories used during vendor registration.':
+        'Kelola kategori untuk pendaftaran vendor.',
+    'Add Category': 'Tambah Kategori',
+    'Edit Category': 'Ubah Kategori',
+    'Category Code': 'Kode Kategori',
+    'Category Name': 'Nama Kategori',
+    'No vendor categories yet.': 'Belum ada kategori vendor.',
+    'Deactivate it instead.': 'Nonaktifkan kategori sebagai gantinya.',
+    'Delete this category?': 'Hapus kategori ini?',
+    'This category is in use. Deactivate it instead.':
+        'Kategori ini sedang digunakan. Nonaktifkan kategori sebagai gantinya.',
+    'Vendor category created.': 'Kategori vendor ditambahkan.',
+    'Vendor category updated.': 'Kategori vendor diperbarui.',
+    'Vendor category deleted.': 'Kategori vendor dihapus.',
+    'Delete Category': 'Hapus Kategori',
+    'Category codes cannot be changed after creation.':
+        'Kode kategori tidak dapat diubah setelah dibuat.',
+    'Delete this vendor category?': 'Hapus kategori vendor ini?',
+    'Categories used by vendors or drafts cannot be deleted. Deactivate them instead.':
+        'Kategori yang digunakan vendor atau draf tidak dapat dihapus. Nonaktifkan kategori tersebut.',
+    'Saving…': 'Menyimpan…',
+    'Deleting…': 'Menghapus…',
+    Inactive: 'Nonaktif',
+    'e.g., office_supplies': 'contoh: perlengkapan_kantor',
+    'e.g., Office Supplies': 'contoh: Perlengkapan Kantor',
     Vendor: 'Vendor',
     Documents: 'Dokumen',
     Compliance: 'Kepatuhan',
@@ -405,7 +471,9 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'e.g., Bank Mandiri': 'contoh: Bank Mandiri',
     'Account Number': 'Nomor Rekening',
     '9-18 digit account number': 'Nomor rekening 9-18 digit',
+    'e.g., 1234567890': 'contoh: 1234567890',
     'Bank Code': 'Kode Bank',
+    'e.g., 008': 'contoh: 008',
     'Branch Name': 'Nama Cabang',
     'e.g., KCP Jakarta Menteng': 'contoh: KCP Jakarta Menteng',
     'Bank Name is required.': 'Nama bank wajib diisi.',
@@ -420,6 +488,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Enter the branch registered for this account.':
         'Masukkan nama cabang yang terdaftar pada rekening ini.',
     'Company Information': 'Informasi Perusahaan',
+    'Vendor ID': 'ID Vendor',
     'Tell us about your business entity.': 'Ceritakan tentang badan usaha Anda.',
     'Company Name': 'Nama Perusahaan',
     // Localize company-field validation displayed during onboarding.
@@ -427,8 +496,36 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Company Name may not exceed 255 characters.':
         'Nama perusahaan tidak boleh lebih dari 255 karakter.',
     'Legal Entity Name': 'Nama badan hukum',
+    'e.g., PPM Manajemen': 'contoh: PPM Manajemen',
     'Business Type': 'Jenis Usaha',
     'Select Type': 'Pilih jenis usaha',
+    Category: 'Kategori',
+    'Select Category': 'Pilih kategori',
+    'Category is required.': 'Kategori wajib dipilih.',
+    'Please select a valid category.': 'Silakan pilih kategori yang valid.',
+    Experience: 'Pengalaman',
+    'Experience is required.': 'Pengalaman wajib diisi.',
+    'Experience may not exceed 2000 characters.':
+        'Pengalaman tidak boleh lebih dari 2000 karakter.',
+    'e.g., Software procurement for PPM Manajemen in 2025.':
+        'contoh: Pengadaan software untuk PPM Manajemen pada 2025.',
+    'e.g., 1234567890123': 'contoh: 1234567890123',
+    'e.g., 0123456789012345': 'contoh: 0123456789012345',
+    'Describe projects or work previously completed by your company.':
+        'Jelaskan proyek atau pekerjaan yang pernah diselesaikan oleh perusahaan Anda.',
+    'Registration Instructions': 'Petunjuk Pengisian',
+    'Complete all fields using your company’s information.':
+        'Isi seluruh kolom sesuai data perusahaan Anda.',
+    'Select a Category from the available dropdown.':
+        'Kolom Kategori pilih dari dropdown yang tersedia.',
+    'Enter the WhatsApp Number in the format 08xxxxxxxxxx.':
+        'Nomor WhatsApp diisi dengan format 08xxxxxxxxxx.',
+    'Ensure the NIB & NPWP match the official documents.':
+        'Pastikan NIB & NPWP sesuai dokumen resmi.',
+    'Enter examples of projects or work previously completed in the Experience field.':
+        'Kolom Pengalaman diisi dengan contoh proyek atau pekerjaan yang pernah dikerjakan.',
+    'This information will be used for the Vendor PPM 2026 registration process.':
+        'Data ini akan digunakan sebagai bahan registrasi Vendor PPM 2026.',
     // Translate only the fixed VMS business-type option labels.
     'Sole Proprietorship': 'Usaha Perseorangan',
     Partnership: 'Kemitraan',
@@ -442,26 +539,33 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     // Localize the vendor deed-number field and its input guidance.
     'Deed of Establishment Number': 'Nomor Akta Pendirian',
     'Enter deed number': 'Masukkan nomor akta pendirian',
+    'e.g., AHU-0012345': 'contoh: AHU-0012345',
     'Contact Person': 'Narahubung',
     'Contact Person is required.': 'Narahubung wajib diisi.',
     'Contact Person may not exceed 255 characters.':
         'Narahubung tidak boleh lebih dari 255 karakter.',
     'Full name of contact person': 'Nama lengkap narahubung',
-    // Label the VMS contact field as telephone or mobile.
+    'e.g., John Doe': 'contoh: John Doe',
+    'WhatsApp Number': 'Nomor WhatsApp',
+    'WhatsApp Number is required.': 'Nomor WhatsApp wajib diisi.',
+    'WhatsApp Number must start with 08 and contain digits only.':
+        'Nomor WhatsApp harus diawali 08 dan hanya berisi angka.',
+    'Use the 08xxxxxxxxxx format and digits only.':
+        'Gunakan format 08xxxxxxxxxx dan hanya masukkan angka.',
+    'e.g., 081234567890': 'contoh: 081234567890',
     'Phone Number / Mobile': 'Nomor Telepon / Ponsel',
     'Phone Number / Mobile is required.': 'Nomor telepon / ponsel wajib diisi.',
-    // Keep VMS mobile-number guidance and validation concise in both languages.
-    'Enter a valid mobile number (e.g. 081234567890 or +6281234567890).':
-        'Masukkan nomor ponsel yang valid (contoh: 081234567890 atau +6281234567890).',
-    'Use 08... or +628... for a mobile number.': 'Gunakan 08... atau +628... untuk nomor ponsel.',
     'Registered Address': 'Alamat Terdaftar',
     'Full street address': 'Alamat lengkap',
+    'e.g., Jl. Menteng Raya 9-19, Menteng, Central Jakarta':
+        'contoh: Jl. Menteng Raya 9-19, Menteng, Jakarta Pusat',
     Province: 'Provinsi',
     'Regency / City': 'Kabupaten / Kota',
     'Postal Code': 'Kode Pos',
     'Select Province': 'Pilih Provinsi',
     'Select Province first': 'Pilih provinsi terlebih dahulu',
     'Select Regency / City': 'Pilih Kabupaten / Kota',
+    'e.g., 10340': 'contoh: 10340',
     'Province is required.': 'Provinsi wajib dipilih.',
     'Regency or city is required.': 'Kabupaten atau kota wajib dipilih.',
     'Postal code is required.': 'Kode pos wajib diisi.',
@@ -743,6 +847,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Internal Notes': 'Catatan Internal',
     'Danger Zone': 'Zona Berbahaya',
     'Document Type': 'Jenis Dokumen',
+    'All Documents': 'Semua Dokumen',
     // Localize fixed document master data without modifying stored database values.
     'Company Registration Certificate': 'Sertifikat Pendaftaran Perusahaan',
     'Certificate of incorporation or business registration':
@@ -773,7 +878,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     Active: 'Aktif',
     Approved: 'Disetujui',
     Draft: 'Draf',
-    Submitted: 'Dikirim',
+    Submitted: 'Diajukan',
     Rejected: 'Ditolak',
     Suspended: 'Ditangguhkan',
     Paid: 'Dibayar',
@@ -787,7 +892,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     Critical: 'Kritis',
     default: 'Standar',
     draft: 'Draf',
-    submitted: 'Dikirim',
+    submitted: 'Diajukan',
     'under review': 'Dalam Peninjauan',
     approved: 'Disetujui',
     active: 'Aktif',
@@ -1234,6 +1339,8 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Vendor Document': 'Dokumen Vendor',
     'Payment Request': 'Permintaan Pembayaran',
     'Contact Message': 'Pesan Kontak',
+    'Internal staff user created': 'Pengguna internal dibuat',
+    'Contact message soft-deleted by staff': 'Pesan kontak dihapus sementara oleh staf',
     // Localize fixed staff-form controls and system-defined role choices only.
     'Create Internal User': 'Tambah Pengguna Internal',
     Role: 'Peran',

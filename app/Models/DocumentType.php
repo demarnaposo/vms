@@ -10,6 +10,20 @@ class DocumentType extends Model
 {
     use HasFactory;
 
+    protected static function booted(): void
+    {
+        static::updating(function (self $type): void {
+            if ($type->isDirty('name')) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['name' => 'Document type codes cannot be changed after creation.']);
+            }
+        });
+        foreach (['saved', 'deleted'] as $event) {
+            static::$event(function (): void {
+                \Illuminate\Support\Facades\DB::afterCommit(fn () => \Illuminate\Support\Facades\Cache::forget('document_types_active'));
+            });
+        }
+    }
+
     protected $fillable = [
         'name',
         'display_name',
@@ -26,6 +40,8 @@ class DocumentType extends Model
         'is_mandatory' => 'boolean',
         'has_expiry' => 'boolean',
         'is_active' => 'boolean',
+        'expiry_warning_days' => 'integer',
+        'max_file_size_mb' => 'integer',
         'allowed_extensions' => 'array',
     ];
 

@@ -125,19 +125,21 @@ class SystemMasterDataService
      */
     public function syncDocumentTypes(): void
     {
-        foreach ($this->data('document_types') as $docType) {
-            $this->updateOrCreateByName('document_types', [
-                'name' => $docType['name'],
-                'display_name' => $docType['display_name'],
-                'description' => $docType['description'] ?? null,
-                'is_mandatory' => (bool) ($docType['is_mandatory'] ?? false),
-                'has_expiry' => (bool) ($docType['has_expiry'] ?? false),
-                'expiry_warning_days' => (int) ($docType['expiry_warning_days'] ?? 30),
-                'allowed_extensions' => json_encode($docType['allowed_extensions'] ?? ['pdf']),
-                'max_file_size_mb' => (int) ($docType['max_file_size_mb'] ?? 10),
-                'is_active' => (bool) ($docType['is_active'] ?? true),
-            ]);
-        }
+        DB::transaction(function (): void {
+            $hasMarker = \Illuminate\Support\Facades\Schema::hasTable('master_data_initializations');
+            if ($hasMarker && DB::table('master_data_initializations')->where('name', 'document_types')->exists()) {
+                return;
+            }
+            // Bootstrap an empty installation only; administrator changes remain authoritative.
+            if (! DB::table('document_types')->exists()) {
+                foreach ($this->data('document_types') as $type) {
+                    \App\Models\DocumentType::create($type);
+                }
+            }
+            if ($hasMarker) {
+                DB::table('master_data_initializations')->insertOrIgnore(['name' => 'document_types', 'initialized_at' => now()]);
+            }
+        });
     }
 
     /**

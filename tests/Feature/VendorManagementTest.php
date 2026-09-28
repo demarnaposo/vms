@@ -53,12 +53,12 @@ class VendorManagementTest extends TestCase
             'submitted_at' => now(),
             // Minimum required fields based on model/migrations
             // Use Indonesian company and bank identifiers in vendor-detail coverage.
-            'registration_number' => '1234567890123',
+            'business_identification_number' => '1234567890123',
             'tax_id' => '0123456789012345',
             'deed_number' => 'DEED-000001',
             'bank_name' => 'Bank Mandiri',
             'bank_account_number' => '1234567890',
-            'bank_ifsc' => '008',
+            'code_bank' => '008',
             'bank_branch' => 'KCP Jakarta Menteng',
             'address' => '123 St',
             // Gunakan fixture lokasi Indonesia.
@@ -92,11 +92,11 @@ class VendorManagementTest extends TestCase
                 ->component('Admin/Vendors/Show')
                 ->where('vendor.id', $this->vendor->id)
                 // Confirm authorized staff receive decrypted summary identifiers.
-                ->where('vendor.registration_number', '1234567890123')
+                ->where('vendor.business_identification_number', '1234567890123')
                 ->where('vendor.tax_id', '0123456789012345')
                 ->where('vendor.deed_number', 'DEED-000001')
                 ->where('vendor.bank_account_number', '1234567890')
-                ->where('vendor.bank_ifsc', '008')
+                ->where('vendor.code_bank', '008')
         );
     }
 

@@ -34,8 +34,8 @@ class SendExpiryReminders extends Command
                 ->where('is_current', true)
                 ->where('verification_status', VendorDocument::STATUS_VERIFIED)
                 ->whereNotNull('expiry_date')
-                ->whereHas('documentType', fn ($query) => $query->where('has_expiry', true))
-                ->whereBetween('expiry_date', [Carbon::now(), Carbon::now()->addDays(30)])
+                ->whereHas('documentType', fn ($query) => $query->where('has_expiry', true)->where('is_active', true))
+                ->whereBetween('expiry_date', [today(), today()->addDays(365)])
                 ->get();
 
             $remindersSent = 0;
@@ -44,7 +44,7 @@ class SendExpiryReminders extends Command
                 $daysUntilExpiry = (int) Carbon::now()->startOfDay()->diffInDays(Carbon::parse($doc->expiry_date)->startOfDay(), false);
 
                 // Send reminders at 30, 15, 7, 3, 1 days before expiry
-                if (in_array($daysUntilExpiry, [30, 15, 7, 3, 1])) {
+                if ($daysUntilExpiry <= $doc->documentType->expiry_warning_days && in_array($daysUntilExpiry, [$doc->documentType->expiry_warning_days, 30, 15, 7, 3, 1], true)) {
                     $this->createNotification($doc, $daysUntilExpiry);
                     $remindersSent++;
                 }
@@ -54,8 +54,8 @@ class SendExpiryReminders extends Command
             $expiredDocs = VendorDocument::with(['vendor.user', 'documentType'])
                 ->where('is_current', true)
                 ->whereNotNull('expiry_date')
-                ->whereHas('documentType', fn ($query) => $query->where('has_expiry', true))
-                ->where('expiry_date', '<', Carbon::now())
+                ->whereHas('documentType', fn ($query) => $query->where('has_expiry', true)->where('is_active', true))
+                ->where('expiry_date', '<', today())
                 ->where('verification_status', VendorDocument::STATUS_VERIFIED)
                 ->get();
 

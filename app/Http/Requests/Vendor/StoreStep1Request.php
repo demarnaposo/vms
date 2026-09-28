@@ -19,13 +19,10 @@ class StoreStep1Request extends FormRequest
     {
         // Accept formatted Indonesian identifiers and persist their canonical digits.
         $this->merge([
-            'registration_number' => IndonesianBusinessIdentifier::normalize($this->input('registration_number')),
+            'business_identification_number' => IndonesianBusinessIdentifier::normalize($this->input('business_identification_number')),
             'tax_id' => IndonesianBusinessIdentifier::normalize($this->input('tax_id')),
         ]);
 
-        if (is_string($this->input('contact_phone'))) {
-            $this->merge(['contact_phone' => IndonesianMobilePhone::normalize($this->input('contact_phone'))]);
-        }
     }
 
     /**
@@ -49,11 +46,13 @@ class StoreStep1Request extends FormRequest
         return [
             'company_name' => 'required|string|max:255',
             // Replace legacy foreign identifiers with Indonesian NIB and NPWP rules.
-            'registration_number' => ['required', 'string', 'regex:/^[0-9]{13}$/'],
+            'business_identification_number' => ['required', 'string', 'regex:/^[0-9]{13}$/'],
             'tax_id' => ['required', 'string', 'regex:/^[0-9]{15,16}$/'],
             // Require the deed number as part of vendor company verification.
             'deed_number' => ['required', 'string', 'max:100'],
             'business_type' => 'required|string|max:50',
+            'category_id' => ['required', 'integer', Rule::exists('vendor_categories', 'id')->where('is_active', true)],
+            'experience' => ['required', 'string', 'max:2000'],
             'contact_person' => 'required|string|max:255',
             // Accept Indonesian mobile numbers of 10 to 13 local digits.
             'contact_phone' => ['required', 'string', 'regex:'.IndonesianMobilePhone::LOCAL_REGEX],
@@ -72,8 +71,8 @@ class StoreStep1Request extends FormRequest
             'company_name.required' => 'Company Name is required.',
             'company_name.max' => 'Company Name may not exceed 255 characters.',
             // Return Indonesian business-identifier validation messages.
-            'registration_number.required' => 'Business Identification Number (NIB) is required.',
-            'registration_number.regex' => 'Business Identification Number (NIB) must be exactly 13 digits.',
+            'business_identification_number.required' => 'Business Identification Number (NIB) is required.',
+            'business_identification_number.regex' => 'Business Identification Number (NIB) must be exactly 13 digits.',
             'tax_id.required' => 'Taxpayer Identification Number (NPWP) is required.',
             'tax_id.regex' => 'Taxpayer Identification Number (NPWP) must be 15 or 16 digits.',
             // Return a specific message for the required deed number.
@@ -82,9 +81,12 @@ class StoreStep1Request extends FormRequest
             'business_type.required' => 'Business Type is required.',
             'contact_person.required' => 'Contact Person is required.',
             'contact_person.max' => 'Contact Person may not exceed 255 characters.',
-            'contact_phone.required' => 'Phone Number / Mobile is required.',
-            // Keep the VMS mobile validation message concise.
-            'contact_phone.regex' => 'Enter a valid mobile number (e.g. 081234567890 or +6281234567890).',
+            'category_id.required' => 'Category is required.',
+            'category_id.exists' => 'Please select a valid category.',
+            'experience.required' => 'Experience is required.',
+            'experience.max' => 'Experience may not exceed 2000 characters.',
+            'contact_phone.required' => 'WhatsApp Number is required.',
+            'contact_phone.regex' => 'WhatsApp Number must start with 08 and contain digits only.',
             'address.required' => 'Address is required.',
             'address.max' => 'Address may not exceed 500 characters.',
             'state.required' => 'Province is required.',

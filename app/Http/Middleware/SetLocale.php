@@ -9,13 +9,20 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SetLocale
 {
-    // Apply only supported language cookies to every web request.
+    // Keep the signed-in recipient's language available to notifications sent outside a web request.
     public function handle(Request $request, Closure $next): Response
     {
-        $locale = (string) $request->cookie('vms_locale', config('app.locale'));
+        $selectedLocale = $request->cookie('vms_locale');
         $supportedLocales = config('app.supported_locales', ['en']);
 
-        App::setLocale(in_array($locale, $supportedLocales, true) ? $locale : config('app.locale'));
+        $locale = in_array($selectedLocale, $supportedLocales, true) ? $selectedLocale : config('app.locale');
+        App::setLocale($locale);
+
+        if (in_array($selectedLocale, $supportedLocales, true)
+            && $request->user()
+            && $request->user()->preferred_locale !== $locale) {
+            $request->user()->update(['preferred_locale' => $locale]);
+        }
 
         return $next($request);
     }

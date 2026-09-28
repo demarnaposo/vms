@@ -26,7 +26,7 @@ class StoreStep2Request extends FormRequest
             'bank_name' => 'required|string|max:255',
             'bank_account_number' => ['required', 'string', 'regex:/^[0-9]{9,18}$/'],
             // Validate Indonesia's three-digit bank transfer code.
-            'bank_ifsc' => ['required', 'string', 'regex:/^[0-9]{3}$/'],
+            'code_bank' => ['required', 'string', 'regex:/^[0-9]{3}$/'],
             'bank_branch' => 'required|string|max:255',
         ];
     }
@@ -36,7 +36,7 @@ class StoreStep2Request extends FormRequest
         return [
             'bank_account_number.regex' => 'Account number must be 9 to 18 digits.',
             // Return Indonesian bank code terminology in validation errors.
-            'bank_ifsc.regex' => 'Bank Code must be exactly 3 digits.',
+            'code_bank.regex' => 'Bank Code must be exactly 3 digits.',
         ];
     }
 }

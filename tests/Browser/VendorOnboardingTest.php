@@ -26,7 +26,7 @@ class VendorOnboardingTest extends DuskTestCase
             // Step 1: Basic Info
             $browser->type('company_name', 'New Vendor Company Ltd')
                 // Enter Indonesian NIB and NPWP values in browser coverage.
-                ->type('registration_number', '1234567890123')
+                ->type('business_identification_number', '1234567890123')
                 ->type('tax_id', '0123456789012345')
                 ->type('deed_number', 'DEED-000001')
                 ->press('@next-step')
@@ -36,7 +36,7 @@ class VendorOnboardingTest extends DuskTestCase
             $browser->type('bank_name', 'Test Bank')
                 // Match the current Indonesian bank-field names and code format.
                 ->type('bank_account_number', '1234567890')
-                ->type('bank_ifsc', '008')
+                ->type('code_bank', '008')
                 ->type('bank_branch', 'KCP Jakarta Menteng')
                 ->press('@next-step')
                 ->pause(1000);

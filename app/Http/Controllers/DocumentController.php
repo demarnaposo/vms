@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
+use App\Models\DocumentType;
 use App\Models\VendorDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class DocumentController extends Controller
@@ -20,7 +22,13 @@ class DocumentController extends Controller
     {
         $this->authorize('viewCompliance');
 
-        $currentStatus = $request->string('status')->toString();
+        $filters = $request->validate([
+            'status' => ['nullable', Rule::in(['all', VendorDocument::STATUS_PENDING, VendorDocument::STATUS_VERIFIED, VendorDocument::STATUS_REJECTED, VendorDocument::STATUS_EXPIRED])],
+            'search' => ['nullable', 'string', 'max:255'],
+            'document_type_id' => ['nullable', 'integer', Rule::exists('document_types', 'id')],
+        ]);
+
+        $currentStatus = $filters['status'] ?? '';
         if ($currentStatus === '') {
             $currentStatus = VendorDocument::STATUS_PENDING;
         }
@@ -32,9 +40,13 @@ class DocumentController extends Controller
             $query->where('verification_status', $currentStatus);
         }
 
+        if (! empty($filters['document_type_id'])) {
+            $query->where('document_type_id', $filters['document_type_id']);
+        }
+
         // Search by vendor name
-        if ($request->has('search') && $request->search) {
-            $escapedSearch = str_replace(['%', '_'], ['\\%', '\\_'], $request->search);
+        if (! empty($filters['search'])) {
+            $escapedSearch = str_replace(['%', '_'], ['\\%', '\\_'], $filters['search']);
             $query->whereHas('vendor', function ($q) use ($escapedSearch) {
                 $q->where('company_name', 'like', '%'.$escapedSearch.'%');
             });
@@ -46,7 +58,11 @@ class DocumentController extends Controller
 
         return Inertia::render('Admin/Documents/Index', [
             'documents' => $documents,
-            'filters' => $request->only(['status', 'search']),
+            'filters' => $filters,
+            'documentTypes' => DocumentType::query()
+                ->where(fn ($query) => $query->where('is_active', true)->orWhereHas('documents'))
+                ->orderBy('display_name')
+                ->get(['id', 'name', 'display_name']),
             'currentStatus' => $currentStatus,
         ]);
     }
@@ -235,6 +251,11 @@ class DocumentController extends Controller
     private function documentTypeLabel(string $name, string $fallback): string
     {
         $translationKey = "master_data.document_types.{$name}";
+
+        $baseline = collect((require database_path('data/system_master_data.php'))['document_types'])->firstWhere('name', $name);
+        if (! $baseline || $fallback !== $baseline['display_name']) {
+            return $fallback;
+        }
 
         return Lang::has($translationKey) ? __($translationKey) : $fallback;
     }

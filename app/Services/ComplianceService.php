@@ -189,10 +189,14 @@ class ComplianceService
      */
     protected function checkRequiredDocuments(Vendor $vendor, ComplianceRule $rule): array
     {
-        $mandatoryTypes = DocumentType::where('is_mandatory', true)->pluck('id');
+        $mandatoryTypes = DocumentType::active()->where('is_mandatory', true)->pluck('id');
         $uploadedTypes = $vendor->documents()
             ->where('is_current', true)
             ->where('verification_status', 'verified')
+            ->where(function ($query) {
+                $query->whereHas('documentType', fn ($type) => $type->where('has_expiry', false))
+                    ->orWhereDate('expiry_date', '>=', today());
+            })
             ->pluck('document_type_id');
 
         $missingTypes = $mandatoryTypes->diff($uploadedTypes);
@@ -219,20 +223,17 @@ class ComplianceService
      */
     protected function checkDocumentExpiry(Vendor $vendor, ComplianceRule $rule): array
     {
-        $warningDays = $rule->conditions['warning_days'] ?? 15;
-        $warningDate = Carbon::now()->addDays($warningDays);
 
         $expiringDocs = $vendor->documents()
             ->where('is_current', true)
-            ->where('verification_status', VendorDocument::STATUS_VERIFIED)
+            ->whereIn('verification_status', [VendorDocument::STATUS_VERIFIED, VendorDocument::STATUS_EXPIRED])
             ->whereNotNull('expiry_date')
-            ->whereHas('documentType', fn ($query) => $query->where('has_expiry', true))
-            ->where('expiry_date', '<=', $warningDate)
+            ->whereHas('documentType', fn ($query) => $query->where('has_expiry', true)->where('is_active', true))
             ->with('documentType')
-            ->get();
+            ->get()->filter(fn ($doc) => $doc->expiry_date->startOfDay()->lte(today()->addDays($doc->documentType->expiry_warning_days)));
 
-        $expiredDocs = $expiringDocs->filter(fn ($doc) => Carbon::parse($doc->expiry_date)->isPast());
-        $soonToExpire = $expiringDocs->filter(fn ($doc) => ! Carbon::parse($doc->expiry_date)->isPast());
+        $expiredDocs = $expiringDocs->filter(fn ($doc) => Carbon::parse($doc->expiry_date)->lt(today()));
+        $soonToExpire = $expiringDocs->filter(fn ($doc) => ! Carbon::parse($doc->expiry_date)->lt(today()));
 
         if ($expiredDocs->isNotEmpty()) {
             return [

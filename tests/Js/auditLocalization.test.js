@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { translateAuditEntity, translateAuditEvent } from '../../resources/js/i18n/auditLabels.js';
+import {
+    translateAuditDescription,
+    translateAuditEntity,
+    translateAuditEvent,
+} from '../../resources/js/i18n/auditLabels.js';
 
 // Verify known audit event codes use display-only Indonesian labels.
 test('translates only known system audit events', () => {
@@ -18,4 +22,37 @@ test('translates only known audit entity class labels', () => {
     assert.equal(translateAuditEntity('en', paymentType), 'Payment Request');
     assert.equal(translateAuditEntity('id', 'App\\Models\\CustomRecord'), 'CustomRecord');
     assert.equal(translateAuditEntity('id', 'Other\\Models\\PaymentRequest'), 'PaymentRequest');
+});
+
+// Localize every application-generated description without modifying manual audit reasons.
+test('translates only known system audit descriptions', () => {
+    const descriptions = [
+        ['Vendor application submitted for review', 'Pengajuan vendor dikirim untuk ditinjau'],
+        ['Vendor approved and activated', 'Vendor disetujui dan diaktifkan'],
+        ['Vendor approved', 'Vendor disetujui'],
+        [
+            'Vendor moved to review before rejection',
+            'Vendor dipindahkan ke peninjauan sebelum ditolak',
+        ],
+        ['Vendor activated', 'Vendor diaktifkan'],
+        [
+            'Admin reviewed termination appeal and restored access.',
+            'Admin meninjau banding penghentian dan memulihkan akses.',
+        ],
+        ['Internal staff user created', 'Pengguna internal dibuat'],
+        ['Contact message soft-deleted by staff', 'Pesan kontak dihapus sementara oleh staf'],
+    ];
+
+    for (const [source, translation] of descriptions) {
+        assert.equal(translateAuditDescription('id', source), translation);
+    }
+
+    assert.equal(
+        translateAuditDescription('en', 'Internal staff user created'),
+        'Internal staff user created'
+    );
+    assert.equal(
+        translateAuditDescription('id', 'Alasan khusus dari staf'),
+        'Alasan khusus dari staf'
+    );
 });

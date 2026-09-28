@@ -32,11 +32,11 @@ class VendorApplicationSubmitted extends Notification implements ShouldQueue
     public function toMail(object $notifiable): \Illuminate\Notifications\Messages\MailMessage
     {
         return (new \Illuminate\Notifications\Messages\MailMessage)
-            ->subject('New Vendor Application: '.$this->vendor->company_name)
-            ->line('A new vendor application has been submitted.')
-            ->line('Company: '.$this->vendor->company_name)
-            ->line('Submitted by: '.$this->vendor->user->name)
-            ->action('Review Application', url('/admin/vendors/'.$this->vendor->id));
+            ->subject(__('mail.vendor_application.subject', ['company' => $this->vendor->company_name]))
+            ->line(__('mail.vendor_application.intro'))
+            ->line(__('mail.vendor_application.company', ['company' => $this->vendor->company_name]))
+            ->line(__('mail.vendor_application.submitted_by', ['name' => $this->vendor->user->name]))
+            ->action(__('mail.vendor_application.action'), url('/admin/vendors/'.$this->vendor->id));
     }
 
     /**

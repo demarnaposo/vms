@@ -52,11 +52,11 @@ class PaymentWorkflowTest extends TestCase
             'status' => Vendor::STATUS_ACTIVE,
             'compliance_status' => 'compliant',
             // Provide an Indonesian transfer destination for payment detail coverage.
-            'registration_number' => '1234567890123',
+            'business_identification_number' => '1234567890123',
             'tax_id' => '0123456789012345',
             'bank_name' => 'Bank Mandiri',
             'bank_account_number' => '1234567890',
-            'bank_ifsc' => '008',
+            'code_bank' => '008',
             'bank_branch' => 'KCP Jakarta Menteng',
             'address' => '123 St',
             // Gunakan fixture lokasi Indonesia.
@@ -231,7 +231,7 @@ class PaymentWorkflowTest extends TestCase
                     ->component('Admin/Payments/Show')
                     ->where('payment.vendor.bank_name', 'Bank Mandiri')
                     ->where('payment.vendor.bank_account_number', '1234567890')
-                    ->where('payment.vendor.bank_ifsc', '008')
+                    ->where('payment.vendor.code_bank', '008')
                     ->where('payment.vendor.bank_branch', 'KCP Jakarta Menteng')
             );
 
@@ -241,7 +241,7 @@ class PaymentWorkflowTest extends TestCase
                 fn ($page) => $page
                     ->component('Admin/Payments/Show')
                     ->missing('payment.vendor.bank_account_number')
-                    ->missing('payment.vendor.bank_ifsc')
+                    ->missing('payment.vendor.code_bank')
             );
     }
 

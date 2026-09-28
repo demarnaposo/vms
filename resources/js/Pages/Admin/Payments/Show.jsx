@@ -448,7 +448,7 @@ export default function PaymentsShow({ payment }) {
                                 {[
                                     ['Bank Name', payment.vendor.bank_name || 'N/A'],
                                     ['Account Number', payment.vendor.bank_account_number || 'N/A'],
-                                    ['Bank Code', payment.vendor.bank_ifsc || 'N/A'],
+                                    ['Bank Code', payment.vendor.code_bank || 'N/A'],
                                     ['Branch Name', payment.vendor.bank_branch || 'N/A'],
                                 ].map(([label, value]) => (
                                     <div key={label}>

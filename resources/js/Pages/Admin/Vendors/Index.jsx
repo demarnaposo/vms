@@ -20,6 +20,10 @@ export default function VendorsIndex({ vendors = {}, currentStatus = 'all', sear
 
     const columns = [
         {
+            header: 'Vendor ID',
+            render: (row) => row.vendor_number || '-',
+        },
+        {
             header: 'Company',
             render: (row) => (
                 <div>

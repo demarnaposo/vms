@@ -64,7 +64,16 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
             subtitle={t('Welcome back, :name!', {
                 name: user?.name?.split(' ')[0] || t('Vendor'),
             })}
-            actions={<Badge status={displayVendor.status} size="lg" />}
+            actions={
+                <div className="flex items-center gap-3">
+                    {displayVendor.vendor_number ? (
+                        <span className="text-sm font-semibold text-(--color-text-secondary)">
+                            {t('Vendor ID')}: {displayVendor.vendor_number}
+                        </span>
+                    ) : null}
+                    <Badge status={displayVendor.status} size="lg" />
+                </div>
+            }
         />
     );
 

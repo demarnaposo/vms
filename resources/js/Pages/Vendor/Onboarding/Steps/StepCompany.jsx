@@ -17,16 +17,21 @@ import {
     validateNpwp,
 } from '@/utils/indonesianBusinessIdentifiers';
 
-export default function StepCompany({ vendor, sessionData }) {
+export default function StepCompany({ vendor, sessionData, vendorCategories = [] }) {
     const { t } = useLanguage();
     const step1Session = sessionData?.step1 || {};
     const { data, setData, post, processing, errors } = useForm({
         company_name: step1Session.company_name || vendor?.company_name || '',
-        registration_number: step1Session.registration_number || vendor?.registration_number || '',
+        business_identification_number:
+            step1Session.business_identification_number ||
+            vendor?.business_identification_number ||
+            '',
         tax_id: step1Session.tax_id || vendor?.tax_id || '',
         // Collect the vendor deed number during company onboarding.
         deed_number: step1Session.deed_number || vendor?.deed_number || '',
         business_type: step1Session.business_type || vendor?.business_type || '',
+        category_id: step1Session.category_id || vendor?.category_id || '',
+        experience: step1Session.experience || vendor?.experience || '',
         contact_person: step1Session.contact_person || vendor?.contact_person || '',
         contact_phone: step1Session.contact_phone || vendor?.contact_phone || '',
         address: step1Session.address || vendor?.address || '',
@@ -100,6 +105,21 @@ export default function StepCompany({ vendor, sessionData }) {
         return '';
     };
 
+    const validateCategory = (value) => {
+        if (!value) return 'Category is required.';
+        return vendorCategories.some(
+            (category) => String(category.id) === String(value) && category.is_active !== false
+        )
+            ? ''
+            : 'Please select a valid category.';
+    };
+
+    const validateExperience = (value) => {
+        if (!value || value.trim() === '') return 'Experience is required.';
+        if (value.length > 2000) return 'Experience may not exceed 2000 characters.';
+        return '';
+    };
+
     // Require a concise deed number before advancing onboarding.
     const validateDeedNumber = (value) => {
         if (!value || value.trim() === '') {
@@ -113,13 +133,23 @@ export default function StepCompany({ vendor, sessionData }) {
 
     // Derive regency/city options only when the selected province changes.
     const cityOptions = useMemo(() => getRegenciesForProvince(data.state), [data.state]);
+    const categoryOptions = useMemo(
+        () =>
+            vendorCategories
+                .filter((category) => category.is_active !== false)
+                .map((category) => ({
+                    value: String(category.id),
+                    label: category.display_name,
+                })),
+        [vendorCategories]
+    );
 
     const submit = (e) => {
         e.preventDefault();
 
         // Validate all required company fields before submitting company data.
         const companyNameError = validateCompanyName(data.company_name);
-        const nibError = validateNib(data.registration_number);
+        const nibError = validateNib(data.business_identification_number);
         const npwpError = validateNpwp(data.tax_id);
         const deedNumberError = validateDeedNumber(data.deed_number);
         const contactError = validateContactPerson(data.contact_person);
@@ -130,6 +160,8 @@ export default function StepCompany({ vendor, sessionData }) {
         // Include postal code validation before submitting onboarding data.
         const postalCodeError = validatePostalCode(data.pincode);
         const bizError = validateBusinessType(data.business_type);
+        const categoryError = validateCategory(data.category_id);
+        const experienceError = validateExperience(data.experience);
 
         if (
             companyNameError ||
@@ -142,11 +174,13 @@ export default function StepCompany({ vendor, sessionData }) {
             stateError ||
             cityError ||
             postalCodeError ||
-            bizError
+            bizError ||
+            categoryError ||
+            experienceError
         ) {
             setClientErrors({
                 company_name: companyNameError,
-                registration_number: nibError,
+                business_identification_number: nibError,
                 tax_id: npwpError,
                 deed_number: deedNumberError,
                 contact_person: contactError,
@@ -156,6 +190,8 @@ export default function StepCompany({ vendor, sessionData }) {
                 city: cityError,
                 pincode: postalCodeError,
                 business_type: bizError,
+                category_id: categoryError,
+                experience: experienceError,
             });
             return;
         }
@@ -173,6 +209,28 @@ export default function StepCompany({ vendor, sessionData }) {
                 <p className="text-(--color-text-tertiary)">
                     {t('Tell us about your business entity.')}
                 </p>
+            </div>
+
+            <div className="mb-8 rounded-xl border border-(--color-border-secondary) bg-(--color-bg-secondary) p-5">
+                <h2 className="mb-3 text-sm font-semibold text-(--color-text-primary)">
+                    {t('Registration Instructions')}
+                </h2>
+                <ol className="list-decimal space-y-1 pl-5 text-sm text-(--color-text-secondary)">
+                    <li>{t('Complete all fields using your company’s information.')}</li>
+                    <li>{t('Select a Category from the available dropdown.')}</li>
+                    <li>{t('Enter the WhatsApp Number in the format 08xxxxxxxxxx.')}</li>
+                    <li>{t('Ensure the NIB & NPWP match the official documents.')}</li>
+                    <li>
+                        {t(
+                            'Enter examples of projects or work previously completed in the Experience field.'
+                        )}
+                    </li>
+                    <li>
+                        {t(
+                            'This information will be used for the Vendor PPM 2026 registration process.'
+                        )}
+                    </li>
+                </ol>
             </div>
 
             <form onSubmit={submit} className="space-y-8">
@@ -205,7 +263,7 @@ export default function StepCompany({ vendor, sessionData }) {
                                     ? 'border-(--color-danger) focus:border-(--color-danger) focus:ring-(--color-danger)/20'
                                     : 'border-(--color-border-primary) focus:border-(--color-border-focus) focus:ring-(--color-brand-primary)/20'
                             }`}
-                            placeholder={t('Legal Entity Name')}
+                            placeholder={t('e.g., PPM Manajemen')}
                             maxLength={255}
                         />
                         {/* Show company-name validation from both client and server checks. */}
@@ -245,43 +303,111 @@ export default function StepCompany({ vendor, sessionData }) {
 
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {/* Show the complete business identifier label. */}
-                            {t('Business Identification Number (NIB)')}{' '}
-                            <span className="text-(--color-danger)">*</span>
+                            {t('Category')} <span className="text-(--color-danger)">*</span>
                         </label>
-                        <input
-                            type="text"
-                            value={data.registration_number}
-                            onChange={(e) => {
-                                // Accept pasted NIB separators while storing digits only.
-                                const val = sanitizeBusinessIdentifier(e.target.value, 13);
-                                setData('registration_number', val);
-                                if (clientErrors.registration_number) {
+                        <FormSelect
+                            value={String(data.category_id)}
+                            onChange={(value) => {
+                                setData('category_id', value);
+                                if (clientErrors.category_id) {
                                     setClientErrors((prev) => ({
                                         ...prev,
-                                        registration_number: validateNib(val),
+                                        category_id: validateCategory(value),
+                                    }));
+                                }
+                            }}
+                            placeholder={t('Select Category')}
+                            options={categoryOptions}
+                            error={clientErrors.category_id || errors.category_id}
+                        />
+                    </div>
+
+                    <div className="md:col-span-2 space-y-2">
+                        <label className="text-sm font-medium text-(--color-text-secondary)">
+                            {t('Experience')} <span className="text-(--color-danger)">*</span>
+                        </label>
+                        <textarea
+                            value={data.experience}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                setData('experience', value);
+                                if (clientErrors.experience) {
+                                    setClientErrors((prev) => ({
+                                        ...prev,
+                                        experience: validateExperience(value),
                                     }));
                                 }
                             }}
                             onBlur={() => {
                                 setClientErrors((prev) => ({
                                     ...prev,
-                                    registration_number: validateNib(data.registration_number),
+                                    experience: validateExperience(data.experience),
                                 }));
                             }}
-                            className={`w-full px-4 py-3 bg-(--color-bg-primary) border rounded-lg text-sm focus:ring-2 outline-none transition-all ${
-                                clientErrors.registration_number || errors.registration_number
+                            className={`min-h-[120px] w-full rounded-lg border bg-(--color-bg-primary) px-4 py-3 text-sm outline-none transition-all focus:ring-2 ${
+                                clientErrors.experience || errors.experience
                                     ? 'border-(--color-danger) focus:border-(--color-danger) focus:ring-(--color-danger)/20'
                                     : 'border-(--color-border-primary) focus:border-(--color-border-focus) focus:ring-(--color-brand-primary)/20'
                             }`}
-                            placeholder="1234567890123"
+                            placeholder={t('e.g., Software procurement for PPM Manajemen in 2025.')}
+                            maxLength={2000}
+                        />
+                        <p className="text-xs text-(--color-text-tertiary)">
+                            {t('Describe projects or work previously completed by your company.')}
+                        </p>
+                        {(clientErrors.experience || errors.experience) && (
+                            <p className="text-sm text-(--color-danger)">
+                                {t(clientErrors.experience || errors.experience)}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-(--color-text-secondary)">
+                            {/* Show the complete business identifier label. */}
+                            {t('Business Identification Number (NIB)')}{' '}
+                            <span className="text-(--color-danger)">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            value={data.business_identification_number}
+                            onChange={(e) => {
+                                // Accept pasted NIB separators while storing digits only.
+                                const val = sanitizeBusinessIdentifier(e.target.value, 13);
+                                setData('business_identification_number', val);
+                                if (clientErrors.business_identification_number) {
+                                    setClientErrors((prev) => ({
+                                        ...prev,
+                                        business_identification_number: validateNib(val),
+                                    }));
+                                }
+                            }}
+                            onBlur={() => {
+                                setClientErrors((prev) => ({
+                                    ...prev,
+                                    business_identification_number: validateNib(
+                                        data.business_identification_number
+                                    ),
+                                }));
+                            }}
+                            className={`w-full px-4 py-3 bg-(--color-bg-primary) border rounded-lg text-sm focus:ring-2 outline-none transition-all ${
+                                clientErrors.business_identification_number ||
+                                errors.business_identification_number
+                                    ? 'border-(--color-danger) focus:border-(--color-danger) focus:ring-(--color-danger)/20'
+                                    : 'border-(--color-border-primary) focus:border-(--color-border-focus) focus:ring-(--color-brand-primary)/20'
+                            }`}
+                            placeholder={t('e.g., 1234567890123')}
                             inputMode="numeric"
                             maxLength={13}
                         />
                         {/* Localize registration-number validation feedback. */}
-                        {(clientErrors.registration_number || errors.registration_number) && (
+                        {(clientErrors.business_identification_number ||
+                            errors.business_identification_number) && (
                             <p className="text-sm text-(--color-danger)">
-                                {t(clientErrors.registration_number || errors.registration_number)}
+                                {t(
+                                    clientErrors.business_identification_number ||
+                                        errors.business_identification_number
+                                )}
                             </p>
                         )}
                     </div>
@@ -317,7 +443,7 @@ export default function StepCompany({ vendor, sessionData }) {
                                     ? 'border-(--color-danger) focus:border-(--color-danger) focus:ring-(--color-danger)/20'
                                     : 'border-(--color-border-primary) focus:border-(--color-border-focus) focus:ring-(--color-brand-primary)/20'
                             }`}
-                            placeholder="0123456789012345"
+                            placeholder={t('e.g., 0123456789012345')}
                             inputMode="numeric"
                             maxLength={16}
                         />
@@ -359,7 +485,7 @@ export default function StepCompany({ vendor, sessionData }) {
                                     ? 'border-(--color-danger) focus:border-(--color-danger) focus:ring-(--color-danger)/20'
                                     : 'border-(--color-border-primary) focus:border-(--color-border-focus) focus:ring-(--color-brand-primary)/20'
                             }`}
-                            placeholder={t('Enter deed number')}
+                            placeholder={t('e.g., AHU-0012345')}
                             maxLength={100}
                         />
                         {(clientErrors.deed_number || errors.deed_number) && (
@@ -396,7 +522,7 @@ export default function StepCompany({ vendor, sessionData }) {
                                     ? 'border-(--color-danger) focus:border-(--color-danger) focus:ring-(--color-danger)/20'
                                     : 'border-(--color-border-primary) focus:border-(--color-border-focus) focus:ring-(--color-brand-primary)/20'
                             }`}
-                            placeholder={t('Full name of contact person')}
+                            placeholder={t('e.g., John Doe')}
                             maxLength={255}
                         />
                         {/* Localize contact-person validation feedback. */}
@@ -409,10 +535,8 @@ export default function StepCompany({ vendor, sessionData }) {
 
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {t('Phone Number / Mobile')}{' '}
-                            <span className="text-(--color-danger)">*</span>
+                            {t('WhatsApp Number')} <span className="text-(--color-danger)">*</span>
                         </label>
-                        {/* Guide Indonesian mobile input without blocking the +62 alternative. */}
                         <input
                             type="tel"
                             inputMode="tel"
@@ -439,10 +563,11 @@ export default function StepCompany({ vendor, sessionData }) {
                                     ? 'border-(--color-danger) focus:border-(--color-danger) focus:ring-(--color-danger)/20'
                                     : 'border-(--color-border-primary) focus:border-(--color-border-focus) focus:ring-(--color-brand-primary)/20'
                             }`}
-                            placeholder="081234567890"
+                            placeholder={t('e.g., 081234567890')}
+                            maxLength={13}
                         />
                         <p className="text-xs text-(--color-text-tertiary)">
-                            {t('Use 08... or +628... for a mobile number.')}
+                            {t('Use the 08xxxxxxxxxx format and digits only.')}
                         </p>
                         {/* Localize contact-phone validation feedback. */}
                         {(clientErrors.contact_phone || errors.contact_phone) && (
@@ -480,7 +605,7 @@ export default function StepCompany({ vendor, sessionData }) {
                                     ? 'border-(--color-danger) focus:border-(--color-danger) focus:ring-(--color-danger)/20'
                                     : 'border-(--color-border-primary) focus:border-(--color-border-focus) focus:ring-(--color-brand-primary)/20'
                             }`}
-                            placeholder={t('Full street address')}
+                            placeholder={t('e.g., Jl. Menteng Raya 9-19, Menteng, Central Jakarta')}
                             maxLength={500}
                         ></textarea>
                         {/* Show registered-address validation from both client and server checks. */}
@@ -562,7 +687,7 @@ export default function StepCompany({ vendor, sessionData }) {
                             maxLength={5}
                             pattern="[0-9]{5}"
                             title="Exactly 5 digits"
-                            placeholder="40115"
+                            placeholder={t('e.g., 10340')}
                         />
                         {/* Localize postal-code validation feedback. */}
                         {(clientErrors.pincode || errors.pincode) && (

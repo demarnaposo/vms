@@ -144,12 +144,12 @@ class ReportService
 
         $vendors = $query->orderBy('created_at', 'desc')->get();
 
-        $headers = ['ID', 'Company Name', 'Contact Person', 'Email', 'Status', 'Compliance Status', 'Compliance Score', 'Performance Score', 'Registered On'];
+        $headers = ['Vendor ID', 'Company Name', 'Contact Person', 'Email', 'Status', 'Compliance Status', 'Compliance Score', 'Performance Score', 'Registered On'];
         $rows = [];
 
         foreach ($vendors as $vendor) {
             $rows[] = [
-                $vendor->id,
+                $vendor->vendor_number ?? 'N/A',
                 $vendor->company_name,
                 $vendor->contact_person ?? 'N/A',
                 $vendor->contact_email ?? 'N/A',
@@ -223,7 +223,7 @@ class ReportService
         $query = VendorDocument::with(['vendor', 'documentType'])
             ->where('is_current', true)
             ->whereNotNull('expiry_date')
-            ->whereHas('documentType', fn ($q) => $q->where('has_expiry', true));
+            ->whereHas('documentType', fn ($q) => $q->where('has_expiry', true)->where('is_active', true));
 
         $startDate = $request->filled('start_date') ? $request->start_date : now()->format('Y-m-d');
         $endDate = $request->filled('end_date') ? $request->end_date : now()->addDays(30)->format('Y-m-d');
@@ -265,6 +265,7 @@ class ReportService
 
         $vendors = $query->select([
             'id',
+            'vendor_number',
             'company_name',
             'contact_person',
             'contact_email',
@@ -372,7 +373,7 @@ class ReportService
         $query = VendorDocument::with(['vendor', 'documentType'])
             ->where('is_current', true)
             ->whereNotNull('expiry_date')
-            ->whereHas('documentType', fn ($q) => $q->where('has_expiry', true));
+            ->whereHas('documentType', fn ($q) => $q->where('has_expiry', true)->where('is_active', true));
 
         $startDate = $request->filled('start_date') ? $request->start_date : now()->format('Y-m-d');
         $endDate = $request->filled('end_date') ? $request->end_date : now()->addDays(30)->format('Y-m-d');
@@ -393,19 +394,19 @@ class ReportService
             'stats' => [
                 'expiring_7_days' => VendorDocument::whereNotNull('expiry_date')
                     ->where('is_current', true)
-                    ->whereHas('documentType', fn ($q) => $q->where('has_expiry', true))
+                    ->whereHas('documentType', fn ($q) => $q->where('has_expiry', true)->where('is_active', true))
                     ->whereBetween('expiry_date', [now(), now()->addDays(7)])->count(),
                 'expiring_30_days' => VendorDocument::whereNotNull('expiry_date')
                     ->where('is_current', true)
-                    ->whereHas('documentType', fn ($q) => $q->where('has_expiry', true))
+                    ->whereHas('documentType', fn ($q) => $q->where('has_expiry', true)->where('is_active', true))
                     ->whereBetween('expiry_date', [now(), now()->addDays(30)])->count(),
                 'expired' => VendorDocument::whereNotNull('expiry_date')
                     ->where('is_current', true)
-                    ->whereHas('documentType', fn ($q) => $q->where('has_expiry', true))
+                    ->whereHas('documentType', fn ($q) => $q->where('has_expiry', true)->where('is_active', true))
                     ->where('expiry_date', '<', now())->count(),
                 'total_with_expiry' => VendorDocument::whereNotNull('expiry_date')
                     ->where('is_current', true)
-                    ->whereHas('documentType', fn ($q) => $q->where('has_expiry', true))
+                    ->whereHas('documentType', fn ($q) => $q->where('has_expiry', true)->where('is_active', true))
                     ->count(),
             ],
             'filters' => [

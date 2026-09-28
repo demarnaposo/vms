@@ -34,6 +34,12 @@ class AuthenticatedSessionController extends Controller
         /** @var \App\Models\User $user */
         $user = $request->user();
 
+        $selectedLocale = $request->cookie('vms_locale');
+        if (in_array($selectedLocale, config('app.supported_locales', ['en']), true)
+            && $user->preferred_locale !== $selectedLocale) {
+            $user->update(['preferred_locale' => $selectedLocale]);
+        }
+
         // Guard vendor access for restricted lifecycle states.
         if ($user->isVendor()) {
             $vendor = $user->vendor;

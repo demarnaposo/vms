@@ -6,6 +6,7 @@ use App\Interfaces\VendorRepositoryInterface;
 use App\Models\DocumentVersion;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Models\VendorCategory;
 // Persist the Indonesian country value with onboarding location data.
 use App\Support\IndonesiaRegions;
 use Illuminate\Http\UploadedFile;
@@ -35,10 +36,49 @@ class VendorService
      */
     public function getDraftApplication(User $user): \App\Models\VendorApplication
     {
-        return \App\Models\VendorApplication::firstOrCreate(
+        $application = \App\Models\VendorApplication::firstOrCreate(
             ['user_id' => $user->id, 'status' => 'draft'],
             ['current_step' => 1, 'data' => []]
         );
+
+        $data = $application->data ?? [];
+        $step1 = $data['step1'] ?? null;
+
+        if (is_array($step1) && ! isset($step1['category_id']) && filled($step1['category'] ?? null)) {
+            $category = VendorCategory::query()->where('code', $step1['category'])->first()
+                ?? VendorCategory::query()->where('code', 'legacy_'.hash('sha256', $step1['category']))->first();
+            if ($category) {
+                $step1['category_id'] = $category->id;
+                $data['step1'] = $step1;
+                $application->setAttribute('data', $data);
+            }
+        }
+
+        if (is_array($step1) && array_key_exists('registration_number', $step1)) {
+            // Read historical drafts through the current NIB key without rewriting them until the next save.
+            if (! array_key_exists('business_identification_number', $step1)) {
+                $step1['business_identification_number'] = $step1['registration_number'];
+            }
+
+            unset($step1['registration_number']);
+            $data['step1'] = $step1;
+            $application->setAttribute('data', $data);
+        }
+
+        $step2 = $data['step2'] ?? null;
+
+        if (is_array($step2) && array_key_exists('bank_ifsc', $step2)) {
+            // Read historical drafts through the current bank-code key until the draft is saved again.
+            if (! array_key_exists('code_bank', $step2)) {
+                $step2['code_bank'] = $step2['bank_ifsc'];
+            }
+
+            unset($step2['bank_ifsc']);
+            $data['step2'] = $step2;
+            $application->setAttribute('data', $data);
+        }
+
+        return $application;
     }
 
     /**
@@ -83,70 +123,78 @@ class VendorService
     /**
      * Handle Step 3 of onboarding (Document Uploads to Temp).
      */
-    public function storeOnboardingStep3(array $documentsData)
+    public function storeOnboardingStep3(array $documentsData, array $removedTypeIds = [])
     {
-        $user = Auth::user();
-        $application = $this->getDraftApplication($user);
+        return DB::transaction(function () use ($documentsData, $removedTypeIds) {
+            $user = Auth::user();
+            $application = $this->getDraftApplication($user);
 
-        // Store files in application-specific folder
-        $tempFolder = 'vendor-applications/'.$application->id.'/temp';
-        $processedDocuments = [];
+            // Store files in application-specific folder
+            $tempFolder = 'vendor-applications/'.$application->id.'/temp';
+            $processedDocuments = [];
 
-        $currentData = $application->data ?? [];
+            $currentData = $application->data ?? [];
 
-        // Check for existing documents in draft
-        $existingDocuments = array_map(function ($doc) {
-            $doc['document_type_id'] = (int) ($doc['document_type_id'] ?? 0);
+            // Check for existing documents in draft
+            $existingDocuments = array_map(function ($doc) {
+                $doc['document_type_id'] = (int) ($doc['document_type_id'] ?? 0);
 
-            return $doc;
-        }, $currentData['step3']['documents'] ?? []);
+                return $doc;
+            }, $currentData['step3']['documents'] ?? []);
 
-        foreach ($documentsData as $doc) {
-            $documentTypeId = (int) ($doc['document_type_id'] ?? 0);
-            /** @var UploadedFile $file */
-            $file = $doc['file'];
-            $path = $file->store($tempFolder, 'private');
+            $existingDocuments = array_values(array_filter($existingDocuments, fn ($doc) => ! in_array($doc['document_type_id'], array_map('intval', $removedTypeIds), true)));
 
-            $processedDocuments[] = [
-                'document_type_id' => $documentTypeId,
-                'file_name' => $this->sanitizeFileName($file->getClientOriginalName()),
-                'file_path' => $path,
-                'file_size' => $file->getSize(),
-                'mime_type' => $file->getMimeType(),
-                'file_hash' => hash_file('sha256', $file->getRealPath()),
-                'expiry_date' => $doc['expiry_date'] ?? null,
-            ];
-        }
+            foreach ($documentsData as $doc) {
+                $documentTypeId = (int) ($doc['document_type_id'] ?? 0);
+                /** @var UploadedFile $file */
+                $file = $doc['file'];
+                \App\Support\DocumentUploadRules::validate($documentTypeId, $file, $doc['expiry_date'] ?? null);
+                $path = $file->store($tempFolder, 'private');
+                if (! $path) {
+                    throw new \RuntimeException('Document storage failed.');
+                }
 
-        // Merge logic
-        $finalDocuments = $existingDocuments;
+                $processedDocuments[] = [
+                    'document_type_id' => $documentTypeId,
+                    'file_name' => $this->sanitizeFileName($file->getClientOriginalName()),
+                    'file_path' => $path,
+                    'file_size' => $file->getSize(),
+                    'mime_type' => $file->getMimeType(),
+                    'file_hash' => hash_file('sha256', $file->getRealPath()),
+                    'expiry_date' => $doc['expiry_date'] ?? null,
+                ];
+            }
 
-        foreach ($processedDocuments as $newDoc) {
-            $replaced = false;
-            foreach ($finalDocuments as $key => $existingDoc) {
-                if ((int) ($existingDoc['document_type_id'] ?? 0) === $newDoc['document_type_id']) {
-                    // Remove old file
-                    if (Storage::disk('private')->exists($existingDoc['file_path'])) {
-                        Storage::disk('private')->delete($existingDoc['file_path']);
+            // Merge logic
+            $finalDocuments = $existingDocuments;
+
+            foreach ($processedDocuments as $newDoc) {
+                $replaced = false;
+                foreach ($finalDocuments as $key => $existingDoc) {
+                    if ((int) ($existingDoc['document_type_id'] ?? 0) === $newDoc['document_type_id']) {
+                        // Remove old file
+                        if (Storage::disk('private')->exists($existingDoc['file_path'])) {
+                            DB::afterCommit(fn () => Storage::disk('private')->delete($existingDoc['file_path']));
+                        }
+                        $finalDocuments[$key] = $newDoc;
+                        $replaced = true;
+                        break;
                     }
-                    $finalDocuments[$key] = $newDoc;
-                    $replaced = true;
-                    break;
+                }
+                if (! $replaced) {
+                    $finalDocuments[] = $newDoc;
                 }
             }
-            if (! $replaced) {
-                $finalDocuments[] = $newDoc;
-            }
-        }
 
-        $currentData['step3'] = ['documents' => $finalDocuments];
+            $currentData['step3'] = ['documents' => $finalDocuments];
 
-        $application->update([
-            'data' => $currentData,
-            'current_step' => max($application->current_step, 4),
-        ]);
+            $application->update([
+                'data' => $currentData,
+                'current_step' => max($application->current_step, 4),
+            ]);
 
-        return $application;
+            return $application;
+        });
     }
 
     /**
@@ -162,12 +210,22 @@ class VendorService
         $application = $this->getDraftApplication($user);
         $data = $application->data ?? [];
 
+        $categoryId = $data['step1']['category_id'] ?? null;
+        if (! $categoryId || ! VendorCategory::query()->whereKey($categoryId)->where('is_active', true)->exists()) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'category_id' => 'Please select a valid category.',
+            ]);
+        }
+
         return DB::transaction(function () use ($user, $data, $application) {
+            \App\Models\DocumentType::query()->whereIn('id', collect($data['step3']['documents'] ?? [])->pluck('document_type_id'))->lockForUpdate()->get();
+            app(DraftDocumentValidator::class)->validate($application);
             // 1. Create or Update Vendor (Ensure it exists first)
             $vendorData = array_merge(
                 $data['step1'] ?? [],
                 $data['step2'] ?? []
             );
+            unset($vendorData['category']);
             // Keep new and resubmitted vendor profiles aligned with Indonesian regions.
             $vendorData['country'] = IndonesiaRegions::country();
 
@@ -258,7 +316,7 @@ class VendorService
             }
 
             return $vendor;
-        });
+        }, 3);
     }
 
     /**
@@ -268,46 +326,52 @@ class VendorService
      */
     public function uploadDocument(Vendor $vendor, UploadedFile $file, int $documentTypeId, ?string $expiryDate)
     {
-        $path = $file->store('vendor-documents/'.$vendor->id, 'private');
-        $hash = hash_file('sha256', $file->getRealPath());
-        $actorId = Auth::id() ?? $vendor->user_id;
+        return DB::transaction(function () use ($vendor, $file, $documentTypeId, $expiryDate) {
+            \App\Support\DocumentUploadRules::validate($documentTypeId, $file, $expiryDate);
+            $path = $file->store('vendor-documents/'.$vendor->id, 'private');
+            if (! $path) {
+                throw new \RuntimeException('Document storage failed.');
+            }
+            $hash = hash_file('sha256', $file->getRealPath());
+            $actorId = Auth::id() ?? $vendor->user_id;
 
-        // Keep old version immutable, mark it as no longer current.
-        $existing = $vendor->documents()
-            ->where('document_type_id', $documentTypeId)
-            ->where('is_current', true)
-            ->latest('version')
-            ->first();
+            // Keep old version immutable, mark it as no longer current.
+            $existing = $vendor->documents()
+                ->where('document_type_id', $documentTypeId)
+                ->where('is_current', true)
+                ->latest('version')
+                ->first();
 
-        $nextVersion = 1;
-        if ($existing) {
-            $existing->update(['is_current' => false]);
-            $nextVersion = $existing->version + 1;
-        }
+            $nextVersion = 1;
+            if ($existing) {
+                $existing->update(['is_current' => false]);
+                $nextVersion = $existing->version + 1;
+            }
 
-        $document = $this->vendorRepository->createDocument($vendor, [
-            'document_type_id' => $documentTypeId,
-            'file_name' => $this->sanitizeFileName($file->getClientOriginalName()),
-            'file_path' => $path,
-            'file_hash' => $hash,
-            'file_size' => $file->getSize(),
-            'mime_type' => $file->getMimeType(),
-            'expiry_date' => $expiryDate,
-            'version' => $nextVersion,
-            'is_current' => true,
-            'verification_status' => 'pending',
-        ]);
+            $document = $this->vendorRepository->createDocument($vendor, [
+                'document_type_id' => $documentTypeId,
+                'file_name' => $this->sanitizeFileName($file->getClientOriginalName()),
+                'file_path' => $path,
+                'file_hash' => $hash,
+                'file_size' => $file->getSize(),
+                'mime_type' => $file->getMimeType(),
+                'expiry_date' => $expiryDate,
+                'version' => $nextVersion,
+                'is_current' => true,
+                'verification_status' => 'pending',
+            ]);
 
-        DocumentVersion::create([
-            'vendor_document_id' => $document->id,
-            'version' => $document->version,
-            'file_path' => $document->file_path,
-            'file_hash' => $document->file_hash,
-            'uploaded_by' => $actorId,
-            'notes' => 'Re-uploaded document version',
-        ]);
+            DocumentVersion::create([
+                'vendor_document_id' => $document->id,
+                'version' => $document->version,
+                'file_path' => $document->file_path,
+                'file_hash' => $document->file_hash,
+                'uploaded_by' => $actorId,
+                'notes' => 'Re-uploaded document version',
+            ]);
 
-        return $document;
+            return $document;
+        });
     }
 
     /**

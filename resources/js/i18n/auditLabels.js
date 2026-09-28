@@ -22,6 +22,18 @@ const AUDIT_ENTITY_LABELS = Object.freeze({
     'App\\Models\\User': 'User',
 });
 
+// Translate application-generated descriptions without changing staff-entered audit reasons.
+const AUDIT_DESCRIPTION_LABELS = new Set([
+    'Vendor application submitted for review',
+    'Vendor approved and activated',
+    'Vendor approved',
+    'Vendor moved to review before rejection',
+    'Vendor activated',
+    'Admin reviewed termination appeal and restored access.',
+    'Internal staff user created',
+    'Contact message soft-deleted by staff',
+]);
+
 // Preserve unknown custom event codes verbatim.
 export function translateAuditEvent(language, event) {
     if (typeof event !== 'string') return event;
@@ -37,4 +49,13 @@ export function translateAuditEntity(language, auditableType) {
     const className = auditableType.split('\\').pop();
     const label = AUDIT_ENTITY_LABELS[auditableType];
     return label ? translateMessage(language, label) : className;
+}
+
+// Preserve custom reasons verbatim and localize only descriptions emitted by VMS.
+export function translateAuditDescription(language, description) {
+    if (typeof description !== 'string') return description;
+
+    return AUDIT_DESCRIPTION_LABELS.has(description)
+        ? translateMessage(language, description)
+        : description;
 }

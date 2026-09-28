@@ -2,6 +2,7 @@
 
 // Translate dynamic alerts while preserving names, status codes, and counts verbatim.
 return [
+    'vendor_decision_mail_failed' => 'Status vendor sudah berubah, tetapi pemberitahuan email tidak dapat diproses.',
     'notification_sent' => 'Notifikasi berhasil dikirim kepada :count penerima.',
     'contact_message_sent' => 'Terima kasih atas pesan Anda! Kami akan segera menghubungi Anda.',
     'contact_message_failed' => 'Pesan Anda tidak dapat dikirim. Silakan coba lagi.',

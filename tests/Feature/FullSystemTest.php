@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Models\VendorCategory;
 use App\Notifications\VendorApplicationSubmitted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -40,6 +41,12 @@ class FullSystemTest extends TestCase
             'is_mandatory' => true,
             'is_active' => true,
         ]);
+
+        VendorCategory::create([
+            'code' => 'test_services',
+            'display_name' => 'Test Services',
+            'is_active' => true,
+        ]);
     }
 
     public function test_full_vendor_onboarding_journey()
@@ -67,10 +74,12 @@ class FullSystemTest extends TestCase
         $companyData = [
             'company_name' => 'Test Corp Ltd',
             // Use NIB and NPWP in the complete onboarding flow.
-            'registration_number' => '1234567890123',
+            'business_identification_number' => '1234567890123',
             'tax_id' => '0123456789012345',
             'deed_number' => 'DEED-000001',
             'business_type' => 'pvt_ltd',
+            'category_id' => VendorCategory::where('code', 'test_services')->value('id'),
+            'experience' => 'Software procurement for PPM Manajemen in 2025.',
             'contact_person' => 'John Doe',
             // Use a valid Indonesian mobile number in the VMS onboarding flow.
             'contact_phone' => '081234567890',
@@ -95,7 +104,7 @@ class FullSystemTest extends TestCase
             // Use Indonesian bank information in the full onboarding fixture.
             'bank_name' => 'Bank Mandiri',
             'bank_account_number' => '123456789012',
-            'bank_ifsc' => '008',
+            'code_bank' => '008',
             'bank_branch' => 'KCP Jakarta Menteng',
         ];
 
@@ -104,7 +113,7 @@ class FullSystemTest extends TestCase
 
         // 6. Step 3: Documents
         // Mock a document upload
-        $file = UploadedFile::fake()->create('gst_cert.pdf', 100);
+        $file = UploadedFile::fake()->createWithContent('gst_cert.pdf', "%PDF-1.4\n%%EOF");
 
         // We need a document_type_id. Let's assume one exists or mock it if using DB seed.
         // For test stability, we'll create one if not exists or use ID 1.

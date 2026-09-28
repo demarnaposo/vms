@@ -6,6 +6,8 @@ use App\Models\DocumentType;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Models\VendorApplication;
+use App\Models\VendorCategory;
 use App\Notifications\VendorApplicationSubmitted;
 // Verifikasi snapshot wilayah Indonesia yang digunakan frontend dan backend.
 use App\Support\IndonesiaRegions;
@@ -24,6 +26,8 @@ class VendorOnboardingTest extends TestCase
     protected $opsUser;
 
     protected $documentType;
+
+    protected $categoryId;
 
     protected function setUp(): void
     {
@@ -50,6 +54,12 @@ class VendorOnboardingTest extends TestCase
             'is_active' => true,
         ]);
 
+        $this->categoryId = VendorCategory::create([
+            'code' => 'test_services',
+            'display_name' => 'Test Services',
+            'is_active' => true,
+        ])->id;
+
         Storage::fake('private');
     }
 
@@ -60,10 +70,13 @@ class VendorOnboardingTest extends TestCase
             ->post(route('vendor.onboarding.step1'), [
                 'company_name' => 'Test Company',
                 // Exercise Indonesian NIB and NPWP onboarding values.
-                'registration_number' => '1234567890123',
+                'business_identification_number' => '1234567890123',
                 'tax_id' => '0123456789012345',
                 'deed_number' => 'DEED-000001',
                 'business_type' => 'pvt_ltd',
+                'category_id' => $this->categoryId,
+                'experience' => 'Software procurement for PT Example in 2025.',
+                'vendor_number' => 'V999',
                 'contact_person' => 'Test Person',
                 // Submit an Indonesian mobile number during VMS onboarding.
                 'contact_phone' => '081234567890',
@@ -82,10 +95,16 @@ class VendorOnboardingTest extends TestCase
 
         $application = \App\Models\VendorApplication::where('user_id', $this->vendorUser->id)->first();
         $this->assertEquals('Test Company', $application->data['step1']['company_name']);
-        $this->assertSame('1234567890123', $application->data['step1']['registration_number']);
+        $this->assertSame('1234567890123', $application->data['step1']['business_identification_number']);
         $this->assertSame('0123456789012345', $application->data['step1']['tax_id']);
         $this->assertSame('DEED-000001', $application->data['step1']['deed_number']);
         $this->assertSame('081234567890', $application->data['step1']['contact_phone']);
+        $this->assertSame($this->categoryId, $application->data['step1']['category_id']);
+        $this->assertSame(
+            'Software procurement for PT Example in 2025.',
+            $application->data['step1']['experience']
+        );
+        $this->assertArrayNotHasKey('vendor_number', $application->data['step1']);
     }
 
     // Keep backend required-field messages aligned with the onboarding form.
@@ -95,12 +114,14 @@ class VendorOnboardingTest extends TestCase
             ->post(route('vendor.onboarding.step1'), [])
             ->assertSessionHasErrors([
                 'company_name' => 'Company Name is required.',
-                'registration_number' => 'Business Identification Number (NIB) is required.',
+                'business_identification_number' => 'Business Identification Number (NIB) is required.',
                 'tax_id' => 'Taxpayer Identification Number (NPWP) is required.',
                 'deed_number' => 'Deed of Establishment Number is required.',
                 'business_type' => 'Business Type is required.',
+                'category_id' => 'Category is required.',
+                'experience' => 'Experience is required.',
                 'contact_person' => 'Contact Person is required.',
-                'contact_phone' => 'Phone Number / Mobile is required.',
+                'contact_phone' => 'WhatsApp Number is required.',
                 'address' => 'Address is required.',
                 'state' => 'Province is required.',
                 'city' => 'Regency or city is required.',
@@ -108,15 +129,78 @@ class VendorOnboardingTest extends TestCase
             ]);
     }
 
+    public function test_step_1_rejects_the_legacy_registration_number_request_key(): void
+    {
+        $this->actingAs($this->vendorUser)
+            ->post(route('vendor.onboarding.step1'), [
+                'company_name' => 'Test Company',
+                'registration_number' => '1234567890123',
+                'tax_id' => '0123456789012345',
+                'deed_number' => 'DEED-000001',
+                'business_type' => 'pvt_ltd',
+                'category_id' => $this->categoryId,
+                'experience' => 'Software procurement for PPM Manajemen in 2025.',
+                'contact_person' => 'Test Person',
+                'contact_phone' => '081234567890',
+                'address' => '123 Test St',
+                'city' => 'Kota Bandung',
+                'state' => 'Jawa Barat',
+                'pincode' => '40115',
+            ])
+            ->assertSessionHasErrors([
+                'business_identification_number' => 'Business Identification Number (NIB) is required.',
+            ]);
+
+        $this->assertDatabaseMissing('vendor_applications', [
+            'user_id' => $this->vendorUser->id,
+        ]);
+    }
+
+    public function test_legacy_draft_nib_key_is_mapped_and_rewritten_on_the_next_save(): void
+    {
+        $application = VendorApplication::create([
+            'user_id' => $this->vendorUser->id,
+            'current_step' => 2,
+            'status' => 'draft',
+            'data' => [
+                'step1' => [
+                    'company_name' => 'Legacy Draft Company',
+                    'registration_number' => '1234567890123',
+                ],
+            ],
+        ]);
+
+        $this->actingAs($this->vendorUser)
+            ->get(route('vendor.onboarding', ['step' => 1]))
+            ->assertInertia(fn ($page) => $page
+                ->where('sessionData.step1.business_identification_number', '1234567890123')
+                ->missing('sessionData.step1.registration_number'));
+
+        $this->actingAs($this->vendorUser)
+            ->post(route('vendor.onboarding.step2'), [
+                'bank_name' => 'Bank Mandiri',
+                'bank_account_number' => '1234567890',
+                'code_bank' => '008',
+                'bank_branch' => 'KCP Jakarta Menteng',
+            ])
+            ->assertRedirect(route('vendor.onboarding', ['step' => 3]));
+
+        $step1 = $application->fresh()->data['step1'];
+        $this->assertSame('1234567890123', $step1['business_identification_number']);
+        $this->assertArrayNotHasKey('registration_number', $step1);
+    }
+
     // Accept formatted identifiers and reject invalid NIB or NPWP lengths.
     public function test_vendor_company_identifiers_follow_indonesian_formats(): void
     {
         $validPayload = [
             'company_name' => 'Test Company',
-            'registration_number' => '1234-5678-90123',
+            'business_identification_number' => '1234-5678-90123',
             'tax_id' => '01.234.567.8-901.234',
             'deed_number' => 'DEED-000001',
             'business_type' => 'pvt_ltd',
+            'category_id' => $this->categoryId,
+            'experience' => 'Software procurement for PT Example in 2025.',
             'contact_person' => 'Test Person',
             'contact_phone' => '081234567890',
             'address' => '123 Test St',
@@ -130,15 +214,16 @@ class VendorOnboardingTest extends TestCase
             ->assertSessionHasNoErrors();
 
         $application = \App\Models\VendorApplication::where('user_id', $this->vendorUser->id)->firstOrFail();
-        $this->assertSame('1234567890123', $application->data['step1']['registration_number']);
+        $this->assertSame('1234567890123', $application->data['step1']['business_identification_number']);
         $this->assertSame('012345678901234', $application->data['step1']['tax_id']);
 
         $this->actingAs($this->vendorUser)
             ->post(route('vendor.onboarding.step1'), array_merge($validPayload, [
-                'registration_number' => '123456789012',
+                'business_identification_number' => '123456789012',
                 'tax_id' => '12345678901234',
             ]))
-            ->assertSessionHasErrors(['registration_number', 'tax_id']);
+            ->assertSessionHasErrors(['business_identification_number', 'tax_id'])
+            ->assertSessionHasInput('business_identification_number', '123456789012');
 
         // Reject an application without the required deed number.
         $this->actingAs($this->vendorUser)
@@ -148,6 +233,44 @@ class VendorOnboardingTest extends TestCase
             ->assertSessionHasErrors(['deed_number']);
     }
 
+    public function test_vendor_category_and_experience_are_validated(): void
+    {
+        $payload = [
+            'company_name' => 'Test Company',
+            'business_identification_number' => '1234567890123',
+            'tax_id' => '0123456789012345',
+            'deed_number' => 'DEED-000001',
+            'business_type' => 'pvt_ltd',
+            'category_id' => 999999,
+            'experience' => str_repeat('a', 2001),
+            'contact_person' => 'Test Person',
+            'contact_phone' => '081234567890',
+            'address' => '123 Test St',
+            'city' => 'Kota Bandung',
+            'state' => 'Jawa Barat',
+            'pincode' => '40115',
+        ];
+
+        $this->actingAs($this->vendorUser)
+            ->post(route('vendor.onboarding.step1'), $payload)
+            ->assertSessionHasErrors([
+                'category_id' => 'Please select a valid category.',
+                'experience' => 'Experience may not exceed 2000 characters.',
+            ]);
+
+        $inactive = \App\Models\VendorCategory::create([
+            'code' => 'inactive_category',
+            'display_name' => 'Inactive Category',
+            'is_active' => false,
+        ]);
+        $this->actingAs($this->vendorUser)
+            ->post(route('vendor.onboarding.step1'), array_merge($payload, [
+                'category_id' => $inactive->id,
+                'experience' => 'Completed a prior project.',
+            ]))
+            ->assertSessionHasErrors(['category_id' => 'Please select a valid category.']);
+    }
+
     // Pastikan lokasi yang tidak didukung dan kode pos enam digit ditolak oleh backend.
     public function test_vendor_cannot_save_indian_location_or_six_digit_postal_code(): void
     {
@@ -155,10 +278,12 @@ class VendorOnboardingTest extends TestCase
             ->from(route('vendor.onboarding'))
             ->post(route('vendor.onboarding.step1'), [
                 'company_name' => 'Test Company',
-                'registration_number' => '1234567890123',
+                'business_identification_number' => '1234567890123',
                 'tax_id' => '0123456789012345',
                 'deed_number' => 'DEED-000001',
                 'business_type' => 'pvt_ltd',
+                'category_id' => $this->categoryId,
+                'experience' => 'Software procurement for PT Example in 2025.',
                 'contact_person' => 'Test Person',
                 // Keep the contact number valid while testing address errors.
                 'contact_phone' => '081234567890',
@@ -173,16 +298,17 @@ class VendorOnboardingTest extends TestCase
             ->assertSessionHasErrors(['city', 'state', 'pincode']);
     }
 
-    // Normalize an accepted +62 mobile number before saving the VMS application.
-    public function test_vendor_can_save_international_mobile_number_as_local_format(): void
+    public function test_vendor_rejects_non_local_whatsapp_formats(): void
     {
         $this->actingAs($this->vendorUser)
             ->post(route('vendor.onboarding.step1'), [
                 'company_name' => 'Test Company',
-                'registration_number' => '1234567890123',
+                'business_identification_number' => '1234567890123',
                 'tax_id' => '0123456789012345',
                 'deed_number' => 'DEED-000001',
                 'business_type' => 'pvt_ltd',
+                'category_id' => $this->categoryId,
+                'experience' => 'Software procurement for PT Example in 2025.',
                 'contact_person' => 'Test Person',
                 'contact_phone' => '+6281234567890',
                 'address' => '123 Test St',
@@ -190,27 +316,25 @@ class VendorOnboardingTest extends TestCase
                 'state' => 'Jawa Barat',
                 'pincode' => '40115',
             ])
-            ->assertRedirect(route('vendor.onboarding', ['step' => 2]));
-
-        $application = \App\Models\VendorApplication::where('user_id', $this->vendorUser->id)->firstOrFail();
-        $this->assertSame('081234567890', $application->data['step1']['contact_phone']);
+            ->assertSessionHasErrors([
+                'contact_phone' => 'WhatsApp Number must start with 08 and contain digits only.',
+            ]);
     }
 
     // Reject unsupported prefixes and mobile numbers beyond the input limit.
     public function test_vendor_cannot_save_invalid_mobile_number(): void
     {
-        foreach (['9876543210', '081234567', '08123456789012', '+62081234567890'] as $number) {
+        foreach (['9876543210', '081234567', '08123456789012', '+6281234567890', '0812 3456 7890', '0812-3456-7890', '0812abc56789'] as $number) {
             $this->actingAs($this->vendorUser)
                 ->from(route('vendor.onboarding'))
                 ->post(route('vendor.onboarding.step1'), ['contact_phone' => $number])
                 ->assertSessionHasErrors([
-                    'contact_phone' => 'Enter a valid mobile number (e.g. 081234567890 or +6281234567890).',
+                    'contact_phone' => 'WhatsApp Number must start with 08 and contain digits only.',
                 ]);
         }
     }
 
-    // Apply the same mobile normalization when editing a submitted VMS profile.
-    public function test_submitted_vendor_profile_normalizes_international_mobile_number(): void
+    public function test_submitted_vendor_profile_rejects_international_whatsapp_number(): void
     {
         $vendor = Vendor::factory()->create([
             'user_id' => $this->vendorUser->id,
@@ -227,13 +351,14 @@ class VendorOnboardingTest extends TestCase
                 'pincode' => '40115',
                 'bank_name' => 'Bank Mandiri',
                 'bank_account_number' => '1234567890',
-                'bank_ifsc' => '008',
+                'code_bank' => '008',
                 'bank_branch' => 'KCP Jakarta Menteng',
             ])
-            ->assertSessionHasNoErrors();
+            ->assertSessionHasErrors([
+                'contact_phone' => 'WhatsApp Number must start with 08 and contain digits only.',
+            ]);
 
-        $this->assertSame('081234567890', $vendor->fresh()->contact_phone);
-        $this->assertSame('081234567890', $this->vendorUser->fresh()->phone);
+        $this->assertNotSame('+6281234567890', $vendor->fresh()->contact_phone);
     }
 
     // Pastikan snapshot wilayah memuat 38 provinsi dan 514 kabupaten/kota.
@@ -267,7 +392,7 @@ class VendorOnboardingTest extends TestCase
                 // Use Indonesian bank information in step two validation.
                 'bank_name' => 'Bank Mandiri',
                 'bank_account_number' => '1234567890',
-                'bank_ifsc' => '008',
+                'code_bank' => '008',
                 'bank_branch' => 'KCP Jakarta Menteng',
             ]);
 
@@ -275,10 +400,12 @@ class VendorOnboardingTest extends TestCase
 
         $application = \App\Models\VendorApplication::where('user_id', $this->vendorUser->id)->first();
         $this->assertEquals('Bank Mandiri', $application->data['step2']['bank_name']);
+        $this->assertSame('008', $application->data['step2']['code_bank']);
+        $this->assertArrayNotHasKey('bank_ifsc', $application->data['step2']);
         $this->assertEquals(3, $application->current_step);
     }
 
-    public function test_vendor_cannot_save_an_ifsc_as_an_indonesian_bank_code(): void
+    public function test_vendor_cannot_save_an_invalid_bank_code_format(): void
     {
         \App\Models\VendorApplication::create([
             'user_id' => $this->vendorUser->id,
@@ -294,13 +421,72 @@ class VendorOnboardingTest extends TestCase
             ->post(route('vendor.onboarding.step2'), [
                 'bank_name' => 'State Bank of India',
                 'bank_account_number' => '1234567890',
-                'bank_ifsc' => 'SBIN0001234',
+                'code_bank' => 'SBIN0001234',
                 'bank_branch' => 'Mumbai Main',
             ]);
 
         $response
             ->assertRedirect(route('vendor.onboarding', ['step' => 2]))
-            ->assertSessionHasErrors(['bank_ifsc']);
+            ->assertSessionHasErrors(['code_bank'])
+            ->assertSessionHasInput('code_bank', 'SBIN0001234');
+    }
+
+    public function test_legacy_bank_ifsc_request_key_is_not_accepted(): void
+    {
+        VendorApplication::create([
+            'user_id' => $this->vendorUser->id,
+            'current_step' => 2,
+            'status' => 'draft',
+            'data' => [
+                'step1' => ['company_name' => 'Test Co'],
+            ],
+        ]);
+
+        $this->actingAs($this->vendorUser)
+            ->post(route('vendor.onboarding.step2'), [
+                'bank_name' => 'Bank Mandiri',
+                'bank_account_number' => '1234567890',
+                'bank_ifsc' => '008',
+                'bank_branch' => 'KCP Jakarta Menteng',
+            ])
+            ->assertSessionHasErrors(['code_bank']);
+    }
+
+    public function test_legacy_draft_bank_key_is_mapped_and_rewritten_on_the_next_save(): void
+    {
+        $application = VendorApplication::create([
+            'user_id' => $this->vendorUser->id,
+            'current_step' => 2,
+            'status' => 'draft',
+            'data' => [
+                'step1' => ['company_name' => 'Legacy Bank Draft'],
+                'step2' => [
+                    'bank_name' => 'Bank Mandiri',
+                    'bank_account_number' => '1234567890',
+                    'bank_ifsc' => '008',
+                    'bank_branch' => 'KCP Jakarta Menteng',
+                ],
+            ],
+        ]);
+
+        $this->actingAs($this->vendorUser)
+            ->get(route('vendor.onboarding', ['step' => 2]))
+            ->assertInertia(fn ($page) => $page
+                ->where('sessionData.step2.code_bank', '008')
+                ->missing('sessionData.step2.bank_ifsc'));
+
+        $this->actingAs($this->vendorUser)
+            ->post(route('vendor.onboarding.step2'), [
+                'bank_name' => 'Bank Mandiri',
+                'bank_account_number' => '1234567890',
+                'code_bank' => '008',
+                'bank_branch' => 'KCP Jakarta Menteng',
+            ])
+            ->assertRedirect(route('vendor.onboarding', ['step' => 3]));
+
+        $step2 = $application->fresh()->data['step2'];
+        $this->assertSame('008', $step2['code_bank']);
+        $this->assertArrayNotHasKey('bank_ifsc', $step2);
     }
 
     public function test_vendor_can_upload_documents_step_3()
@@ -316,7 +502,7 @@ class VendorOnboardingTest extends TestCase
             ],
         ]);
 
-        $file = UploadedFile::fake()->create('pan.pdf', 100);
+        $file = UploadedFile::fake()->createWithContent('pan.pdf', "%PDF-1.4\n%%EOF");
 
         $response = $this->actingAs($this->vendorUser)
             ->post(route('vendor.onboarding.step3'), [
@@ -350,10 +536,14 @@ class VendorOnboardingTest extends TestCase
                 // Simpan lokasi vendor Indonesia saat aplikasi dikirim.
                 'step1' => [
                     'company_name' => 'Test Company',
-                    // Persist Indonesian identifiers during final application submission.
+                    // Confirm historical drafts still submit through the current NIB column.
                     'registration_number' => '1234567890123',
                     'tax_id' => '0123456789012345',
                     'deed_number' => 'DEED-000001',
+                    'business_type' => 'pvt_ltd',
+                    'category_id' => $this->categoryId,
+                    'experience' => 'Software procurement for PT Example in 2025.',
+                    'vendor_number' => 'V999',
                     'contact_person' => 'Test Person',
                     // Use an Indonesian mobile number in the VMS submission fixture.
                     'contact_phone' => '081234567890',
@@ -367,14 +557,14 @@ class VendorOnboardingTest extends TestCase
                 'step2' => [
                     'bank_name' => 'Bank Mandiri',
                     'bank_account_number' => '1234567890',
-                    'bank_ifsc' => '008',
+                    'code_bank' => '008',
                 ],
                 // Step 3 will be set up with a real temp file
             ],
         ]);
 
         // Create a real temp file
-        $file = UploadedFile::fake()->create('pan.pdf', 100);
+        $file = UploadedFile::fake()->createWithContent('pan.pdf', "%PDF-1.4\n%%EOF");
         $path = $file->store('vendor-applications/'.$application->id.'/temp', 'private');
 
         // Update application data with document info
@@ -403,6 +593,10 @@ class VendorOnboardingTest extends TestCase
         $this->assertDatabaseHas('vendors', [
             'user_id' => $this->vendorUser->id,
             'company_name' => 'Test Company',
+            'vendor_number' => 'V001',
+            'business_identification_number' => '1234567890123',
+            'category_id' => $this->categoryId,
+            'experience' => 'Software procurement for PT Example in 2025.',
             'country' => 'Indonesia',
             'status' => Vendor::STATUS_SUBMITTED,
         ]);

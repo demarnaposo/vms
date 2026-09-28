@@ -135,6 +135,12 @@ export function translateSystemMasterDataField(
         categoryDefinitions && Object.hasOwn(categoryDefinitions, record.name)
             ? categoryDefinitions[record.name]
             : null;
+    if (
+        category === 'document_types' &&
+        record[field] != null &&
+        record[field] !== definition?.[field]
+    )
+        return record[field];
     const source = definition?.[field] || record[field] || fallback;
 
     return definition && source ? translateMessage(language, source) : source;

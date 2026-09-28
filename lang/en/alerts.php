@@ -2,6 +2,7 @@
 
 // Keep dynamic alert copy separate from database and user-provided values.
 return [
+    'vendor_decision_mail_failed' => 'The vendor status changed, but the email notification could not be processed.',
     'notification_sent' => 'Notification sent to :count recipient(s).',
     'contact_message_sent' => 'Thank you for your message! We\'ll get back to you soon.',
     'contact_message_failed' => 'Your message could not be sent. Please try again.',

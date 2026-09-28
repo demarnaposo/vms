@@ -26,11 +26,12 @@ class VendorFactory extends Factory
             'user_id' => User::factory(),
             'company_name' => $this->faker->company(),
             // Generate Indonesian NIB and NPWP fixture values for new vendors.
-            'registration_number' => $this->faker->numerify('#############'),
+            'business_identification_number' => $this->faker->numerify('#############'),
             'tax_id' => $this->faker->numerify('################'),
             // Generate a deed number for complete vendor fixtures.
             'deed_number' => 'DEED-'.$this->faker->unique()->numerify('######'),
             'business_type' => $this->faker->randomElement(['proprietorship', 'partnership', 'private_limited']),
+            'experience' => 'Software procurement for a client company in 2025.',
             'contact_person' => $this->faker->name(),
             'contact_email' => $this->faker->companyEmail(),
             // Generate valid Indonesian VMS mobile numbers for new vendor fixtures.
@@ -45,7 +46,7 @@ class VendorFactory extends Factory
             'bank_name' => 'Bank Mandiri',
             'bank_account_number' => $this->faker->numerify('#############'),
             // Generate an Indonesian three-digit bank code fixture.
-            'bank_ifsc' => '008',
+            'code_bank' => '008',
             'status' => Vendor::STATUS_DRAFT,
             'compliance_status' => Vendor::COMPLIANCE_PENDING,
             'compliance_score' => $this->faker->numberBetween(0, 100),

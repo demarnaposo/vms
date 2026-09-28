@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
 // Use the centralized bilingual message resolver.
 import { translateMessage } from '@/i18n/translations';
 
@@ -42,13 +43,26 @@ export function LanguageProvider({ children }) {
             preferences = {};
         }
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...preferences, language }));
+
+        axios.post('/locale').catch(() => {
+            window.alert(
+                translateMessage(
+                    language,
+                    'Your email language preference could not be saved. Please try again.'
+                )
+            );
+        });
     }, [language]);
 
     const value = useMemo(
         () => ({
             language,
             setLanguage: (nextLanguage) => {
-                if (SUPPORTED_LANGUAGES.includes(nextLanguage)) setLanguage(nextLanguage);
+                if (!SUPPORTED_LANGUAGES.includes(nextLanguage) || nextLanguage === language)
+                    return;
+
+                document.cookie = `${COOKIE_NAME}=${nextLanguage}; path=/; max-age=31536000; samesite=lax`;
+                setLanguage(nextLanguage);
             },
             t: (message, replacements) => translateMessage(language, message, replacements),
         }),

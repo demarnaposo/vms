@@ -53,6 +53,9 @@ class VendorLifecycleService
     public function approve(Vendor $vendor, User $actor, ?string $comment = null): void
     {
         DB::transaction(function () use ($vendor, $actor, $comment) {
+            // Recheck the current state under a row lock before deciding once.
+            Vendor::query()->whereKey($vendor->getKey())->lockForUpdate()->firstOrFail();
+            $vendor->refresh();
             $note = $comment ?: 'Vendor approved';
 
             if ($vendor->status === Vendor::STATUS_SUBMITTED) {
@@ -79,6 +82,9 @@ class VendorLifecycleService
     public function reject(Vendor $vendor, User $actor, string $reason): void
     {
         DB::transaction(function () use ($vendor, $actor, $reason) {
+            // Recheck the current state under a row lock before deciding once.
+            Vendor::query()->whereKey($vendor->getKey())->lockForUpdate()->firstOrFail();
+            $vendor->refresh();
             if ($vendor->status === Vendor::STATUS_SUBMITTED) {
                 // Mark the fixed pre-rejection transition comment as automatic.
                 $vendor->transitionTo(Vendor::STATUS_UNDER_REVIEW, $actor, 'Vendor moved to review before rejection', automaticComment: true);
@@ -181,8 +187,7 @@ class VendorLifecycleService
                 ->where(function ($query) {
                     $query->whereDate('expiry_date', '>=', now()->toDateString())
                         ->orWhere(function ($query) {
-                            $query->whereNull('expiry_date')
-                                ->whereHas('documentType', fn ($typeQuery) => $typeQuery->where('has_expiry', false));
+                            $query->whereHas('documentType', fn ($typeQuery) => $typeQuery->where('has_expiry', false));
                         });
                 })
                 ->pluck('document_type_id');

@@ -2,6 +2,12 @@
 
 // Translate common Laravel validation responses for Indonesian requests.
 return [
+    'after_or_equal' => ':attribute harus berupa tanggal pada atau setelah :date.',
+    'date_format' => ':attribute harus sesuai format :format.',
+    'extensions' => ':attribute harus memiliki ekstensi: :values.',
+    'file' => ':attribute harus berupa berkas.',
+    'mimetypes' => ':attribute harus memiliki tipe MIME: :values.',
+    'prohibited' => ':attribute tidak boleh diisi.',
     'accepted' => ':attribute harus diterima.',
     // Cover validation rules used by the performance rating form.
     'array' => ':attribute harus berupa daftar.',
@@ -42,6 +48,21 @@ return [
     'url' => ':attribute harus berupa URL yang valid.',
 
     'attributes' => [
+        'document_type_id' => 'jenis dokumen',
+        'display_name' => 'nama tampilan',
+        'description' => 'deskripsi',
+        'expiry_date' => 'tanggal kedaluwarsa',
+        'expiry_warning_days' => 'hari peringatan kedaluwarsa',
+        'allowed_extensions' => 'ekstensi yang diizinkan',
+        'allowed_extensions.*' => 'ekstensi',
+        'max_file_size_mb' => 'ukuran file maksimum',
+        'is_active' => 'status aktif',
+        'is_mandatory' => 'status wajib',
+        'has_expiry' => 'masa berlaku',
+        'file' => 'file',
+        'documents.*.file' => 'file dokumen',
+        'documents.*.expiry_date' => 'tanggal kedaluwarsa',
+        'documents.*.document_type_id' => 'jenis dokumen',
         'name' => 'nama',
         'email' => 'email',
         'password' => 'kata sandi',
@@ -70,7 +91,7 @@ return [
         'pincode' => 'kode pos',
         'bank_name' => 'nama bank',
         'bank_account_number' => 'nomor rekening',
-        'bank_ifsc' => 'kode bank',
+        'code_bank' => 'kode bank',
         'bank_branch' => 'nama cabang',
     ],
 ];

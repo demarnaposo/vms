@@ -7,12 +7,13 @@ import { useLanguage } from '@/Contexts/LanguageContext';
 // Reuse selective master document label localization in the review step.
 import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
 
-export default function StepReview({ vendor, sessionData, documentTypes }) {
+const normalizeDocumentTypeId = (typeId) => String(typeId ?? '');
+
+export default function StepReview({ vendor, sessionData, documentTypes, vendorCategories = [] }) {
     // Read the active language for fixed document labels.
     const { language, t } = useLanguage();
     const step1Session = sessionData?.step1 || {};
     const step2Session = sessionData?.step2 || {};
-    const normalizeDocumentTypeId = (typeId) => String(typeId ?? '');
     const documentTypesById = useMemo(() => {
         const map = new Map();
 
@@ -24,6 +25,11 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
     }, [documentTypes]);
 
     const [processing, setProcessing] = useState(false);
+    const category =
+        vendorCategories.find(
+            (item) => String(item.id) === String(step1Session.category_id || vendor?.category_id)
+        ) || vendor?.vendor_category;
+    const categoryLabel = category?.display_name || 'N/A';
 
     const submitApplication = () => {
         router.post(
@@ -73,8 +79,8 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                                 {t('Business Identification Number (NIB)')}:
                             </span>{' '}
                             <span className="text-(--color-text-primary) ml-2 font-medium">
-                                {step1Session.registration_number ||
-                                    vendor?.registration_number ||
+                                {step1Session.business_identification_number ||
+                                    vendor?.business_identification_number ||
                                     'N/A'}
                             </span>
                         </div>
@@ -95,13 +101,27 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                             </span>
                         </div>
                         <div>
+                            <span className="text-(--color-text-tertiary)">{t('Category')}:</span>{' '}
+                            <span className="text-(--color-text-primary) ml-2 font-medium">
+                                {categoryLabel}
+                            </span>
+                        </div>
+                        <div className="md:col-span-2">
+                            <span className="text-(--color-text-tertiary)">{t('Experience')}:</span>{' '}
+                            <span className="text-(--color-text-primary) ml-2 whitespace-pre-wrap">
+                                {step1Session.experience || vendor?.experience || 'N/A'}
+                            </span>
+                        </div>
+                        <div>
                             <span className="text-(--color-text-tertiary)">{t('Contact')}:</span>{' '}
                             <span className="text-(--color-text-primary) ml-2 font-medium">
                                 {step1Session.contact_person || vendor?.contact_person}
                             </span>
                         </div>
                         <div>
-                            <span className="text-(--color-text-tertiary)">{t('Phone')}:</span>{' '}
+                            <span className="text-(--color-text-tertiary)">
+                                {t('WhatsApp Number')}:
+                            </span>{' '}
                             <span className="text-(--color-text-primary) ml-2 font-medium">
                                 {step1Session.contact_phone || vendor?.contact_phone}
                             </span>
@@ -164,7 +184,7 @@ export default function StepReview({ vendor, sessionData, documentTypes }) {
                         <div>
                             <span className="text-(--color-text-tertiary)">{t('Bank Code')}:</span>{' '}
                             <span className="text-(--color-text-primary) ml-2 font-medium">
-                                {step2Session.bank_ifsc || vendor?.bank_ifsc}
+                                {step2Session.code_bank || vendor?.code_bank}
                             </span>
                         </div>
                         <div>

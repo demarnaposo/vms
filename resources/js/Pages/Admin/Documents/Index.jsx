@@ -10,6 +10,7 @@ import {
     ModalCancelButton,
     ModalPrimaryButton,
     FormTextarea,
+    FormSelect,
 } from '@/Components';
 import { DocumentViewer } from '@/Components/DocumentViewer';
 // Use shared language state for document filters and actions.
@@ -27,11 +28,16 @@ const statusFilters = [
     { value: 'all', label: 'All' },
 ];
 
-export default function DocumentsIndex({ documents, currentStatus = 'pending' }) {
+export default function DocumentsIndex({
+    documents,
+    currentStatus = 'pending',
+    filters = {},
+    documentTypes = [],
+}) {
     // Translate document-specific labels and expiry descriptions.
     const { language, t } = useLanguage();
     const dateLocale = language === 'id' ? 'id-ID' : 'en-IN';
-    const { auth } = usePage().props;
+    const { auth, errors } = usePage().props;
     const can = auth?.can || {};
 
     const [showRejectModal, setShowRejectModal] = useState(false);
@@ -222,19 +228,32 @@ export default function DocumentsIndex({ documents, currentStatus = 'pending' })
         ),
     });
 
+    const filterParams = {
+        status: currentStatus,
+        ...(filters.search ? { search: filters.search } : {}),
+        ...(filters.document_type_id ? { document_type_id: filters.document_type_id } : {}),
+    };
+    const changeDocumentType = (value) => {
+        const params = { ...filterParams };
+        if (value) params.document_type_id = value;
+        else delete params.document_type_id;
+        router.get('/admin/documents', params, { preserveScroll: true });
+    };
+
     const header = (
         <PageHeader title="Document Verification" subtitle="Review and verify vendor documents" />
     );
 
     return (
         <AdminLayout title="Document Verification" activeNav="Documents" header={header}>
-            <div className="mb-6">
+            <div className="mb-6 space-y-4">
                 <div className="inline-flex gap-2 flex-wrap p-1 bg-(--color-bg-tertiary) rounded-xl">
                     {statusFilters.map((status) => (
                         <Link
                             key={status.value}
-                            href={`/admin/documents?status=${status.value}`}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                            href={`/admin/documents?${new URLSearchParams({ ...filterParams, status: status.value })}`}
+                            aria-current={currentStatus === status.value ? 'page' : undefined}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) focus-visible:ring-offset-2 ${
                                 currentStatus === status.value
                                     ? 'bg-(--color-bg-primary) text-(--color-text-primary) shadow-token-sm'
                                     : 'text-(--color-text-tertiary) hover:text-(--color-text-primary) hover:bg-(--color-bg-primary)/50'
@@ -246,6 +265,35 @@ export default function DocumentsIndex({ documents, currentStatus = 'pending' })
                         </Link>
                     ))}
                 </div>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                    <FormSelect
+                        className="w-full min-w-0 sm:w-80"
+                        name="document_type_id"
+                        placeholder="All Documents"
+                        label="Document Type"
+                        value={filters.document_type_id ?? ''}
+                        onChange={changeDocumentType}
+                        translateOptions={false}
+                        error={errors?.document_type_id}
+                        options={documentTypes.map((type) => ({
+                            value: type.id,
+                            label: translateDocumentTypeLabel(language, type),
+                        }))}
+                    />
+                    {(filters.document_type_id ||
+                        filters.search ||
+                        currentStatus !== 'pending') && (
+                        <Button
+                            variant="outline"
+                            className="shrink-0 focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) focus-visible:ring-offset-2"
+                            onClick={() =>
+                                router.get('/admin/documents', {}, { preserveScroll: true })
+                            }
+                        >
+                            Reset
+                        </Button>
+                    )}
+                </div>
             </div>
 
             {/* Scrollable Document List with sticky header */}
@@ -255,7 +303,7 @@ export default function DocumentsIndex({ documents, currentStatus = 'pending' })
                 links={documents?.links || []}
                 emptyIcon="success"
                 emptyMessage={
-                    currentStatus === 'pending'
+                    currentStatus === 'pending' && !filters.document_type_id && !filters.search
                         ? 'All pending documents have been reviewed.'
                         : 'No documents found for this filter.'
                 }

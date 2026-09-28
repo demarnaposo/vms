@@ -72,7 +72,7 @@ export default function VendorSummaryReport({ vendors, stats, filters }) {
     };
 
     const columns = [
-        { key: 'id', label: 'ID', render: (row) => `#${row.id}` },
+        { key: 'vendor_number', label: 'Vendor ID', render: (row) => row.vendor_number || '-' },
         { key: 'company_name', label: 'Company', render: (row) => row.company_name },
         { key: 'contact_person', label: 'Contact', render: (row) => row.contact_person || '-' },
         { key: 'status', label: 'Status', render: (row) => getStatusBadge(row.status) },

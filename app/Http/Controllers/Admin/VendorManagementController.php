@@ -7,6 +7,7 @@ use App\Models\ComplianceResult;
 use App\Models\DocumentType;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Notifications\VendorApplicationDecision;
 use App\Services\VendorLifecycleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,6 +26,7 @@ class VendorManagementController extends Controller
 
         $query = Vendor::select([
             'id',
+            'vendor_number',
             'company_name',
             'contact_person',
             'contact_email',
@@ -42,6 +44,7 @@ class VendorManagementController extends Controller
             $escapedSearch = str_replace(['%', '_'], ['\\%', '\\_'], $search);
             $query->where(function ($q) use ($escapedSearch) {
                 $q->where('company_name', 'like', "%{$escapedSearch}%")
+                    ->orWhere('vendor_number', 'like', "%{$escapedSearch}%")
                     ->orWhere('contact_person', 'like', "%{$escapedSearch}%")
                     ->orWhere('contact_email', 'like', "%{$escapedSearch}%");
             });
@@ -60,11 +63,11 @@ class VendorManagementController extends Controller
     {
         $this->authorize('view', $vendor);
 
-
         // Expose the protected deed number on the authorized staff summary.
-        $vendor->makeVisible(['tax_id', 'deed_number', 'bank_account_number', 'bank_ifsc']);
+        $vendor->makeVisible(['tax_id', 'deed_number', 'bank_account_number', 'code_bank']);
 
         $vendor->load([
+            'vendorCategory',
             'documents:id,vendor_id,document_type_id,file_name,verification_status,verification_notes,expiry_date,is_current,created_at' => [
                 'documentType:id,name,display_name',
             ],
@@ -107,9 +110,7 @@ class VendorManagementController extends Controller
             $doc = $currentDocs->where('document_type_id', $docType->id)->first();
 
             $isVerified = $doc?->verification_status === 'verified'
-                && ($doc->expiry_date
-                    ? ! \Carbon\Carbon::parse($doc->expiry_date)->startOfDay()->isPast()
-                    : ! $docType->has_expiry);
+                && (! $docType->has_expiry || ($doc->expiry_date && \Carbon\Carbon::parse($doc->expiry_date)->gte(today())));
 
             return [
                 // Expose the stable master key so the UI translates only system document types.
@@ -143,13 +144,17 @@ class VendorManagementController extends Controller
 
         try {
             $this->lifecycleService->approve($vendor, $actor, $request->string('comment')->toString());
-
-            return back()->with('success', 'Vendor approved! The vendor can be activated once compliance requirements are met.');
         } catch (\Throwable $e) {
             Log::error('Vendor approval failed', ['vendor_id' => $vendor->id, 'error' => $e->getMessage()]);
 
             return back()->withErrors(['status' => $e->getMessage()]);
         }
+
+        return $this->respondToDecision(
+            $vendor,
+            new VendorApplicationDecision(Vendor::STATUS_APPROVED, $vendor->company_name),
+            'Vendor approved! The vendor can be activated once compliance requirements are met.'
+        );
     }
 
     public function reject(Request $request, Vendor $vendor): RedirectResponse
@@ -165,13 +170,42 @@ class VendorManagementController extends Controller
 
         try {
             $this->lifecycleService->reject($vendor, $actor, $validated['comment']);
-
-            return back()->with('success', 'Vendor rejected.');
         } catch (\Throwable $e) {
             Log::error('Vendor rejection failed', ['vendor_id' => $vendor->id, 'error' => $e->getMessage()]);
 
             return back()->withErrors(['status' => $e->getMessage()]);
         }
+
+        return $this->respondToDecision(
+            $vendor,
+            new VendorApplicationDecision(Vendor::STATUS_REJECTED, $vendor->company_name, $validated['comment']),
+            'Vendor rejected.'
+        );
+    }
+
+    private function respondToDecision(Vendor $vendor, VendorApplicationDecision $notification, string $success): RedirectResponse
+    {
+        $response = back()->with('success', $success);
+        $recipient = $vendor->user;
+
+        if (! $recipient) {
+            Log::warning('Vendor decision email has no recipient', ['vendor_id' => $vendor->id]);
+
+            return $response->with('error', __('alerts.vendor_decision_mail_failed'));
+        }
+
+        try {
+            $recipient->notify($notification->afterCommit());
+        } catch (\Throwable $e) {
+            Log::error('Vendor decision email could not be processed', [
+                'vendor_id' => $vendor->id,
+                'exception' => $e::class,
+            ]);
+
+            return $response->with('error', __('alerts.vendor_decision_mail_failed'));
+        }
+
+        return $response;
     }
 
     public function activate(Request $request, Vendor $vendor): RedirectResponse

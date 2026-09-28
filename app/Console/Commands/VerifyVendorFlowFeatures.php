@@ -32,7 +32,7 @@ class VerifyVendorFlowFeatures extends Command
             'user_id' => $user->id,
             'company_name' => 'Demo Company LLC',
             // Use Indonesian company identifiers in the verification fixture.
-            'registration_number' => '1234567890123',
+            'business_identification_number' => '1234567890123',
             'tax_id' => '0123456789012345',
             // Include the required deed number in the verification fixture.
             'deed_number' => 'DEED-000001',
@@ -43,7 +43,7 @@ class VerifyVendorFlowFeatures extends Command
             // Use an Indonesian-compatible numeric account fixture.
             'bank_account_number' => '1234567890',
             // Use an Indonesian bank code in the verification fixture.
-            'bank_ifsc' => '008',
+            'code_bank' => '008',
         ]);
 
         // 2. Test VendorBond

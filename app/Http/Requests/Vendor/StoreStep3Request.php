@@ -4,80 +4,25 @@ namespace App\Http\Requests\Vendor;
 
 use App\Models\DocumentType;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Validator;
 
 class StoreStep3Request extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->isVendor();
+        return $this->user()?->isVendor() ?? false;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
-        return [
-            'documents' => 'nullable|array',
-            'documents.*.document_type_id' => 'required|exists:document_types,id',
-            'documents.*.file' => 'required|file|mimes:pdf,jpg,jpeg,png|mimetypes:application/pdf,image/jpeg,image/png|max:10240',
-            'documents.*.expiry_date' => 'nullable|date|after_or_equal:today',
-        ];
-    }
+        $rules = ['documents' => ['nullable', 'array'], 'documents.*' => ['array'], 'documents.*.document_type_id' => ['required', 'integer', 'distinct', 'exists:document_types,id,is_active,1'], 'removed_document_type_ids' => ['nullable', 'array'], 'removed_document_type_ids.*' => ['integer', 'distinct']];
+        $types = DocumentType::query()->whereIn('id', collect($this->input('documents', []))->pluck('document_type_id')->filter(fn ($id) => is_scalar($id))->all())->get()->keyBy('id');
+        foreach ((array) $this->input('documents', []) as $index => $document) {
+            $id = is_array($document) ? ($document['document_type_id'] ?? null) : null;
+            $type = is_scalar($id) ? $types->get($id) : null;
+            $rules["documents.{$index}.file"] = \App\Support\DocumentUploadRules::file($type);
+            $rules["documents.{$index}.expiry_date"] = \App\Support\DocumentUploadRules::expiry($type);
+        }
 
-    public function withValidator(Validator $validator): void
-    {
-        $validator->after(function (Validator $validator): void {
-            $documents = $this->input('documents', []);
-
-            if (! is_array($documents) || empty($documents)) {
-                return;
-            }
-
-            $documentTypeIds = collect($documents)
-                ->pluck('document_type_id')
-                ->filter()
-                ->map(fn ($id) => (int) $id)
-                ->unique()
-                ->values()
-                ->all();
-
-            $types = DocumentType::query()
-                ->whereIn('id', $documentTypeIds)
-                ->get()
-                ->keyBy('id');
-
-            foreach ($documents as $index => $doc) {
-                $typeId = (int) ($doc['document_type_id'] ?? 0);
-                $type = $types->get($typeId);
-
-                if (! $type) {
-                    continue;
-                }
-
-                $expiryDate = $doc['expiry_date'] ?? null;
-
-                if ($type->has_expiry && blank($expiryDate)) {
-                    $validator->errors()->add(
-                        "documents.{$index}.expiry_date",
-                        "Expiry date is required for {$type->display_name}."
-                    );
-                }
-
-                if (! $type->has_expiry && filled($expiryDate)) {
-                    $validator->errors()->add(
-                        "documents.{$index}.expiry_date",
-                        "Expiry date is not allowed for {$type->display_name}."
-                    );
-                }
-            }
-        });
+        return $rules;
     }
 }

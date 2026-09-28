@@ -13,7 +13,9 @@ test('all required company fields render their validation errors', () => {
     const requiredFields = [
         'company_name',
         'business_type',
-        'registration_number',
+        'category_id',
+        'experience',
+        'business_identification_number',
         'tax_id',
         'deed_number',
         'contact_person',
@@ -25,7 +27,44 @@ test('all required company fields render their validation errors', () => {
     ];
 
     for (const field of requiredFields) {
-        assert.match(source, new RegExp(`clientErrors\\.${field} \\|\\| errors\\.${field}`));
+        assert.match(source, new RegExp(`clientErrors\\.${field}\\s*\\|\\|\\s*errors\\.${field}`));
+    }
+});
+
+test('company category, experience, and registration guidance are bilingual', () => {
+    const examples = [
+        ['Category', 'Kategori'],
+        ['Experience', 'Pengalaman'],
+        ['Registration Instructions', 'Petunjuk Pengisian'],
+        [
+            'e.g., Software procurement for PPM Manajemen in 2025.',
+            'contoh: Pengadaan software untuk PPM Manajemen pada 2025.',
+        ],
+    ];
+
+    for (const [message, translated] of examples) {
+        assert.equal(translateMessage('id', message), translated);
+        assert.equal(translateMessage('en', message), message);
+    }
+});
+
+test('company fields use bilingual example placeholders', () => {
+    const placeholders = [
+        ['e.g., PPM Manajemen', 'contoh: PPM Manajemen'],
+        ['e.g., 1234567890123', 'contoh: 1234567890123'],
+        ['e.g., 0123456789012345', 'contoh: 0123456789012345'],
+        ['e.g., John Doe', 'contoh: John Doe'],
+        ['e.g., 081234567890', 'contoh: 081234567890'],
+        ['e.g., 10340', 'contoh: 10340'],
+    ];
+
+    for (const [placeholder, translated] of placeholders) {
+        assert.match(source, new RegExp(placeholder.replace(/[().]/g, '\\$&')));
+        assert.equal(translateMessage('id', placeholder), translated);
+    }
+
+    for (const selectPlaceholder of ['Select Type', 'Select Category', 'Select Province']) {
+        assert.match(source, new RegExp(`placeholder=\\{t\\('${selectPlaceholder}'\\)\\}`));
     }
 });
 
