@@ -3,7 +3,7 @@ import Logo from '@/Components/Logo';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { useLanguage } from '@/Contexts/LanguageContext';
 
-export default function VerifyEmail({ email, status }) {
+export default function VerifyEmail({ email }) {
     const { t } = useLanguage();
     const resendForm = useForm({});
 
@@ -35,15 +35,6 @@ export default function VerifyEmail({ email, status }) {
                     <p className="text-(--color-text-tertiary) mb-6">
                         {t('Check your inbox and spam folder. The link expires in 60 minutes.')}
                     </p>
-
-                    {status === 'verification-link-sent' && (
-                        <p
-                            role="status"
-                            className="mb-5 rounded-lg bg-(--color-success-light) p-4 text-sm text-(--color-success-dark)"
-                        >
-                            {t('A new verification link has been sent to your email address.')}
-                        </p>
-                    )}
 
                     <form onSubmit={resend}>
                         <button

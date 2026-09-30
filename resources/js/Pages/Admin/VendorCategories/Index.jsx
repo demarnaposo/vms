@@ -1,8 +1,8 @@
 import { router, useForm } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import {
     AdminLayout,
-    Alert,
     Badge,
     Button,
     Card,
@@ -61,7 +61,10 @@ export default function VendorCategoryIndex({ categories = [] }) {
         router.delete(`/admin/vendor-categories/${deletingCategory.id}`, {
             preserveScroll: true,
             onSuccess: () => setDeletingCategory(null),
-            onError: () => setDeletingCategory(null),
+            onError: (responseErrors) => {
+                if (responseErrors.category) toast.error(t(responseErrors.category));
+                setDeletingCategory(null);
+            },
             onFinish: () => setDeleting(false),
         });
     };
@@ -192,12 +195,6 @@ export default function VendorCategoryIndex({ categories = [] }) {
                         </div>
                     </form>
                 </Card>
-
-                {errors.category && (
-                    <div role="alert" aria-live="polite">
-                        <Alert type="error">{errors.category}</Alert>
-                    </div>
-                )}
 
                 <Card title="Vendor Categories" noPadding>
                     <DataTable

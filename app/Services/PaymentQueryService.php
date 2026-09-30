@@ -12,7 +12,10 @@ class PaymentQueryService
      */
     public function adminIndexData(Request $request): array
     {
-        $status = (string) $request->query('status', 'all');
+        $filters = $request->validate([
+            'status' => ['nullable', \Illuminate\Validation\Rule::in(['all', PaymentRequest::STATUS_REQUESTED, PaymentRequest::STATUS_PENDING_OPS, PaymentRequest::STATUS_PENDING_FINANCE, PaymentRequest::STATUS_APPROVED, PaymentRequest::STATUS_PAID, PaymentRequest::STATUS_REJECTED, PaymentRequest::STATUS_CANCELLED])],
+        ]);
+        $status = $filters['status'] ?? 'all';
 
         $query = PaymentRequest::with(['vendor:id,company_name', 'requester:id,name'])
             ->orderBy('created_at', 'desc');
@@ -21,7 +24,7 @@ class PaymentQueryService
             $query->where('status', $status);
         }
 
-        $payments = $query->paginate(15);
+        $payments = $query->paginate(15)->appends($filters);
 
         $stats = [
             'pending' => PaymentRequest::whereIn('status', [

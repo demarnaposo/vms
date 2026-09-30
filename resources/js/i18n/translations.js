@@ -1,5 +1,77 @@
 // Centralize Indonesian translations while English remains the source-language fallback.
 export const INDONESIAN_TRANSLATIONS = Object.freeze({
+    'Confirm Deletion': 'Konfirmasi Penghapusan',
+    'No staff roles found': 'Peran staff tidak ditemukan',
+    'No permissions found': 'Izin tidak ditemukan',
+    'admin.dashboard cross-module statistics and activity':
+        'admin.dashboard — statistik dan aktivitas lintas modul',
+    'admin.vendors.notes / protected summary': 'admin.vendors.notes / ringkasan yang dilindungi',
+    'admin.reports.* read routes': 'admin.reports.* — rute baca',
+    'admin.payments.validate-ops (approve/reject)': 'admin.payments.validate-ops (setujui/tolak)',
+    'admin.payments.approve-finance (approve/reject)':
+        'admin.payments.approve-finance (setujui/tolak)',
+    'View Cross-module Dashboard Summary': 'Lihat Ringkasan Dasbor Lintas Modul',
+    'Edit Staff User': 'Ubah Pengguna Staff',
+    'Staff Roles': 'Peran Staff',
+    'Save User': 'Simpan Pengguna',
+    'Edit Staff Role': 'Ubah Peran Staff',
+    'Create Staff Role': 'Tambah Peran Staff',
+    'Role Code': 'Kode Peran',
+    'Role Name': 'Nama Peran',
+    'Save Role': 'Simpan Peran',
+    Permissions: 'Izin',
+    Permission: 'Izin',
+    'Permission Catalogue': 'Katalog Izin',
+    'Legacy Roles': 'Peran Lama',
+    'Staff User Details': 'Detail Pengguna Staff',
+    'Manage staff users, roles and permissions': 'Kelola pengguna staff, peran, dan izin',
+    'Staff management sections': 'Bagian pengelolaan staff',
+    'Super admin access is protected and cannot be restricted here.':
+        'Akses super admin dilindungi dan tidak dapat dibatasi di sini.',
+    'Legacy permissions are preserved and cannot be edited here.':
+        'Izin lama tetap disimpan dan tidak dapat diubah di sini.',
+    'Mixed vendor roles require manual review.':
+        'Peran campuran vendor memerlukan pemeriksaan manual.',
+    'Legacy or protected permission; not selectable.':
+        'Izin lama atau dilindungi; tidak dapat dipilih.',
+    'Built-in role codes and assigned roles are protected from deletion.':
+        'Kode peran bawaan dan peran yang digunakan dilindungi dari penghapusan.',
+    'Unclassified legacy roles are preserved for manual review.':
+        'Peran lama yang belum diklasifikasi tetap disimpan untuk pemeriksaan manual.',
+    'Permission codes are protected. Only operational permissions can be assigned to staff roles.':
+        'Kode izin dilindungi. Hanya izin operasional yang dapat diberikan pada peran staff.',
+    'Delete this record? Historical records and assigned roles cannot be deleted.':
+        'Hapus data ini? Data berhistori dan peran yang digunakan tidak dapat dihapus.',
+    'e.g., johndoe@example.com': 'contoh: johndoe@example.com',
+    'e.g., document_reviewer': 'contoh: document_reviewer',
+    'e.g., Document Reviewer': 'contoh: Pemeriksa Dokumen',
+    'e.g., Reviews vendor documents': 'contoh: Memeriksa dokumen vendor',
+    'View Dashboard': 'Lihat Dasbor',
+    'Reject Vendors': 'Tolak Vendor',
+    'Activate Vendors': 'Aktifkan Vendor',
+    'Terminate Vendors': 'Akhiri Vendor',
+    'Edit Vendor Notes': 'Ubah Catatan Vendor',
+    'List Admin Documents': 'Lihat Daftar Dokumen Admin',
+    'View Private Documents': 'Lihat Dokumen Privat',
+    'View Admin Compliance': 'Lihat Kepatuhan Admin',
+    'Evaluate Compliance': 'Evaluasi Kepatuhan',
+    'View Performance': 'Lihat Kinerja',
+    'Validate Payments': 'Validasi Pembayaran',
+    'Mark Payments Paid': 'Tandai Pembayaran Lunas',
+    'View System Health': 'Lihat Kesehatan Sistem',
+    'Manage Messages': 'Kelola Pesan',
+    'Send Notifications': 'Kirim Notifikasi',
+    vendors: 'vendor',
+    compliance: 'kepatuhan',
+    performance: 'kinerja',
+    payments: 'pembayaran',
+    reports: 'laporan',
+    system: 'sistem',
+    Users: 'Pengguna',
+    Usage: 'Penggunaan',
+    Code: 'Kode',
+    Group: 'Kelompok',
+
     'Your email language preference could not be saved. Please try again.':
         'Pilihan bahasa email Anda tidak dapat disimpan. Silakan coba lagi.',
     Mandatory: 'Wajib',

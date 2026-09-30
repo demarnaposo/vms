@@ -6,6 +6,7 @@ import { createRoot } from 'react-dom/client';
 import { Suspense, Component, useEffect } from 'react';
 // Provide persistent bilingual state to every Inertia page and layout.
 import { LanguageProvider, useLanguage } from '@/Contexts/LanguageContext';
+import NotificationToaster from '@/Components/NotificationToaster';
 
 // Loading component for lazy-loaded pages - Light theme
 // Translate the global lazy-page loading state.
@@ -133,6 +134,7 @@ createInertiaApp({
         // Mount one language provider above all errors, suspense boundaries, and pages.
         root.render(
             <LanguageProvider>
+                <NotificationToaster initialPage={props.initialPage} />
                 <ErrorBoundary>
                     <Suspense fallback={<PageLoader />}>
                         <AppWrapper>

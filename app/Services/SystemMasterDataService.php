@@ -52,57 +52,24 @@ class SystemMasterDataService
      */
     public function syncRolesAndPermissions(): void
     {
-        foreach ($this->data('roles') as $role) {
-            $this->updateOrCreateByName('roles', [
-                'name' => $role['name'],
-                'display_name' => $role['display_name'],
-                'description' => $role['description'] ?? null,
-            ]);
-        }
-
-        foreach ($this->data('permissions') as $permission) {
-            $this->updateOrCreateByName('permissions', [
-                'name' => $permission['name'],
-                'display_name' => $permission['display_name'],
-                'group' => $permission['group'] ?? null,
-            ]);
-        }
-
-        $roleIds = DB::table('roles')->pluck('id', 'name');
-        $permissionIds = DB::table('permissions')->pluck('id', 'name');
-        $rolePermissions = (array) $this->data('role_permissions');
-
-        $managedRoleIds = [];
-        $pivotRows = [];
-
-        foreach ($rolePermissions as $roleName => $permissions) {
-            $roleId = $roleIds[$roleName] ?? null;
-            if (! $roleId) {
-                continue;
-            }
-
-            $managedRoleIds[] = (int) $roleId;
-
-            foreach ((array) $permissions as $permissionName) {
-                $permissionId = $permissionIds[$permissionName] ?? null;
-                if (! $permissionId) {
-                    continue;
+        DB::transaction(function (): void {
+            $newRoles = [];
+            foreach ($this->data('roles') as $role) {
+                if (! \App\Models\Role::where('name', $role['name'])->exists()) {
+                    $newRoles[] = \App\Models\Role::create($role + ['guard_name' => 'web']);
                 }
-
-                $pivotRows[] = [
-                    'role_id' => (int) $roleId,
-                    'permission_id' => (int) $permissionId,
-                ];
             }
-        }
-
-        if ($managedRoleIds !== []) {
-            DB::table('permission_role')->whereIn('role_id', $managedRoleIds)->delete();
-        }
-
-        if ($pivotRows !== []) {
-            DB::table('permission_role')->insertOrIgnore($pivotRows);
-        }
+            foreach ($this->data('permissions') as $permission) {
+                \App\Models\Permission::firstOrCreate(['name' => $permission['name'], 'guard_name' => 'web'], $permission);
+            }
+            foreach (config('rbac.permissions') as $code => $item) {
+                \App\Models\Permission::firstOrCreate(['name' => $code, 'guard_name' => 'web'], ['display_name' => $item['label'], 'group' => $item['group']]);
+            }
+            foreach ($newRoles as $role) {
+                $role->givePermissionTo((array) ($this->data('role_permissions')[$role->name] ?? []));
+            }
+            app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        });
     }
 
     /**
@@ -204,14 +171,7 @@ class SystemMasterDataService
                 ->first(['id']);
 
             if ($existingUser) {
-                $userId = (int) $existingUser->id;
-                DB::table('users')
-                    ->where('id', $userId)
-                    ->update([
-                        'name' => $staffUser['name'],
-                        'email_verified_at' => now(),
-                        'updated_at' => now(),
-                    ]);
+                continue;
             } else {
                 $userId = (int) DB::table('users')->insertGetId([
                     'name' => $staffUser['name'],
@@ -223,10 +183,7 @@ class SystemMasterDataService
                 ]);
             }
 
-            DB::table('role_user')->insertOrIgnore([
-                'user_id' => $userId,
-                'role_id' => (int) $roleId,
-            ]);
+            \App\Models\User::findOrFail($userId)->assignRole((string) $staffUser['role']);
         }
     }
 

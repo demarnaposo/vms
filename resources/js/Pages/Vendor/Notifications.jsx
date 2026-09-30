@@ -1,25 +1,21 @@
 import { router } from '@inertiajs/react';
-import { useState } from 'react';
 import { VendorLayout, PageHeader, Card, Button, AppIcon } from '@/Components';
 import { formatRelativeTime } from '@/utils/dateFormatters';
 // Translate vendor notification controls without altering stored notification content.
 import { useLanguage } from '@/Contexts/LanguageContext';
+import PaginationLinks from '@/Components/PaginationLinks';
 
-export default function Notifications({ vendor, notifications = { data: [] } }) {
+export default function Notifications({
+    vendor,
+    notifications = { data: [] },
+    unreadCount = 0,
+    totalCount = 0,
+    filter = 'all',
+}) {
     // Use the selected language for static labels and relative timestamps.
     const { language, t } = useLanguage();
     const dateLocale = language === 'id' ? 'id-ID' : 'en-US';
-    const [filter, setFilter] = useState('all');
-
     const displayNotifications = notifications.data || [];
-    const unreadCount = displayNotifications.filter((n) => !n.read_at).length;
-
-    const filteredNotifications =
-        filter === 'all'
-            ? displayNotifications
-            : filter === 'unread'
-              ? displayNotifications.filter((n) => !n.read_at)
-              : displayNotifications.filter((n) => n.data?.type === filter);
 
     const notificationTypes = {
         document: {
@@ -93,7 +89,7 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
     );
 
     const filters = [
-        { id: 'all', label: 'All', count: displayNotifications.length },
+        { id: 'all', label: 'All', count: totalCount },
         { id: 'unread', label: 'Unread', count: unreadCount },
         { id: 'document', label: 'Documents' },
         { id: 'payment', label: 'Payments' },
@@ -112,7 +108,13 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                     {filters.map((f) => (
                         <button
                             key={f.id}
-                            onClick={() => setFilter(f.id)}
+                            onClick={() =>
+                                router.get(
+                                    '/vendor/notifications',
+                                    { filter: f.id },
+                                    { preserveScroll: true }
+                                )
+                            }
                             className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
                                 filter === f.id
                                     ? 'bg-(--color-brand-primary) text-white'
@@ -137,7 +139,7 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                 </div>
 
                 <Card>
-                    {filteredNotifications.length === 0 ? (
+                    {displayNotifications.length === 0 ? (
                         <div className="p-12 text-center text-(--color-text-tertiary)">
                             <div className="text-5xl mb-4 inline-flex justify-center w-full">
                                 <AppIcon name="notifications" className="h-12 w-12" />
@@ -151,7 +153,7 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                         </div>
                     ) : (
                         <div className="divide-y divide-(--color-border-secondary)">
-                            {filteredNotifications.map((notification) => {
+                            {displayNotifications.map((notification) => {
                                 const typeInfo =
                                     notificationTypes[notification.data?.type] ||
                                     notificationTypes.system;
@@ -160,12 +162,9 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                                 return (
                                     <div
                                         key={notification.id}
-                                        className={`p-4 hover:bg-(--color-bg-hover) transition-colors cursor-pointer ${
+                                        className={`p-4 hover:bg-(--color-bg-hover) transition-colors ${
                                             isUnread ? 'bg-(--color-brand-primary-light)/50' : ''
                                         }`}
-                                        onClick={() =>
-                                            isUnread && handleMarkAsRead(notification.id)
-                                        }
                                     >
                                         <div className="flex items-start gap-4">
                                             <div
@@ -215,7 +214,15 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                                             </div>
 
                                             {isUnread && (
-                                                <div className="w-2.5 h-2.5 rounded-full bg-(--color-brand-primary) flex-shrink-0 mt-2" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        handleMarkAsRead(notification.id)
+                                                    }
+                                                    className="shrink-0 rounded-lg px-2 py-1 text-sm font-medium text-(--color-brand-primary) hover:bg-(--color-brand-primary-light) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-brand-primary)"
+                                                >
+                                                    {t('Mark read')}
+                                                </button>
                                             )}
                                         </div>
                                     </div>
@@ -223,9 +230,10 @@ export default function Notifications({ vendor, notifications = { data: [] } }) 
                             })}
                         </div>
                     )}
+                    <PaginationLinks links={notifications.links} />
                 </Card>
 
-                {displayNotifications.length === 0 && (
+                {totalCount === 0 && (
                     <div className="bg-(--color-bg-secondary) border border-(--color-border-secondary) rounded-xl p-6">
                         <h3 className="font-semibold text-(--color-text-primary) mb-4">
                             {t('What notifications will you receive?')}

@@ -2,6 +2,15 @@
 
 // Translate dynamic alerts while preserving names, status codes, and counts verbatim.
 return [
+    'rbac_last_admin' => 'Super admin terakhir tidak dapat dihapus atau dicabut perannya.',
+    'rbac_invalid_role' => 'Pilih peran staff yang valid.',
+    'rbac_invalid_permission' => 'Pilih izin dari katalog operasional.',
+    'rbac_role_in_use' => 'Peran bawaan dan peran yang digunakan pengguna tidak dapat dihapus.',
+    'rbac_user_saved' => 'Pengguna staff berhasil disimpan.',
+    'rbac_user_deleted' => 'Pengguna staff berhasil dihapus.',
+    'rbac_role_saved' => 'Peran staff berhasil disimpan.',
+    'rbac_role_deleted' => 'Peran staff berhasil dihapus.',
+
     'vendor_decision_mail_failed' => 'Status vendor sudah berubah, tetapi pemberitahuan email tidak dapat diproses.',
     'notification_sent' => 'Notifikasi berhasil dikirim kepada :count penerima.',
     'contact_message_sent' => 'Terima kasih atas pesan Anda! Kami akan segera menghubungi Anda.',
@@ -12,6 +21,8 @@ return [
     'too_many_requests' => 'Terlalu banyak tindakan dikirim. Tunggu sebentar lalu coba lagi.',
     'document_verified' => ':document berhasil diverifikasi.',
     'document_rejected' => ':document ditolak.',
+    'document_pending_current_only' => 'Hanya dokumen current yang masih pending dapat ditinjau.',
+    'account_deletion_has_history' => 'Akun ini memiliki riwayat yang harus disimpan dan tidak dapat dihapus. Silakan hubungi dukungan.',
     'vendor_account_status' => 'Akun vendor Anda saat ini berstatus :status. Silakan hubungi dukungan.',
     'user_account_inactive' => 'Akun Anda tidak aktif. Silakan hubungi dukungan.',
     'vendor_not_compliant' => 'Vendor tidak patuh (Status: :status). Silakan selesaikan masalah kepatuhan terlebih dahulu.',

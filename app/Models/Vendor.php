@@ -235,57 +235,59 @@ class Vendor extends Model
     // Tag new timeline comments as system or user-authored without changing their stored text.
     public function transitionTo(string $newStatus, User $user, ?string $comment = null, ?string $reasonCode = null, bool $automaticComment = false): bool
     {
-        if (! $this->canTransitionTo($newStatus)) {
-            throw new InvalidArgumentException("Invalid vendor status transition: {$this->status} -> {$newStatus}");
-        }
-
-        if (in_array($newStatus, [self::STATUS_REJECTED, self::STATUS_SUSPENDED, self::STATUS_TERMINATED], true) && blank($comment)) {
-            throw new InvalidArgumentException('A comment is required when rejecting, suspending, or terminating a vendor.');
-        }
-
         // Carry comment provenance into the immutable state log.
         return \Illuminate\Support\Facades\DB::transaction(function () use ($newStatus, $user, $comment, $reasonCode, $automaticComment) {
-            $oldStatus = $this->status;
-            $this->status = $newStatus;
+            $vendor = self::query()->lockForUpdate()->findOrFail($this->getKey());
+
+            if (! $vendor->canTransitionTo($newStatus)) {
+                throw new InvalidArgumentException("Invalid vendor status transition: {$vendor->status} -> {$newStatus}");
+            }
+
+            if (in_array($newStatus, [self::STATUS_REJECTED, self::STATUS_SUSPENDED, self::STATUS_TERMINATED], true) && blank($comment)) {
+                throw new InvalidArgumentException('A comment is required when rejecting, suspending, or terminating a vendor.');
+            }
+
+            $oldStatus = $vendor->status;
+            $vendor->status = $newStatus;
 
             // Set relevant timestamps
             match ($newStatus) {
-                self::STATUS_SUBMITTED => $this->submitted_at = now(),
-                self::STATUS_APPROVED => $this->approved_at = now(),
-                self::STATUS_ACTIVE => $this->activated_at = now(),
-                self::STATUS_SUSPENDED => $this->suspended_at = now(),
-                self::STATUS_TERMINATED => $this->terminated_at = now(),
+                self::STATUS_SUBMITTED => $vendor->submitted_at = now(),
+                self::STATUS_APPROVED => $vendor->approved_at = now(),
+                self::STATUS_ACTIVE => $vendor->activated_at = now(),
+                self::STATUS_SUSPENDED => $vendor->suspended_at = now(),
+                self::STATUS_TERMINATED => $vendor->terminated_at = now(),
                 default => null,
             };
 
             if ($newStatus === self::STATUS_APPROVED) {
-                $this->approved_by = $user->id;
+                $vendor->approved_by = $user->id;
             }
 
             $blocksAccess = in_array($newStatus, self::ACCESS_BLOCKED_STATUSES, true);
             $previouslyBlockedAccess = in_array($oldStatus, self::ACCESS_BLOCKED_STATUSES, true);
 
-            if ($blocksAccess && $this->user) {
-                $this->user->is_active = false;
-                $this->user->setRememberToken(Str::random(60));
-                $this->user->save();
+            if ($blocksAccess && $vendor->user) {
+                $vendor->user->is_active = false;
+                $vendor->user->setRememberToken(Str::random(60));
+                $vendor->user->save();
 
                 if (config('session.driver') === 'database') {
                     DB::connection(config('session.connection'))
                         ->table(config('session.table', 'sessions'))
-                        ->where('user_id', $this->user->id)
+                        ->where('user_id', $vendor->user->id)
                         ->delete();
                 }
             }
 
-            if ($previouslyBlockedAccess && ! $blocksAccess && $this->user) {
-                $this->user->update(['is_active' => true]);
+            if ($previouslyBlockedAccess && ! $blocksAccess && $vendor->user) {
+                $vendor->user->update(['is_active' => true]);
             }
 
-            $this->save();
+            $vendor->save();
 
             // Log the transition
-            $this->stateLogs()->create([
+            $vendor->stateLogs()->create([
                 'user_id' => $user->id,
                 'actioned_by_user_id' => $user->id,
                 'from_status' => $oldStatus,
@@ -298,11 +300,13 @@ class Vendor extends Model
 
             AuditLog::log(
                 AuditLog::EVENT_STATE_CHANGED,
-                $this,
+                $vendor,
                 ['status' => $oldStatus],
                 ['status' => $newStatus, 'reason_code' => $reasonCode],
                 $comment
             );
+
+            $this->setRawAttributes($vendor->getAttributes(), true);
 
             return true;
         });

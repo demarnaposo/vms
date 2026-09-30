@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import React from 'react';
 import AppIcon from './AppIcon';
 import Sidebar from './Sidebar';
@@ -16,7 +16,6 @@ export default function VendorLayout({
     header = null,
     badges = {},
 }) {
-    const { flash = {} } = usePage().props;
     const { t } = useLanguage();
 
     // Show onboarding in nav if vendor not complete
@@ -124,38 +123,6 @@ export default function VendorLayout({
                     )}
 
                     {header}
-
-                    {/* Flash Messages */}
-                    {(flash?.success || flash?.error) && (
-                        <div className="px-4 md:px-8 pt-4 animate-scale-in">
-                            {flash.success && (
-                                <div className="p-4 rounded-xl bg-(--color-success-light) border border-(--color-success) text-(--color-success-dark) flex items-center gap-3 shadow-token-md">
-                                    <span className="w-6 h-6 rounded-full bg-(--color-success) text-white flex items-center justify-center min-w-6">
-                                        <AppIcon
-                                            name="success"
-                                            className="h-4 w-4"
-                                            strokeWidth={2.2}
-                                        />
-                                    </span>
-                                    {/* Translate known server flash messages before display. */}
-                                    <span className="font-medium text-sm">{t(flash.success)}</span>
-                                </div>
-                            )}
-                            {flash.error && (
-                                <div className="p-4 rounded-xl bg-(--color-danger-light) border border-(--color-danger) text-(--color-danger-dark) flex items-center gap-3 shadow-token-md">
-                                    <span className="w-6 h-6 rounded-full bg-(--color-danger) text-white flex items-center justify-center min-w-6">
-                                        <AppIcon
-                                            name="error"
-                                            className="h-4 w-4"
-                                            strokeWidth={2.2}
-                                        />
-                                    </span>
-                                    {/* Translate known server flash errors before display. */}
-                                    <span className="font-medium text-sm">{t(flash.error)}</span>
-                                </div>
-                            )}
-                        </div>
-                    )}
 
                     <div className="p-4 md:p-8 animate-fade-in">{children}</div>
                 </main>

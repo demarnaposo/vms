@@ -5,6 +5,7 @@ import { formatDate } from '@/utils/dateFormatters';
 import { useLanguage } from '@/Contexts/LanguageContext';
 // Localize fixed document master labels and descriptions during onboarding.
 import { translateDocumentTypeDescription, translateDocumentTypeLabel } from '@/i18n/documentTypes';
+import { Modal, ModalCancelButton, ModalPrimaryButton } from '@/Components';
 
 export default function StepDocuments({ documentTypes, sessionData }) {
     // Read the active language for master-data translation.
@@ -14,6 +15,7 @@ export default function StepDocuments({ documentTypes, sessionData }) {
     const [expiryByType, setExpiryByType] = useState({});
     const [localErrors, setLocalErrors] = useState({});
     const [processing, setProcessing] = useState(false);
+    const [pendingRemovalTypeId, setPendingRemovalTypeId] = useState(null);
     const sessionDocs = useMemo(() => sessionData?.step3?.documents || [], [sessionData]);
     const normalizeTypeId = (typeId) => String(typeId ?? '');
     const { props } = usePage();
@@ -321,19 +323,9 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                                                 <button
                                                     type="button"
                                                     className="text-sm text-(--color-danger)"
-                                                    onClick={() => {
-                                                        if (
-                                                            window.confirm(
-                                                                t(
-                                                                    'Remove this document from the draft?'
-                                                                )
-                                                            )
-                                                        )
-                                                            setRemovedTypeIds((ids) => [
-                                                                ...ids,
-                                                                docType.id,
-                                                            ]);
-                                                    }}
+                                                    onClick={() =>
+                                                        setPendingRemovalTypeId(docType.id)
+                                                    }
                                                 >
                                                     {t('Remove from draft')}
                                                 </button>
@@ -414,6 +406,27 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                     </button>
                 </div>
             </form>
+            <Modal
+                isOpen={pendingRemovalTypeId !== null}
+                onClose={() => setPendingRemovalTypeId(null)}
+                title="Remove from draft"
+                footer={
+                    <>
+                        <ModalCancelButton onClick={() => setPendingRemovalTypeId(null)} />
+                        <ModalPrimaryButton
+                            variant="danger"
+                            onClick={() => {
+                                setRemovedTypeIds((ids) => [...ids, pendingRemovalTypeId]);
+                                setPendingRemovalTypeId(null);
+                            }}
+                        >
+                            Remove from draft
+                        </ModalPrimaryButton>
+                    </>
+                }
+            >
+                <p>{t('Remove this document from the draft?')}</p>
+            </Modal>
         </div>
     );
 }

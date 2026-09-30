@@ -80,9 +80,14 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+        app(\App\Services\RbacService::class)->locked(function () use ($user): void {
+            $freshUser = \App\Models\User::lockForUpdate()->findOrFail($user->id);
+            app(\App\Services\RbacService::class)->assertNotLastAdmin($freshUser, [], 'password');
+            app(\App\Services\AccountDeletionService::class)->assertNoHistory($freshUser, 'password');
+            $freshUser->delete();
+            \Illuminate\Support\Facades\DB::afterCommit(fn () => \App\Http\Middleware\HandleInertiaRequests::clearAuthCache($freshUser->id));
+        });
         Auth::logout();
-
-        $user->delete();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

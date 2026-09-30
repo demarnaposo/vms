@@ -24,6 +24,7 @@ return [
         ],
     ],
 
+    // Legacy catalogue and grants are preserved. Operational staff capabilities live in config/rbac.php.
     'permissions' => [
         ['name' => 'vendors.view', 'display_name' => 'View Vendors', 'group' => 'vendors'],
         ['name' => 'vendors.create', 'display_name' => 'Create Vendors', 'group' => 'vendors'],

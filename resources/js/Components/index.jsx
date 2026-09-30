@@ -54,7 +54,6 @@ export { default as Modal, ModalCancelButton, ModalPrimaryButton } from './Modal
 // =====================================
 export {
     Alert,
-    Toast,
     EmptyState,
     Spinner,
     LoadingState,

@@ -15,6 +15,27 @@ class PaymentWorkflowTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_vendor_payment_totals_include_all_pages(): void
+    {
+        for ($index = 0; $index < 12; $index++) {
+            PaymentRequest::create([
+                'vendor_id' => $this->vendor->id,
+                'requested_by' => $this->vendorUser->id,
+                'reference_number' => 'PAY-PAGE-'.$index,
+                'amount' => 100,
+                'description' => 'Synthetic payment',
+                'status' => $index < 10 ? PaymentRequest::STATUS_PAID : PaymentRequest::STATUS_REQUESTED,
+            ]);
+        }
+
+        $this->actingAs($this->vendorUser)->get(route('vendor.payments'))
+            ->assertInertia(fn ($page) => $page
+                ->where('payments.total', 12)
+                ->where('paymentStats.total_count', 12)
+                ->where('paymentStats.pending_amount', 200)
+                ->where('paymentStats.paid_amount', 1000));
+    }
+
     protected $vendorUser;
 
     protected $opsUser;

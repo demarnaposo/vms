@@ -30,7 +30,7 @@ class AdminNotificationController extends Controller
             ->get();
 
         $staffUsers = User::whereHas('roles', function ($q) {
-            $q->whereIn('name', ['ops_manager', 'finance_manager', 'super_admin']);
+            $q->where('is_staff', true)->where('guard_name', 'web');
         })
             ->select('id', 'name', 'email')
             ->orderBy('name')

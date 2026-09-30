@@ -12,7 +12,9 @@ class DocumentUploadRules
 
     public static function extensions(?DocumentType $type): array
     {
-        return array_values(array_intersect(self::EXTENSIONS, $type?->allowed_extensions ?? self::EXTENSIONS));
+        $allowed = $type === null ? self::EXTENSIONS : ($type->allowed_extensions ?? self::EXTENSIONS);
+
+        return array_values(array_intersect(self::EXTENSIONS, $allowed));
     }
 
     public static function file(?DocumentType $type): array
@@ -22,8 +24,10 @@ class DocumentUploadRules
             'pdf' => 'application/pdf',
             'jpg', 'jpeg' => 'image/jpeg',
             'png' => 'image/png',
+            default => throw new \InvalidArgumentException('Unsupported document extension.'),
         }, $extensions)));
-        $maxMb = max(1, min(self::MAX_MB, (int) ($type?->max_file_size_mb ?? self::MAX_MB)));
+        $configuredMax = $type === null ? self::MAX_MB : ($type->max_file_size_mb ?? self::MAX_MB);
+        $maxMb = max(1, min(self::MAX_MB, (int) $configuredMax));
 
         return ['bail', 'required', 'file', 'extensions:'.implode(',', $extensions), 'mimes:'.implode(',', $extensions), 'mimetypes:'.implode(',', $mimeTypes), 'max:'.($maxMb * 1024)];
     }

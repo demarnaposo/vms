@@ -83,6 +83,23 @@ class ReportExportTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_vendor_csv_neutralizes_formula_prefixes_without_changing_stored_values(): void
+    {
+        $user = $this->createOpsUser();
+        foreach (['=1+1', '+SUM(1,1)', '-SUM(1,1)', '@SUM(1,1)', "\t=1+1"] as $name) {
+            Vendor::factory()->create(['company_name' => $name]);
+        }
+
+        $response = $this->actingAs($user)->get(route('admin.reports.export', ['type' => 'vendor']));
+        $response->assertOk();
+        $rows = array_map('str_getcsv', explode("\n", trim($response->getContent())));
+        $names = array_column(array_slice($rows, 1), 1);
+        foreach (['=1+1', '+SUM(1,1)', '-SUM(1,1)', '@SUM(1,1)', "\t=1+1"] as $name) {
+            $this->assertContains("'".$name, $names);
+            $this->assertDatabaseHas('vendors', ['company_name' => $name]);
+        }
+    }
+
     private function createOpsUser(): User
     {
         $opsRole = Role::firstOrCreate(['name' => Role::OPS_MANAGER], ['display_name' => 'Ops Manager']);

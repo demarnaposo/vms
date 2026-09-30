@@ -1,8 +1,8 @@
 import { router, useForm } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import {
     AdminLayout,
-    Alert,
     Badge,
     Button,
     Card,
@@ -81,7 +81,10 @@ export default function DocumentTypeIndex({ documentTypes = [] }) {
         router.delete(`/admin/document-types/${deletingDocumentType.id}`, {
             preserveScroll: true,
             onSuccess: () => setDeletingDocumentType(null),
-            onError: () => setDeletingDocumentType(null),
+            onError: (responseErrors) => {
+                if (responseErrors.document_type) toast.error(t(responseErrors.document_type));
+                setDeletingDocumentType(null);
+            },
             onFinish: () => setDeleting(false),
         });
     };
@@ -145,6 +148,8 @@ export default function DocumentTypeIndex({ documentTypes = [] }) {
             ),
         },
     ];
+
+    // console.log('Document Types:', documentTypes);
 
     const header = (
         <PageHeader title="Document Types" subtitle="Manage vendor document requirements." />
@@ -290,12 +295,6 @@ export default function DocumentTypeIndex({ documentTypes = [] }) {
                         </div>
                     </form>
                 </Card>
-
-                {errors.document_type && (
-                    <div role="alert" aria-live="polite">
-                        <Alert type="error">{errors.document_type}</Alert>
-                    </div>
-                )}
 
                 <Card title="Document Types" noPadding>
                     <DataTable

@@ -19,6 +19,8 @@ class VendorLifecycleService
     public function approveAndActivate(Vendor $vendor, User $actor, ?string $comment = null): void
     {
         DB::transaction(function () use ($vendor, $actor, $comment) {
+            Vendor::query()->whereKey($vendor->getKey())->lockForUpdate()->firstOrFail();
+            $vendor->refresh();
             $note = $comment ?: 'Vendor approved and activated';
 
             if ($vendor->status === Vendor::STATUS_SUBMITTED) {
@@ -126,12 +128,14 @@ class VendorLifecycleService
      */
     public function suspend(Vendor $vendor, User $actor, string $reason): void
     {
-        if ($vendor->status !== Vendor::STATUS_ACTIVE) {
-            // Localize the blocked suspension alert while preserving the vendor status.
-            throw new InvalidArgumentException(__('alerts.vendor_transition', ['action' => __('alerts.actions.suspended'), 'status' => $vendor->status]));
-        }
+        DB::transaction(function () use ($vendor, $actor, $reason): void {
+            $lockedVendor = Vendor::query()->lockForUpdate()->findOrFail($vendor->getKey());
+            if ($lockedVendor->status !== Vendor::STATUS_ACTIVE) {
+                throw new InvalidArgumentException(__('alerts.vendor_transition', ['action' => __('alerts.actions.suspended'), 'status' => $lockedVendor->status]));
+            }
 
-        $vendor->transitionTo(Vendor::STATUS_SUSPENDED, $actor, $reason);
+            $lockedVendor->transitionTo(Vendor::STATUS_SUSPENDED, $actor, $reason);
+        });
     }
 
     /**
@@ -139,17 +143,18 @@ class VendorLifecycleService
      */
     public function terminate(Vendor $vendor, User $actor, string $reason): void
     {
-        if (! in_array($vendor->status, [Vendor::STATUS_ACTIVE, Vendor::STATUS_SUSPENDED], true)) {
-            // Localize the blocked termination alert while preserving the vendor status.
-            throw new InvalidArgumentException(__('alerts.vendor_transition', ['action' => __('alerts.actions.terminated'), 'status' => $vendor->status]));
-        }
+        DB::transaction(function () use ($vendor, $actor, $reason): void {
+            $lockedVendor = Vendor::query()->lockForUpdate()->findOrFail($vendor->getKey());
+            if (! in_array($lockedVendor->status, [Vendor::STATUS_ACTIVE, Vendor::STATUS_SUSPENDED], true)) {
+                throw new InvalidArgumentException(__('alerts.vendor_transition', ['action' => __('alerts.actions.terminated'), 'status' => $lockedVendor->status]));
+            }
 
-        if (blank($reason)) {
-            // Localize the missing termination reason alert.
-            throw new InvalidArgumentException(__('alerts.termination_reason_required'));
-        }
+            if (blank($reason)) {
+                throw new InvalidArgumentException(__('alerts.termination_reason_required'));
+            }
 
-        $vendor->transitionTo(Vendor::STATUS_TERMINATED, $actor, $reason);
+            $lockedVendor->transitionTo(Vendor::STATUS_TERMINATED, $actor, $reason);
+        });
     }
 
     /**
@@ -157,17 +162,18 @@ class VendorLifecycleService
      */
     public function reactivate(Vendor $vendor, User $actor, string $reason): void
     {
-        if ($vendor->status !== Vendor::STATUS_TERMINATED) {
-            // Localize the blocked reactivation alert while preserving the vendor status.
-            throw new InvalidArgumentException(__('alerts.vendor_transition', ['action' => __('alerts.actions.reactivated'), 'status' => $vendor->status]));
-        }
+        DB::transaction(function () use ($vendor, $actor, $reason): void {
+            $lockedVendor = Vendor::query()->lockForUpdate()->findOrFail($vendor->getKey());
+            if ($lockedVendor->status !== Vendor::STATUS_TERMINATED) {
+                throw new InvalidArgumentException(__('alerts.vendor_transition', ['action' => __('alerts.actions.reactivated'), 'status' => $lockedVendor->status]));
+            }
 
-        if (blank($reason)) {
-            // Localize the missing reactivation reason alert.
-            throw new InvalidArgumentException(__('alerts.reactivation_reason_required'));
-        }
+            if (blank($reason)) {
+                throw new InvalidArgumentException(__('alerts.reactivation_reason_required'));
+            }
 
-        $vendor->transitionTo(Vendor::STATUS_UNDER_REVIEW, $actor, $reason, 'APPEAL_APPROVED');
+            $lockedVendor->transitionTo(Vendor::STATUS_UNDER_REVIEW, $actor, $reason, 'APPEAL_APPROVED');
+        });
     }
 
     /**
@@ -237,6 +243,7 @@ class VendorLifecycleService
             'documents' => __('alerts.documents_required_for_activation'),
             'compliance' => __('alerts.compliance_required_for_activation'),
             'flags' => __('alerts.flags_block_activation'),
+            default => throw new \LogicException('Unknown activation readiness reason.'),
         };
 
         throw new InvalidArgumentException($message);

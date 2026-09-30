@@ -10,7 +10,7 @@ class PaymentRequestPolicy
     public function view(User $user, PaymentRequest $paymentRequest): bool
     {
         if ($user->isStaff()) {
-            return true;
+            return $user->staffCan('payments.view');
         }
 
         return $user->isVendor() && $paymentRequest->vendor->user_id === $user->id;
@@ -18,16 +18,16 @@ class PaymentRequestPolicy
 
     public function validateOps(User $user, PaymentRequest $paymentRequest): bool
     {
-        return $user->hasAnyRole(['ops_manager', 'super_admin']);
+        return $user->staffCan('payments.validate');
     }
 
     public function approveFinance(User $user, PaymentRequest $paymentRequest): bool
     {
-        return $user->hasAnyRole(['finance_manager', 'super_admin']);
+        return $user->staffCan('payments.approve');
     }
 
     public function markPaid(User $user, PaymentRequest $paymentRequest): bool
     {
-        return $user->hasAnyRole(['finance_manager', 'super_admin']);
+        return $user->staffCan('payments.disburse');
     }
 }

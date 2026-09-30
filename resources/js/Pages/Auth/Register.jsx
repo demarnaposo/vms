@@ -104,11 +104,19 @@ export default function Register() {
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
+                                <label
+                                    htmlFor="register-name"
+                                    className="block text-sm font-medium text-(--color-text-secondary) mb-2"
+                                >
                                     {t('Full Name')}
                                 </label>
                                 {/* Localize the static full-name example on registration. */}
                                 <input
+                                    id="register-name"
+                                    aria-invalid={Boolean(form.errors.name)}
+                                    aria-describedby={
+                                        form.errors.name ? 'register-name-error' : undefined
+                                    }
                                     type="text"
                                     value={form.data.name}
                                     onChange={(e) => form.setData('name', e.target.value)}
@@ -117,18 +125,29 @@ export default function Register() {
                                     required
                                 />
                                 {form.errors.name && (
-                                    <p className="mt-1 text-sm text-(--color-danger)">
+                                    <p
+                                        id="register-name-error"
+                                        className="mt-1 text-sm text-(--color-danger)"
+                                    >
                                         {form.errors.name}
                                     </p>
                                 )}
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
+                                <label
+                                    htmlFor="register-email"
+                                    className="block text-sm font-medium text-(--color-text-secondary) mb-2"
+                                >
                                     {t('Email')}
                                 </label>
                                 {/* Localize the static email example on registration. */}
                                 <input
+                                    id="register-email"
+                                    aria-invalid={Boolean(form.errors.email)}
+                                    aria-describedby={
+                                        form.errors.email ? 'register-email-error' : undefined
+                                    }
                                     type="email"
                                     value={form.data.email}
                                     onChange={(e) => form.setData('email', e.target.value)}
@@ -137,18 +156,29 @@ export default function Register() {
                                     required
                                 />
                                 {form.errors.email && (
-                                    <p className="mt-1 text-sm text-(--color-danger)">
+                                    <p
+                                        id="register-email-error"
+                                        className="mt-1 text-sm text-(--color-danger)"
+                                    >
                                         {form.errors.email}
                                     </p>
                                 )}
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
+                                <label
+                                    htmlFor="register-password"
+                                    className="block text-sm font-medium text-(--color-text-secondary) mb-2"
+                                >
                                     {t('Password')}
                                 </label>
                                 {/* Let users show or hide their new registration password. */}
                                 <PasswordInput
+                                    id="register-password"
+                                    aria-invalid={Boolean(form.errors.password)}
+                                    aria-describedby={
+                                        form.errors.password ? 'register-password-error' : undefined
+                                    }
                                     value={form.data.password}
                                     onChange={(e) => form.setData('password', e.target.value)}
                                     className="w-full px-4 py-3 rounded-lg border border-(--color-border-primary) focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-primary)/20 transition-colors bg-(--color-bg-primary)"
@@ -157,18 +187,31 @@ export default function Register() {
                                     required
                                 />
                                 {form.errors.password && (
-                                    <p className="mt-1 text-sm text-(--color-danger)">
+                                    <p
+                                        id="register-password-error"
+                                        className="mt-1 text-sm text-(--color-danger)"
+                                    >
                                         {form.errors.password}
                                     </p>
                                 )}
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-(--color-text-secondary) mb-2">
+                                <label
+                                    htmlFor="register-password-confirmation"
+                                    className="block text-sm font-medium text-(--color-text-secondary) mb-2"
+                                >
                                     {t('Confirm Password')}
                                 </label>
                                 {/* Give password confirmation its own independent visibility control. */}
                                 <PasswordInput
+                                    id="register-password-confirmation"
+                                    aria-invalid={Boolean(form.errors.password_confirmation)}
+                                    aria-describedby={
+                                        form.errors.password_confirmation
+                                            ? 'register-password-confirmation-error'
+                                            : undefined
+                                    }
                                     value={form.data.password_confirmation}
                                     onChange={(e) =>
                                         form.setData('password_confirmation', e.target.value)
@@ -178,6 +221,14 @@ export default function Register() {
                                     autoComplete="new-password"
                                     required
                                 />
+                                {form.errors.password_confirmation && (
+                                    <p
+                                        id="register-password-confirmation-error"
+                                        className="mt-1 text-sm text-(--color-danger)"
+                                    >
+                                        {form.errors.password_confirmation}
+                                    </p>
+                                )}
                             </div>
 
                             <button

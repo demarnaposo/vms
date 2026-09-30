@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SaveVendorCategoryRequest;
+use App\Models\Vendor;
 use App\Models\VendorApplication;
 use App\Models\VendorCategory;
 use Illuminate\Http\RedirectResponse;
@@ -43,7 +44,7 @@ class VendorCategoryController extends Controller
                 ->orWhere('data->step1->category', $vendorCategory->code)
                 ->exists();
 
-            if ($vendorCategory->vendors()->withTrashed()->exists() || $usedInDraft) {
+            if (Vendor::withTrashed()->where('category_id', $vendorCategory->id)->exists() || $usedInDraft) {
                 return back()->withErrors(['category' => 'This category is in use. Deactivate it instead.']);
             }
 

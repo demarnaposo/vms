@@ -60,34 +60,6 @@ export function Alert({ type = 'info', title, children, onClose }) {
     );
 }
 
-// Toast notification (for temporary messages)
-export function Toast({ message, type = 'success', onClose }) {
-    const { t } = useLanguage();
-    const types = {
-        success: 'bg-(--color-success)',
-        error: 'bg-(--color-danger)',
-        warning: 'bg-(--color-warning)',
-        info: 'bg-(--color-info)',
-    };
-
-    return (
-        <div
-            className={`fixed bottom-4 right-4 ${types[type]} text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 z-50 animate-slide-up`}
-        >
-            <span>{t(message)}</span>
-            {onClose && (
-                <button
-                    onClick={onClose}
-                    className="opacity-70 hover:opacity-100"
-                    aria-label={t('Dismiss')}
-                >
-                    &#215;
-                </button>
-            )}
-        </div>
-    );
-}
-
 // Empty State Component
 export function EmptyState({
     icon = 'empty',

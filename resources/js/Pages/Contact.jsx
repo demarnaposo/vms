@@ -1,5 +1,6 @@
-import { router, useForm, usePage } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import AppIcon from '@/Components/AppIcon';
 import GuestLayout from '@/Components/GuestLayout';
 // Translate the contact experience with the global language state.
@@ -29,7 +30,6 @@ const contactCards = [
 export default function Contact() {
     // Resolve contact labels, validation feedback, and actions bilingually.
     const { t } = useLanguage();
-    const { flash = {} } = usePage().props;
     const form = useForm({
         name: '',
         email: '',
@@ -38,12 +38,6 @@ export default function Contact() {
     });
 
     const [emailError, setEmailError] = useState('');
-    const [feedback, setFeedback] = useState(() => {
-        if (flash.success) return { type: 'success', message: flash.success };
-        if (flash.error) return { type: 'error', message: flash.error };
-
-        return null;
-    });
 
     // Validate email requires a proper domain with TLD (e.g., user@example.com)
     const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
@@ -52,10 +46,7 @@ export default function Contact() {
         () =>
             router.on('exception', (event) => {
                 event.preventDefault();
-                setFeedback({
-                    type: 'error',
-                    message: t('Your message could not be sent. Please try again.'),
-                });
+                toast.error(t('Your message could not be sent. Please try again.'));
             }),
         [t]
     );
@@ -63,7 +54,6 @@ export default function Contact() {
     const handleSubmit = (event) => {
         event.preventDefault();
         setEmailError('');
-        setFeedback(null);
 
         if (!isValidEmail(form.data.email)) {
             setEmailError(t('Please enter a valid email address (e.g., user@example.com).'));
@@ -75,17 +65,11 @@ export default function Contact() {
             onSuccess: (page) => {
                 if (page.props.flash?.success) {
                     form.reset();
-                    setFeedback({ type: 'success', message: page.props.flash.success });
-                } else if (page.props.flash?.error) {
-                    setFeedback({ type: 'error', message: page.props.flash.error });
                 }
             },
             onError: (errors) => {
                 if (Object.keys(errors).length === 0) {
-                    setFeedback({
-                        type: 'error',
-                        message: t('Your message could not be sent. Please try again.'),
-                    });
+                    toast.error(t('Your message could not be sent. Please try again.'));
                 }
             },
         });
@@ -144,31 +128,21 @@ export default function Contact() {
                                 {t('Fields marked here are required.')}
                             </p>
 
-                            {feedback?.type === 'success' && (
-                                <div
-                                    className="mt-5 rounded-xl border border-(--color-success) bg-(--color-success-light) p-4 text-sm font-medium text-(--color-success-dark)"
-                                    role="status"
-                                >
-                                    {t(feedback.message)}
-                                </div>
-                            )}
-
-                            {feedback?.type === 'error' && (
-                                <div
-                                    className="mt-5 rounded-xl border border-(--color-danger) bg-(--color-danger-light) p-4 text-sm font-medium text-(--color-danger-dark)"
-                                    role="alert"
-                                >
-                                    {t(feedback.message)}
-                                </div>
-                            )}
-
                             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                                 <div className="grid sm:grid-cols-2 gap-4">
                                     <div className="space-y-1">
-                                        <label className="text-sm font-medium text-(--color-text-secondary)">
+                                        <label
+                                            htmlFor="contact-name"
+                                            className="text-sm font-medium text-(--color-text-secondary)"
+                                        >
                                             {t('Name')}
                                         </label>
                                         <input
+                                            id="contact-name"
+                                            aria-invalid={Boolean(form.errors.name)}
+                                            aria-describedby={
+                                                form.errors.name ? 'contact-name-error' : undefined
+                                            }
                                             type="text"
                                             value={form.data.name}
                                             onChange={(event) =>
@@ -180,6 +154,7 @@ export default function Contact() {
                                         />
                                         {form.errors.name && (
                                             <p
+                                                id="contact-name-error"
                                                 className="text-sm text-(--color-danger)"
                                                 role="alert"
                                             >
@@ -188,10 +163,20 @@ export default function Contact() {
                                         )}
                                     </div>
                                     <div className="space-y-1">
-                                        <label className="text-sm font-medium text-(--color-text-secondary)">
+                                        <label
+                                            htmlFor="contact-email"
+                                            className="text-sm font-medium text-(--color-text-secondary)"
+                                        >
                                             {t('Email')}
                                         </label>
                                         <input
+                                            id="contact-email"
+                                            aria-invalid={Boolean(emailError || form.errors.email)}
+                                            aria-describedby={
+                                                emailError || form.errors.email
+                                                    ? 'contact-email-error'
+                                                    : undefined
+                                            }
                                             type="email"
                                             value={form.data.email}
                                             onChange={(event) => {
@@ -208,6 +193,7 @@ export default function Contact() {
                                         />
                                         {(emailError || form.errors.email) && (
                                             <p
+                                                id="contact-email-error"
                                                 className="text-sm text-(--color-danger)"
                                                 role="alert"
                                             >
@@ -218,10 +204,20 @@ export default function Contact() {
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium text-(--color-text-secondary)">
+                                    <label
+                                        htmlFor="contact-subject"
+                                        className="text-sm font-medium text-(--color-text-secondary)"
+                                    >
                                         {t('Subject')}
                                     </label>
                                     <input
+                                        id="contact-subject"
+                                        aria-invalid={Boolean(form.errors.subject)}
+                                        aria-describedby={
+                                            form.errors.subject
+                                                ? 'contact-subject-error'
+                                                : undefined
+                                        }
                                         type="text"
                                         value={form.data.subject}
                                         onChange={(event) =>
@@ -232,17 +228,31 @@ export default function Contact() {
                                         required
                                     />
                                     {form.errors.subject && (
-                                        <p className="text-sm text-(--color-danger)" role="alert">
+                                        <p
+                                            id="contact-subject-error"
+                                            className="text-sm text-(--color-danger)"
+                                            role="alert"
+                                        >
                                             {t(form.errors.subject)}
                                         </p>
                                     )}
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium text-(--color-text-secondary)">
+                                    <label
+                                        htmlFor="contact-message"
+                                        className="text-sm font-medium text-(--color-text-secondary)"
+                                    >
                                         {t('Message')}
                                     </label>
                                     <textarea
+                                        id="contact-message"
+                                        aria-invalid={Boolean(form.errors.message)}
+                                        aria-describedby={
+                                            form.errors.message
+                                                ? 'contact-message-error'
+                                                : undefined
+                                        }
                                         value={form.data.message}
                                         onChange={(event) =>
                                             form.setData('message', event.target.value)
@@ -253,7 +263,11 @@ export default function Contact() {
                                         required
                                     />
                                     {form.errors.message && (
-                                        <p className="text-sm text-(--color-danger)" role="alert">
+                                        <p
+                                            id="contact-message-error"
+                                            className="text-sm text-(--color-danger)"
+                                            role="alert"
+                                        >
                                             {t(form.errors.message)}
                                         </p>
                                     )}

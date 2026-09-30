@@ -65,7 +65,7 @@ class ReportService
         }
 
         return [
-            'payments' => $query->orderBy('created_at', 'desc')->paginate(20),
+            'payments' => $query->orderBy('created_at', 'desc')->paginate(20)->withQueryString(),
             'stats' => [
                 'total_amount' => (clone $statsQuery)->sum('amount'),
                 'pending_count' => (clone $statsQuery)->whereIn('status', $pendingStatuses)->count(),
@@ -274,7 +274,7 @@ class ReportService
             'compliance_score',
             'performance_score',
             'created_at',
-        ])->orderBy('created_at', 'desc')->paginate(20);
+        ])->orderBy('created_at', 'desc')->paginate(20)->withQueryString();
 
         return [
             'vendors' => $vendors,
@@ -314,7 +314,7 @@ class ReportService
                 'compliance_score',
                 'status',
                 'created_at',
-            ])->orderBy('performance_score', 'desc')->paginate(20),
+            ])->orderBy('performance_score', 'desc')->paginate(20)->withQueryString(),
             'stats' => [
                 'total_active' => Vendor::where('status', Vendor::STATUS_ACTIVE)->count(),
                 'avg_performance' => round(Vendor::where('status', Vendor::STATUS_ACTIVE)->avg('performance_score') ?? 0),
@@ -348,7 +348,7 @@ class ReportService
                 'compliance_score',
                 'status',
                 'created_at',
-            ])->orderBy('compliance_score', 'asc')->paginate(20),
+            ])->orderBy('compliance_score', 'asc')->paginate(20)->withQueryString(),
             'stats' => [
                 'total_vendors' => Vendor::count(),
                 'compliant' => Vendor::where('compliance_status', Vendor::COMPLIANCE_COMPLIANT)->count(),
@@ -380,7 +380,7 @@ class ReportService
 
         $query->whereBetween('expiry_date', [$startDate, $endDate]);
 
-        $documents = $query->orderBy('expiry_date', 'asc')->paginate(20);
+        $documents = $query->orderBy('expiry_date', 'asc')->paginate(20)->withQueryString();
 
         $documents->getCollection()->transform(function ($doc) {
             $doc->setAttribute('expiry_formatted', $doc->expiry_date ? $doc->expiry_date->format('Y-m-d') : 'N/A');
@@ -427,7 +427,7 @@ class ReportService
 
         fputcsv($handle, $headers);
         foreach ($rows as $row) {
-            fputcsv($handle, $row);
+            fputcsv($handle, array_map(fn ($cell) => $this->safeCsvCell($cell), $row));
         }
 
         rewind($handle);
@@ -438,5 +438,14 @@ class ReportService
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
+    }
+
+    private function safeCsvCell(mixed $cell): mixed
+    {
+        if (! is_string($cell) || ! preg_match('/^[\p{Z}\p{C}]*[=+\-@]/u', $cell)) {
+            return $cell;
+        }
+
+        return "'".$cell;
     }
 }

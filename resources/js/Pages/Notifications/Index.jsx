@@ -11,6 +11,7 @@ import {
 import { formatDateTime } from '@/utils/dateFormatters';
 // Translate the shared notification-center interface without altering database content.
 import { useLanguage } from '@/Contexts/LanguageContext';
+import PaginationLinks from '@/Components/PaginationLinks';
 
 export default function NotificationsIndex({ notifications, unreadCount }) {
     // Use the selected language for fixed copy and notification timestamps.
@@ -20,7 +21,7 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
     const isVendor = auth?.roles?.includes('vendor');
 
     const markAsRead = (id) => {
-        router.post(`/notifications/${id}/read`);
+        router.post(`/notifications/${id}/read`, {}, { preserveScroll: true });
     };
 
     const markAllAsRead = () => {
@@ -128,6 +129,7 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
                             </div>
                         ))}
                     </div>
+                    <PaginationLinks links={notifications?.links} />
                 </Card>
             )}
         </Layout>

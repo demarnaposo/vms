@@ -136,7 +136,7 @@ export function translateSystemMasterDataField(
             ? categoryDefinitions[record.name]
             : null;
     if (
-        category === 'document_types' &&
+        ['document_types', 'roles'].includes(category) &&
         record[field] != null &&
         record[field] !== definition?.[field]
     )

@@ -3,20 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Role extends Model
+class Role extends \Spatie\Permission\Models\Role
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name',
-        'display_name',
-        'description',
-    ];
-
-    // Role constants
     const SUPER_ADMIN = 'super_admin';
 
     const OPS_MANAGER = 'ops_manager';
@@ -25,31 +16,34 @@ class Role extends Model
 
     const VENDOR = 'vendor';
 
-    /**
-     * Get all permissions for this role.
-     *
-     * @return BelongsToMany<Permission, $this>
-     */
-    public function permissions(): BelongsToMany
+    protected $fillable = ['name', 'display_name', 'description', 'guard_name', 'is_staff'];
+
+    protected $casts = ['is_staff' => 'boolean'];
+
+    public static function builtInNames(): array
     {
-        return $this->belongsToMany(Permission::class);
+        return [self::SUPER_ADMIN, self::OPS_MANAGER, self::FINANCE_MANAGER, self::VENDOR];
     }
 
-    /**
-     * Get all users with this role.
-     *
-     * @return BelongsToMany<User, $this>
-     */
-    public function users(): BelongsToMany
+    protected static function booted(): void
     {
-        return $this->belongsToMany(User::class);
+        static::creating(function (Role $role): void {
+            if (in_array($role->name, self::builtInNames(), true)) {
+                $role->is_staff = $role->name !== self::VENDOR;
+            }
+        });
+        static::created(function (Role $role): void {
+            // Only a newly created built-in role receives bootstrap capabilities.
+            foreach (config('rbac.baseline.'.$role->name, []) as $code) {
+                $item = config('rbac.permissions')[$code];
+                $permission = Permission::firstOrCreate(['name' => $code, 'guard_name' => 'web'], ['display_name' => $item['label'], 'group' => $item['group']]);
+                $role->givePermissionTo($permission);
+            }
+        });
     }
 
-    /**
-     * Check if role has a permission.
-     */
     public function hasPermission(string $permission): bool
     {
-        return $this->permissions()->where('name', $permission)->exists();
+        return $this->checkPermissionTo($permission, 'web');
     }
 }

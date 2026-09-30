@@ -12,7 +12,12 @@ import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 // SIDEBAR CONFIGURATION
 // =====================================
 const adminNavConfig = [
-    { name: 'Dashboard', icon: 'dashboard', href: '/admin/dashboard' },
+    {
+        name: 'Dashboard',
+        icon: 'dashboard',
+        href: '/admin/dashboard',
+        permission: 'dashboard.view',
+    },
     {
         name: 'Master Data',
         icon: 'metrics',
@@ -38,50 +43,45 @@ const adminNavConfig = [
             },
         ],
     },
-    { name: 'Vendors', icon: 'vendors', href: '/admin/vendors' },
+    { name: 'Vendors', icon: 'vendors', href: '/admin/vendors', permission: 'vendors.view' },
     {
         name: 'Documents',
         icon: 'documents',
         href: '/admin/documents',
-        permission: 'verify_documents',
-        allowedRoles: ['ops_manager', 'super_admin'],
+        permission: 'documents.list',
     },
     {
         name: 'Compliance',
         icon: 'compliance',
         href: '/admin/compliance',
-        permission: 'run_compliance',
-        allowedRoles: ['ops_manager', 'super_admin'],
+        permission: 'compliance.access',
     },
     {
         name: 'Performance',
         icon: 'performance',
         href: '/admin/performance',
-        permission: 'rate_vendors',
-        allowedRoles: ['ops_manager', 'super_admin'],
+        permission: 'performance.view',
     },
-    { name: 'Payments', icon: 'payments', href: '/admin/payments' },
+    { name: 'Payments', icon: 'payments', href: '/admin/payments', permission: 'payments.view' },
     { name: 'Audit Logs', icon: 'audit', href: '/admin/audit', permission: 'view_audit' },
     {
         name: 'Messages',
         icon: 'messages',
         href: '/admin/contact-messages',
-        permission: 'view_messages',
-        allowedRoles: ['ops_manager', 'super_admin'],
+        permission: 'messages.manage',
     },
     {
         name: 'Send Notification',
         icon: 'notifications',
         href: '/admin/notifications/send',
-        permission: 'send_notifications',
-        allowedRoles: ['ops_manager', 'super_admin'],
+        permission: 'notifications.send',
     },
     { name: 'Reports', icon: 'reports', href: '/admin/reports', permission: 'view_reports' },
     {
         name: 'System Health',
         icon: 'system',
         href: '/admin/system-health',
-        permission: 'view_reports',
+        permission: 'system.health',
     },
 ];
 
@@ -358,14 +358,14 @@ export default function Sidebar({
     // Translate fixed roles and retain unknown role codes as readable fallbacks.
     const roleDisplay =
         roles.length > 0
-            ? roles
+            ? (auth?.role_items || roles.map((name) => ({ name })))
                   .map((role) =>
                       translateSystemMasterDataField(
                           language,
                           'roles',
-                          { name: role },
+                          role,
                           'display_name',
-                          role.replace(/_/g, ' ')
+                          role.name.replace(/_/g, ' ')
                       )
                   )
                   .join(', ')

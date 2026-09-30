@@ -11,7 +11,7 @@ class UpdateContactMessageRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()?->isStaff() === true;
+        return $this->user()?->staffCan('messages.manage') === true;
     }
 
     /**

@@ -44,6 +44,7 @@ class ComplianceDashboardService
 
         $recentResults = ComplianceResult::with(['vendor', 'rule'])
             ->whereIn('id', ComplianceResult::latestResultIdsQuery())
+            ->whereHas('rule', fn ($query) => $query->where('is_active', true))
             ->where('status', ComplianceResult::STATUS_FAIL)
             ->orderByDesc('evaluated_at')
             ->take(10)
@@ -71,6 +72,7 @@ class ComplianceDashboardService
         $results = ComplianceResult::with('rule')
             ->where('vendor_id', $vendor->id)
             ->whereIn('id', ComplianceResult::latestResultIdsQuery($vendor->id))
+            ->whereHas('rule', fn ($query) => $query->where('is_active', true))
             ->orderByDesc('evaluated_at')
             ->get();
 

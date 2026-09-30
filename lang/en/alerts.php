@@ -2,6 +2,15 @@
 
 // Keep dynamic alert copy separate from database and user-provided values.
 return [
+    'rbac_last_admin' => 'The last super admin cannot be removed.',
+    'rbac_invalid_role' => 'Select valid staff roles.',
+    'rbac_invalid_permission' => 'Select permissions from the operational catalogue.',
+    'rbac_role_in_use' => 'Built-in roles and roles assigned to users cannot be deleted.',
+    'rbac_user_saved' => 'Staff user saved successfully.',
+    'rbac_user_deleted' => 'Staff user deleted successfully.',
+    'rbac_role_saved' => 'Staff role saved successfully.',
+    'rbac_role_deleted' => 'Staff role deleted successfully.',
+
     'vendor_decision_mail_failed' => 'The vendor status changed, but the email notification could not be processed.',
     'notification_sent' => 'Notification sent to :count recipient(s).',
     'contact_message_sent' => 'Thank you for your message! We\'ll get back to you soon.',
@@ -12,6 +21,8 @@ return [
     'too_many_requests' => 'Too many actions were submitted. Please wait a moment and try again.',
     'document_verified' => ':document verified successfully.',
     'document_rejected' => ':document rejected.',
+    'document_pending_current_only' => 'Only the current pending document can be reviewed.',
+    'account_deletion_has_history' => 'This account has a history that must be retained and cannot be deleted. Please contact support.',
     'vendor_account_status' => 'Your vendor account is currently :status. Please contact support.',
     'user_account_inactive' => 'Your account is inactive. Please contact support.',
     'vendor_not_compliant' => 'Vendor is not compliant (Status: :status). Please resolve compliance issues first.',

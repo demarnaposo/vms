@@ -1,0 +1,36 @@
+<?php
+
+return [
+    'permissions' => [
+        'staff.dashboard.summary' => ['label' => 'View Cross-module Dashboard Summary', 'group' => 'system', 'usage' => 'admin.dashboard cross-module statistics and activity'],
+        'staff.dashboard.view' => ['label' => 'View Dashboard', 'group' => 'system', 'usage' => 'admin.dashboard'],
+        'staff.vendors.view' => ['label' => 'View Vendors', 'group' => 'vendors', 'usage' => 'admin.vendors.index / show'],
+        'staff.vendors.approve' => ['label' => 'Approve Vendors', 'group' => 'vendors', 'usage' => 'admin.vendors.approve'],
+        'staff.vendors.reject' => ['label' => 'Reject Vendors', 'group' => 'vendors', 'usage' => 'admin.vendors.reject'],
+        'staff.vendors.activate' => ['label' => 'Activate Vendors', 'group' => 'vendors', 'usage' => 'admin.vendors.activate'],
+        'staff.vendors.suspend' => ['label' => 'Suspend Vendors', 'group' => 'vendors', 'usage' => 'admin.vendors.suspend'],
+        'staff.vendors.terminate' => ['label' => 'Terminate Vendors', 'group' => 'vendors', 'usage' => 'admin.vendors.terminate / reactivate'],
+        'staff.vendors.notes' => ['label' => 'Edit Vendor Notes', 'group' => 'vendors', 'usage' => 'admin.vendors.notes / protected summary'],
+        'staff.documents.list' => ['label' => 'List Admin Documents', 'group' => 'documents', 'usage' => 'admin.documents.index / preview'],
+        'staff.documents.view' => ['label' => 'View Private Documents', 'group' => 'documents', 'usage' => 'documents.view / download'],
+        'staff.documents.verify' => ['label' => 'Verify Documents', 'group' => 'documents', 'usage' => 'admin.documents.verify'],
+        'staff.documents.reject' => ['label' => 'Reject Documents', 'group' => 'documents', 'usage' => 'admin.documents.reject'],
+        'staff.compliance.access' => ['label' => 'View Admin Compliance', 'group' => 'compliance', 'usage' => 'admin.compliance.dashboard / vendor / rules'],
+        'staff.compliance.evaluate' => ['label' => 'Evaluate Compliance', 'group' => 'compliance', 'usage' => 'admin.compliance.evaluate / evaluate-all'],
+        'staff.performance.view' => ['label' => 'View Performance', 'group' => 'performance', 'usage' => 'admin.performance.index / show'],
+        'staff.performance.rate' => ['label' => 'Rate Performance', 'group' => 'performance', 'usage' => 'admin.performance.rate-form / rate'],
+        'staff.payments.view' => ['label' => 'View Payments', 'group' => 'payments', 'usage' => 'admin.payments.index / show'],
+        'staff.payments.validate' => ['label' => 'Validate Payments', 'group' => 'payments', 'usage' => 'admin.payments.validate-ops (approve/reject)'],
+        'staff.payments.approve' => ['label' => 'Approve Payments', 'group' => 'payments', 'usage' => 'admin.payments.approve-finance (approve/reject)'],
+        'staff.payments.disburse' => ['label' => 'Mark Payments Paid', 'group' => 'payments', 'usage' => 'admin.payments.mark-paid'],
+        'staff.reports.view' => ['label' => 'View Reports', 'group' => 'reports', 'usage' => 'admin.reports.* read routes'],
+        'staff.reports.export' => ['label' => 'Export Reports', 'group' => 'reports', 'usage' => 'admin.reports.export'],
+        'staff.system.health' => ['label' => 'View System Health', 'group' => 'system', 'usage' => 'admin.system-health.index'],
+        'staff.messages.manage' => ['label' => 'Manage Messages', 'group' => 'system', 'usage' => 'admin.contact-messages.*'],
+        'staff.notifications.send' => ['label' => 'Send Notifications', 'group' => 'system', 'usage' => 'admin.notifications.send / store'],
+    ],
+    'baseline' => [
+        'ops_manager' => ['staff.dashboard.summary', 'staff.dashboard.view', 'staff.vendors.view', 'staff.documents.view', 'staff.payments.view', 'staff.reports.view', 'staff.reports.export', 'staff.system.health', 'staff.vendors.approve', 'staff.vendors.reject', 'staff.vendors.activate', 'staff.vendors.suspend', 'staff.vendors.terminate', 'staff.vendors.notes', 'staff.documents.list', 'staff.documents.verify', 'staff.documents.reject', 'staff.compliance.access', 'staff.compliance.evaluate', 'staff.performance.view', 'staff.performance.rate', 'staff.payments.validate', 'staff.messages.manage', 'staff.notifications.send'],
+        'finance_manager' => ['staff.dashboard.summary', 'staff.dashboard.view', 'staff.vendors.view', 'staff.documents.view', 'staff.payments.view', 'staff.reports.view', 'staff.reports.export', 'staff.system.health', 'staff.payments.approve', 'staff.payments.disburse'],
+    ],
+];

@@ -117,12 +117,34 @@ class DocumentVerificationWorkflowTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        $response->assertSessionHas('error', 'Only pending documents can be verified.');
+        $response->assertSessionHas('error', 'Only the current pending document can be reviewed.');
 
         $document->refresh();
         $this->assertSame(VendorDocument::STATUS_REJECTED, $document->verification_status);
         $this->assertNull($document->verified_by);
         $this->assertNull($document->verified_at);
+    }
+
+    public function test_historical_pending_document_is_not_actionable_but_remains_in_history(): void
+    {
+        $historical = $this->createDocument(VendorDocument::STATUS_PENDING, 'historical-pan.pdf');
+        $historical->update(['is_current' => false]);
+        $current = $this->createDocument(VendorDocument::STATUS_PENDING, 'current-pan.pdf');
+
+        $this->actingAs($this->opsUser)
+            ->get(route('admin.documents.index'))
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('documents.data', 1)
+                ->where('documents.data.0.id', $current->id));
+
+        $this->post(route('admin.documents.verify', $historical))
+            ->assertSessionHas('error', 'Only the current pending document can be reviewed.');
+        $this->post(route('admin.documents.reject', $historical), ['reason' => 'Outdated'])
+            ->assertSessionHas('error', 'Only the current pending document can be reviewed.');
+
+        $this->assertSame(VendorDocument::STATUS_PENDING, $historical->fresh()->verification_status);
+        $this->get(route('admin.documents.index', ['status' => 'all']))
+            ->assertInertia(fn (Assert $page) => $page->has('documents.data', 2));
     }
 
     // Verify alerts localize known VMS master document labels.

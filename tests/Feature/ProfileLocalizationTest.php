@@ -3,12 +3,49 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ProfileLocalizationTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_account_with_vendor_history_cannot_be_deleted_and_session_stays_active(): void
+    {
+        $user = User::factory()->create();
+        $vendor = Vendor::factory()->create(['user_id' => $user->id]);
+
+        $this->actingAs($user)->delete('/profile', ['password' => 'password'])
+            ->assertRedirect()
+            ->assertSessionHasErrors('password');
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertDatabaseHas('users', ['id' => $user->id]);
+        $this->assertDatabaseHas('vendors', ['id' => $vendor->id]);
+    }
+
+    public function test_wrong_password_does_not_delete_account(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->delete('/profile', ['password' => 'incorrect'])
+            ->assertSessionHasErrors('password');
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertDatabaseHas('users', ['id' => $user->id]);
+    }
+
+    public function test_account_without_history_can_still_be_deleted(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->delete('/profile', ['password' => 'password'])
+            ->assertRedirect('/');
+
+        $this->assertGuest();
+        $this->assertDatabaseMissing('users', ['id' => $user->id]);
+    }
 
     // Verify an invalid current password uses Indonesian feedback.
     public function test_current_password_validation_is_localized_in_indonesian(): void

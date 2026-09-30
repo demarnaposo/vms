@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
 use App\Models\DocumentType;
+use App\Models\Vendor;
 use App\Models\VendorDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -20,7 +22,7 @@ class DocumentController extends Controller
      */
     public function adminIndex(Request $request)
     {
-        $this->authorize('viewCompliance');
+        $this->authorize('viewDocuments');
 
         $filters = $request->validate([
             'status' => ['nullable', Rule::in(['all', VendorDocument::STATUS_PENDING, VendorDocument::STATUS_VERIFIED, VendorDocument::STATUS_REJECTED, VendorDocument::STATUS_EXPIRED])],
@@ -38,6 +40,9 @@ class DocumentController extends Controller
         // Filter by status
         if ($currentStatus !== 'all') {
             $query->where('verification_status', $currentStatus);
+        }
+        if ($currentStatus === VendorDocument::STATUS_PENDING) {
+            $query->where('is_current', true);
         }
 
         if (! empty($filters['document_type_id'])) {
@@ -74,31 +79,36 @@ class DocumentController extends Controller
     {
         $this->authorize('verify', $document);
 
-        if (! $document->isPending()) {
-            return back()->with('error', 'Only pending documents can be verified.');
-        }
-
         $request->validate([
             'notes' => 'nullable|string|max:500',
         ]);
 
-        $oldStatus = $document->verification_status;
+        $document = DB::transaction(function () use ($document, $request) {
+            Vendor::query()->whereKey($document->vendor_id)->lockForUpdate()->firstOrFail();
+            $current = VendorDocument::query()->lockForUpdate()->findOrFail($document->id);
+            if (! $current->is_current || ! $current->isPending()) {
+                return null;
+            }
 
-        $document->update([
-            'verification_status' => VendorDocument::STATUS_VERIFIED,
-            'verified_by' => Auth::id(),
-            'verified_at' => now(),
-            'verification_notes' => $request->notes,
-        ]);
+            $current->update([
+                'verification_status' => VendorDocument::STATUS_VERIFIED,
+                'verified_by' => Auth::id(),
+                'verified_at' => now(),
+                'verification_notes' => $request->notes,
+            ]);
+            AuditLog::log(
+                AuditLog::EVENT_VERIFIED,
+                $current,
+                ['verification_status' => VendorDocument::STATUS_PENDING],
+                ['verification_status' => VendorDocument::STATUS_VERIFIED],
+                $request->notes
+            );
 
-        // Log the verification
-        AuditLog::log(
-            AuditLog::EVENT_VERIFIED,
-            $document,
-            ['verification_status' => $oldStatus],
-            ['verification_status' => VendorDocument::STATUS_VERIFIED],
-            $request->notes
-        );
+            return $current;
+        });
+        if ($document === null) {
+            return back()->with('error', __('alerts.document_pending_current_only'));
+        }
 
         $document->loadMissing('documentType');
         // Translate only known VMS master document types in alerts.
@@ -118,31 +128,36 @@ class DocumentController extends Controller
     {
         $this->authorize('reject', $document);
 
-        if (! $document->isPending()) {
-            return back()->with('error', 'Only pending documents can be rejected.');
-        }
-
         $request->validate([
             'reason' => 'required|string|max:500',
         ]);
 
-        $oldStatus = $document->verification_status;
+        $document = DB::transaction(function () use ($document, $request) {
+            Vendor::query()->whereKey($document->vendor_id)->lockForUpdate()->firstOrFail();
+            $current = VendorDocument::query()->lockForUpdate()->findOrFail($document->id);
+            if (! $current->is_current || ! $current->isPending()) {
+                return null;
+            }
 
-        $document->update([
-            'verification_status' => VendorDocument::STATUS_REJECTED,
-            'verified_by' => Auth::id(),
-            'verified_at' => now(),
-            'verification_notes' => $request->reason,
-        ]);
+            $current->update([
+                'verification_status' => VendorDocument::STATUS_REJECTED,
+                'verified_by' => Auth::id(),
+                'verified_at' => now(),
+                'verification_notes' => $request->reason,
+            ]);
+            AuditLog::log(
+                AuditLog::EVENT_REJECTED,
+                $current,
+                ['verification_status' => VendorDocument::STATUS_PENDING],
+                ['verification_status' => VendorDocument::STATUS_REJECTED],
+                $request->reason
+            );
 
-        // Log the rejection
-        AuditLog::log(
-            AuditLog::EVENT_REJECTED,
-            $document,
-            ['verification_status' => $oldStatus],
-            ['verification_status' => VendorDocument::STATUS_REJECTED],
-            $request->reason
-        );
+            return $current;
+        });
+        if ($document === null) {
+            return back()->with('error', __('alerts.document_pending_current_only'));
+        }
 
         $document->loadMissing('documentType');
         // Preserve custom document names while localizing known master records.

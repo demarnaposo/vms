@@ -74,8 +74,8 @@ test('manual contact-message content remains unchanged', () => {
 
 test('contact form only resets after stored-success feedback and exposes failures', () => {
     assert.match(contactPage, /if \(page\.props\.flash\?\.success\) \{\s*form\.reset\(\)/);
-    assert.match(contactPage, /feedback\?\.type === 'success'/);
-    assert.match(contactPage, /feedback\?\.type === 'error'/);
+    assert.match(contactPage, /toast\.error\(t\('Your message could not be sent/);
+    assert.doesNotMatch(contactPage, /setFeedback|feedback\?\.type/);
     assert.match(contactPage, /router\.on\('exception'/);
     assert.match(contactPage, /disabled=\{form\.processing\}/);
     assert.match(contactPage, /form\.errors\.(name|email|subject|message)/);

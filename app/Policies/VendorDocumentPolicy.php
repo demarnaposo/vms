@@ -10,7 +10,7 @@ class VendorDocumentPolicy
     public function view(User $user, VendorDocument $document): bool
     {
         if ($user->isStaff()) {
-            return true;
+            return $user->staffCan('documents.view');
         }
 
         return $user->isVendor() && $document->vendor->user_id === $user->id;
@@ -23,11 +23,11 @@ class VendorDocumentPolicy
 
     public function verify(User $user, VendorDocument $document): bool
     {
-        return $user->hasAnyRole(['ops_manager', 'super_admin']);
+        return $user->staffCan('documents.verify');
     }
 
     public function reject(User $user, VendorDocument $document): bool
     {
-        return $user->hasAnyRole(['ops_manager', 'super_admin']);
+        return $user->staffCan('documents.reject');
     }
 }

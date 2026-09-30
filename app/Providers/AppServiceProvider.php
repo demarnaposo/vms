@@ -83,28 +83,16 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(VendorDocument::class, VendorDocumentPolicy::class);
         Gate::policy(PaymentRequest::class, PaymentRequestPolicy::class);
 
-        Gate::define('viewReports', fn (User $user) => $user->isStaff());
-        Gate::define('exportReports', fn (User $user) => $user->isStaff());
-
-        Gate::define('viewPerformance', fn (User $user) => $user->hasAnyRole([
-            Role::OPS_MANAGER,
-            Role::SUPER_ADMIN,
-        ]));
-        Gate::define('ratePerformance', fn (User $user) => $user->hasAnyRole([
-            Role::OPS_MANAGER,
-            Role::SUPER_ADMIN,
-        ]));
-
-        Gate::define('viewCompliance', fn (User $user) => $user->hasAnyRole([
-            Role::OPS_MANAGER,
-            Role::SUPER_ADMIN,
-        ]));
-        Gate::define('runCompliance', fn (User $user) => $user->hasAnyRole([
-            Role::OPS_MANAGER,
-            Role::SUPER_ADMIN,
-        ]));
-        Gate::define('manageComplianceRules', fn (User $user) => $user->hasRole(Role::SUPER_ADMIN));
-        Gate::define('viewAuditLogs', fn (User $user) => $user->hasRole(Role::SUPER_ADMIN));
+        foreach ([
+            'viewDashboard' => 'dashboard.view', 'viewReports' => 'reports.view', 'exportReports' => 'reports.export',
+            'viewPerformance' => 'performance.view', 'ratePerformance' => 'performance.rate',
+            'viewCompliance' => 'compliance.access', 'runCompliance' => 'compliance.evaluate',
+            'viewDocuments' => 'documents.list', 'viewSystemHealth' => 'system.health',
+        ] as $ability => $permission) {
+            Gate::define($ability, fn (User $user) => $user->staffCan($permission));
+        }
+        Gate::define('manageComplianceRules', fn (User $user) => $user->isSuperAdmin());
+        Gate::define('viewAuditLogs', fn (User $user) => $user->isSuperAdmin());
 
         Gate::before(function (User $user) {
             return $user->hasRole(Role::SUPER_ADMIN) ? true : null;

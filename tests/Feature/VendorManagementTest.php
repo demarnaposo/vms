@@ -81,6 +81,22 @@ class VendorManagementTest extends TestCase
         );
     }
 
+    public function test_vendor_list_page_two_preserves_validated_status_and_search(): void
+    {
+        Vendor::factory()->count(16)->create([
+            'company_name' => 'FilterTarget Supplier',
+            'status' => Vendor::STATUS_ACTIVE,
+        ]);
+
+        $response = $this->actingAs($this->adminUser)
+            ->get(route('admin.vendors.index', ['status' => Vendor::STATUS_ACTIVE, 'search' => 'FilterTarget']));
+
+        $response->assertOk();
+        $this->assertStringContainsString('status=active', $response->inertiaProps('vendors')['next_page_url']);
+        $this->assertStringContainsString('search=FilterTarget', $response->inertiaProps('vendors')['next_page_url']);
+        $this->get(route('admin.vendors.index', ['status' => 'invalid']))->assertSessionHasErrors('status');
+    }
+
     public function test_admin_can_view_vendor_details()
     {
         $response = $this->actingAs($this->adminUser)
@@ -98,6 +114,22 @@ class VendorManagementTest extends TestCase
                 ->where('vendor.bank_account_number', '1234567890')
                 ->where('vendor.code_bank', '008')
         );
+    }
+
+    public function test_internal_notes_are_visible_only_to_staff_allowed_to_edit_them(): void
+    {
+        $this->vendor->forceFill(['internal_notes' => 'Private operations note'])->save();
+
+        $this->actingAs($this->adminUser)
+            ->get(route('admin.vendors.show', $this->vendor))
+            ->assertInertia(fn ($page) => $page->where('vendor.internal_notes', 'Private operations note'));
+
+        Role::firstOrCreate(['name' => Role::FINANCE_MANAGER], ['display_name' => 'Finance Manager']);
+        $finance = User::factory()->create();
+        $finance->assignRole(Role::FINANCE_MANAGER);
+        $this->actingAs($finance)
+            ->get(route('admin.vendors.show', $this->vendor))
+            ->assertInertia(fn ($page) => $page->missing('vendor.internal_notes'));
     }
 
     // Ensure timeline payload preserves raw comments and exposes reason codes for selective localization.

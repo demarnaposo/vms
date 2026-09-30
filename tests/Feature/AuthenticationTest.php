@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -38,6 +39,32 @@ class AuthenticationTest extends TestCase
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('verification.notice'));
+    }
+
+    public function test_registration_rejects_email_header_injection_without_sending_notification(): void
+    {
+        Notification::fake();
+
+        $this->post('/register', [
+            'name' => 'Test Vendor',
+            'email' => "\"x\r\nBcc: attacker@example.net\"@example.com",
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ])->assertSessionHasErrors('email');
+
+        $this->assertDatabaseCount('users', 0);
+        Notification::assertNothingSent();
+    }
+
+    public function test_password_reset_rejects_email_header_injection_without_sending_notification(): void
+    {
+        Notification::fake();
+
+        $this->post('/forgot-password', [
+            'email' => "\"x\r\nBcc: attacker@example.net\"@example.com",
+        ])->assertSessionHasErrors('email');
+
+        Notification::assertNothingSent();
     }
 
     public function test_vendor_login_redirects_to_vendor_dashboard()

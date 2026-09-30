@@ -6,6 +6,18 @@ The VMS (Vendor Management System) changelog starts on 2026-09-18. Changes befor
 
 ### Fixed
 
+- 2026-09-30 — Completed staff permission catalogue, module groups, empty-state, deletion and RBAC validation translations while preserving custom labels; matched the staff View link to the existing Edit button styling.
+
+- 2026-09-30 — Added a guarded, data-preserving repair migration for MySQL RBAC morph types whose backslashes were lost during legacy conversion, restoring role recognition without changing grants.
+
+- 2026-09-29 — Made vendor lifecycle transitions use fresh locked state, excluded inactive compliance rules from current decisions, and protected current document versions against failed uploads and stale review actions.
+- 2026-09-29 — Restored authorized internal notes, kept account sessions and history intact when deletion is not allowed, neutralized spreadsheet formulas in CSV exports, and preserved report, vendor, payment, and notification pagination and totals.
+- 2026-09-29 — Connected registration and contact form labels and errors to their inputs, set an explicit English test locale, and resolved scoped PHPStan issues without changing application locale.
+
+- 2026-09-29 — Localized the Sonner toast close button and split Sonner into a cacheable Vite chunk to keep the main app bundle below its configured warning limit.
+
+- 2026-09-29 — Announced vendor flash messages and toast feedback accessibly, replaced browser alerts in language and onboarding flows with VMS UI components, and made vendor notification read actions keyboard accessible.
+
 - 2026-09-28 — Localized verification, password-reset and vendor-application emails using each recipient's saved language, including queued delivery and Laravel's email template text.
 
 - 2026-09-27 — Applied per-type safe extension/MIME, size and expiry requirements to both upload flows and draft submission; excluded inactive requirements from current compliance, activation, expiry reports and reminders while preserving document history.
@@ -23,6 +35,10 @@ The VMS (Vendor Management System) changelog starts on 2026-09-18. Changes befor
 - 2026-09-18 — An email verification link opened in another browser now resumes automatically after the vendor signs in, without bypassing account and signed-link checks.
 
 ### Added
+
+- 2026-09-30 — Added Spatie-backed staff and role CRUD, multi-role assignments, an operational permission catalogue, safe legacy schema conversion, and RBAC regression/audit documentation.
+
+- 2026-09-30 — Documented RBAC access mapping, authorization conflicts, legacy migration safeguards, and verification limitations.
 
 - 2026-09-28 — Added bilingual vendor decision emails after successful approval or rejection, using the recipient's saved language and preserving the exact rejection reason.
 
@@ -44,6 +60,12 @@ The VMS (Vendor Management System) changelog starts on 2026-09-18. Changes befor
 
 ### Changed
 
+- 2026-09-30 — Applied staff permissions to active routes, policies, navigation and dashboard data while retaining the effective built-in access baseline and dormant legacy grants; made role bootstrap preserve administrator changes.
+
+- 2026-09-30 — Matched admin document and payment status filter styling to vendor filters while preserving filter behavior and existing document keyboard focus indicators.
+
+- 2026-09-29 — Replaced temporary React feedback with one top-right Sonner toaster across guest, vendor and admin pages, preserving existing message types and wording.
+
 - 2026-09-27 — Placed the document-type dropdown below status filters with responsive spacing, a single all-documents option, and visible keyboard focus for status and reset controls.
 
 - 2026-09-26 — Kept vendor categories admin-managed, displayed stored category names unchanged, and added a guarded migration to replace the legacy vendor category column with `category_id`.
@@ -59,3 +81,9 @@ The VMS (Vendor Management System) changelog starts on 2026-09-18. Changes befor
 - 2026-09-18 — Existing accounts with unverified email addresses are now redirected to the verification page immediately after sign-in; shared routes also require verification without changing staff access.
 - 2026-09-18 — Vendor-area access now requires email verification; changing a vendor profile email address requires reverification without locking staff accounts.
 - 2026-09-18 — Change-marker comments were restricted to explicit user requests.
+
+### Security
+
+- 2026-09-30 — Protected the last super admin across staff assignment/deletion and profile deletion with a shared transaction lock, preserved account history, and refreshed authorization plus affected caches after RBAC changes.
+
+- 2026-09-29 — Updated affected Composer and npm dependencies within existing major versions and added regression coverage for CRLF email input and CSV formula injection.

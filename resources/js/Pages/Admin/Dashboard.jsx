@@ -68,9 +68,11 @@ export default function AdminDashboard({
                 name: user?.name?.split(' ')[0] || 'Admin',
             })}
             actions={
-                <Link href="/admin/vendors" className="btn-primary">
-                    {t('View All Vendors')}
-                </Link>
+                can['vendors.view'] && (
+                    <Link href="/admin/vendors" className="btn-primary">
+                        {t('View All Vendors')}
+                    </Link>
+                )
             }
         />
     );
@@ -80,13 +82,27 @@ export default function AdminDashboard({
             <div className="space-y-8">
                 {/* Stats Grid */}
                 <StatGrid cols={6}>
-                    {statCards.map((stat) => (
-                        <StatCard
-                            key={stat.label}
-                            {...stat}
-                            className="h-full border border-(--color-border-primary)"
-                        />
-                    ))}
+                    {statCards
+                        .filter((stat) =>
+                            Object.hasOwn(
+                                stats,
+                                {
+                                    'Total Vendors': 'total_vendors',
+                                    'Active Vendors': 'active_vendors',
+                                    'Pending Review': 'pending_review',
+                                    'Non-Compliant': 'non_compliant',
+                                    'Pending Payments': 'pending_payments',
+                                    'Approved Amount': 'approved_payments',
+                                }[stat.label]
+                            )
+                        )
+                        .map((stat) => (
+                            <StatCard
+                                key={stat.label}
+                                {...stat}
+                                className="h-full border border-(--color-border-primary)"
+                            />
+                        ))}
                 </StatGrid>
 
                 <div className="grid lg:grid-cols-2 gap-6">

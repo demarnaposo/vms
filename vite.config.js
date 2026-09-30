@@ -14,6 +14,13 @@ export default defineConfig({
     ],
     build: {
         chunkSizeWarningLimit: 500,
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    if (id.includes('/node_modules/sonner/')) return 'sonner';
+                },
+            },
+        },
     },
     server: {
         watch: {

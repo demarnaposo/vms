@@ -14,7 +14,7 @@ class SystemHealthController extends Controller
 
     public function index(Request $request): Response
     {
-        $this->authorize('viewReports');
+        $this->authorize('viewSystemHealth');
 
         $data = $this->systemHealthService->indexData($request);
 

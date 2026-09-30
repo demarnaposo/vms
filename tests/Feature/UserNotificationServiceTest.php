@@ -26,6 +26,22 @@ class UserNotificationServiceTest extends TestCase
 
         $this->assertSame(2, $data['notifications']->total());
         $this->assertSame(1, $data['unreadCount']);
+        $this->assertSame(2, $data['totalCount']);
+    }
+
+    public function test_unread_filter_and_counts_cover_notifications_beyond_first_page(): void
+    {
+        $user = User::factory()->create();
+        for ($index = 0; $index < 25; $index++) {
+            $this->insertNotification($user->id, $index < 22 ? null : now());
+        }
+
+        $service = app(UserNotificationService::class);
+        $first = $service->indexData($user, 'unread');
+        $this->assertSame(22, $first['notifications']->total());
+        $this->assertSame(22, $first['unreadCount']);
+        $this->assertSame(25, $first['totalCount']);
+        $this->assertStringContainsString('filter=unread', $first['notifications']->url(2));
     }
 
     public function test_mark_as_read_marks_single_notification(): void

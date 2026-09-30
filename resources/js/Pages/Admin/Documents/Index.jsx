@@ -192,7 +192,7 @@ export default function DocumentsIndex({
                 >
                     {t('View')}
                 </button>
-                {row.verification_status === 'pending' && (
+                {row.verification_status === 'pending' && row.is_current && (
                     <>
                         {can.verify_documents && (
                             <Button
@@ -253,10 +253,10 @@ export default function DocumentsIndex({
                             key={status.value}
                             href={`/admin/documents?${new URLSearchParams({ ...filterParams, status: status.value })}`}
                             aria-current={currentStatus === status.value ? 'page' : undefined}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) focus-visible:ring-offset-2 ${
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) focus-visible:ring-offset-2 ${
                                 currentStatus === status.value
-                                    ? 'bg-(--color-bg-primary) text-(--color-text-primary) shadow-token-sm'
-                                    : 'text-(--color-text-tertiary) hover:text-(--color-text-primary) hover:bg-(--color-bg-primary)/50'
+                                    ? 'bg-(--color-brand-primary) text-white shadow-token-primary'
+                                    : 'text-(--color-text-tertiary) hover:text-(--color-text-primary) hover:bg-(--color-bg-primary)'
                             }`}
                             preserveScroll
                         >

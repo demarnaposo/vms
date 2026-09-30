@@ -10,6 +10,9 @@ export default function PasswordInput({
     required = false,
     autoComplete,
     className = '',
+    id,
+    'aria-describedby': ariaDescribedBy,
+    'aria-invalid': ariaInvalid,
 }) {
     const [isVisible, setIsVisible] = useState(false);
     const { t } = useLanguage();
@@ -19,6 +22,9 @@ export default function PasswordInput({
         <div className="relative">
             {/* Translate only the static password placeholder while preserving the entered value. */}
             <input
+                id={id}
+                aria-describedby={ariaDescribedBy}
+                aria-invalid={ariaInvalid}
                 type={isVisible ? 'text' : 'password'}
                 value={value}
                 onChange={onChange}

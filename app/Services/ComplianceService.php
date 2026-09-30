@@ -63,6 +63,10 @@ class ComplianceService
             $openFailFlags = ComplianceFlag::where('vendor_id', $vendor->id)
                 ->where('status', 'open')
                 ->where('severity', '!=', ComplianceRule::SEVERITY_LOW)
+                ->where(function ($query) {
+                    $query->whereNull('compliance_rule_id')
+                        ->orWhereHas('complianceRule', fn ($rule) => $rule->where('is_active', true));
+                })
                 ->count();
 
             // Determine compliance status

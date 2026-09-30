@@ -5,7 +5,7 @@ import Logo from '@/Components/Logo';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { useLanguage } from '@/Contexts/LanguageContext';
 
-export default function ForgotPassword({ status }) {
+export default function ForgotPassword() {
     const { t } = useLanguage();
     const form = useForm({
         email: '',
@@ -39,12 +39,6 @@ export default function ForgotPassword({ status }) {
                             )}
                         </p>
                     </div>
-
-                    {status && (
-                        <div className="mb-4 p-4 rounded-lg bg-(--color-success-light) text-(--color-success-dark) text-sm">
-                            {status}
-                        </div>
-                    )}
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>

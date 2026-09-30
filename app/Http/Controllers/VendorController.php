@@ -150,11 +150,18 @@ class VendorController extends Controller
             return redirect()->route('vendor.onboarding');
         }
 
-        $payments = $vendor->paymentRequests()->latest()->paginate(10);
+        $paymentQuery = $vendor->paymentRequests();
+        $paymentStats = [
+            'pending_amount' => (clone $paymentQuery)->whereIn('status', ['requested', 'pending_ops', 'pending_finance', 'approved'])->sum('amount'),
+            'paid_amount' => (clone $paymentQuery)->where('status', 'paid')->sum('amount'),
+            'total_count' => (clone $paymentQuery)->count(),
+        ];
+        $payments = $paymentQuery->latest()->paginate(10);
 
         return Inertia::render('Vendor/Payments', [
             'vendor' => $vendor,
             'payments' => $payments,
+            'paymentStats' => $paymentStats,
         ]);
     }
 
@@ -272,6 +279,7 @@ class VendorController extends Controller
         $latestResults = ComplianceResult::with('rule')
             ->where('vendor_id', $vendor->id)
             ->whereIn('id', ComplianceResult::latestResultIdsQuery($vendor->id))
+            ->whereHas('rule', fn ($query) => $query->where('is_active', true))
             ->orderByDesc('evaluated_at')
             ->get();
 
@@ -317,17 +325,21 @@ class VendorController extends Controller
     /**
      * Show vendor notifications page.
      */
-    public function notifications()
+    public function notifications(Request $request)
     {
         $user = Auth::user();
         /** @var \App\Models\User $user */
         $vendor = $user->vendor;
 
-        $notificationData = $this->notificationService->indexData($user);
+        $filter = $request->validate(['filter' => ['nullable', \Illuminate\Validation\Rule::in(['all', 'unread', 'document', 'payment', 'compliance'])]])['filter'] ?? 'all';
+        $notificationData = $this->notificationService->indexData($user, $filter);
 
         return Inertia::render('Vendor/Notifications', [
             'vendor' => $vendor,
             'notifications' => $notificationData['notifications'],
+            'unreadCount' => $notificationData['unreadCount'],
+            'totalCount' => $notificationData['totalCount'],
+            'filter' => $filter,
         ]);
     }
 

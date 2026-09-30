@@ -260,10 +260,10 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                         <Link
                             key={status}
                             href={`/admin/payments?status=${status}`}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium capitalize transition-all duration-200 ${
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
                                 currentStatus === status
-                                    ? 'bg-(--color-bg-primary) text-(--color-text-primary) shadow-token-sm'
-                                    : 'text-(--color-text-tertiary) hover:text-(--color-text-primary) hover:bg-(--color-bg-primary)/50'
+                                    ? 'bg-(--color-brand-primary) text-white shadow-token-primary'
+                                    : 'text-(--color-text-tertiary) hover:text-(--color-text-primary) hover:bg-(--color-bg-primary)'
                             }`}
                         >
                             {/* Translate filter labels while preserving URL enum codes. */}

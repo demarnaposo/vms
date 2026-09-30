@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\PaymentRequest;
+use App\Models\Vendor;
 use App\Services\ReportService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class ReportController extends Controller
@@ -38,7 +41,7 @@ class ReportController extends Controller
         $request->validate([
             'start_date' => 'nullable|date|date_format:Y-m-d',
             'end_date' => 'nullable|date|date_format:Y-m-d|after_or_equal:start_date',
-            'status' => 'nullable|string|max:50',
+            'status' => ['nullable', Rule::in(['all', PaymentRequest::STATUS_REQUESTED, PaymentRequest::STATUS_PENDING_OPS, PaymentRequest::STATUS_PENDING_FINANCE, PaymentRequest::STATUS_APPROVED, PaymentRequest::STATUS_PAID, PaymentRequest::STATUS_REJECTED, PaymentRequest::STATUS_CANCELLED])],
         ]);
 
         $data = $this->reportService->paymentReportData($request);
@@ -61,8 +64,8 @@ class ReportController extends Controller
             'start_date' => 'nullable|date|date_format:Y-m-d',
             'end_date' => 'nullable|date|date_format:Y-m-d|after_or_equal:start_date',
             'status' => 'nullable|string|max:50',
-            'compliance' => 'nullable|string|max:50',
-            'compliance_status' => 'nullable|string|max:50',
+            'compliance' => ['nullable', Rule::in(['all', Vendor::COMPLIANCE_PENDING, Vendor::COMPLIANCE_COMPLIANT, Vendor::COMPLIANCE_AT_RISK, Vendor::COMPLIANCE_NON_COMPLIANT, Vendor::COMPLIANCE_BLOCKED])],
+            'compliance_status' => ['nullable', Rule::in(['all', Vendor::COMPLIANCE_PENDING, Vendor::COMPLIANCE_COMPLIANT, Vendor::COMPLIANCE_AT_RISK, Vendor::COMPLIANCE_NON_COMPLIANT, Vendor::COMPLIANCE_BLOCKED])],
             'min_score' => 'nullable|numeric|min:0|max:100',
         ]);
 
@@ -75,6 +78,11 @@ class ReportController extends Controller
     public function vendorSummaryReport(Request $request)
     {
         $this->authorize('viewReports');
+
+        $request->validate([
+            'status' => ['nullable', Rule::in(['all', Vendor::STATUS_DRAFT, Vendor::STATUS_SUBMITTED, Vendor::STATUS_UNDER_REVIEW, Vendor::STATUS_APPROVED, Vendor::STATUS_ACTIVE, Vendor::STATUS_SUSPENDED, Vendor::STATUS_TERMINATED, Vendor::STATUS_REJECTED])],
+            'compliance' => ['nullable', Rule::in(['all', Vendor::COMPLIANCE_PENDING, Vendor::COMPLIANCE_COMPLIANT, Vendor::COMPLIANCE_AT_RISK, Vendor::COMPLIANCE_NON_COMPLIANT, Vendor::COMPLIANCE_BLOCKED])],
+        ]);
 
         $data = $this->reportService->vendorSummaryReportData($request);
 
@@ -92,6 +100,8 @@ class ReportController extends Controller
     {
         $this->authorize('viewReports');
 
+        $request->validate(['min_score' => 'nullable|numeric|min:0|max:100']);
+
         $data = $this->reportService->performanceReportData($request);
 
         return Inertia::render('Admin/Reports/PerformanceReport', [
@@ -107,6 +117,10 @@ class ReportController extends Controller
     public function complianceReport(Request $request)
     {
         $this->authorize('viewReports');
+
+        $request->validate([
+            'compliance_status' => ['nullable', Rule::in(['all', Vendor::COMPLIANCE_PENDING, Vendor::COMPLIANCE_COMPLIANT, Vendor::COMPLIANCE_AT_RISK, Vendor::COMPLIANCE_NON_COMPLIANT, Vendor::COMPLIANCE_BLOCKED])],
+        ]);
 
         $data = $this->reportService->complianceReportData($request);
 

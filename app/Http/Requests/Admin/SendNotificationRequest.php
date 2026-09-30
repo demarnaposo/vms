@@ -8,7 +8,7 @@ class SendNotificationRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->hasAnyRole(['ops_manager', 'super_admin']) ?? false;
+        return $this->user()?->staffCan('notifications.send') ?? false;
     }
 
     public function rules(): array

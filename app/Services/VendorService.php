@@ -326,52 +326,62 @@ class VendorService
      */
     public function uploadDocument(Vendor $vendor, UploadedFile $file, int $documentTypeId, ?string $expiryDate)
     {
-        return DB::transaction(function () use ($vendor, $file, $documentTypeId, $expiryDate) {
-            \App\Support\DocumentUploadRules::validate($documentTypeId, $file, $expiryDate);
-            $path = $file->store('vendor-documents/'.$vendor->id, 'private');
-            if (! $path) {
-                throw new \RuntimeException('Document storage failed.');
-            }
-            $hash = hash_file('sha256', $file->getRealPath());
-            $actorId = Auth::id() ?? $vendor->user_id;
+        \App\Support\DocumentUploadRules::validate($documentTypeId, $file, $expiryDate);
+        $path = $file->store('vendor-documents/'.$vendor->id, 'private');
+        if (! $path) {
+            throw new \RuntimeException('Document storage failed.');
+        }
 
-            // Keep old version immutable, mark it as no longer current.
-            $existing = $vendor->documents()
-                ->where('document_type_id', $documentTypeId)
-                ->where('is_current', true)
-                ->latest('version')
-                ->first();
+        try {
+            return DB::transaction(function () use ($vendor, $file, $documentTypeId, $expiryDate, $path) {
+                \App\Support\DocumentUploadRules::validate($documentTypeId, $file, $expiryDate);
+                $lockedVendor = Vendor::query()->lockForUpdate()->findOrFail($vendor->getKey());
+                $hash = hash_file('sha256', $file->getRealPath());
+                $actorId = Auth::id() ?? $lockedVendor->user_id;
 
-            $nextVersion = 1;
-            if ($existing) {
-                $existing->update(['is_current' => false]);
-                $nextVersion = $existing->version + 1;
-            }
+                // Keep old version immutable, mark it as no longer current.
+                $existing = $lockedVendor->documents()
+                    ->where('document_type_id', $documentTypeId)
+                    ->where('is_current', true)
+                    ->latest('version')
+                    ->first();
 
-            $document = $this->vendorRepository->createDocument($vendor, [
-                'document_type_id' => $documentTypeId,
-                'file_name' => $this->sanitizeFileName($file->getClientOriginalName()),
-                'file_path' => $path,
-                'file_hash' => $hash,
-                'file_size' => $file->getSize(),
-                'mime_type' => $file->getMimeType(),
-                'expiry_date' => $expiryDate,
-                'version' => $nextVersion,
-                'is_current' => true,
-                'verification_status' => 'pending',
-            ]);
+                $nextVersion = (int) $lockedVendor->documents()
+                    ->where('document_type_id', $documentTypeId)
+                    ->max('version') + 1;
+                if ($existing) {
+                    $existing->update(['is_current' => false]);
+                }
 
-            DocumentVersion::create([
-                'vendor_document_id' => $document->id,
-                'version' => $document->version,
-                'file_path' => $document->file_path,
-                'file_hash' => $document->file_hash,
-                'uploaded_by' => $actorId,
-                'notes' => 'Re-uploaded document version',
-            ]);
+                $document = $this->vendorRepository->createDocument($lockedVendor, [
+                    'document_type_id' => $documentTypeId,
+                    'file_name' => $this->sanitizeFileName($file->getClientOriginalName()),
+                    'file_path' => $path,
+                    'file_hash' => $hash,
+                    'file_size' => $file->getSize(),
+                    'mime_type' => $file->getMimeType(),
+                    'expiry_date' => $expiryDate,
+                    'version' => $nextVersion,
+                    'is_current' => true,
+                    'verification_status' => 'pending',
+                ]);
 
-            return $document;
-        });
+                DocumentVersion::create([
+                    'vendor_document_id' => $document->id,
+                    'version' => $document->version,
+                    'file_path' => $document->file_path,
+                    'file_hash' => $document->file_hash,
+                    'uploaded_by' => $actorId,
+                    'notes' => 'Re-uploaded document version',
+                ]);
+
+                return $document;
+            });
+        } catch (\Throwable $exception) {
+            Storage::disk('private')->delete($path);
+
+            throw $exception;
+        }
     }
 
     /**

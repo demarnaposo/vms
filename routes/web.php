@@ -108,108 +108,108 @@ Route::middleware(['auth', EnsureVendorAccountIsActive::class, EnsureVendorEmail
     // ==========================================
     // STAFF ROUTES (Ops Manager / Finance Manager / Super Admin)
     // ==========================================
-    Route::middleware(['role:ops_manager,finance_manager,super_admin'])->prefix('admin')->name('admin.')->group(function () {
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::middleware(['staff.permission'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('staff.permission:dashboard.view')->name('dashboard');
 
         // Shared read-only vendor/payment/report access
-        Route::get('/vendors', [VendorManagementController::class, 'index'])->name('vendors.index');
-        Route::get('/vendors/{vendor}', [VendorManagementController::class, 'show'])->name('vendors.show');
-        Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
-        Route::get('/payments/{payment}', [PaymentController::class, 'show'])->name('payments.show');
+        Route::get('/vendors', [VendorManagementController::class, 'index'])->middleware('staff.permission:vendors.view')->name('vendors.index');
+        Route::get('/vendors/{vendor}', [VendorManagementController::class, 'show'])->middleware('staff.permission:vendors.view')->name('vendors.show');
+        Route::get('/payments', [PaymentController::class, 'index'])->middleware('staff.permission:payments.view')->name('payments.index');
+        Route::get('/payments/{payment}', [PaymentController::class, 'show'])->middleware('staff.permission:payments.view')->name('payments.show');
 
-        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-        Route::get('/reports/payment', [ReportController::class, 'paymentReport'])->name('reports.payment');
-        Route::get('/reports/vendor-summary', [ReportController::class, 'vendorSummaryReport'])->name('reports.vendor-summary');
-        Route::get('/reports/performance', [ReportController::class, 'performanceReport'])->name('reports.performance');
-        Route::get('/reports/compliance', [ReportController::class, 'complianceReport'])->name('reports.compliance');
-        Route::get('/reports/document-expiry', [ReportController::class, 'documentExpiryReport'])->name('reports.document-expiry');
+        Route::get('/reports', [ReportController::class, 'index'])->middleware('staff.permission:reports.view')->name('reports.index');
+        Route::get('/reports/payment', [ReportController::class, 'paymentReport'])->middleware('staff.permission:reports.view')->name('reports.payment');
+        Route::get('/reports/vendor-summary', [ReportController::class, 'vendorSummaryReport'])->middleware('staff.permission:reports.view')->name('reports.vendor-summary');
+        Route::get('/reports/performance', [ReportController::class, 'performanceReport'])->middleware('staff.permission:reports.view')->name('reports.performance');
+        Route::get('/reports/compliance', [ReportController::class, 'complianceReport'])->middleware('staff.permission:reports.view')->name('reports.compliance');
+        Route::get('/reports/document-expiry', [ReportController::class, 'documentExpiryReport'])->middleware('staff.permission:reports.view')->name('reports.document-expiry');
         Route::get('/reports/export/{type}', [ReportController::class, 'exportCsv'])
             ->where('type', '[a-z_]+')
-            ->name('reports.export');
-        Route::get('/system-health', [SystemHealthController::class, 'index'])->name('system-health.index');
+            ->middleware('staff.permission:reports.export')->name('reports.export');
+        Route::get('/system-health', [SystemHealthController::class, 'index'])->middleware('staff.permission:system.health')->name('system-health.index');
     });
 
     // ==========================================
     // OPS + SUPER ADMIN ROUTES
     // ==========================================
-    Route::middleware(['role:ops_manager,super_admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware(['staff.permission'])->prefix('admin')->name('admin.')->group(function () {
         // Vendor lifecycle actions
         Route::post('/vendors/{vendor}/approve', [VendorManagementController::class, 'approve'])
             ->middleware('throttle:sensitive-action')
-            ->name('vendors.approve');
+            ->middleware('staff.permission:vendors.approve')->name('vendors.approve');
         Route::post('/vendors/{vendor}/reject', [VendorManagementController::class, 'reject'])
             ->middleware('throttle:sensitive-action')
-            ->name('vendors.reject');
+            ->middleware('staff.permission:vendors.reject')->name('vendors.reject');
         Route::post('/vendors/{vendor}/activate', [VendorManagementController::class, 'activate'])
             ->middleware('throttle:sensitive-action')
-            ->name('vendors.activate');
+            ->middleware('staff.permission:vendors.activate')->name('vendors.activate');
         Route::post('/vendors/{vendor}/suspend', [VendorManagementController::class, 'suspend'])
             ->middleware('throttle:sensitive-action')
-            ->name('vendors.suspend');
+            ->middleware('staff.permission:vendors.suspend')->name('vendors.suspend');
         Route::post('/vendors/{vendor}/terminate', [VendorManagementController::class, 'terminate'])
             ->middleware('throttle:sensitive-action')
-            ->name('vendors.terminate');
+            ->middleware('staff.permission:vendors.terminate')->name('vendors.terminate');
         Route::post('/vendors/{vendor}/reactivate', [VendorManagementController::class, 'reactivate'])
             ->middleware('throttle:sensitive-action')
-            ->name('vendors.reactivate');
+            ->middleware('staff.permission:vendors.terminate')->name('vendors.reactivate');
         Route::post('/vendors/{vendor}/notes', [VendorManagementController::class, 'notes'])
             ->middleware('throttle:sensitive-action')
-            ->name('vendors.notes');
+            ->middleware('staff.permission:vendors.notes')->name('vendors.notes');
 
         // Admin notification sending
-        Route::get('/notifications/send', [AdminNotificationController::class, 'index'])->name('notifications.send');
+        Route::get('/notifications/send', [AdminNotificationController::class, 'index'])->middleware('staff.permission:notifications.send')->name('notifications.send');
         Route::post('/notifications/send', [AdminNotificationController::class, 'send'])
             ->middleware('throttle:sensitive-action')
-            ->name('notifications.store');
+            ->middleware('staff.permission:notifications.send')->name('notifications.store');
 
         // Contact messages
-        Route::resource('contact-messages', \App\Http\Controllers\ContactController::class)->only(['index', 'show', 'update', 'destroy'])->names('contact-messages');
+        Route::resource('contact-messages', \App\Http\Controllers\ContactController::class)->only(['index', 'show', 'update', 'destroy'])->middleware('staff.permission:messages.manage')->names('contact-messages');
 
         // Document management
-        Route::get('/documents', [DocumentController::class, 'adminIndex'])->name('documents.index');
-        Route::get('/documents/{document}/preview', [DocumentController::class, 'preview'])->name('documents.preview');
+        Route::get('/documents', [DocumentController::class, 'adminIndex'])->middleware('staff.permission:documents.list')->name('documents.index');
+        Route::get('/documents/{document}/preview', [DocumentController::class, 'preview'])->middleware('staff.permission:documents.list')->name('documents.preview');
         Route::post('/documents/{document}/verify', [DocumentController::class, 'verify'])
             ->middleware('throttle:sensitive-action')
-            ->name('documents.verify');
+            ->middleware('staff.permission:documents.verify')->name('documents.verify');
         Route::post('/documents/{document}/reject', [DocumentController::class, 'reject'])
             ->middleware('throttle:sensitive-action')
-            ->name('documents.reject');
+            ->middleware('staff.permission:documents.reject')->name('documents.reject');
 
         // Compliance operations
-        Route::get('/compliance', [ComplianceController::class, 'dashboard'])->name('compliance.dashboard');
-        Route::get('/compliance/rules', [ComplianceController::class, 'rules'])->name('compliance.rules');
-        Route::get('/compliance/vendor/{vendor}', [ComplianceController::class, 'vendorCompliance'])->name('compliance.vendor');
+        Route::get('/compliance', [ComplianceController::class, 'dashboard'])->middleware('staff.permission:compliance.access')->name('compliance.dashboard');
+        Route::get('/compliance/rules', [ComplianceController::class, 'rules'])->middleware('staff.permission:compliance.access')->name('compliance.rules');
+        Route::get('/compliance/vendor/{vendor}', [ComplianceController::class, 'vendorCompliance'])->middleware('staff.permission:compliance.access')->name('compliance.vendor');
         Route::post('/compliance/evaluate/{vendor}', [ComplianceController::class, 'evaluate'])
             ->middleware('throttle:sensitive-action')
-            ->name('compliance.evaluate');
+            ->middleware('staff.permission:compliance.evaluate')->name('compliance.evaluate');
         Route::post('/compliance/evaluate-all', [ComplianceController::class, 'evaluateAll'])
             ->middleware('throttle:sensitive-action')
-            ->name('compliance.evaluate-all');
+            ->middleware('staff.permission:compliance.evaluate')->name('compliance.evaluate-all');
 
         // Performance operations
-        Route::get('/performance', [PerformanceController::class, 'index'])->name('performance.index');
-        Route::get('/performance/{vendor}', [PerformanceController::class, 'show'])->name('performance.show');
-        Route::get('/performance/{vendor}/rate', [PerformanceController::class, 'rateForm'])->name('performance.rate-form');
+        Route::get('/performance', [PerformanceController::class, 'index'])->middleware('staff.permission:performance.view')->name('performance.index');
+        Route::get('/performance/{vendor}', [PerformanceController::class, 'show'])->middleware('staff.permission:performance.view')->name('performance.show');
+        Route::get('/performance/{vendor}/rate', [PerformanceController::class, 'rateForm'])->middleware('staff.permission:performance.rate')->name('performance.rate-form');
         Route::post('/performance/{vendor}/rate', [PerformanceController::class, 'rate'])
             ->middleware('throttle:sensitive-action')
-            ->name('performance.rate');
+            ->middleware('staff.permission:performance.rate')->name('performance.rate');
 
         // Ops payment validation only
         Route::post('/payments/{payment}/validate-ops', [PaymentController::class, 'validateOps'])
             ->middleware('throttle:sensitive-action')
-            ->name('payments.validate-ops');
+            ->middleware('staff.permission:payments.validate')->name('payments.validate-ops');
     });
 
     // ==========================================
     // FINANCE + SUPER ADMIN ROUTES
     // ==========================================
-    Route::middleware(['role:finance_manager,super_admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware(['staff.permission'])->prefix('admin')->name('admin.')->group(function () {
         Route::post('/payments/{payment}/approve-finance', [PaymentController::class, 'approveFinance'])
             ->middleware('throttle:sensitive-action')
-            ->name('payments.approve-finance');
+            ->middleware('staff.permission:payments.approve')->name('payments.approve-finance');
         Route::post('/payments/{payment}/mark-paid', [PaymentController::class, 'markPaid'])
             ->middleware('throttle:sensitive-action')
-            ->name('payments.mark-paid');
+            ->middleware('staff.permission:payments.disburse')->name('payments.mark-paid');
     });
 
     // ==========================================
@@ -230,6 +230,13 @@ Route::middleware(['auth', EnsureVendorAccountIsActive::class, EnsureVendorEmail
             ->middleware('throttle:sensitive-action')
             ->name('compliance.rules.update');
         Route::get('/staff-users', [StaffUserController::class, 'index'])->name('staff-users.index');
+        Route::get('/staff-users/{staffUser}', [StaffUserController::class, 'show'])->name('staff-users.show');
+        Route::put('/staff-users/{staffUser}', [StaffUserController::class, 'update'])->middleware('throttle:sensitive-action')->name('staff-users.update');
+        Route::delete('/staff-users/{staffUser}', [StaffUserController::class, 'destroy'])->middleware('throttle:sensitive-action')->name('staff-users.destroy');
+        Route::post('/staff-roles', [\App\Http\Controllers\Admin\StaffRoleController::class, 'store'])->middleware('throttle:sensitive-action')->name('staff-roles.store');
+        Route::put('/staff-roles/{staffRole}', [\App\Http\Controllers\Admin\StaffRoleController::class, 'update'])->middleware('throttle:sensitive-action')->name('staff-roles.update');
+        Route::delete('/staff-roles/{staffRole}', [\App\Http\Controllers\Admin\StaffRoleController::class, 'destroy'])->middleware('throttle:sensitive-action')->name('staff-roles.destroy');
+
         Route::post('/staff-users', [StaffUserController::class, 'store'])
             ->middleware('throttle:sensitive-action')
             ->name('staff-users.store');
@@ -249,16 +256,4 @@ Route::middleware(['auth', EnsureVendorAccountIsActive::class, EnsureVendorEmail
 require __DIR__.'/auth.php';
 
 // Fallback route for undefined routes - redirects to appropriate dashboard
-Route::fallback(function () {
-    $user = auth()->user();
-
-    if (! $user) {
-        return redirect('/');
-    }
-
-    if ($user->isVendor()) {
-        return redirect()->route('vendor.dashboard')->with('error', 'The page you were looking for was not found.');
-    }
-
-    return redirect()->route('admin.dashboard')->with('error', 'The page you were looking for was not found.');
-});
+Route::fallback(fn () => auth()->check() ? app(DashboardRedirectController::class)() : redirect('/'));

@@ -2,151 +2,70 @@
 
 namespace App\Traits;
 
-use App\Http\Middleware\HandleInertiaRequests;
-use App\Models\Permission;
 use App\Models\Role;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 trait HasRoles
 {
-    /**
-     * Get all roles for this user.
-     */
-    /**
-     * @return BelongsToMany<Role, $this>
-     */
-    public function roles(): BelongsToMany
-    {
-        return $this->belongsToMany(Role::class);
-    }
+    use \Spatie\Permission\Traits\HasRoles { scopeRole as private spatieScopeRole; }
 
-    /**
-     * Assign a role to the user.
-     */
-    public function assignRole(string $roleName): void
+    public function scopeRole($query, $roles, $guard = null, $without = false)
     {
-        $role = Role::where('name', $roleName)->first();
-        if ($role && ! $this->hasRole($roleName)) {
-            $this->roles()->attach($role);
-            HandleInertiaRequests::clearAuthCache($this->id);
+        // Legacy notification callers expect an empty result when a built-in role is not bootstrapped yet.
+        if (is_string($roles) && ! Role::where('name', $roles)->where('guard_name', $guard ?? 'web')->exists()) {
+            return $without ? $query : $query->whereRaw('1 = 0');
         }
+
+        return $this->spatieScopeRole($query, $roles, $guard, $without);
     }
 
-    /**
-     * Remove a role from the user.
-     */
-    public function removeRole(string $roleName): void
-    {
-        $role = Role::where('name', $roleName)->first();
-        if ($role) {
-            $this->roles()->detach($role);
-            HandleInertiaRequests::clearAuthCache($this->id);
-        }
-    }
+    protected string $guard_name = 'web';
 
-    /**
-     * Check if user has a specific role.
-     */
-    public function hasRole(string $roleName): bool
-    {
-        return $this->roles()->where('name', $roleName)->exists();
-    }
-
-    /**
-     * Check if user has any of the given roles.
-     */
-    public function hasAnyRole(array $roles): bool
-    {
-        return $this->roles()->whereIn('name', $roles)->exists();
-    }
-
-    /**
-     * Check if user is super admin.
-     */
     public function isSuperAdmin(): bool
     {
-        return $this->hasRole(Role::SUPER_ADMIN);
+        return $this->hasRole(Role::SUPER_ADMIN, 'web');
     }
 
-    /**
-     * Check if user is ops manager.
-     */
     public function isOpsManager(): bool
     {
-        return $this->hasRole(Role::OPS_MANAGER);
+        return $this->hasRole(Role::OPS_MANAGER, 'web');
     }
 
-    /**
-     * Check if user is finance manager.
-     */
     public function isFinanceManager(): bool
     {
-        return $this->hasRole(Role::FINANCE_MANAGER);
+        return $this->hasRole(Role::FINANCE_MANAGER, 'web');
     }
 
-    /**
-     * Check if user is a vendor.
-     */
     public function isVendor(): bool
     {
-        return $this->hasRole(Role::VENDOR);
+        return $this->hasRole(Role::VENDOR, 'web');
     }
 
-    /**
-     * Check if user is staff (not a vendor).
-     */
     public function isStaff(): bool
     {
-        return $this->hasAnyRole([Role::SUPER_ADMIN, Role::OPS_MANAGER, Role::FINANCE_MANAGER]);
+        $this->loadMissing('roles');
+
+        return $this->roles->contains(fn (Role $role) => $role->guard_name === 'web' && $role->is_staff);
     }
 
-    /**
-     * Check if user has a specific permission.
-     */
+    public function staffCan(string $permission): bool
+    {
+        $code = str_starts_with($permission, 'staff.') ? $permission : 'staff.'.$permission;
+
+        return $this->isStaff() && array_key_exists($code, config('rbac.permissions')) && $this->can($code);
+    }
+
     public function hasPermission(string $permission): bool
     {
-        // Super admin has all permissions
-        if ($this->isSuperAdmin()) {
-            return true;
-        }
-
-        foreach ($this->roles()->get() as $role) {
-            if ($role->hasPermission($permission)) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->isStaff() ? $this->staffCan($permission) : $this->can($permission);
     }
 
-    /**
-     * Get the user's primary role.
-     */
     public function getPrimaryRole(): ?Role
     {
-        return $this->roles()->first();
+        return $this->roles()->orderBy('roles.id')->first();
     }
 
-    /**
-     * Get role name for display.
-     */
     public function getRoleDisplayName(): string
     {
-        $role = $this->getPrimaryRole();
-
-        return $role ? $role->display_name : 'No Role';
-    }
-
-    /**
-     * Scope a query to only include users with a given role.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeRole($query, string $roleName)
-    {
-        return $query->whereHas('roles', function ($q) use ($roleName) {
-            $q->where('name', $roleName);
-        });
+        return $this->getPrimaryRole()?->display_name ?? 'No Role';
     }
 }

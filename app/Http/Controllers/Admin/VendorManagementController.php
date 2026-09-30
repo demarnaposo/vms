@@ -12,6 +12,7 @@ use App\Services\VendorLifecycleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,8 +22,12 @@ class VendorManagementController extends Controller
 
     public function index(Request $request): Response
     {
-        $status = (string) $request->query('status', 'all');
-        $search = (string) $request->query('search', '');
+        $filters = $request->validate([
+            'status' => ['nullable', Rule::in(['all', Vendor::STATUS_DRAFT, Vendor::STATUS_SUBMITTED, Vendor::STATUS_UNDER_REVIEW, Vendor::STATUS_APPROVED, Vendor::STATUS_ACTIVE, Vendor::STATUS_SUSPENDED, Vendor::STATUS_TERMINATED, Vendor::STATUS_REJECTED])],
+            'search' => ['nullable', 'string', 'max:255'],
+        ]);
+        $status = $filters['status'] ?? 'all';
+        $search = $filters['search'] ?? '';
 
         $query = Vendor::select([
             'id',
@@ -50,7 +55,7 @@ class VendorManagementController extends Controller
             });
         }
 
-        $vendors = $query->paginate(15);
+        $vendors = $query->paginate(15)->appends($filters);
 
         return Inertia::render('Admin/Vendors/Index', [
             'vendors' => $vendors,
@@ -65,6 +70,9 @@ class VendorManagementController extends Controller
 
         // Expose the protected deed number on the authorized staff summary.
         $vendor->makeVisible(['tax_id', 'deed_number', 'bank_account_number', 'code_bank']);
+        if (request()->user()->staffCan('vendors.notes')) {
+            $vendor->makeVisible('internal_notes');
+        }
 
         $vendor->load([
             'vendorCategory',

@@ -18,8 +18,9 @@ import { formatCurrency } from '@/utils/currencyFormatters';
 import { formatDate } from '@/utils/dateFormatters';
 // Translate payment request feedback through the existing language provider.
 import { useLanguage } from '@/Contexts/LanguageContext';
+import PaginationLinks from '@/Components/PaginationLinks';
 
-export default function Payments({ vendor, payments = { data: [] } }) {
+export default function Payments({ vendor, payments = { data: [] }, paymentStats = {} }) {
     // Localize fixed payment labels and dates, not descriptions or references.
     const { language, t } = useLanguage();
     const dateLocale = language === 'id' ? 'id-ID' : 'en-IN';
@@ -56,15 +57,8 @@ export default function Payments({ vendor, payments = { data: [] } }) {
         cancelled: 'bg-(--color-bg-tertiary) text-(--color-text-tertiary)',
     };
 
-    const totalPending = displayPayments
-        .filter((payment) =>
-            ['requested', 'pending_ops', 'pending_finance', 'approved'].includes(payment.status)
-        )
-        .reduce((sum, payment) => sum + (parseFloat(payment.amount) || 0), 0);
-
-    const totalPaid = displayPayments
-        .filter((payment) => payment.status === 'paid')
-        .reduce((sum, payment) => sum + (parseFloat(payment.amount) || 0), 0);
+    const totalPending = paymentStats.pending_amount ?? 0;
+    const totalPaid = paymentStats.paid_amount ?? 0;
 
     const header = (
         <PageHeader
@@ -132,7 +126,7 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                             </span>
                         </div>
                         <div className="text-3xl font-bold text-(--color-text-primary) relative z-10">
-                            {displayPayments.length}
+                            {paymentStats.total_count ?? payments.total ?? 0}
                         </div>
                     </div>
                 </div>
@@ -220,6 +214,7 @@ export default function Payments({ vendor, payments = { data: [] } }) {
                             </table>
                         </div>
                     )}
+                    <PaginationLinks links={payments.links} />
                 </Card>
             </div>
 

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Interfaces\VendorRepositoryInterface;
 use App\Models\DocumentType;
 use App\Models\Role;
 use App\Models\User;
@@ -11,6 +12,7 @@ use App\Models\VendorDocument;
 use App\Services\DocumentTypeUsage;
 use App\Services\DraftDocumentValidator;
 use App\Services\SystemMasterDataService;
+use App\Services\VendorService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
@@ -182,9 +184,10 @@ class DocumentTypeManagementTest extends TestCase
         $this->actingAs($owner)->get('/documents/'.$doc->id.'/view')->assertOk();
         $this->get('/documents/'.$doc->id.'/download')->assertOk();
         $this->actingAs($this->user('vendor'))->get('/documents/'.$doc->id.'/view')->assertForbidden();
-        $this->actingAs($this->user('ops_manager'))->post('/admin/documents/'.$doc->id.'/verify')->assertSessionHasNoErrors();
-        $this->assertSame('verified', $doc->fresh()->verification_status);
-        $doc->update(['is_current' => true]);
+        $this->actingAs($this->user('ops_manager'))->post('/admin/documents/'.$doc->id.'/verify')
+            ->assertSessionHas('error', 'Only the current pending document can be reviewed.');
+        $this->assertSame('pending', $doc->fresh()->verification_status);
+        $doc->update(['is_current' => true, 'verification_status' => 'verified']);
         foreach (['document_required', 'document_expiry'] as $ruleType) {
             \App\Models\ComplianceRule::create(['name' => $ruleType, 'description' => $ruleType, 'type' => $ruleType, 'is_active' => true, 'conditions' => []]);
         }
@@ -193,6 +196,31 @@ class DocumentTypeManagementTest extends TestCase
         $this->assertTrue(app(\App\Services\VendorLifecycleService::class)->activationReadiness($vendor->fresh())['allowed']);
         $this->artisan('vendors:expiry-reminders')->assertSuccessful();
         $this->assertSame('verified', $doc->fresh()->verification_status);
+    }
+
+    public function test_failed_document_record_creation_preserves_current_version_and_removes_new_file(): void
+    {
+        Storage::fake('private');
+        $owner = $this->user('vendor');
+        $vendor = Vendor::factory()->create(['user_id' => $owner->id]);
+        $type = DocumentType::create($this->config());
+        $oldPath = 'vendor-documents/'.$vendor->id.'/old.pdf';
+        Storage::disk('private')->put($oldPath, "%PDF-1.4\n%%EOF");
+        $old = VendorDocument::create(['vendor_id' => $vendor->id, 'document_type_id' => $type->id, 'file_name' => 'old.pdf', 'file_path' => $oldPath, 'file_hash' => str_repeat('a', 64), 'file_size' => 10, 'mime_type' => 'application/pdf', 'version' => 3, 'is_current' => true, 'verification_status' => 'verified']);
+        $repository = \Mockery::mock(VendorRepositoryInterface::class);
+        $repository->shouldReceive('createDocument')->once()->andThrow(new \RuntimeException('Synthetic database failure'));
+        $this->app->instance(VendorRepositoryInterface::class, $repository);
+
+        try {
+            app(VendorService::class)->uploadDocument($vendor, UploadedFile::fake()->createWithContent('new.pdf', "%PDF-1.4\n%%EOF"), $type->id, null);
+            $this->fail('Expected synthetic database failure');
+        } catch (\RuntimeException $exception) {
+            $this->assertSame('Synthetic database failure', $exception->getMessage());
+        }
+
+        $this->assertTrue($old->fresh()->is_current);
+        $this->assertSame(1, VendorDocument::query()->where('vendor_id', $vendor->id)->count());
+        $this->assertSame([$oldPath], Storage::disk('private')->allFiles('vendor-documents/'.$vendor->id));
     }
 
     public function test_duplicate_legacy_codes_stop_migration_without_discarding_records(): void

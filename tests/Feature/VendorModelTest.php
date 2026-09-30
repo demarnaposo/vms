@@ -8,6 +8,7 @@ use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use InvalidArgumentException;
 use Tests\TestCase;
 
 class VendorModelTest extends TestCase
@@ -91,6 +92,28 @@ class VendorModelTest extends TestCase
             'from_status' => Vendor::STATUS_SUBMITTED,
             'to_status' => Vendor::STATUS_UNDER_REVIEW,
             'comment' => 'Reviewing application',
+        ]);
+    }
+
+    public function test_stale_vendor_instance_cannot_overwrite_a_terminated_status(): void
+    {
+        $vendor = Vendor::factory()->create(['status' => Vendor::STATUS_ACTIVE]);
+        $stale = Vendor::findOrFail($vendor->id);
+        $admin = User::factory()->create();
+
+        $vendor->transitionTo(Vendor::STATUS_TERMINATED, $admin, 'Contract ended');
+
+        try {
+            $stale->transitionTo(Vendor::STATUS_SUSPENDED, $admin, 'Outdated action');
+            $this->fail('A stale transition must be rejected.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame('Invalid vendor status transition: terminated -> suspended', $exception->getMessage());
+        }
+
+        $this->assertSame(Vendor::STATUS_TERMINATED, $vendor->fresh()->status);
+        $this->assertDatabaseMissing('vendor_state_logs', [
+            'vendor_id' => $vendor->id,
+            'to_status' => Vendor::STATUS_SUSPENDED,
         ]);
     }
 

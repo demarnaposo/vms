@@ -9,17 +9,23 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class UserNotificationService
 {
     /**
-     * @return array{notifications: LengthAwarePaginator, unreadCount: int}
+     * @return array{notifications: LengthAwarePaginator, unreadCount: int, totalCount: int}
      */
-    public function indexData(User $user): array
+    public function indexData(User $user, string $filter = 'all'): array
     {
-        $notifications = $user->notifications()
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $query = $user->notifications()->orderBy('created_at', 'desc');
+        if ($filter === 'unread') {
+            $query->whereNull('read_at');
+        } elseif ($filter !== 'all') {
+            $query->where('data->type', $filter);
+        }
+
+        $notifications = $query->paginate(20)->appends(['filter' => $filter]);
 
         return [
             'notifications' => $notifications,
             'unreadCount' => $this->unreadCount($user),
+            'totalCount' => $user->notifications()->count(),
         ];
     }
 

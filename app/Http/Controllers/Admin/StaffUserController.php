@@ -3,83 +3,77 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\StoreStaffUserRequest;
-use App\Models\AuditLog;
+use App\Http\Requests\Admin\SaveStaffUserRequest;
+use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\RbacService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class StaffUserController extends Controller
 {
-    /**
-     * Show staff management page.
-     */
     public function index(): Response
     {
-        $staffUsers = User::query()
-            ->whereHas('roles', function ($query) {
-                $query->whereIn('name', [
-                    Role::SUPER_ADMIN,
-                    Role::OPS_MANAGER,
-                    Role::FINANCE_MANAGER,
-                ]);
-            })
-            ->with('roles:id,name,display_name')
-            ->select('id', 'name', 'email', 'created_at')
-            ->latest()
-            ->get()
-            ->map(function (User $user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'created_at' => $user->created_at?->toDateTimeString(),
-                    'roles' => $user->roles->pluck('name')->values(),
-                    'role_labels' => $user->roles->pluck('display_name')->values(),
-                    // Pair stable role keys with labels for selective master-data translation.
-                    'role_items' => $user->roles->map->only(['name', 'display_name'])->values(),
-                ];
-            });
+        abort_unless(request()->user()?->isSuperAdmin(), 403);
+        $roles = Role::where('guard_name', 'web')->where('is_staff', true)->with('permissions')->withCount('users')->orderBy('id')->get();
 
         return Inertia::render('Admin/Staff/Index', [
-            'staffUsers' => $staffUsers,
-            'availableRoles' => [
-                ['value' => Role::SUPER_ADMIN, 'label' => 'Super Admin'],
-                ['value' => Role::OPS_MANAGER, 'label' => 'Operations Manager'],
-                ['value' => Role::FINANCE_MANAGER, 'label' => 'Finance Manager'],
-            ],
+            'staffUsers' => User::whereHas('roles', fn ($q) => $q->where('is_staff', true)->where('guard_name', 'web'))
+                ->with('roles')->select('id', 'name', 'email', 'created_at')->latest()->get()->map(fn (User $user) => $this->present($user)),
+            'availableRoles' => $roles->map(fn (Role $role) => ['id' => $role->id, 'value' => $role->name, 'label' => $role->display_name]),
+            'staffRoles' => $roles->map(fn (Role $role) => [
+                ...$role->only(['id', 'name', 'display_name', 'description']), 'users_count' => $role->users_count,
+                'protected' => in_array($role->name, Role::builtInNames(), true),
+                'permission_ids' => $role->permissions->whereIn('name', array_keys(config('rbac.permissions')))->pluck('id')->values(),
+                'legacy_permissions' => $role->permissions->whereNotIn('name', array_keys(config('rbac.permissions')))->pluck('name')->values(),
+            ]),
+            'permissions' => Permission::where('guard_name', 'web')->orderBy('group')->orderBy('name')->get()->map(fn (Permission $permission) => [
+                ...$permission->only(['id', 'name', 'display_name', 'group']),
+                'operational' => array_key_exists($permission->name, config('rbac.permissions')),
+                'usage' => config('rbac.permissions')[$permission->name]['usage'] ?? null,
+            ]),
+            'legacyRoles' => Role::where('guard_name', 'web')->where('is_staff', false)->where('name', '!=', Role::VENDOR)->get(['id', 'name', 'display_name']),
         ]);
     }
 
-    /**
-     * Create an internal staff user (super admin only).
-     */
-    public function store(StoreStaffUserRequest $request): RedirectResponse
+    private function present(User $user): array
     {
-        $validated = $request->validated();
+        return [
+            ...$user->only(['id', 'name', 'email', 'created_at']),
+            'roles' => $user->roles->pluck('name')->values(), 'role_ids' => $user->roles->pluck('id')->values(),
+            'role_labels' => $user->roles->pluck('display_name')->values(),
+            'role_items' => $user->roles->map->only(['name', 'display_name'])->values(),
+            'manageable' => ! $user->isVendor(),
+        ];
+    }
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
+    public function show(User $staffUser): Response
+    {
+        abort_unless(request()->user()?->isSuperAdmin() && $staffUser->isStaff() && ! $staffUser->isVendor(), 404);
 
-        $user->assignRole($validated['role']);
+        return Inertia::render('Admin/Staff/Show', ['staffUser' => $this->present($staffUser->load('roles'))]);
+    }
 
-        AuditLog::log(
-            AuditLog::EVENT_CREATED,
-            $user,
-            null,
-            [
-                'role' => $validated['role'],
-                'created_by' => $request->user()->id,
-            ],
-            'Internal staff user created'
-        );
+    public function store(SaveStaffUserRequest $request, RbacService $service): RedirectResponse
+    {
+        $service->saveUser($request->validated());
 
-        return back()->with('success', 'Internal user created successfully.');
+        return back()->with('success', __('alerts.rbac_user_saved'));
+    }
+
+    public function update(SaveStaffUserRequest $request, User $staffUser, RbacService $service): RedirectResponse
+    {
+        $service->saveUser($request->validated(), $staffUser);
+
+        return back()->with('success', __('alerts.rbac_user_saved'));
+    }
+
+    public function destroy(User $staffUser, RbacService $service): RedirectResponse
+    {
+        $service->deleteUser($staffUser);
+
+        return back()->with('success', __('alerts.rbac_user_deleted'));
     }
 }

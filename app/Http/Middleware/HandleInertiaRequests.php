@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -16,6 +17,14 @@ class HandleInertiaRequests extends Middleware
      * @var string
      */
     protected $rootView = 'app';
+
+    public function handle(Request $request, \Closure $next)
+    {
+        $request->user()?->unsetRelation('roles');
+        $request->user()?->unsetRelation('permissions');
+
+        return parent::handle($request, $next);
+    }
 
     /**
      * Determines the current asset version.
@@ -37,6 +46,9 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
+        $hasFlash = $request->session()->has('success')
+            || $request->session()->has('error')
+            || $request->session()->has('status');
 
         // Use lazy evaluation to prevent unnecessary queries
         return [
@@ -45,8 +57,10 @@ class HandleInertiaRequests extends Middleware
             // Share the centralized currency settings with every Inertia page.
             'currency' => fn () => config('currency'),
             'flash' => [
+                'id' => $hasFlash ? (string) Str::uuid() : null,
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
+                'status' => fn () => $request->session()->get('status'),
             ],
         ];
     }
@@ -65,81 +79,42 @@ class HandleInertiaRequests extends Middleware
             ];
         }
 
-        // Cache user roles for 5 minutes to reduce DB queries
-        $cacheKey = "user_{$user->id}_auth_data_v2";
+        $user->unsetRelation('roles');
+        $user->unsetRelation('permissions');
+        $user->load('roles.permissions');
+        $can = [];
+        foreach (array_keys(config('rbac.permissions')) as $permission) {
+            $can[substr($permission, 6)] = $user->staffCan($permission);
+        }
+        $can['approve_vendors'] = $can['vendors.approve'];
+        $can['reject_vendors'] = $can['vendors.reject'];
+        $can['activate_vendors'] = $can['vendors.activate'];
+        $can['suspend_vendors'] = $can['vendors.suspend'];
+        $can['terminate_vendors'] = $can['vendors.terminate'];
+        $can['edit_vendor_notes'] = $can['vendors.notes'];
+        $can['verify_documents'] = $can['documents.verify'];
+        $can['reject_documents'] = $can['documents.reject'];
+        $can['validate_payments'] = $can['payments.validate'];
+        $can['approve_payments'] = $can['payments.approve'];
+        $can['mark_paid'] = $can['payments.disburse'];
+        $can['rate_vendors'] = $can['performance.rate'];
+        $can['run_compliance'] = $can['compliance.evaluate'];
+        $can['view_messages'] = $can['messages.manage'];
+        $can['send_notifications'] = $can['notifications.send'];
+        $can['view_reports'] = $can['reports.view'];
+        $can['is_staff'] = $user->isStaff();
+        $can['view_audit'] = $user->isSuperAdmin();
+        $can['edit_rules'] = $user->isSuperAdmin();
+        $can['audit.view'] = $user->isSuperAdmin();
+        $can['compliance.view'] = $can['compliance.access'];
 
-        return Cache::remember($cacheKey, now()->addMinutes(5), function () use ($user) {
-            // Eager load roles and permissions in ONE query
-            $user->load('roles.permissions');
-
-            // Get role names as array
-            $roleNames = $user->roles->pluck('name')->toArray();
-
-            // Pre-compute role checks ONCE
-            $isOpsManager = in_array('ops_manager', $roleNames);
-            $isFinanceManager = in_array('finance_manager', $roleNames);
-            $isSuperAdmin = in_array('super_admin', $roleNames);
-            $isVendor = in_array('vendor', $roleNames);
-            $isStaff = $isOpsManager || $isFinanceManager || $isSuperAdmin;
-
-            // Get unique permissions
-            $permissions = $user->roles
-                ->flatMap(fn ($role) => $role->permissions->pluck('name'))
-                ->unique()
-                ->values()
-                ->toArray();
-
-            return [
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'phone' => $user->phone,
-                ],
-                'roles' => $roleNames,
-                'permissions' => $permissions,
-                'can' => [
-                    // Vendor actions
-                    'approve_vendors' => $isOpsManager || $isSuperAdmin,
-                    'reject_vendors' => $isOpsManager || $isSuperAdmin,
-                    'activate_vendors' => $isOpsManager || $isSuperAdmin,
-                    'suspend_vendors' => $isOpsManager || $isSuperAdmin,
-                    'terminate_vendors' => $isOpsManager || $isSuperAdmin,
-                    'edit_vendor_notes' => $isOpsManager || $isSuperAdmin,
-
-                    // Document actions
-                    'verify_documents' => $isOpsManager || $isSuperAdmin,
-                    'reject_documents' => $isOpsManager || $isSuperAdmin,
-
-                    // Payment actions
-                    'validate_payments' => $isOpsManager || $isSuperAdmin,
-                    'approve_payments' => $isFinanceManager || $isSuperAdmin,
-                    'mark_paid' => $isFinanceManager || $isSuperAdmin,
-
-                    // Performance actions
-                    'rate_vendors' => $isOpsManager || $isSuperAdmin,
-
-                    // Compliance actions
-                    'run_compliance' => $isOpsManager || $isSuperAdmin,
-                    'edit_rules' => $isSuperAdmin,
-                    'view_messages' => $isOpsManager || $isSuperAdmin,
-                    'send_notifications' => $isOpsManager || $isSuperAdmin,
-
-                    // Admin access
-                    'view_audit' => $isSuperAdmin,
-                    'view_reports' => ! $isVendor,
-                    'is_staff' => $isStaff,
-
-                    // View permissions for reports (using dot notation keys)
-                    'vendors.view' => $isOpsManager || $isFinanceManager || $isSuperAdmin,
-                    'payments.view' => $isFinanceManager || $isSuperAdmin,
-                    'compliance.view' => $isOpsManager || $isSuperAdmin,
-                    'documents.view' => $isOpsManager || $isSuperAdmin,
-                    'audit.view' => $isSuperAdmin,
-                    'reports.export' => $isOpsManager || $isFinanceManager || $isSuperAdmin,
-                ],
-            ];
-        });
+        return [
+            'user' => $user->only(['id', 'name', 'email', 'phone']),
+            'roles' => $user->roles->pluck('name')->values()->all(),
+            'role_items' => $user->roles->map->only(['name', 'display_name'])->values()->all(),
+            'permissions' => $user->getAllPermissions()->pluck('name')->values()->all(),
+            'can' => $can,
+        ];
     }
 
     /**

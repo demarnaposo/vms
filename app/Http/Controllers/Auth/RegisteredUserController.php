@@ -48,17 +48,9 @@ class RegisteredUserController extends Controller
 
         // Public registration is restricted to vendor role only.
         $roleName = Role::VENDOR;
-        $user->assignRole($roleName);
+        $role = Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'web'], ['display_name' => 'Vendor']);
+        $user->assignRole($role);
         HandleInertiaRequests::clearAuthCache($user->id);
-
-        // Verify role assignment
-        if (! $user->hasRole($roleName)) {
-            // Fallback: Manually attach if trait failed or role name case mismatch
-            $role = \App\Models\Role::where('name', $roleName)->first();
-            if ($role) {
-                $user->roles()->attach($role);
-            }
-        }
 
         event(new Registered($user));
 

@@ -13,7 +13,7 @@ class StorePerformanceRatingRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()?->hasAnyRole(['ops_manager', 'super_admin']) === true;
+        return $this->user()?->staffCan('performance.rate') === true;
     }
 
     /**
