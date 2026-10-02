@@ -6,6 +6,8 @@ The VMS (Vendor Management System) changelog starts on 2026-09-18. Changes befor
 
 ### Fixed
 
+- 2026-10-02 — Typed the configured RBAC role and permission relations for PHPStan and simplified the primary-role display fallback, preserving Spatie relations and legacy grants.
+
 - 2026-10-01 — Right-aligned the Internal Users table action header and buttons to match the Performance table, retaining wrapping, action handlers and staff access rules.
 
 - 2026-10-01 — Restored white text on the vendor summary Rate Performance link with a scoped override, preserving its rating destination and permission check.

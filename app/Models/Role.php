@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Role extends \Spatie\Permission\Models\Role
 {
@@ -19,6 +20,14 @@ class Role extends \Spatie\Permission\Models\Role
     protected $fillable = ['name', 'display_name', 'description', 'guard_name', 'is_staff'];
 
     protected $casts = ['is_staff' => 'boolean'];
+
+    /**
+     * @return BelongsToMany<Permission, $this>
+     */
+    public function permissions(): BelongsToMany
+    {
+        return parent::permissions();
+    }
 
     public static function builtInNames(): array
     {

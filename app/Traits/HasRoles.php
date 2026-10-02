@@ -3,10 +3,22 @@
 namespace App\Traits;
 
 use App\Models\Role;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 trait HasRoles
 {
-    use \Spatie\Permission\Traits\HasRoles { scopeRole as private spatieScopeRole; }
+    use \Spatie\Permission\Traits\HasRoles {
+        roles as private spatieRoles;
+        scopeRole as private spatieScopeRole;
+    }
+
+    /**
+     * @return BelongsToMany<Role, $this>
+     */
+    public function roles(): BelongsToMany
+    {
+        return $this->spatieRoles();
+    }
 
     public function scopeRole($query, $roles, $guard = null, $without = false)
     {
@@ -66,6 +78,6 @@ trait HasRoles
 
     public function getRoleDisplayName(): string
     {
-        return $this->getPrimaryRole()?->display_name ?? 'No Role';
+        return $this->getPrimaryRole()->display_name ?? 'No Role';
     }
 }

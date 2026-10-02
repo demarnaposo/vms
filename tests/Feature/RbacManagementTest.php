@@ -204,8 +204,15 @@ class RbacManagementTest extends TestCase
     {
         $user = User::factory()->create();
         $this->assertFalse($user->isStaff());
+        $this->assertNull($user->getPrimaryRole());
+        $this->assertSame('No Role', $user->getRoleDisplayName());
         $this->actingAs($user)->get('/dashboard')->assertForbidden();
-        $user->assignRole($this->custom(['vendors.view'], 'vendors_reader'), $this->custom(['payments.view'], 'payments_reader'));
+        $primaryRole = $this->custom(['vendors.view'], 'vendors_reader');
+        $secondaryRole = $this->custom(['payments.view'], 'payments_reader');
+        $user->assignRole($secondaryRole, $primaryRole);
+        $this->assertTrue($user->isStaff());
+        $this->assertTrue($user->getPrimaryRole()->is($primaryRole));
+        $this->assertSame($primaryRole->display_name, $user->getRoleDisplayName());
         $this->get('/admin/vendors')->assertOk();
         $this->get('/admin/payments')->assertOk();
         $this->get('/admin/documents')->assertForbidden();
