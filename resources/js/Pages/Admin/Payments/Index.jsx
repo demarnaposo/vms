@@ -1,3 +1,4 @@
+import { ActionButton } from '@/Components/ActionControls';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import {
@@ -5,7 +6,6 @@ import {
     PageHeader,
     DataTable,
     Badge,
-    Button,
     Modal,
     ModalCancelButton,
     ModalPrimaryButton,
@@ -149,63 +149,57 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                     !vendorIsCompliant;
 
                 return (
-                    <div className="flex gap-2 justify-end items-center">
-                        <Button
-                            variant="secondary"
-                            size="sm"
+                    <div className="flex flex-wrap gap-2 justify-end items-center">
+                        <ActionButton
+                            variant="outline"
                             onClick={() => router.get(`/admin/payments/${row.id}`)}
                         >
                             Review
-                        </Button>
+                        </ActionButton>
                         {['requested', 'pending_ops'].includes(row.status) &&
                             can.validate_payments && (
                                 <>
-                                    <Button
+                                    <ActionButton
                                         variant="success"
-                                        size="sm"
                                         onClick={() => handleAction(row.id, 'ops', 'approve')}
                                     >
                                         Validate
-                                    </Button>
-                                    <Button
+                                    </ActionButton>
+                                    <ActionButton
                                         variant="danger"
-                                        size="sm"
                                         onClick={() => handleAction(row.id, 'ops', 'reject')}
                                     >
                                         Reject
-                                    </Button>
+                                    </ActionButton>
                                 </>
                             )}
                         {row.status === 'pending_finance' && can.approve_payments && (
                             <>
-                                <Button
+                                <ActionButton
                                     variant="success"
-                                    size="sm"
                                     disabled={isFinanceApprovalBlocked}
                                     onClick={() => handleAction(row.id, 'finance', 'approve')}
                                 >
                                     {isFinanceApprovalBlocked ? 'Blocked' : 'Approve'}
-                                </Button>
-                                <Button
+                                </ActionButton>
+                                <ActionButton
                                     variant="danger"
-                                    size="sm"
                                     onClick={() => handleAction(row.id, 'finance', 'reject')}
                                 >
                                     Reject
-                                </Button>
+                                </ActionButton>
                             </>
                         )}
                         {row.status === 'approved' && can.mark_paid && (
-                            <Button
+                            <ActionButton
                                 variant="primary"
-                                size="sm"
                                 onClick={() => {
                                     setSelectedPayment(row.id);
                                     setShowMarkPaidModal(true);
                                 }}
                             >
                                 Mark Paid
-                            </Button>
+                            </ActionButton>
                         )}
                         {['requested', 'pending_ops'].includes(row.status) &&
                             !can.validate_payments && (
@@ -260,10 +254,11 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                         <Link
                             key={status}
                             href={`/admin/payments?status=${status}`}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
+                            aria-current={currentStatus === status ? 'page' : undefined}
+                            className={`staff-status-filter px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) focus-visible:ring-offset-2 ${
                                 currentStatus === status
                                     ? 'bg-(--color-brand-primary) text-white shadow-token-primary'
-                                    : 'text-(--color-text-tertiary) hover:text-(--color-text-primary) hover:bg-(--color-bg-primary)'
+                                    : 'text-(--color-text-tertiary) hover:bg-(--color-bg-primary)'
                             }`}
                         >
                             {/* Translate filter labels while preserving URL enum codes. */}

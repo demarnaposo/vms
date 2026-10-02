@@ -19,7 +19,7 @@ test('registers all display-oriented system master-data categories', () => {
     assert.equal(Object.keys(SYSTEM_MASTER_DATA.roles).length, 4);
     assert.equal(Object.keys(SYSTEM_MASTER_DATA.permissions).length, 21);
     assert.equal(Object.keys(SYSTEM_MASTER_DATA.vendor_states).length, 8);
-    assert.equal(Object.keys(SYSTEM_MASTER_DATA.document_types).length, 7);
+    assert.equal(Object.keys(SYSTEM_MASTER_DATA.document_types).length, 14);
     assert.equal(Object.keys(SYSTEM_MASTER_DATA.compliance_rules).length, 3);
     assert.equal(Object.keys(SYSTEM_MASTER_DATA.performance_metrics).length, 4);
 });

@@ -107,6 +107,7 @@ export default function Navbar({
     // Translate public navigation from centralized messages.
     const { t } = useLanguage();
     const user = auth?.user;
+    const showVendorTools = Boolean(user && auth?.roles?.includes('vendor'));
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState(null);
     const navRef = useRef(null);
@@ -159,7 +160,7 @@ export default function Navbar({
                             </NavLink>
                         ))}
 
-                        {user && (
+                        {showVendorTools && (
                             <MenuDropdown
                                 id="create-tools"
                                 label={t('Create Tools')}
@@ -247,7 +248,7 @@ export default function Navbar({
                             ))}
                         </div>
 
-                        {user && (
+                        {showVendorTools && (
                             <div className="rounded-xl border border-(--color-border-secondary) p-2">
                                 <p className="px-2 pb-1 text-xs uppercase tracking-wide text-(--color-text-muted)">
                                     {t('Create Tools')}

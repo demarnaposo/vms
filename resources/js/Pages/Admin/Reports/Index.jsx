@@ -1,6 +1,7 @@
+import { ActionLink, ActionButton, ActionAnchor } from '@/Components/ActionControls';
 import { useState } from 'react';
-import { Link, usePage } from '@inertiajs/react';
-import { AdminLayout, PageHeader, Card, StatCard, Button, FormSelect, AppIcon } from '@/Components';
+import { usePage } from '@inertiajs/react';
+import { AdminLayout, PageHeader, Card, StatCard, FormSelect, AppIcon } from '@/Components';
 // Translate static report cards and scheduled-job descriptions.
 import { useLanguage } from '@/Contexts/LanguageContext';
 // Reuse the centralized Indonesian currency formatter.
@@ -132,7 +133,7 @@ export default function ReportsIndex({ stats = {} }) {
                                     className="p-5 rounded-xl bg-(--color-bg-secondary) border border-(--color-border-secondary) hover:border-(--color-brand-primary-light) hover:shadow-lg transition-all cursor-pointer group"
                                 >
                                     <div className="flex items-start gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-gradient-primary text-(--color-text-primary) flex items-center justify-center shadow-token-primary group-hover:scale-110 transition-transform">
+                                        <div className="w-12 h-12 rounded-xl bg-gradient-primary text-white flex items-center justify-center shadow-token-primary group-hover:scale-110 transition-transform">
                                             <AppIcon
                                                 name={report.icon}
                                                 className="h-6 w-6"
@@ -151,26 +152,27 @@ export default function ReportsIndex({ stats = {} }) {
                                             <p className="text-sm text-(--color-text-tertiary)">
                                                 {t(report.description)}
                                             </p>
-                                            <div className="flex gap-2 mt-3">
+                                            <div className="flex flex-wrap gap-2 mt-3">
                                                 {report.route ? (
-                                                    <Link href={report.route}>
-                                                        <Button variant="ghost" size="sm">
-                                                            View
-                                                        </Button>
-                                                    </Link>
+                                                    <ActionLink
+                                                        variant="outline"
+                                                        href={report.route}
+                                                    >
+                                                        {t('View')}
+                                                    </ActionLink>
                                                 ) : (
-                                                    <Button variant="ghost" size="sm" disabled>
+                                                    <ActionButton variant="outline" disabled>
                                                         View
-                                                    </Button>
+                                                    </ActionButton>
                                                 )}
                                                 {can['reports.export'] && report.route && (
-                                                    <a
+                                                    <ActionAnchor
+                                                        variant="primary"
+                                                        className="report-export-link"
                                                         href={`/admin/reports/export/${report.id.replace('_report', '')}`}
                                                     >
-                                                        <Button variant="secondary" size="sm">
-                                                            Export CSV
-                                                        </Button>
-                                                    </a>
+                                                        {t('Export CSV')}
+                                                    </ActionAnchor>
                                                 )}
                                             </div>
                                         </div>

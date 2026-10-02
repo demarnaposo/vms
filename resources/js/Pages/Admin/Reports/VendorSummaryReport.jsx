@@ -1,11 +1,11 @@
+import { ActionButton, ActionLink } from '@/Components/ActionControls';
 import { useState } from 'react';
-import { Link, router, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import {
     AdminLayout,
     PageHeader,
     Card,
     StatCard,
-    Button,
     Badge,
     DataTable,
     FormSelect,
@@ -98,9 +98,9 @@ export default function VendorSummaryReport({ vendors, stats, filters }) {
             title="Vendor Summary Report"
             subtitle="Overview of all vendors by status and compliance"
             actions={
-                <Link href="/admin/reports">
-                    <Button variant="secondary">Back to Reports</Button>
-                </Link>
+                <ActionLink variant="outline" href="/admin/reports">
+                    {t('Back to Reports')}
+                </ActionLink>
             }
         />
     );
@@ -160,12 +160,14 @@ export default function VendorSummaryReport({ vendors, stats, filters }) {
                                 options={complianceOptions}
                             />
                         </div>
-                        <div className="flex gap-2">
-                            <Button onClick={handleFilter}>Apply Filters</Button>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <ActionButton variant="primary" onClick={handleFilter}>
+                                Apply Filters
+                            </ActionButton>
                             {can['reports.export'] && (
-                                <Button variant="secondary" onClick={handleExport}>
+                                <ActionButton variant="primary" onClick={handleExport}>
                                     Export CSV
-                                </Button>
+                                </ActionButton>
                             )}
                         </div>
                     </div>

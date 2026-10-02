@@ -265,6 +265,7 @@ class DocumentController extends Controller
     // Resolve localized master labels by stable key with a verbatim database fallback.
     private function documentTypeLabel(string $name, string $fallback): string
     {
+        $name = \App\Support\DocumentTypeCode::canonical($name);
         $translationKey = "master_data.document_types.{$name}";
 
         $baseline = collect((require database_path('data/system_master_data.php'))['document_types'])->firstWhere('name', $name);

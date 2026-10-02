@@ -1,3 +1,4 @@
+import { ActionButton } from '@/Components/ActionControls';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import {
@@ -178,8 +179,9 @@ export default function DocumentsIndex({
         header: 'Actions',
         align: 'right',
         render: (row) => (
-            <div className="flex gap-2 justify-end items-center">
-                <button
+            <div className="flex flex-wrap gap-2 justify-end items-center">
+                <ActionButton
+                    variant="outline"
                     onClick={() => {
                         setViewerDocument({
                             ...row,
@@ -188,26 +190,23 @@ export default function DocumentsIndex({
                         });
                         setShowViewer(true);
                     }}
-                    className="px-3 py-1.5 text-sm font-medium text-(--color-brand-primary) hover:text-(--color-brand-primary-hover) hover:bg-(--color-brand-primary-light) rounded-lg transition-colors"
                 >
                     {t('View')}
-                </button>
+                </ActionButton>
                 {row.verification_status === 'pending' && row.is_current && (
                     <>
                         {can.verify_documents && (
-                            <Button
+                            <ActionButton
                                 variant="success"
-                                size="sm"
                                 onClick={() => verifyDocument(row.id)}
                                 disabled={processingDocId === row.id}
                             >
                                 Verify
-                            </Button>
+                            </ActionButton>
                         )}
                         {can.reject_documents && (
-                            <Button
+                            <ActionButton
                                 variant="danger"
-                                size="sm"
                                 onClick={() => {
                                     setSelectedDoc(row.id);
                                     setShowRejectModal(true);
@@ -215,7 +214,7 @@ export default function DocumentsIndex({
                                 disabled={processingDocId === row.id}
                             >
                                 Reject
-                            </Button>
+                            </ActionButton>
                         )}
                     </>
                 )}
@@ -253,10 +252,10 @@ export default function DocumentsIndex({
                             key={status.value}
                             href={`/admin/documents?${new URLSearchParams({ ...filterParams, status: status.value })}`}
                             aria-current={currentStatus === status.value ? 'page' : undefined}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) focus-visible:ring-offset-2 ${
+                            className={`staff-status-filter px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) focus-visible:ring-offset-2 ${
                                 currentStatus === status.value
                                     ? 'bg-(--color-brand-primary) text-white shadow-token-primary'
-                                    : 'text-(--color-text-tertiary) hover:text-(--color-text-primary) hover:bg-(--color-bg-primary)'
+                                    : 'text-(--color-text-tertiary) hover:bg-(--color-bg-primary)'
                             }`}
                             preserveScroll
                         >

@@ -1,6 +1,5 @@
 import { Link } from '@inertiajs/react';
 import AppIcon from './AppIcon';
-import ThemeSwitcher from './ThemeSwitcher';
 // Translate shared page headers from the global language context.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
@@ -32,10 +31,11 @@ export default function PageHeader({ title, subtitle, backLink = null, actions =
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2 flex-wrap md:justify-end">
-                    <ThemeSwitcher compact />
-                    {actions && <div className="flex items-center gap-2">{actions}</div>}
-                </div>
+                {actions && (
+                    <div className="flex items-center gap-2 flex-wrap md:justify-end">
+                        <div className="flex items-center gap-2">{actions}</div>
+                    </div>
+                )}
             </div>
         </header>
     );

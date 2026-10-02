@@ -54,6 +54,91 @@ class DocumentTypeManagementTest extends TestCase
         return new UploadedFile($path, 'bad.pdf', null, null, true);
     }
 
+    public function test_full_catalogue_bootstraps_without_duplicates_or_new_mandatory_requirements(): void
+    {
+        app(SystemMasterDataService::class)->syncDocumentTypes();
+        $this->assertDatabaseCount('document_types', 14);
+        $this->assertSame(6, DocumentType::active()->mandatory()->count());
+        $this->assertFalse(DocumentType::where('name', 'pkp_certificate')->firstOrFail()->is_mandatory);
+        $codes = ['company_deed', 'npwp', 'nib_oss', 'domicile_letter', 'pic_identity_card', 'bank_account_letter', 'experience_portfolio', 'business_license', 'pkp_certificate'];
+        $this->assertSame(9, DocumentType::whereIn('name', $codes)->count());
+        $type = DocumentType::where('name', 'pkp_certificate')->firstOrFail();
+        $type->update(['display_name' => 'Admin label', 'is_active' => false]);
+        app(SystemMasterDataService::class)->syncDocumentTypes();
+        $this->assertSame('Admin label', $type->fresh()->display_name);
+        $this->assertFalse($type->fresh()->is_active);
+        $this->assertDatabaseCount('document_types', 14);
+    }
+
+    public function test_catalogue_migration_preserves_existing_metadata_documents_drafts_and_cache(): void
+    {
+        $custom = DocumentType::create($this->config(['name' => 'business_license', 'display_name' => 'Admin permit', 'is_active' => false, 'is_mandatory' => true]));
+        $old = DocumentType::create($this->config(['name' => 'company_registration']));
+        $vendor = Vendor::factory()->create();
+        $document = VendorDocument::create(['vendor_id' => $vendor->id, 'document_type_id' => $old->id, 'file_name' => 'old.pdf', 'file_path' => 'old.pdf', 'file_size' => 10, 'file_hash' => str_repeat('a', 64), 'mime_type' => 'application/pdf', 'is_current' => false]);
+        $draft = VendorApplication::create(['user_id' => $vendor->user_id, 'status' => 'draft', 'data' => ['step3' => ['documents' => [['document_type_id' => $old->id]]]]]);
+        $snapshot = [$custom->fresh()->getAttributes(), $old->fresh()->getAttributes(), $document->fresh()->getAttributes(), $draft->fresh()->getAttributes()];
+        Cache::put('document_types_active', ['stale']);
+        $migration = require database_path('migrations/2026_09_30_000002_extend_vendor_document_catalogue.php');
+        $migration->up();
+        $this->assertFalse(Cache::has('document_types_active'));
+        $migration->up();
+        $this->assertDatabaseCount('document_types', 8);
+        $this->assertEquals($snapshot, [$custom->fresh()->getAttributes(), $old->fresh()->getAttributes(), $document->fresh()->getAttributes(), $draft->fresh()->getAttributes()]);
+        $this->assertSame($old->id, $document->fresh()->documentType->id);
+        $this->assertFalse(DocumentType::where('name', 'pkp_certificate')->firstOrFail()->is_mandatory);
+        try {
+            $migration->down();
+            $this->fail('Expected protected rollback');
+        } catch (\RuntimeException $exception) {
+            $this->assertStringContainsString('data-preserving review', $exception->getMessage());
+        }
+        $this->assertDatabaseCount('document_types', 8);
+    }
+
+    public function test_optional_catalogue_does_not_change_submission_compliance_or_activation(): void
+    {
+        Storage::fake('private');
+        $type = DocumentType::create($this->config(['is_mandatory' => true]));
+        $vendor = Vendor::factory()->create(['compliance_status' => Vendor::COMPLIANCE_COMPLIANT, 'compliance_score' => 100]);
+        VendorDocument::create(['vendor_id' => $vendor->id, 'document_type_id' => $type->id, 'file_name' => 'ok.pdf', 'file_path' => 'ok.pdf', 'file_size' => 10, 'file_hash' => str_repeat('a', 64), 'mime_type' => 'application/pdf', 'is_current' => true, 'verification_status' => 'verified']);
+        $draft = VendorApplication::create(['user_id' => $vendor->user_id, 'status' => 'draft', 'data' => []]);
+        $path = 'vendor-applications/'.$draft->id.'/temp/ok.pdf';
+        Storage::disk('private')->put($path, "%PDF-1.4\n%%EOF");
+        $draft->update(['data' => ['step3' => ['documents' => [['document_type_id' => $type->id, 'file_name' => 'ok.pdf', 'file_path' => $path]]]]]);
+        \App\Models\ComplianceRule::create(['name' => 'mandatory', 'description' => 'Required documents', 'type' => 'document_required', 'conditions' => [], 'is_active' => true]);
+        $before = app(\App\Services\ComplianceService::class)->evaluateVendor($vendor);
+        $readiness = app(\App\Services\VendorLifecycleService::class)->activationReadiness($vendor->fresh());
+        app(DraftDocumentValidator::class)->validate($draft);
+        (require database_path('migrations/2026_09_30_000002_extend_vendor_document_catalogue.php'))->up();
+        app(DraftDocumentValidator::class)->validate($draft);
+        $this->assertEquals($before, app(\App\Services\ComplianceService::class)->evaluateVendor($vendor->fresh()));
+        $this->assertEquals($readiness, app(\App\Services\VendorLifecycleService::class)->activationReadiness($vendor->fresh()));
+        $this->assertSame(1, DocumentType::active()->mandatory()->count());
+    }
+
+    public function test_new_catalogue_types_work_in_both_upload_flows_and_admin_filter(): void
+    {
+        Storage::fake('private');
+        $this->withoutMiddleware(\Illuminate\Routing\Middleware\ThrottleRequests::class);
+        DocumentType::create($this->config());
+        (require database_path('migrations/2026_09_30_000002_extend_vendor_document_catalogue.php'))->up();
+        $user = $this->user('vendor');
+        $vendor = Vendor::factory()->create(['user_id' => $user->id, 'status' => Vendor::STATUS_ACTIVE]);
+        VendorApplication::create(['user_id' => $user->id, 'status' => 'draft', 'current_step' => 3, 'data' => ['step1' => ['company_name' => 'PPM Manajemen'], 'step2' => ['bank_name' => 'Fixture Bank']]]);
+        $this->actingAs($user);
+        foreach (DocumentType::where('name', '!=', 'custom_document')->get() as $type) {
+            $file = fn () => UploadedFile::fake()->createWithContent('fixture.pdf', "%PDF-1.4\n%%EOF");
+            $this->post('/vendor/onboarding/step3', ['documents' => [['document_type_id' => $type->id, 'file' => $file()]]])->assertSessionHasNoErrors();
+            $this->post('/vendor/documents/upload', ['document_type_id' => $type->id, 'file' => $file()])->assertSessionHasNoErrors();
+            $this->assertDatabaseHas('vendor_documents', ['vendor_id' => $vendor->id, 'document_type_id' => $type->id]);
+        }
+        $this->assertCount(7, VendorApplication::where('user_id', $user->id)->firstOrFail()->data['step3']['documents']);
+        $pkp = DocumentType::where('name', 'pkp_certificate')->firstOrFail();
+        $this->actingAs($this->user('ops_manager'))->get('/admin/documents?status=all&document_type_id='.$pkp->id)
+            ->assertOk()->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page->has('documents.data', 1)->where('documents.data.0.document_type_id', $pkp->id));
+    }
+
     public function test_roles_are_denied_every_endpoint_and_super_admin_can_manage(): void
     {
         $type = DocumentType::create($this->config());

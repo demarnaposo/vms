@@ -30,6 +30,7 @@ export default function Footer({ links = defaultLinks, showSocial = true, classN
     const year = new Date().getFullYear();
     const { auth } = usePage().props;
     const { t } = useLanguage();
+    const showVendorTools = Boolean(auth?.user && auth?.roles?.includes('vendor'));
 
     return (
         <footer
@@ -91,22 +92,24 @@ export default function Footer({ links = defaultLinks, showSocial = true, classN
                         </div>
                     </div>
 
-                    <div className="md:col-span-2">
-                        <h3 className="text-sm font-semibold text-(--color-text-primary) mb-3">
-                            {t('Create Tools')}
-                        </h3>
-                        <div className="space-y-2">
-                            {toolLinks.map((item) => (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className="block text-sm text-(--color-text-tertiary) hover:text-(--color-brand-primary) transition-colors"
-                                >
-                                    {t(item.label)}
-                                </Link>
-                            ))}
+                    {showVendorTools && (
+                        <div className="md:col-span-2">
+                            <h3 className="text-sm font-semibold text-(--color-text-primary) mb-3">
+                                {t('Create Tools')}
+                            </h3>
+                            <div className="space-y-2">
+                                {toolLinks.map((item) => (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        className="block text-sm text-(--color-text-tertiary) hover:text-(--color-brand-primary) transition-colors"
+                                    >
+                                        {t(item.label)}
+                                    </Link>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {auth?.user && !auth?.roles?.includes('vendor') && (
                         <div className="md:col-span-3">

@@ -1,11 +1,11 @@
+import { ActionButton, ActionLink } from '@/Components/ActionControls';
 import { useState } from 'react';
-import { Link, router, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import {
     AdminLayout,
     PageHeader,
     Card,
     StatCard,
-    Button,
     Badge,
     DataTable,
     FormInput,
@@ -82,9 +82,9 @@ export default function PaymentReport({ payments, stats, filters }) {
             title="Payment Report"
             subtitle="View and export payment request data"
             actions={
-                <Link href="/admin/reports">
-                    <Button variant="secondary">Back to Reports</Button>
-                </Link>
+                <ActionLink variant="outline" href="/admin/reports">
+                    {t('Back to Reports')}
+                </ActionLink>
             }
         />
     );
@@ -163,12 +163,14 @@ export default function PaymentReport({ payments, stats, filters }) {
                                 options={statusOptions}
                             />
                         </div>
-                        <div className="flex gap-2">
-                            <Button onClick={handleFilter}>Apply Filters</Button>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <ActionButton variant="primary" onClick={handleFilter}>
+                                Apply Filters
+                            </ActionButton>
                             {can['reports.export'] && (
-                                <Button variant="secondary" onClick={handleExport}>
+                                <ActionButton variant="primary" onClick={handleExport}>
                                     Export CSV
-                                </Button>
+                                </ActionButton>
                             )}
                         </div>
                     </div>

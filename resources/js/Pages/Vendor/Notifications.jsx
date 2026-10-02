@@ -1,5 +1,6 @@
+import { ActionButton, ActionAnchor } from '@/Components/ActionControls';
 import { router } from '@inertiajs/react';
-import { VendorLayout, PageHeader, Card, Button, AppIcon } from '@/Components';
+import { VendorLayout, PageHeader, Card, AppIcon } from '@/Components';
 import { formatRelativeTime } from '@/utils/dateFormatters';
 // Translate vendor notification controls without altering stored notification content.
 import { useLanguage } from '@/Contexts/LanguageContext';
@@ -80,9 +81,9 @@ export default function Notifications({
             )}
             actions={
                 unreadCount > 0 && (
-                    <Button variant="outline" onClick={handleMarkAllAsRead}>
+                    <ActionButton variant="primary" onClick={handleMarkAllAsRead}>
                         Mark All as Read
-                    </Button>
+                    </ActionButton>
                 )
             }
         />
@@ -202,27 +203,28 @@ export default function Notifications({
                                                 </p>
 
                                                 {notification.data?.action_url && (
-                                                    <a
+                                                    <ActionAnchor
+                                                        variant="outline"
                                                         href={notification.data.action_url}
-                                                        className="inline-flex items-center gap-1 text-sm text-(--color-brand-primary) hover:underline mt-2"
+                                                        className="mt-2"
                                                     >
                                                         {/* Preserve stored action text and translate only the system fallback. */}
                                                         {notification.data.action_text ||
                                                             t('View Details')}
-                                                    </a>
+                                                    </ActionAnchor>
                                                 )}
                                             </div>
 
                                             {isUnread && (
-                                                <button
+                                                <ActionButton
                                                     type="button"
                                                     onClick={() =>
                                                         handleMarkAsRead(notification.id)
                                                     }
-                                                    className="shrink-0 rounded-lg px-2 py-1 text-sm font-medium text-(--color-brand-primary) hover:bg-(--color-brand-primary-light) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-brand-primary)"
+                                                    className="shrink-0"
                                                 >
                                                     {t('Mark read')}
-                                                </button>
+                                                </ActionButton>
                                             )}
                                         </div>
                                     </div>
@@ -234,10 +236,7 @@ export default function Notifications({
                 </Card>
 
                 {totalCount === 0 && (
-                    <div className="bg-(--color-bg-secondary) border border-(--color-border-secondary) rounded-xl p-6">
-                        <h3 className="font-semibold text-(--color-text-primary) mb-4">
-                            {t('What notifications will you receive?')}
-                        </h3>
+                    <Card title="What notifications will you receive?">
                         <div className="grid md:grid-cols-2 gap-4">
                             {[
                                 {
@@ -262,21 +261,21 @@ export default function Notifications({
                                 },
                             ].map((item, index) => (
                                 <div key={index} className="flex items-start gap-3">
-                                    <span className="text-xl inline-flex mt-0.5">
+                                    <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-(--color-brand-primary-light) text-(--color-brand-primary)">
                                         <AppIcon name={item.icon} className="h-5 w-5" />
                                     </span>
-                                    <div>
+                                    <div className="min-w-0">
                                         <div className="font-medium text-(--color-text-primary)">
                                             {t(item.title)}
                                         </div>
-                                        <div className="text-sm text-(--color-text-tertiary)">
+                                        <div className="text-sm text-(--color-text-secondary)">
                                             {t(item.desc)}
                                         </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                    </div>
+                    </Card>
                 )}
             </div>
         </VendorLayout>

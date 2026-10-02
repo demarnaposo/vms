@@ -818,3 +818,20 @@ a {
         animation: none !important;
     }
 }
+
+/* Opt-in link colors override the unlayered anchor reset without affecting other links. */
+.staff-status-filter {
+    color: var(--color-text-tertiary);
+}
+
+.staff-status-filter[aria-current='page'] {
+    color: #ffffff;
+}
+
+.report-export-link {
+    color: #ffffff;
+}
+
+.sidebar-active-label {
+    color: #ffffff;
+}

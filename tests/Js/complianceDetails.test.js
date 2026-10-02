@@ -19,7 +19,7 @@ test('translates system-generated compliance result details', () => {
             { name: 'mandatory_documents' },
             'Missing mandatory documents: NPWP Document, Regional Permit'
         ),
-        'Dokumen wajib yang belum terpenuhi: Dokumen Nomor Pokok Wajib Pajak (NPWP), Regional Permit'
+        'Dokumen wajib yang belum terpenuhi: NPWP Perusahaan, Regional Permit'
     );
     assert.equal(
         translateComplianceDetails(

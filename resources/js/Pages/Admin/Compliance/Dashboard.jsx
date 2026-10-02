@@ -1,10 +1,10 @@
+import { ActionButton } from '@/Components/ActionControls';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import {
     AdminLayout,
     AppIcon,
     Badge,
-    Button,
     Card,
     Modal,
     ModalCancelButton,
@@ -45,7 +45,9 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
             subtitle="Monitor vendor compliance status"
             actions={
                 can.run_compliance && (
-                    <Button onClick={() => setShowConfirmModal(true)}>Run Evaluation</Button>
+                    <ActionButton onClick={() => setShowConfirmModal(true)}>
+                        Run Evaluation
+                    </ActionButton>
                 )
             }
         />

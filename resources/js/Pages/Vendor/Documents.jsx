@@ -1,3 +1,4 @@
+import { ActionButton, ActionAnchor } from '@/Components/ActionControls';
 import { useForm } from '@inertiajs/react';
 import { useMemo, useRef, useState } from 'react';
 import {
@@ -5,7 +6,6 @@ import {
     PageHeader,
     Card,
     Badge,
-    Button,
     FormSelect,
     AppIcon,
     Modal,
@@ -131,7 +131,7 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
             title="Documents"
             subtitle="Manage your uploaded documents"
             actions={
-                <Button onClick={() => setShowUploadModal(true)}>
+                <ActionButton onClick={() => setShowUploadModal(true)}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                             strokeLinecap="round"
@@ -141,7 +141,7 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                         />
                     </svg>
                     {t('Upload Document')}
-                </Button>
+                </ActionButton>
             }
         />
     );
@@ -254,7 +254,8 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                                             </div>
                                         </div>
                                         <div className="flex flex-wrap items-center gap-2 md:justify-end">
-                                            <button
+                                            <ActionButton
+                                                variant="outline"
                                                 type="button"
                                                 onClick={() => {
                                                     setSelectedDocument({
@@ -264,19 +265,19 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                                                     });
                                                     setShowViewer(true);
                                                 }}
-                                                className="px-3 py-1.5 text-sm font-medium text-(--color-brand-primary) hover:text-(--color-brand-primary-hover) hover:bg-(--color-brand-primary-light) rounded-lg transition-colors"
                                             >
                                                 {t('View')}
-                                            </button>
-                                            <a
+                                            </ActionButton>
+                                            <ActionAnchor
+                                                variant="outline"
                                                 href={`/documents/${doc.id}/download`}
-                                                className="px-3 py-1.5 text-sm font-medium text-(--color-text-tertiary) hover:text-(--color-text-primary) hover:bg-(--color-bg-hover) rounded-lg transition-colors"
                                             >
                                                 {t('Download')}
-                                            </a>
+                                            </ActionAnchor>
                                             <Badge status={doc.verification_status} />
                                             {doc.verification_status === 'rejected' && (
-                                                <button
+                                                <ActionButton
+                                                    variant="warning"
                                                     type="button"
                                                     onClick={() => {
                                                         uploadForm.setData(
@@ -285,10 +286,9 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                                                         );
                                                         setShowUploadModal(true);
                                                     }}
-                                                    className="px-3 py-1.5 text-sm font-medium text-(--color-warning) hover:text-(--color-warning-dark) hover:bg-(--color-warning-light) rounded-lg transition-colors"
                                                 >
                                                     {t('Re-upload')}
-                                                </button>
+                                                </ActionButton>
                                             )}
                                         </div>
                                     </div>

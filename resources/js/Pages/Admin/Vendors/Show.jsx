@@ -1,4 +1,5 @@
-import { Link, router, useForm, usePage } from '@inertiajs/react';
+import { ActionButton, ActionLink, ActionAnchor } from '@/Components/ActionControls';
+import { router, useForm, usePage } from '@inertiajs/react';
 // Guard vendor actions immediately before React processing state is rendered.
 import { useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -252,24 +253,27 @@ export default function VendorShow({
     );
 
     const headerActions = (
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+            <ActionLink href="/admin/vendors" variant="outline">
+                {t('Back')}
+            </ActionLink>
             {canApprove && (
-                <Button
+                <ActionButton
                     variant="success"
                     onClick={() => openActionModal('approve')}
                     disabled={isVendorActionProcessing}
                 >
                     Approve
-                </Button>
+                </ActionButton>
             )}
             {canReject && (
-                <Button
+                <ActionButton
                     variant="danger"
                     onClick={() => openActionModal('reject')}
                     disabled={isVendorActionProcessing}
                 >
                     Reject
-                </Button>
+                </ActionButton>
             )}
             {canActivate && (
                 <DisabledActionTooltip
@@ -286,41 +290,40 @@ export default function VendorShow({
                         </ul>
                     }
                 >
-                    <Button
+                    <ActionButton
                         onClick={() => openActionModal('activate')}
                         disabled={!isReadyForActivation || isVendorActionProcessing}
-                        className={!isReadyForActivation ? 'opacity-50 cursor-not-allowed' : ''}
                     >
                         Activate
-                    </Button>
+                    </ActionButton>
                 </DisabledActionTooltip>
             )}
             {canSuspend && (
-                <Button
+                <ActionButton
                     variant="warning"
                     onClick={() => openActionModal('suspend')}
                     disabled={isVendorActionProcessing}
                 >
                     Suspend
-                </Button>
+                </ActionButton>
             )}
             {canTerminate && (
-                <Button
+                <ActionButton
                     variant="danger"
                     onClick={() => openActionModal('terminate')}
                     disabled={isVendorActionProcessing}
                 >
                     Terminate
-                </Button>
+                </ActionButton>
             )}
             {canReactivate && (
-                <Button
+                <ActionButton
                     variant="warning"
                     onClick={() => openActionModal('reactivate')}
                     disabled={isVendorActionProcessing}
                 >
                     Reactivate
-                </Button>
+                </ActionButton>
             )}
         </div>
     );
@@ -334,7 +337,6 @@ export default function VendorShow({
                 </div>
             }
             subtitle={vendor?.contact_email}
-            backLink="/admin/vendors"
             actions={headerActions}
         />
     );
@@ -472,12 +474,13 @@ export default function VendorShow({
                                 <Badge status={vendor?.compliance_status} />
                             </div>
                             {can.rate_vendors && (
-                                <Link
+                                <ActionLink
+                                    variant="primary"
                                     href={`/admin/performance/${vendor?.id}/rate`}
-                                    className="text-(--color-brand-primary) hover:text-(--color-brand-primary-light) text-sm block mt-4"
+                                    className="mt-4 text-white!"
                                 >
                                     {t('Rate Performance')}
-                                </Link>
+                                </ActionLink>
                             )}
                         </div>
                     </Card>
@@ -584,9 +587,10 @@ export default function VendorShow({
                                             {formatDateTime(doc.created_at, dateLocale)}
                                         </td>
                                         <td className="p-4 text-right">
-                                            <div className="flex gap-2 justify-end">
+                                            <div className="flex flex-wrap gap-2 justify-end">
                                                 {/* Feature 2: View/Download buttons */}
-                                                <button
+                                                <ActionButton
+                                                    variant="outline"
                                                     type="button"
                                                     onClick={() => {
                                                         setViewerDocument({
@@ -596,23 +600,21 @@ export default function VendorShow({
                                                         });
                                                         setShowDocViewer(true);
                                                     }}
-                                                    className="px-3 py-1.5 text-sm font-medium text-(--color-brand-primary) hover:text-(--color-brand-primary-hover) hover:bg-(--color-brand-primary-light) rounded-lg transition-colors"
                                                 >
                                                     {t('View')}
-                                                </button>
-                                                <a
+                                                </ActionButton>
+                                                <ActionAnchor
+                                                    variant="outline"
                                                     href={`/documents/${doc.id}/download`}
-                                                    className="px-3 py-1.5 text-sm font-medium text-(--color-text-tertiary) hover:text-(--color-text-primary) hover:bg-(--color-bg-hover) rounded-lg transition-colors"
                                                 >
                                                     {t('Download')}
-                                                </a>
+                                                </ActionAnchor>
                                                 {/* Verify/Reject buttons for pending documents */}
                                                 {can.verify_documents &&
                                                     doc.verification_status === 'pending' && (
                                                         <>
-                                                            <Button
+                                                            <ActionButton
                                                                 variant="success"
-                                                                size="sm"
                                                                 onClick={() =>
                                                                     router.post(
                                                                         `/admin/documents/${doc.id}/verify`,
@@ -622,11 +624,10 @@ export default function VendorShow({
                                                                 }
                                                             >
                                                                 Verify
-                                                            </Button>
+                                                            </ActionButton>
                                                             {/* Feature 4: Modal-based rejection */}
-                                                            <Button
+                                                            <ActionButton
                                                                 variant="danger"
-                                                                size="sm"
                                                                 onClick={() => {
                                                                     setRejectDocId(doc.id);
                                                                     setDocRejectReason('');
@@ -634,7 +635,7 @@ export default function VendorShow({
                                                                 }}
                                                             >
                                                                 Reject
-                                                            </Button>
+                                                            </ActionButton>
                                                         </>
                                                     )}
                                             </div>
@@ -651,13 +652,13 @@ export default function VendorShow({
             {activeTab === 'compliance' && (
                 <div className="space-y-4">
                     {can.run_compliance && (
-                        <div className="flex justify-end">
-                            <Button
+                        <div className="flex flex-wrap justify-end">
+                            <ActionButton
                                 onClick={runComplianceEvaluation}
                                 disabled={isVendorActionProcessing}
                             >
                                 {evaluationForm.processing ? 'Evaluating...' : 'Run Evaluation'}
-                            </Button>
+                            </ActionButton>
                         </div>
                     )}
                     {vendor?.compliance_results?.map((result) => (

@@ -1,5 +1,6 @@
 import { Link, useForm } from '@inertiajs/react';
 import { AdminLayout, PageHeader, Card, Button } from '@/Components';
+import { ActionLink } from '@/Components/ActionControls';
 // Translate rating controls while keeping metric records and typed notes unchanged.
 import { useLanguage } from '@/Contexts/LanguageContext';
 // Localize fixed performance metric master records in the rating form.
@@ -38,7 +39,11 @@ export default function RateVendor({ vendor, metrics = [] }) {
         <PageHeader
             title="Rate Performance"
             subtitle={<>{vendor?.company_name}</>}
-            backLink="/admin/performance"
+            actions={
+                <ActionLink href="/admin/performance" variant="outline">
+                    {t('Back')}
+                </ActionLink>
+            }
         />
     );
 

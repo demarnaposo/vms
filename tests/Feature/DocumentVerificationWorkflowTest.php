@@ -156,12 +156,12 @@ class DocumentVerificationWorkflowTest extends TestCase
         $this->actingAs($this->opsUser)
             ->withUnencryptedCookie('vms_locale', 'id')
             ->post(route('admin.documents.verify', $verifiedDocument))
-            ->assertSessionHas('success', 'Dokumen Nomor Induk Berusaha (NIB) berhasil diverifikasi.');
+            ->assertSessionHas('success', 'NIB OSS berhasil diverifikasi.');
 
         $this->actingAs($this->opsUser)
             ->withUnencryptedCookie('vms_locale', 'id')
             ->post(route('admin.documents.reject', $rejectedDocument), ['reason' => 'Not valid'])
-            ->assertSessionHas('success', 'Dokumen Nomor Induk Berusaha (NIB) ditolak.');
+            ->assertSessionHas('success', 'NIB OSS ditolak.');
     }
 
     // Preserve custom database document labels inside localized alerts.

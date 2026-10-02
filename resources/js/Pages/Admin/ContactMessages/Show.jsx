@@ -1,3 +1,4 @@
+import { ActionButton, ActionAnchor } from '@/Components/ActionControls';
 import { useForm, router } from '@inertiajs/react';
 import { useState } from 'react';
 import {
@@ -44,9 +45,9 @@ export default function Show({ message }) {
             }
             backLink="/admin/contact-messages"
             actions={
-                <Button variant="danger" onClick={() => setShowDeleteModal(true)}>
+                <ActionButton variant="danger" onClick={() => setShowDeleteModal(true)}>
                     Delete
-                </Button>
+                </ActionButton>
             }
         />
     );
@@ -217,12 +218,13 @@ export default function Show({ message }) {
                         <p className="text-sm text-(--color-text-secondary) mb-4">
                             {t('Open your email client to respond directly.')}
                         </p>
-                        <a
+                        <ActionAnchor
+                            variant="primary"
                             href={`mailto:${message.email}?subject=Re: ${encodeURIComponent(message.subject)}`}
-                            className="block w-full py-2.5 px-4 bg-(--color-brand-primary) text-white text-center font-medium rounded-lg hover:opacity-90 transition-opacity"
+                            className="w-full justify-center"
                         >
                             {t('Compose Reply')}
-                        </a>
+                        </ActionAnchor>
                     </div>
                 </div>
             </div>

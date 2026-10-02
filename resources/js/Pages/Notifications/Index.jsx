@@ -1,13 +1,6 @@
+import { ActionButton } from '@/Components/ActionControls';
 import { router, usePage } from '@inertiajs/react';
-import {
-    AdminLayout,
-    VendorLayout,
-    PageHeader,
-    Card,
-    Button,
-    EmptyState,
-    AppIcon,
-} from '@/Components';
+import { AdminLayout, VendorLayout, PageHeader, Card, EmptyState, AppIcon } from '@/Components';
 import { formatDateTime } from '@/utils/dateFormatters';
 // Translate the shared notification-center interface without altering database content.
 import { useLanguage } from '@/Contexts/LanguageContext';
@@ -52,9 +45,9 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
             title="Notifications"
             subtitle={t(':count unread', { count: resolvedUnreadCount })}
             actions={
-                <Button variant="ghost" onClick={markAllAsRead}>
+                <ActionButton variant="primary" onClick={markAllAsRead}>
                     Mark all as read
-                </Button>
+                </ActionButton>
             }
         />
     );
@@ -117,13 +110,12 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
                                         </div>
                                     </div>
                                     {!notification.read_at && (
-                                        <Button
+                                        <ActionButton
                                             variant="ghost"
-                                            size="sm"
                                             onClick={() => markAsRead(notification.id)}
                                         >
                                             Mark read
-                                        </Button>
+                                        </ActionButton>
                                     )}
                                 </div>
                             </div>

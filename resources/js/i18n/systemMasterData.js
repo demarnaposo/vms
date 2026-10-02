@@ -1,5 +1,11 @@
 import { translateMessage } from './translations.js';
 
+const DOCUMENT_TYPE_CODE_ALIASES = Object.freeze({
+    gst_certificate: 'npwp',
+    pan_card: 'nib_oss',
+    cancelled_cheque: 'bank_account_proof',
+});
+
 // Define translatable VMS master records by stable category and name.
 export const SYSTEM_MASTER_DATA = Object.freeze({
     roles: {
@@ -54,21 +60,49 @@ export const SYSTEM_MASTER_DATA = Object.freeze({
         rejected: { display_name: 'Rejected' },
     },
     document_types: {
+        company_deed: {
+            display_name: 'Company Deed of Establishment',
+            description: 'Deed establishing the company',
+        },
+        bank_account_letter: {
+            display_name: 'Bank Account Confirmation Letter',
+            description: 'Bank letter confirming the company account',
+        },
+        domicile_letter: {
+            display_name: 'Company Domicile Letter',
+            description: 'Letter confirming the company domicile',
+        },
+        pic_identity_card: {
+            display_name: 'PIC Identity Card (KTP)',
+            description: 'Identity card of the person in charge',
+        },
+        experience_portfolio: {
+            display_name: 'Experience Portfolio',
+            description: 'Portfolio of previous projects and work experience',
+        },
+        business_license: {
+            display_name: 'SIUP / Business License',
+            description: 'Trading license or other applicable business license',
+        },
+        pkp_certificate: {
+            display_name: 'PKP Certificate (if applicable)',
+            description: 'Optional certificate for vendors registered as PKP',
+        },
         company_registration: {
             display_name: 'Company Registration Certificate',
             description: 'Certificate of incorporation or business registration',
         },
-        gst_certificate: {
+        npwp: {
             // Localize the stable master key with the complete taxpayer identifier label.
             display_name: 'Taxpayer Identification Number (NPWP) Document',
             description: 'Taxpayer identification document',
         },
-        pan_card: {
+        nib_oss: {
             // Localize the stable master key with the complete business identifier label.
             display_name: 'Business Identification Number (NIB) Document',
             description: 'Business identification document',
         },
-        cancelled_cheque: {
+        bank_account_proof: {
             // Present bank-account proof instead of a cheque-specific document.
             display_name: 'Bank Account Proof',
             description: 'Bank account ownership proof for payment verification',
@@ -131,9 +165,13 @@ export function translateSystemMasterDataField(
     if (!record || typeof record !== 'object') return fallback;
 
     const categoryDefinitions = SYSTEM_MASTER_DATA[category];
+    const name =
+        category === 'document_types' && Object.hasOwn(DOCUMENT_TYPE_CODE_ALIASES, record.name)
+            ? DOCUMENT_TYPE_CODE_ALIASES[record.name]
+            : record.name;
     const definition =
-        categoryDefinitions && Object.hasOwn(categoryDefinitions, record.name)
-            ? categoryDefinitions[record.name]
+        categoryDefinitions && Object.hasOwn(categoryDefinitions, name)
+            ? categoryDefinitions[name]
             : null;
     if (
         ['document_types', 'roles'].includes(category) &&

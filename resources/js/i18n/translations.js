@@ -1,5 +1,28 @@
 // Centralize Indonesian translations while English remains the source-language fallback.
 export const INDONESIAN_TRANSLATIONS = Object.freeze({
+    'Theme options': 'Pilihan tema',
+    'Balanced teal': 'Hijau kebiruan seimbang',
+    'Cool blue tones': 'Nuansa biru sejuk',
+    'Warm contrast': 'Kontras hangat',
+    'Dark workspace': 'Ruang kerja gelap',
+    'Company Deed of Establishment': 'Akta Pendirian Perusahaan',
+    'Deed establishing the company': 'Akta pendirian perusahaan',
+    'Bank Account Confirmation Letter': 'Surat Keterangan Rekening Bank',
+    'Bank letter confirming the company account':
+        'Surat bank yang mengonfirmasi rekening perusahaan',
+    'Company Domicile Letter': 'Surat Domisili',
+    'Letter confirming the company domicile': 'Surat keterangan domisili perusahaan',
+    'PIC Identity Card (KTP)': 'KTP PIC',
+    'Identity card of the person in charge': 'Kartu tanda penduduk penanggung jawab',
+    'Experience Portfolio': 'Portofolio Pengalaman',
+    'Portfolio of previous projects and work experience':
+        'Portofolio proyek dan pengalaman kerja sebelumnya',
+    'SIUP / Business License': 'SIUP / Izin Usaha',
+    'Trading license or other applicable business license':
+        'Surat izin usaha perdagangan atau izin usaha yang sesuai',
+    'PKP Certificate (if applicable)': 'Sertifikat PKP (jika PKP)',
+    'Optional certificate for vendors registered as PKP':
+        'Sertifikat opsional bagi vendor yang terdaftar sebagai PKP',
     'Confirm Deletion': 'Konfirmasi Penghapusan',
     'No staff roles found': 'Peran staff tidak ditemukan',
     'No permissions found': 'Izin tidak ditemukan',
@@ -925,9 +948,9 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Certificate of incorporation or business registration':
         'Sertifikat pendirian atau pendaftaran usaha',
     // Translate the default identification and bank-proof documents.
-    'Taxpayer Identification Number (NPWP) Document': 'Dokumen Nomor Pokok Wajib Pajak (NPWP)',
+    'Taxpayer Identification Number (NPWP) Document': 'NPWP Perusahaan',
     'Taxpayer identification document': 'Dokumen identitas wajib pajak',
-    'Business Identification Number (NIB) Document': 'Dokumen Nomor Induk Berusaha (NIB)',
+    'Business Identification Number (NIB) Document': 'NIB OSS',
     'Business identification document': 'Dokumen identitas usaha',
     'Bank Account Proof': 'Bukti Rekening Bank',
     'Bank account ownership proof for payment verification':

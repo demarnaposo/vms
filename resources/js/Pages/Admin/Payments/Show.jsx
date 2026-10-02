@@ -1,3 +1,4 @@
+import { ActionButton } from '@/Components/ActionControls';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import {
@@ -302,22 +303,22 @@ export default function PaymentsShow({ payment }) {
                                         {/* Translate the fixed operations-stage hint. */}
                                         {t('Ops Validation Required')}
                                     </p>
-                                    <Button
+                                    <ActionButton
                                         variant="success"
-                                        className="w-full justify-center py-2.5"
+                                        className="w-full justify-center"
                                         disabled={isApproving || isRejecting || isMarkingPaid}
                                         onClick={() => handleApprove('ops')}
                                     >
                                         {isApproving ? 'Validating...' : 'Validate Request'}
-                                    </Button>
-                                    <Button
+                                    </ActionButton>
+                                    <ActionButton
                                         variant="danger"
-                                        className="w-full justify-center py-2.5"
+                                        className="w-full justify-center"
                                         disabled={isApproving || isRejecting || isMarkingPaid}
                                         onClick={() => openRejectModal('ops')}
                                     >
                                         Reject Request
-                                    </Button>
+                                    </ActionButton>
                                 </>
                             )}
 
@@ -333,35 +334,35 @@ export default function PaymentsShow({ payment }) {
                                             {t('Approval blocked: vendor is non-compliant.')}
                                         </div>
                                     ) : (
-                                        <Button
+                                        <ActionButton
                                             variant="success"
-                                            className="w-full justify-center py-2.5"
+                                            className="w-full justify-center"
                                             disabled={isApproving || isRejecting || isMarkingPaid}
                                             onClick={() => handleApprove('finance')}
                                         >
                                             {isApproving ? 'Approving...' : 'Approve Payment'}
-                                        </Button>
+                                        </ActionButton>
                                     )}
-                                    <Button
+                                    <ActionButton
                                         variant="danger"
-                                        className="w-full justify-center py-2.5"
+                                        className="w-full justify-center"
                                         disabled={isApproving || isRejecting || isMarkingPaid}
                                         onClick={() => openRejectModal('finance')}
                                     >
                                         Reject Payment
-                                    </Button>
+                                    </ActionButton>
                                 </>
                             )}
 
                             {canMarkAsPaid && (
-                                <Button
+                                <ActionButton
                                     variant="primary"
-                                    className="w-full justify-center py-2.5"
+                                    className="w-full justify-center"
                                     disabled={isApproving || isRejecting || isMarkingPaid}
                                     onClick={() => setShowMarkPaidModal(true)}
                                 >
                                     {isMarkingPaid ? 'Saving...' : 'Mark as Paid'}
-                                </Button>
+                                </ActionButton>
                             )}
 
                             {isOpsStage && !can.validate_payments && (

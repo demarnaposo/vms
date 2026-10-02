@@ -1,3 +1,4 @@
+import { ActionButton } from '@/Components/ActionControls';
 import { router, useForm } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -127,23 +128,21 @@ export default function DocumentTypeIndex({ documentTypes = [] }) {
             header: 'Actions',
             align: 'right',
             render: (document_type) => (
-                <div className="flex items-center justify-end gap-2">
-                    <Button
-                        variant="ghost"
-                        size="sm"
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                    <ActionButton
+                        variant="primary"
                         className={buttonFocus}
                         onClick={() => edit(document_type)}
                     >
                         Edit
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className={`${buttonFocus} text-(--color-danger) hover:text-(--color-danger-dark)`}
+                    </ActionButton>
+                    <ActionButton
+                        variant="danger"
+                        className={buttonFocus}
                         onClick={() => setDeletingDocumentType(document_type)}
                     >
                         Delete
-                    </Button>
+                    </ActionButton>
                 </div>
             ),
         },

@@ -1,3 +1,4 @@
+import { ActionLink } from '@/Components/ActionControls';
 import { Link, usePage, router } from '@inertiajs/react';
 import { AdminLayout, DataTable, Badge, PageHeader, Button } from '@/Components';
 import { formatDateTime } from '@/utils/dateFormatters';
@@ -62,11 +63,9 @@ export default function Index() {
             header: 'Actions',
             align: 'right',
             render: (row) => (
-                <Link href={`/admin/contact-messages/${row.id}`}>
-                    <Button variant="ghost" size="sm">
-                        View
-                    </Button>
-                </Link>
+                <ActionLink variant="outline" href={`/admin/contact-messages/${row.id}`}>
+                    {t('View')}
+                </ActionLink>
             ),
         },
     ];
@@ -87,7 +86,9 @@ export default function Index() {
                         placeholder={t('Search messages...')}
                         className="input-field"
                     />
-                    <Button type="submit">Search</Button>
+                    <Button type="submit" size="sm" className="self-center">
+                        Search
+                    </Button>
                 </form>
             }
         />
@@ -222,10 +223,15 @@ export default function Index() {
                         <Link
                             key={status}
                             href={`/admin/contact-messages?status=${status === 'all' ? '' : status}${search ? `&search=${search}` : ''}`}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
+                            aria-current={
+                                filters?.status === status || (!filters?.status && status === 'all')
+                                    ? 'page'
+                                    : undefined
+                            }
+                            className={`staff-status-filter px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) focus-visible:ring-offset-2 ${
                                 filters?.status === status || (!filters?.status && status === 'all')
                                     ? 'bg-(--color-brand-primary) text-white shadow-token-primary'
-                                    : 'text-(--color-text-tertiary) hover:text-(--color-text-primary) hover:bg-(--color-bg-primary)'
+                                    : 'text-(--color-text-tertiary) hover:bg-(--color-bg-primary)'
                             }`}
                         >
                             {/* Keep the filter URL code intact and localize its label. */}

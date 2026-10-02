@@ -1,3 +1,4 @@
+import { ActionButton } from '@/Components/ActionControls';
 import { router, useForm } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -107,23 +108,21 @@ export default function VendorCategoryIndex({ categories = [] }) {
             header: 'Actions',
             align: 'right',
             render: (category) => (
-                <div className="flex items-center justify-end gap-2">
-                    <Button
-                        variant="ghost"
-                        size="sm"
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                    <ActionButton
+                        variant="primary"
                         className={buttonFocus}
                         onClick={() => edit(category)}
                     >
                         Edit
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className={`${buttonFocus} text-(--color-danger) hover:text-(--color-danger-dark)`}
+                    </ActionButton>
+                    <ActionButton
+                        variant="danger"
+                        className={buttonFocus}
                         onClick={() => setDeletingCategory(category)}
                     >
                         Delete
-                    </Button>
+                    </ActionButton>
                 </div>
             ),
         },

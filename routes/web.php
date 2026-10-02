@@ -17,6 +17,7 @@ use App\Http\Controllers\PerformanceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\VendorOnboardingController;
+use App\Http\Middleware\EnsureUserIsVendor;
 use App\Http\Middleware\EnsureVendorAccountIsActive;
 use App\Http\Middleware\EnsureVendorEmailIsVerified;
 use Illuminate\Support\Facades\Route;
@@ -63,7 +64,7 @@ Route::middleware(['auth', EnsureVendorAccountIsActive::class, EnsureVendorEmail
     // ==========================================
     Route::middleware('role:vendor')->prefix('vendor')->name('vendor.')->group(function () {
         // Vendor Onboarding
-        Route::prefix('onboarding')->name('onboarding')->group(function () {
+        Route::prefix('onboarding')->name('onboarding')->middleware(EnsureUserIsVendor::class)->group(function () {
             Route::get('/', [VendorOnboardingController::class, 'show']);
             Route::post('/step1', [VendorOnboardingController::class, 'storeStep1'])->name('.step1');
             Route::post('/step2', [VendorOnboardingController::class, 'storeStep2'])->name('.step2');

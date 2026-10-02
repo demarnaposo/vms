@@ -6,6 +6,46 @@ The VMS (Vendor Management System) changelog starts on 2026-09-18. Changes befor
 
 ### Fixed
 
+- 2026-10-01 — Right-aligned the Internal Users table action header and buttons to match the Performance table, retaining wrapping, action handlers and staff access rules.
+
+- 2026-10-01 — Restored white text on the vendor summary Rate Performance link with a scoped override, preserving its rating destination and permission check.
+
+- 2026-10-01 — Made Available Reports card icons white on their existing gradient backgrounds without changing report labels, actions or permissions.
+
+- 2026-10-01 — Restored white icons on active sidebar menu links to match their labels, preserving inactive icons, branding, navigation and theme backgrounds.
+
+- 2026-10-01 — Restored white text on the vendor dashboard Request Payment link with a scoped override, preserving its destination and active-vendor visibility rule.
+
+- 2026-10-01 — Matched the vendor notification guide to the shared VMS card with themed icon badges and clearer description colors, preserving its empty-state visibility and bilingual content.
+
+- 2026-10-01 — Fixed Safari PDF previews by embedding authorized document endpoints after a HEAD/MIME check instead of blob frames; kept preview loading until the media loads, added a timeout fallback and removed empty preview sources without changing document permissions or CSP.
+
+- 2026-10-01 — Restored white text on the performance detail Add Rating link with a scoped color override, preserving its size, theme background and rating destination.
+
+- 2026-10-01 — Replaced plain header Back links on vendor details and the performance rating form with the shared small outline action links, preserving navigation destinations and rating submission behavior.
+
+- 2026-10-01 — Restricted every onboarding endpoint to users with the vendor role, including super-admin requests; limited landing navbar and footer vendor tools to vendor users while retaining public registration.
+
+- 2026-10-01 — Matched the shared and vendor Notifications Mark All as Read buttons to the small theme-primary variant, preserving read actions and existing visibility conditions.
+
+- 2026-10-01 — Restored white text on active sidebar navigation labels only, preserving inactive labels, icons, backgrounds, layout and navigation.
+
+- 2026-10-01 — Enabled the existing Audit Logs table scrolling and sticky-header presentation for the Staff Permission Catalogue only, preserving permission data and RBAC behavior.
+
+- 2026-10-01 — Reduced only the Vendors and Messages Search buttons to the existing small size and prevented flex stretching to the search-input height; preserved search behavior and layout.
+
+- 2026-10-01 — Restored white text on the Reports dashboard CSV export link with scoped styling that overrides the anchor reset while preserving export URLs, permissions and theme backgrounds.
+
+- 2026-10-01 — Fixed the unlayered anchor color reset overriding active status-filter text on Vendors, Documents, Payments and Messages; scoped link colors and keyboard focus now follow Staff tabs while preserving queries and filter behavior.
+
+- 2026-10-01 — Rolled back the global white button/filter-label styling and restored the presentation after the report-button fixes, preserving report sizes, variants and behavior.
+
+- 2026-10-01 — Completed report button consistency on the report dashboard and five detail reports: small outline Back links, small theme-primary Apply Filter/Export controls and responsive action groups, retaining filter queries, downloads and export permissions.
+
+- 2026-10-01 — Corrected Master Data row-action variants: category/document-type and staff/role Edit now use the small primary presentation, Delete uses danger, and staff View retains outline; preserved handlers and permission checks.
+
+- 2026-10-01 — Standardized 64 list, toolbar, card and detail action controls across 24 admin/vendor pages to the Kinerja small-button presentation, preserving semantic variants and behavior; added accessible single-element navigation controls and an action-button audit without changing Kinerja or form/filter defaults.
+
 - 2026-09-30 — Completed staff permission catalogue, module groups, empty-state, deletion and RBAC validation translations while preserving custom labels; matched the staff View link to the existing Edit button styling.
 
 - 2026-09-30 — Added a guarded, data-preserving repair migration for MySQL RBAC morph types whose backslashes were lost during legacy conversion, restoring role recognition without changing grants.
@@ -36,6 +76,8 @@ The VMS (Vendor Management System) changelog starts on 2026-09-18. Changes befor
 
 ### Added
 
+- 2026-09-30 — Added seven optional vendor document master types, a data-preserving additive migration, bilingual labels/descriptions, catalogue audit guidance and regression coverage; retained legacy document codes and requirements.
+
 - 2026-09-30 — Added Spatie-backed staff and role CRUD, multi-role assignments, an operational permission catalogue, safe legacy schema conversion, and RBAC regression/audit documentation.
 
 - 2026-09-30 — Documented RBAC access mapping, authorization conflicts, legacy migration safeguards, and verification limitations.
@@ -59,6 +101,16 @@ The VMS (Vendor Management System) changelog starts on 2026-09-18. Changes befor
 - 2026-09-18 — Added agent guidelines and a project changelog for recording future changes.
 
 ### Changed
+
+- 2026-10-01 — Moved the existing theme switcher from page headers beside the sidebar logo in admin and vendor layouts, replacing the portal/panel branding labels; retained theme preferences and added localized labels and keyboard focus styling.
+
+- 2026-10-01 — Added responsive UI and cross-browser requirements for desktop and mobile, including bilingual layout checks and reporting of actual browser and viewport verification.
+
+- 2026-10-01 — Added production dependency guidance to prefer supported LTS or maintained stable releases, verify compatibility and support, and require explicit authorization for unsupported or prerelease exceptions.
+
+- 2026-10-01 — Clarified agent instruction precedence, dependency and missing-skill boundaries, isolated database testing, and scoped verification commands based on the current project configuration.
+
+- 2026-09-30 — Renamed canonical document master codes to npwp, nib_oss and bank_account_proof, added legacy read compatibility and a collision-guarded ID-preserving rename migration without changing document metadata or requirements.
 
 - 2026-09-30 — Applied staff permissions to active routes, policies, navigation and dashboard data while retaining the effective built-in access baseline and dormant legacy grants; made role bootstrap preserve administrator changes.
 

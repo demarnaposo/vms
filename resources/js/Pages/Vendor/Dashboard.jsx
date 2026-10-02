@@ -1,5 +1,6 @@
+import { ActionLink } from '@/Components/ActionControls';
 import { Link, usePage } from '@inertiajs/react';
-import { AppIcon, Badge, Card, LinkButton, PageHeader, VendorLayout } from '@/Components';
+import { AppIcon, Badge, Card, PageHeader, VendorLayout } from '@/Components';
 // Reuse the centralized Indonesian currency formatter.
 import { formatCurrency } from '@/utils/currencyFormatters';
 // Translate vendor dashboard status and actions.
@@ -101,11 +102,7 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                     </h3>
                     <p className="text-(--color-text-tertiary) mb-4">{t(currentStatus.message)}</p>
                     {currentStatus.action && (
-                        <LinkButton
-                            href={currentStatus.link}
-                            variant="primary"
-                            className="inline-flex items-center gap-2"
-                        >
+                        <ActionLink href={currentStatus.link} variant="primary">
                             {/* Translate only the static onboarding action. */}
                             {t(currentStatus.action)}
                             <svg
@@ -122,7 +119,7 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                                     d="M17 8l4 4m0 0l-4 4m4-4H3"
                                 />
                             </svg>
-                        </LinkButton>
+                        </ActionLink>
                     )}
                 </div>
 
@@ -193,14 +190,14 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                                 {formatCurrency(stats.pending_payments, currency)}
                             </div>
                             {displayVendor.status === 'active' && (
-                                <LinkButton
+                                <ActionLink
                                     href="/vendor/payments"
                                     variant="primary"
-                                    className="w-full mt-4 text-center justify-center block"
+                                    className="w-full mt-4 text-center justify-center text-white!"
                                 >
                                     {/* Translate the payment request action. */}
                                     {t('Request Payment')}
-                                </LinkButton>
+                                </ActionLink>
                             )}
                         </div>
                     </div>

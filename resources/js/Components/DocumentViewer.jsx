@@ -32,6 +32,7 @@ export function DocumentViewer({ document, isOpen, onClose }) {
         let objectUrl = null;
 
         fetch(viewUrl, {
+            method: isPdf ? 'HEAD' : 'GET',
             credentials: 'same-origin',
             signal: controller.signal,
             headers: {
@@ -43,13 +44,27 @@ export function DocumentViewer({ document, isOpen, onClose }) {
                     throw new Error(`Preview request failed (${response.status})`);
                 }
 
+                const contentType = response.headers.get('Content-Type')?.split(';')[0].trim();
+                if (
+                    isPdf ? contentType !== 'application/pdf' : !contentType?.startsWith('image/')
+                ) {
+                    throw new Error('Unexpected preview content type');
+                }
+
+                if (isPdf) {
+                    // PDF frames must use the authorized response's CSP, not a blob's inherited page CSP.
+                    setPreviewSrc(viewUrl);
+                    setError(null);
+                    return null;
+                }
+
                 return response.blob();
             })
             .then((blob) => {
+                if (!blob || controller.signal.aborted) return;
                 objectUrl = URL.createObjectURL(blob);
                 setPreviewSrc(objectUrl);
                 setError(null);
-                setIsLoading(false);
             })
             .catch(() => {
                 if (controller.signal.aborted) {
@@ -68,10 +83,24 @@ export function DocumentViewer({ document, isOpen, onClose }) {
         };
     }, [isPdf, isPreviewable, viewUrl]);
 
+    useEffect(() => {
+        if (!isPreviewable || !isLoading) return undefined;
+
+        const timeout = setTimeout(() => {
+            setError('Failed to load document. Please use Open or Download.');
+            setIsLoading(false);
+        }, 30000);
+
+        return () => clearTimeout(timeout);
+    }, [isPreviewable, isLoading]);
+
     if (!isOpen || !document) return null;
 
     const handleLoad = () => setIsLoading(false);
-    const handleError = () => setError('Failed to load document. Please use Open or Download.');
+    const handleError = () => {
+        setError('Failed to load document. Please use Open or Download.');
+        setIsLoading(false);
+    };
 
     const typeIcon = 'documents';
 
@@ -130,7 +159,7 @@ export function DocumentViewer({ document, isOpen, onClose }) {
                         <div className="absolute inset-0 flex items-center justify-center bg-(--color-bg-primary) z-10">
                             <div className="flex flex-col items-center gap-3">
                                 <div className="w-10 h-10 border-4 border-(--color-brand-primary) border-t-transparent rounded-full animate-spin" />
-                                <p className="text-(--color-text-tertiary)">
+                                <p role="status" className="text-(--color-text-tertiary)">
                                     {t('Loading document...')}
                                 </p>
                             </div>
@@ -158,23 +187,27 @@ export function DocumentViewer({ document, isOpen, onClose }) {
                             </div>
                         </div>
                     ) : isPdf ? (
-                        <iframe
-                            src={previewSrc || ''}
-                            className="w-full h-full min-h-[500px] rounded-lg border border-(--color-border-primary) bg-(--color-bg-primary)"
-                            onLoad={handleLoad}
-                            onError={handleError}
-                            title={fileName}
-                        />
-                    ) : isImage ? (
-                        <div className="flex items-center justify-center h-full">
-                            <img
-                                src={previewSrc || ''}
-                                alt={fileName}
-                                className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-token-lg"
+                        previewSrc && (
+                            <iframe
+                                src={previewSrc}
+                                className="w-full h-full min-h-[500px] rounded-lg border border-(--color-border-primary) bg-(--color-bg-primary)"
                                 onLoad={handleLoad}
                                 onError={handleError}
+                                title={fileName}
                             />
-                        </div>
+                        )
+                    ) : isImage ? (
+                        previewSrc && (
+                            <div className="flex items-center justify-center h-full">
+                                <img
+                                    src={previewSrc}
+                                    alt={fileName}
+                                    className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-token-lg"
+                                    onLoad={handleLoad}
+                                    onError={handleError}
+                                />
+                            </div>
+                        )
                     ) : (
                         <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
                             <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-(--color-bg-secondary) text-(--color-brand-primary)">

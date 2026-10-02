@@ -1,3 +1,4 @@
+import { ActionButton } from '@/Components/ActionControls';
 import { usePage, useForm } from '@inertiajs/react';
 import { useState, useMemo } from 'react';
 import {
@@ -180,7 +181,9 @@ export default function Profile({ vendor }) {
                         vendor?.status !== 'draft' &&
                         activeTab !== 'company' &&
                         activeTab !== 'status' && (
-                            <Button onClick={() => setIsEditing(true)}>{t('Edit Profile')}</Button>
+                            <ActionButton onClick={() => setIsEditing(true)}>
+                                {t('Edit Profile')}
+                            </ActionButton>
                         )}
                 </div>
             }

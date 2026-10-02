@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import AppIcon from './AppIcon';
+import { useLanguage } from '@/Contexts/LanguageContext';
 
 const STORAGE_KEY = 'vms-theme';
 const DEFAULT_THEME = 'aurora';
@@ -56,6 +57,7 @@ function getInitialTheme() {
 }
 
 export default function ThemeSwitcher({ className = '', compact = false, align = 'right' }) {
+    const { t } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [theme, setTheme] = useState(() => getInitialTheme());
     const ref = useRef(null);
@@ -105,12 +107,13 @@ export default function ThemeSwitcher({ className = '', compact = false, align =
             <button
                 type="button"
                 onClick={() => setIsOpen((prev) => !prev)}
-                className={`inline-flex items-center gap-2 rounded-xl border border-(--color-border-primary) bg-(--color-bg-primary)/85 text-(--color-text-secondary) hover:text-(--color-text-primary) hover:border-(--color-border-hover) transition-colors ${
+                className={`inline-flex items-center gap-2 rounded-xl border border-(--color-border-primary) bg-(--color-bg-primary)/85 text-(--color-text-secondary) hover:text-(--color-text-primary) hover:border-(--color-border-hover) transition-colors focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) ${
                     compact ? 'px-2.5 py-2 text-xs' : 'px-3 py-2 text-sm'
                 }`}
                 aria-haspopup="menu"
                 aria-expanded={isOpen}
-                aria-label="Theme options"
+                aria-label={t('Theme options')}
+                title={t('Theme options')}
             >
                 <AppIcon name={currentOption.icon} className={compact ? 'h-4 w-4' : 'h-4 w-4'} />
                 {!compact && <span>{currentOption.label}</span>}
@@ -130,7 +133,7 @@ export default function ThemeSwitcher({ className = '', compact = false, align =
                                 key={option.id}
                                 type="button"
                                 onClick={() => handleSelect(option.id)}
-                                className={`w-full flex items-center justify-between rounded-xl px-3 py-2.5 text-left transition-colors ${
+                                className={`w-full flex items-center justify-between rounded-xl px-3 py-2.5 text-left transition-colors focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) ${
                                     isActive
                                         ? 'bg-(--color-brand-primary-light) text-(--color-brand-primary)'
                                         : 'text-(--color-text-secondary) hover:bg-(--color-bg-secondary)'
@@ -144,7 +147,7 @@ export default function ThemeSwitcher({ className = '', compact = false, align =
                                             {option.label}
                                         </span>
                                         <span className="block text-xs opacity-80">
-                                            {option.description}
+                                            {t(option.description)}
                                         </span>
                                     </span>
                                 </span>

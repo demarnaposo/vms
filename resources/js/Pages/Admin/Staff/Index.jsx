@@ -1,4 +1,5 @@
-import { Link, router, useForm } from '@inertiajs/react';
+import { ActionLink, ActionButton } from '@/Components/ActionControls';
+import { router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import {
@@ -306,24 +307,22 @@ export default function StaffIndex({
         },
         {
             header: 'Actions',
+            align: 'right',
             render: (row) =>
                 row.manageable ? (
-                    <div className="flex flex-wrap gap-2">
-                        <Link
-                            className="inline-flex items-center gap-2 rounded-xl font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-(--color-border-primary) hover:border-(--color-border-secondary) text-(--color-text-secondary) hover:bg-(--color-bg-secondary) px-4 py-2 text-sm"
-                            href={`/admin/staff-users/${row.id}`}
-                        >
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                        <ActionLink variant="outline" href={`/admin/staff-users/${row.id}`}>
                             {t('View')}
-                        </Link>
-                        <Button variant="outline" onClick={() => setEditingUser(row)}>
+                        </ActionLink>
+                        <ActionButton variant="primary" onClick={() => setEditingUser(row)}>
                             Edit
-                        </Button>
-                        <Button
+                        </ActionButton>
+                        <ActionButton
                             variant="danger"
                             onClick={() => setDeleting({ kind: 'users', row })}
                         >
                             Delete
-                        </Button>
+                        </ActionButton>
                     </div>
                 ) : (
                     <span>{t('Mixed vendor roles require manual review.')}</span>
@@ -338,16 +337,16 @@ export default function StaffIndex({
             header: 'Actions',
             render: (row) => (
                 <div className="flex flex-wrap gap-2">
-                    <Button variant="outline" onClick={() => setEditingRole(row)}>
+                    <ActionButton variant="primary" onClick={() => setEditingRole(row)}>
                         Edit
-                    </Button>
-                    <Button
+                    </ActionButton>
+                    <ActionButton
                         variant="danger"
                         disabled={row.protected || row.users_count > 0}
                         onClick={() => setDeleting({ kind: 'roles', row })}
                     >
                         Delete
-                    </Button>
+                    </ActionButton>
                 </div>
             ),
         },
@@ -477,6 +476,7 @@ export default function StaffIndex({
                             columns={permissionColumns}
                             data={permissions}
                             emptyMessage="No permissions found"
+                            stickyHeader={true}
                         />
                     </Card>
                 )}

@@ -2,6 +2,7 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { useEffect, useId, useRef, useState } from 'react';
 import AppIcon from './AppIcon';
 import Logo from './Logo';
+import ThemeSwitcher from './ThemeSwitcher';
 // Translate sidebar content and expose the global language switch.
 import LanguageSwitcher from './LanguageSwitcher';
 import { useLanguage } from '@/Contexts/LanguageContext';
@@ -249,10 +250,10 @@ function NavItem({ item, isActive }) {
                     : undefined
             }
         >
-            <span className="w-6 flex justify-center">
+            <span className={`w-6 flex justify-center ${isActive ? 'text-white!' : ''}`}>
                 <IconRenderer icon={item.icon} />
             </span>
-            <span>{t(item.name)}</span>
+            <span className={isActive ? 'sidebar-active-label' : undefined}>{t(item.name)}</span>
             {item.badge && (
                 <span
                     className={`
@@ -396,19 +397,14 @@ export default function Sidebar({
                 aria-label={`${translatedLogoText} navigation`}
             >
                 {/* Logo - matches PageHeader height */}
-                <div className="h-[73px] px-5 border-b border-(--color-border-primary) flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-3 group">
+                <div className="h-[73px] px-5 border-b border-(--color-border-primary) flex items-center gap-3">
+                    <Link
+                        href="/"
+                        className="min-w-0 shrink-0 rounded-lg focus-visible:ring-2 focus-visible:ring-(--color-brand-primary)"
+                    >
                         <Logo size="xl" light={true} linkToHome={false} />
-                        <div className="h-8 w-px bg-(--color-border-primary) mx-1"></div>
-                        <div className="flex flex-col justify-center">
-                            <span className="text-[10px] uppercase tracking-wider font-bold text-(--color-text-muted) group-hover:text-(--color-brand-primary) transition-colors">
-                                {translatedLogoText.split(' ')[0]}
-                            </span>
-                            <span className="text-[10px] uppercase tracking-wider font-bold text-(--color-text-muted) opacity-70 group-hover:text-(--color-brand-secondary) transition-colors">
-                                {translatedLogoText.split(' ')[1]}
-                            </span>
-                        </div>
                     </Link>
+                    <ThemeSwitcher compact className="ml-auto shrink-0" />
                     {/* Mobile Close Button */}
                     <button
                         type="button"

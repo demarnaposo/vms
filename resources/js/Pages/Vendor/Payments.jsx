@@ -1,9 +1,9 @@
+import { ActionButton } from '@/Components/ActionControls';
 // Read shared currency settings alongside the existing payment form.
 import { useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import {
     AppIcon,
-    Button,
     Card,
     FormInput,
     FormTextarea,
@@ -66,11 +66,11 @@ export default function Payments({ vendor, payments = { data: [] }, paymentStats
             subtitle="Track and request payments"
             actions={
                 ['active', 'approved'].includes(vendor?.status) && (
-                    <Button onClick={() => setShowRequestModal(true)}>
+                    <ActionButton onClick={() => setShowRequestModal(true)}>
                         <AppIcon name="payments" className="h-4 w-4" />
                         {/* Translate the fixed icon-button label. */}
                         {t('Request Payment')}
-                    </Button>
+                    </ActionButton>
                 )
             }
         />
@@ -146,9 +146,9 @@ export default function Payments({ vendor, payments = { data: [] }, paymentStats
                                 {t('Create your first payment request to get started.')}
                             </p>
                             {['active', 'approved'].includes(vendor?.status) && (
-                                <Button onClick={() => setShowRequestModal(true)}>
+                                <ActionButton onClick={() => setShowRequestModal(true)}>
                                     Request Payment
-                                </Button>
+                                </ActionButton>
                             )}
                         </div>
                     ) : (

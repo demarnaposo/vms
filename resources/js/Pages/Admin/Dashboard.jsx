@@ -1,3 +1,4 @@
+import { ActionLink } from '@/Components/ActionControls';
 import { Link, usePage } from '@inertiajs/react';
 import { AdminLayout, AppIcon, Card, PageHeader, StatCard, StatGrid } from '@/Components';
 // Reuse the centralized Indonesian currency formatter.
@@ -132,7 +133,7 @@ export default function AdminDashboard({
                                     pendingVendors.map((vendor) => (
                                         <div
                                             key={vendor.id}
-                                            className="px-5 py-4 flex items-center justify-between hover:bg-(--color-bg-hover) transition-colors"
+                                            className="px-5 py-4 flex flex-wrap items-center justify-between hover:bg-(--color-bg-hover) transition-colors"
                                         >
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 rounded-xl bg-(--color-brand-primary-light) flex items-center justify-center text-lg">
@@ -147,12 +148,12 @@ export default function AdminDashboard({
                                                     </div>
                                                 </div>
                                             </div>
-                                            <Link
+                                            <ActionLink
+                                                variant="outline"
                                                 href={`/admin/vendors/${vendor.id}`}
-                                                className="inline-flex items-center px-4 py-2 bg-(--color-success) text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all"
                                             >
                                                 {t('Review')}
-                                            </Link>
+                                            </ActionLink>
                                         </div>
                                     ))
                                 ) : (
@@ -258,7 +259,7 @@ export default function AdminDashboard({
                                     pendingPayments.map((payment) => (
                                         <div
                                             key={payment.id}
-                                            className="px-5 py-4 flex items-center justify-between hover:bg-(--color-bg-hover) transition-colors"
+                                            className="px-5 py-4 flex flex-wrap items-center justify-between hover:bg-(--color-bg-hover) transition-colors"
                                         >
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 rounded-xl icon-bg-gradient-success flex items-center justify-center text-lg">
@@ -277,13 +278,13 @@ export default function AdminDashboard({
                                                     </div>
                                                 </div>
                                             </div>
-                                            <Link
+                                            <ActionLink
+                                                variant="outline"
                                                 href={`/admin/payments/${payment.id}`}
-                                                className="inline-flex items-center px-4 py-2 bg-(--color-brand-primary) text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all"
                                             >
                                                 {/* Translate the payment review action. */}
                                                 {t('Review')}
-                                            </Link>
+                                            </ActionLink>
                                         </div>
                                     ))
                                 ) : (

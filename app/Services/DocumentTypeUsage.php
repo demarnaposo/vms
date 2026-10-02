@@ -39,7 +39,8 @@ class DocumentTypeUsage
                     return true;
                 }
             }
-            if (in_array($key, ['document_type_name', 'document_type_names'], true) && in_array($type->name, (array) $value, true)) {
+            if (in_array($key, ['document_type_name', 'document_type_names'], true)
+                && array_filter(\App\Support\DocumentTypeCode::equivalents($type->name), fn ($code) => in_array($code, (array) $value, true)) !== []) {
                 return true;
             }
             if (is_array($value) && $this->references($value, $type, $table)) {

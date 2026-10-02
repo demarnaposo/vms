@@ -1,3 +1,4 @@
+import { ActionLink } from '@/Components/ActionControls';
 import { Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { AdminLayout, PageHeader, DataTable, Badge, Button } from '@/Components';
@@ -57,11 +58,9 @@ export default function VendorsIndex({ vendors = {}, currentStatus = 'all', sear
             header: 'Actions',
             align: 'right',
             render: (row) => (
-                <Link href={`/admin/vendors/${row.id}`}>
-                    <Button variant="ghost" size="sm">
-                        View
-                    </Button>
-                </Link>
+                <ActionLink variant="outline" href={`/admin/vendors/${row.id}`}>
+                    {t('View')}
+                </ActionLink>
             ),
         },
     ];
@@ -91,7 +90,9 @@ export default function VendorsIndex({ vendors = {}, currentStatus = 'all', sear
                         placeholder={t('Search vendors...')}
                         className="input-field"
                     />
-                    <Button type="submit">Search</Button>
+                    <Button type="submit" size="sm" className="self-center">
+                        Search
+                    </Button>
                 </form>
             }
         />
@@ -105,10 +106,11 @@ export default function VendorsIndex({ vendors = {}, currentStatus = 'all', sear
                         <Link
                             key={status}
                             href={`/admin/vendors?status=${status}${searchQuery ? `&search=${searchQuery}` : ''}`}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
+                            aria-current={currentStatus === status ? 'page' : undefined}
+                            className={`staff-status-filter px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) focus-visible:ring-offset-2 ${
                                 currentStatus === status
                                     ? 'bg-(--color-brand-primary) text-white shadow-token-primary'
-                                    : 'text-(--color-text-tertiary) hover:text-(--color-text-primary) hover:bg-(--color-bg-primary)'
+                                    : 'text-(--color-text-tertiary) hover:bg-(--color-bg-primary)'
                             }`}
                         >
                             {/* Translate status labels without changing filter query parameters. */}
