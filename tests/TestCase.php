@@ -31,6 +31,8 @@ abstract class TestCase extends BaseTestCase
     {
         $overrides = [
             'APP_ENV' => 'testing',
+            'APP_LOCALE' => 'en',
+            'APP_FALLBACK_LOCALE' => 'en',
             'DB_CONNECTION' => 'sqlite',
             'DB_DATABASE' => ':memory:',
             'CACHE_STORE' => 'array',

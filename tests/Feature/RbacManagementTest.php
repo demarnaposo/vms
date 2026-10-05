@@ -66,6 +66,8 @@ class RbacManagementTest extends TestCase
 
     public function test_custom_role_has_only_its_selected_endpoint_and_redirect(): void
     {
+        config(['features.payments.enabled' => true]);
+
         $user = User::factory()->create();
         $user->assignRole($this->custom(['vendors.view']));
         $this->actingAs($user)->get('/admin/vendors')->assertOk();
@@ -203,6 +205,8 @@ class RbacManagementTest extends TestCase
 
     public function test_no_role_user_is_not_staff_and_multi_role_permissions_are_unioned(): void
     {
+        config(['features.payments.enabled' => true]);
+
         $user = User::factory()->create();
         $this->assertFalse($user->isStaff());
         $this->assertNull($user->getPrimaryRole());

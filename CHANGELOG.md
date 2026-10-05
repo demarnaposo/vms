@@ -6,6 +6,8 @@ The VMS (Vendor Management System) changelog starts on 2026-09-18. Changes befor
 
 ### Fixed
 
+- 2026-10-05 — Aligned Artisan/PHPUnit test locale overrides and explicitly enabled payments in payment authorization/RBAC scenarios, fixing CI expectations without changing the Indonesian application default or disabled payment module.
+
 - 2026-10-05 — Displayed staff-user validation once beside each field, moved password mismatch errors to confirmation, and tailored Sonner feedback for user updates and optional password changes.
 
 - 2026-10-02 — Gave the Messages Total, New, Replied and Read summary cards explicit theme-primary backgrounds and shared shadows, retaining status colors, counts and responsive layout.

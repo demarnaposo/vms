@@ -69,6 +69,8 @@ class AuthorizationRouteDenialTest extends TestCase
 
     public function test_finance_manager_cannot_access_ops_validation_route(): void
     {
+        config(['features.payments.enabled' => true]);
+
         Role::firstOrCreate(['name' => 'finance_manager'], ['display_name' => 'Finance Manager']);
 
         $financeUser = User::factory()->create();
@@ -110,6 +112,8 @@ class AuthorizationRouteDenialTest extends TestCase
 
     public function test_ops_manager_cannot_access_finance_approval_route(): void
     {
+        config(['features.payments.enabled' => true]);
+
         Role::firstOrCreate(['name' => 'ops_manager'], ['display_name' => 'Ops Manager']);
 
         $opsUser = User::factory()->create();
