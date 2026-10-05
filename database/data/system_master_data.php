@@ -317,17 +317,17 @@ return [
     'default_staff_users' => [
         [
             'name' => 'Super Admin',
-            'email' => 'admin@vendorflow.com',
+            'email' => 'admin@test.com',
             'role' => 'super_admin',
         ],
         [
             'name' => 'John Operations',
-            'email' => 'ops@vendorflow.com',
+            'email' => 'ops@test.com',
             'role' => 'ops_manager',
         ],
         [
             'name' => 'Jane Finance',
-            'email' => 'finance@vendorflow.com',
+            'email' => 'finance@test.com',
             'role' => 'finance_manager',
         ],
     ],

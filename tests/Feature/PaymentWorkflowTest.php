@@ -47,6 +47,7 @@ class PaymentWorkflowTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        config(['features.payments.enabled' => true]);
 
         // Seed roles
         Role::firstOrCreate(['name' => 'vendor'], ['display_name' => 'Vendor']);

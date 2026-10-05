@@ -47,12 +47,14 @@ class VendorController extends Controller
         $stats = [
             'total_documents' => $vendor->documents()->count(),
             'verified_documents' => $vendor->documents()->where('verification_status', 'verified')->count(),
-            'pending_payments' => $vendor->paymentRequests()->whereIn('status', ['requested', 'pending_ops', 'pending_finance', 'approved'])->sum('amount'),
-            'total_paid' => $vendor->paymentRequests()->where('status', 'paid')->sum('amount'),
+            ...(\App\Support\PaymentsModule::enabled() ? [
+                'pending_payments' => $vendor->paymentRequests()->whereIn('status', ['requested', 'pending_ops', 'pending_finance', 'approved'])->sum('amount'),
+                'total_paid' => $vendor->paymentRequests()->where('status', 'paid')->sum('amount'),
+            ] : []),
         ];
 
         $recentDocs = $vendor->documents()->with('documentType')->latest()->take(5)->get();
-        $recentPayments = $vendor->paymentRequests()->latest()->take(5)->get();
+        $recentPayments = \App\Support\PaymentsModule::enabled() ? $vendor->paymentRequests()->latest()->take(5)->get() : collect();
 
         return Inertia::render('Vendor/Dashboard', [
             'vendor' => $vendor,

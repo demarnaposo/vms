@@ -16,12 +16,18 @@ class PendingPaymentApprovalsAlert extends Notification implements ShouldQueue
         private readonly int $thresholdHours
     ) {}
 
+    // [VMS_PAYMENTS_DISABLED] Also suppress already queued payment alerts when config/features.php disables the module.
+    public function shouldSend(object $notifiable, string $channel): bool
+    {
+        return \App\Support\PaymentsModule::enabled();
+    }
+
     /**
      * @return array<int, string>
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return \App\Support\PaymentsModule::enabled() ? ['database'] : [];
     }
 
     /**

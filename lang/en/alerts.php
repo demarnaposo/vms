@@ -6,8 +6,12 @@ return [
     'rbac_invalid_role' => 'Select valid staff roles.',
     'rbac_invalid_permission' => 'Select permissions from the operational catalogue.',
     'rbac_role_in_use' => 'Built-in roles and roles assigned to users cannot be deleted.',
+    'rbac_user_updated' => 'Staff user updated successfully.',
+    'rbac_user_password_updated' => 'Staff user and password updated successfully.',
     'rbac_user_saved' => 'Staff user saved successfully.',
-    'rbac_user_deleted' => 'Staff user deleted successfully.',
+    'staff_deletion_schema_required' => 'The staff deletion history migration must be applied before deleting this account.',
+    'staff_deletion_vendor_owner' => 'This account owns vendor records and cannot be deleted through internal staff management.',
+    'rbac_user_deleted' => 'Staff user permanently deleted successfully.',
     'rbac_role_saved' => 'Staff role saved successfully.',
     'rbac_role_deleted' => 'Staff role deleted successfully.',
 

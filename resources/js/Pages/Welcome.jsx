@@ -1,3 +1,4 @@
+import { paymentsEnabled } from '@/utils/paymentModule';
 import { Link, usePage } from '@inertiajs/react';
 import AppIcon from '@/Components/AppIcon';
 import GuestLayout from '@/Components/GuestLayout';
@@ -41,7 +42,8 @@ const featureCards = [
 
 export default function Welcome() {
     // Read the shared IDR settings supplied by Laravel.
-    const { auth, currency } = usePage().props;
+    const { auth, currency, features } = usePage().props;
+    const enabled = paymentsEnabled(features);
     // Resolve prominent landing-page copy through the bilingual dictionary.
     const { t } = useLanguage();
 
@@ -63,7 +65,9 @@ export default function Welcome() {
 
                             <p className="max-w-xl text-lg text-(--color-text-tertiary)">
                                 {t(
-                                    'Manage onboarding, compliance, and payment approvals from one unified workspace with cleaner workflows and faster decisions.'
+                                    enabled
+                                        ? 'Manage onboarding, compliance, and payment approvals from one unified workspace with cleaner workflows and faster decisions.'
+                                        : 'Manage onboarding and compliance from one unified workspace with cleaner workflows and faster decisions.'
                                 )}
                             </p>
 
@@ -86,7 +90,9 @@ export default function Welcome() {
                                 )}
                             </div>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-3">
+                            <div
+                                className={`grid grid-cols-2 ${enabled ? 'sm:grid-cols-3' : ''} gap-3 pt-3`}
+                            >
                                 <div className="surface-panel p-4">
                                     <p className="text-xs uppercase tracking-wide text-(--color-text-muted)">
                                         {t('Active Vendors')}
@@ -103,15 +109,17 @@ export default function Welcome() {
                                         50K+
                                     </p>
                                 </div>
-                                <div className="surface-panel p-4 col-span-2 sm:col-span-1">
-                                    <p className="text-xs uppercase tracking-wide text-(--color-text-muted)">
-                                        {t('Payment Value')}
-                                    </p>
-                                    <p className="text-2xl font-bold text-(--color-text-primary)">
-                                        {/* Replace crore notation with the full Indonesian-formatted amount. */}
-                                        {formatCurrency(120000000, currency)}+
-                                    </p>
-                                </div>
+                                {enabled && (
+                                    <div className="surface-panel p-4 col-span-2 sm:col-span-1">
+                                        <p className="text-xs uppercase tracking-wide text-(--color-text-muted)">
+                                            {t('Payment Value')}
+                                        </p>
+                                        <p className="text-2xl font-bold text-(--color-text-primary)">
+                                            {/* Replace crore notation with the full Indonesian-formatted amount. */}
+                                            {formatCurrency(120000000, currency)}+
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -142,14 +150,16 @@ export default function Welcome() {
                                             28
                                         </span>
                                     </div>
-                                    <div className="flex items-center justify-between rounded-xl bg-(--color-bg-secondary) px-3 py-2">
-                                        <span className="text-sm text-(--color-text-secondary)">
-                                            {t('Payments Awaiting')}
-                                        </span>
-                                        <span className="text-sm font-semibold text-(--color-text-primary)">
-                                            9
-                                        </span>
-                                    </div>
+                                    {enabled && (
+                                        <div className="flex items-center justify-between rounded-xl bg-(--color-bg-secondary) px-3 py-2">
+                                            <span className="text-sm text-(--color-text-secondary)">
+                                                {t('Payments Awaiting')}
+                                            </span>
+                                            <span className="text-sm font-semibold text-(--color-text-primary)">
+                                                9
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
@@ -173,21 +183,23 @@ export default function Welcome() {
                                             />
                                         </div>
                                     </div>
-                                    <div>
-                                        <div className="flex justify-between text-xs text-(--color-text-tertiary) mb-1">
-                                            <span>{t('Payment turnaround')}</span>
-                                            <span>88%</span>
+                                    {enabled && (
+                                        <div>
+                                            <div className="flex justify-between text-xs text-(--color-text-tertiary) mb-1">
+                                                <span>{t('Payment turnaround')}</span>
+                                                <span>88%</span>
+                                            </div>
+                                            <div className="h-2 rounded-full bg-(--color-bg-tertiary)">
+                                                <div
+                                                    className="h-2 rounded-full"
+                                                    style={{
+                                                        width: '88%',
+                                                        background: 'var(--gradient-success)',
+                                                    }}
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="h-2 rounded-full bg-(--color-bg-tertiary)">
-                                            <div
-                                                className="h-2 rounded-full"
-                                                style={{
-                                                    width: '88%',
-                                                    background: 'var(--gradient-success)',
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -207,19 +219,21 @@ export default function Welcome() {
                     </div>
 
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {featureCards.map((feature) => (
-                            <article key={feature.title} className="surface-panel p-5">
-                                <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-(--color-bg-tertiary) text-(--color-brand-primary)">
-                                    <AppIcon name={feature.icon} className="h-5 w-5" />
-                                </div>
-                                <h3 className="mt-4 text-lg font-semibold text-(--color-text-primary)">
-                                    {t(feature.title)}
-                                </h3>
-                                <p className="mt-2 text-sm text-(--color-text-tertiary)">
-                                    {t(feature.description)}
-                                </p>
-                            </article>
-                        ))}
+                        {featureCards
+                            .filter((feature) => enabled || feature.icon !== 'payments')
+                            .map((feature) => (
+                                <article key={feature.title} className="surface-panel p-5">
+                                    <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-(--color-bg-tertiary) text-(--color-brand-primary)">
+                                        <AppIcon name={feature.icon} className="h-5 w-5" />
+                                    </div>
+                                    <h3 className="mt-4 text-lg font-semibold text-(--color-text-primary)">
+                                        {t(feature.title)}
+                                    </h3>
+                                    <p className="mt-2 text-sm text-(--color-text-tertiary)">
+                                        {t(feature.description)}
+                                    </p>
+                                </article>
+                            ))}
                     </div>
                 </div>
             </section>

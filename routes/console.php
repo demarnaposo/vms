@@ -38,6 +38,7 @@ Schedule::command('vendors:generate-performance-scores')
 
 // Daily payment workflow alerts (approval backlog + payment delays) at 10:00 AM
 Schedule::command('vendors:payment-alerts')
+    ->when(fn () => \App\Support\PaymentsModule::enabled())
     ->dailyAt('10:00')
     ->withoutOverlapping()
     ->appendOutputTo(storage_path('logs/payment-alerts.log'));

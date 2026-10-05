@@ -67,7 +67,7 @@ class StaffUserController extends Controller
     {
         $service->saveUser($request->validated(), $staffUser);
 
-        return back()->with('success', __('alerts.rbac_user_saved'));
+        return back()->with('success', __($request->filled('password') ? 'alerts.rbac_user_password_updated' : 'alerts.rbac_user_updated'));
     }
 
     public function destroy(User $staffUser, RbacService $service): RedirectResponse

@@ -1,3 +1,4 @@
+import { paymentLinkVisible } from '@/utils/paymentModule';
 import { Link, usePage } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 import AppIcon from './AppIcon';
@@ -103,7 +104,7 @@ export default function Navbar({
     actions = null,
     className = '',
 }) {
-    const { auth } = usePage().props;
+    const { auth, features } = usePage().props;
     // Translate public navigation from centralized messages.
     const { t } = useLanguage();
     const user = auth?.user;
@@ -164,7 +165,9 @@ export default function Navbar({
                             <MenuDropdown
                                 id="create-tools"
                                 label={t('Create Tools')}
-                                items={createToolsLinks}
+                                items={createToolsLinks.filter((item) =>
+                                    paymentLinkVisible(item.href, features)
+                                )}
                                 activeDropdown={activeDropdown}
                                 setActiveDropdown={setActiveDropdown}
                             />
@@ -253,16 +256,18 @@ export default function Navbar({
                                 <p className="px-2 pb-1 text-xs uppercase tracking-wide text-(--color-text-muted)">
                                     {t('Create Tools')}
                                 </p>
-                                {createToolsLinks.map((item) => (
-                                    <Link
-                                        key={item.label}
-                                        href={item.href}
-                                        className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm text-(--color-text-secondary) hover:bg-(--color-bg-hover)"
-                                    >
-                                        <AppIcon name={item.icon} className="h-4 w-4" />
-                                        <span>{t(item.label)}</span>
-                                    </Link>
-                                ))}
+                                {createToolsLinks
+                                    .filter((item) => paymentLinkVisible(item.href, features))
+                                    .map((item) => (
+                                        <Link
+                                            key={item.label}
+                                            href={item.href}
+                                            className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm text-(--color-text-secondary) hover:bg-(--color-bg-hover)"
+                                        >
+                                            <AppIcon name={item.icon} className="h-4 w-4" />
+                                            <span>{t(item.label)}</span>
+                                        </Link>
+                                    ))}
                             </div>
                         )}
 

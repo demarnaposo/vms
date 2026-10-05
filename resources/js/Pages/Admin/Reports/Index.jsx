@@ -1,3 +1,4 @@
+import { paymentsEnabled } from '@/utils/paymentModule';
 import { ActionLink, ActionButton, ActionAnchor } from '@/Components/ActionControls';
 import { useState } from 'react';
 import { usePage } from '@inertiajs/react';
@@ -12,8 +13,9 @@ export default function ReportsIndex({ stats = {} }) {
     // Resolve report dashboard copy using the selected language.
     const { t } = useLanguage();
     // Read the shared IDR settings supplied by Laravel.
-    const { auth, currency } = usePage().props;
+    const { auth, currency, features } = usePage().props;
     const can = auth?.can || {};
+    const enabled = paymentsEnabled(features);
 
     const reportTypes = [
         {
@@ -67,7 +69,9 @@ export default function ReportsIndex({ stats = {} }) {
     ];
 
     const allowedReports = reportTypes.filter(
-        (report) => !report.permission || can[report.permission]
+        (report) =>
+            (enabled || report.id !== 'payment_report') &&
+            (!report.permission || can[report.permission])
     );
 
     const dateOptions = [
@@ -90,7 +94,7 @@ export default function ReportsIndex({ stats = {} }) {
         <AdminLayout title="Reports" activeNav="Reports" header={header}>
             <div className="space-y-8">
                 {/* Quick Stats - from backend */}
-                <div className="grid md:grid-cols-5 gap-4">
+                <div className={`grid ${enabled ? 'md:grid-cols-5' : 'md:grid-cols-3'} gap-4`}>
                     <StatCard
                         label="Total Vendors"
                         value={stats.total_vendors || 0}
@@ -109,18 +113,22 @@ export default function ReportsIndex({ stats = {} }) {
                         icon="compliance"
                         color="info"
                     />
-                    <StatCard
-                        label="Pending Payments"
-                        value={stats.pending_payments || 0}
-                        icon="clock"
-                        color="warning"
-                    />
-                    <StatCard
-                        label="Total Paid"
-                        value={formatCurrency(stats.total_paid, currency)}
-                        icon="payments"
-                        color="success"
-                    />
+                    {enabled && (
+                        <StatCard
+                            label="Pending Payments"
+                            value={stats.pending_payments || 0}
+                            icon="clock"
+                            color="warning"
+                        />
+                    )}
+                    {enabled && (
+                        <StatCard
+                            label="Total Paid"
+                            value={formatCurrency(stats.total_paid, currency)}
+                            icon="payments"
+                            color="success"
+                        />
+                    )}
                 </div>
 
                 {/* Available Reports */}

@@ -1,3 +1,4 @@
+import { paymentsEnabled } from '@/utils/paymentModule';
 import { ActionLink } from '@/Components/ActionControls';
 import { Link, usePage } from '@inertiajs/react';
 import { AdminLayout, AppIcon, Card, PageHeader, StatCard, StatGrid } from '@/Components';
@@ -17,10 +18,16 @@ export default function AdminDashboard({
     // Read the language used for system document types.
     const { language, t } = useLanguage();
     // Read the shared IDR settings supplied by Laravel.
-    const { auth, currency } = usePage().props;
+    const { auth, currency, features } = usePage().props;
 
+    const enabled = paymentsEnabled(features);
     const user = auth?.user;
     const can = auth?.can || {};
+    const quickActionColumns = enabled
+        ? 'md:grid-cols-4'
+        : { 1: 'md:grid-cols-1', 2: 'md:grid-cols-2', 3: 'md:grid-cols-3' }[
+              1 + Number(Boolean(can.approve_vendors)) + Number(Boolean(can.run_compliance))
+          ];
 
     const statCards = [
         {
@@ -82,20 +89,22 @@ export default function AdminDashboard({
         <AdminLayout title="Admin Dashboard" activeNav="Dashboard" header={header}>
             <div className="space-y-8">
                 {/* Stats Grid */}
-                <StatGrid cols={6}>
+                <StatGrid cols={enabled ? 6 : 4}>
                     {statCards
-                        .filter((stat) =>
-                            Object.hasOwn(
-                                stats,
-                                {
-                                    'Total Vendors': 'total_vendors',
-                                    'Active Vendors': 'active_vendors',
-                                    'Pending Review': 'pending_review',
-                                    'Non-Compliant': 'non_compliant',
-                                    'Pending Payments': 'pending_payments',
-                                    'Approved Amount': 'approved_payments',
-                                }[stat.label]
-                            )
+                        .filter(
+                            (stat) =>
+                                (enabled || stat.icon !== 'payments') &&
+                                Object.hasOwn(
+                                    stats,
+                                    {
+                                        'Total Vendors': 'total_vendors',
+                                        'Active Vendors': 'active_vendors',
+                                        'Pending Review': 'pending_review',
+                                        'Non-Compliant': 'non_compliant',
+                                        'Pending Payments': 'pending_payments',
+                                        'Approved Amount': 'approved_payments',
+                                    }[stat.label]
+                                )
                         )
                         .map((stat) => (
                             <StatCard
@@ -106,7 +115,9 @@ export default function AdminDashboard({
                         ))}
                 </StatGrid>
 
-                <div className="grid lg:grid-cols-2 gap-6">
+                <div
+                    className={`grid ${enabled || (can.approve_vendors && can.verify_documents) ? 'lg:grid-cols-2' : ''} gap-6`}
+                >
                     {/* Pending Vendor Applications */}
                     {can.approve_vendors && (
                         <Card
@@ -233,7 +244,7 @@ export default function AdminDashboard({
                     )}
 
                     {/* Finance manager view */}
-                    {!can.approve_vendors && can.approve_payments && (
+                    {enabled && !can.approve_vendors && can.approve_payments && (
                         <Card
                             title={
                                 <>
@@ -304,7 +315,7 @@ export default function AdminDashboard({
                 {/* Quick Actions */}
                 <Card title="Quick Actions">
                     <div className="p-4">
-                        <div className="grid md:grid-cols-4 gap-4">
+                        <div className={`grid ${quickActionColumns} gap-4`}>
                             {can.approve_vendors && (
                                 <Link
                                     href="/admin/vendors?status=submitted"
@@ -333,18 +344,24 @@ export default function AdminDashboard({
                                     </span>
                                 </Link>
                             )}
-                            <Link
-                                href="/admin/payments"
-                                className="p-4 rounded-xl bg-gradient-warning text-white flex flex-col items-center justify-center gap-2 group shadow-token-warning hover:shadow-xl hover:-translate-y-0.5 transition-all"
-                            >
-                                <span className="text-2xl group-hover:scale-110 transition-transform inline-flex">
-                                    <AppIcon name="payments" className="h-6 w-6" />
-                                </span>
-                                <span className="text-sm font-bold tracking-wide uppercase opacity-95 text-center">
-                                    {/* Translate role-specific payment shortcuts. */}
-                                    {t(can.approve_payments ? 'Approve Payments' : 'View Payments')}
-                                </span>
-                            </Link>
+                            {enabled && (
+                                <Link
+                                    href="/admin/payments"
+                                    className="p-4 rounded-xl bg-gradient-warning text-white flex flex-col items-center justify-center gap-2 group shadow-token-warning hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                                >
+                                    <span className="text-2xl group-hover:scale-110 transition-transform inline-flex">
+                                        <AppIcon name="payments" className="h-6 w-6" />
+                                    </span>
+                                    <span className="text-sm font-bold tracking-wide uppercase opacity-95 text-center">
+                                        {/* Translate role-specific payment shortcuts. */}
+                                        {t(
+                                            can.approve_payments
+                                                ? 'Approve Payments'
+                                                : 'View Payments'
+                                        )}
+                                    </span>
+                                </Link>
+                            )}
                             <Link
                                 href="/notifications"
                                 className="p-4 rounded-xl bg-gradient-danger text-white flex flex-col items-center justify-center gap-2 group shadow-token-danger hover:shadow-xl hover:-translate-y-0.5 transition-all"

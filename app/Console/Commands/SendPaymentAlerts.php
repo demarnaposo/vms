@@ -19,6 +19,13 @@ class SendPaymentAlerts extends Command
 
     public function handle(): int
     {
+        // [VMS_PAYMENTS_DISABLED] Skip external-payment alerts and job writes until config/features.php enables payments.
+        if (! \App\Support\PaymentsModule::enabled()) {
+            $this->info('Payment module disabled; alerts skipped.');
+
+            return self::SUCCESS;
+        }
+
         $startedAt = now();
         $approvalHours = (int) $this->option('approval-hours');
         $delayDays = (int) $this->option('delay-days');

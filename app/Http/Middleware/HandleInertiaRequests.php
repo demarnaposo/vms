@@ -53,6 +53,7 @@ class HandleInertiaRequests extends Middleware
         // Use lazy evaluation to prevent unnecessary queries
         return [
             ...parent::share($request),
+            'features' => ['payments' => ['enabled' => \App\Support\PaymentsModule::enabled()]],
             'auth' => fn () => $this->getAuthData($user),
             // Share the centralized currency settings with every Inertia page.
             'currency' => fn () => config('currency'),

@@ -1,4 +1,4 @@
-import { ActionLink, ActionButton } from '@/Components/ActionControls';
+import { ActionButton } from '@/Components/ActionControls';
 import { router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -37,13 +37,32 @@ function StaffUserForm({ roles, editing, onDone }) {
     const { language, t } = useLanguage();
     const form = useForm(
         editing
-            ? { name: editing.name, email: editing.email, role_ids: editing.role_ids }
+            ? { ...emptyUser, name: editing.name, email: editing.email, role_ids: editing.role_ids }
             : emptyUser
+    );
+    const roleErrors = Object.fromEntries(
+        Object.entries(form.errors).filter(
+            ([field]) => field === 'role_ids' || field.startsWith('role_ids.')
+        )
+    );
+    const generalErrors = Object.fromEntries(
+        Object.entries(form.errors).filter(
+            ([field]) =>
+                !['name', 'email', 'password', 'password_confirmation', 'role_ids'].includes(
+                    field
+                ) && !field.startsWith('role_ids.')
+        )
     );
     const submit = (event) => {
         event.preventDefault();
         const options = {
             preserveScroll: true,
+            onError: () => {
+                if (editing)
+                    toast.error(
+                        t('Unable to update the user. Please check the highlighted fields.')
+                    );
+            },
             onSuccess: () => {
                 form.reset();
                 onDone();
@@ -80,25 +99,28 @@ function StaffUserForm({ roles, editing, onDone }) {
                         placeholder="e.g., johndoe@example.com"
                         required
                     />
-                    {!editing && (
-                        <>
-                            <FormInput
-                                label="Password"
-                                type="password"
-                                value={form.data.password}
-                                onChange={(value) => form.setData('password', value)}
-                                error={form.errors.password}
-                                required
-                            />
-                            <FormInput
-                                label="Confirm Password"
-                                type="password"
-                                value={form.data.password_confirmation}
-                                onChange={(value) => form.setData('password_confirmation', value)}
-                                error={form.errors.password_confirmation}
-                                required
-                            />
-                        </>
+                    <FormInput
+                        label={editing ? 'New Password' : 'Password'}
+                        type="password"
+                        autoComplete="new-password"
+                        value={form.data.password}
+                        onChange={(value) => form.setData('password', value)}
+                        error={form.errors.password}
+                        required={!editing}
+                    />
+                    <FormInput
+                        label="Confirm Password"
+                        type="password"
+                        autoComplete="new-password"
+                        value={form.data.password_confirmation}
+                        onChange={(value) => form.setData('password_confirmation', value)}
+                        error={form.errors.password_confirmation}
+                        required={!editing}
+                    />
+                    {editing && (
+                        <p className="text-sm text-(--color-text-tertiary) md:col-span-2">
+                            {t('Leave blank if you do not want to change the password.')}
+                        </p>
                     )}
                 </div>
                 <fieldset className="space-y-2">
@@ -119,8 +141,9 @@ function StaffUserForm({ roles, editing, onDone }) {
                             </label>
                         ))}
                     </div>
+                    <FormErrors errors={roleErrors} />
                 </fieldset>
-                <FormErrors errors={form.errors} />
+                <FormErrors errors={generalErrors} />
                 <div className="flex justify-end gap-3">
                     <Button
                         type="button"
@@ -311,9 +334,6 @@ export default function StaffIndex({
             render: (row) =>
                 row.manageable ? (
                     <div className="flex flex-wrap items-center justify-end gap-2">
-                        <ActionLink variant="outline" href={`/admin/staff-users/${row.id}`}>
-                            {t('View')}
-                        </ActionLink>
                         <ActionButton variant="primary" onClick={() => setEditingUser(row)}>
                             Edit
                         </ActionButton>
@@ -335,8 +355,9 @@ export default function StaffIndex({
         { header: 'Users', render: (row) => row.users_count },
         {
             header: 'Actions',
+            align: 'right',
             render: (row) => (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap items-center justify-end gap-2">
                     <ActionButton variant="primary" onClick={() => setEditingRole(row)}>
                         Edit
                     </ActionButton>
@@ -472,12 +493,14 @@ export default function StaffIndex({
                                 'Permission codes are protected. Only operational permissions can be assigned to staff roles.'
                             )}
                         </p>
-                        <DataTable
-                            columns={permissionColumns}
-                            data={permissions}
-                            emptyMessage="No permissions found"
-                            stickyHeader={true}
-                        />
+                        <div className="min-w-0 [&_table]:min-w-[720px] [&_table]:table-fixed [&_th:nth-child(1)]:w-[25%] [&_th:nth-child(2)]:w-[25%] [&_th:nth-child(3)]:w-[20%] [&_th:nth-child(4)]:w-[30%] [&_td]:break-words">
+                            <DataTable
+                                columns={permissionColumns}
+                                data={permissions}
+                                emptyMessage="No permissions found"
+                                stickyHeader={true}
+                            />
+                        </div>
                     </Card>
                 )}
             </div>
@@ -500,7 +523,9 @@ export default function StaffIndex({
             >
                 <p>
                     {t(
-                        'Delete this record? Historical records and assigned roles cannot be deleted.'
+                        deleting?.kind === 'users'
+                            ? 'Permanently delete this internal user? This cannot be undone. Historical records will be retained.'
+                            : 'Delete this record? Historical records and assigned roles cannot be deleted.'
                     )}
                 </p>
                 <p className="mt-2 font-medium">

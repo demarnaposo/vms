@@ -17,6 +17,12 @@ class PaymentAlertsCommandTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config(['features.payments.enabled' => true]);
+    }
+
     public function test_payment_alert_command_sends_backlog_and_delay_notifications(): void
     {
         Carbon::setTestNow('2026-02-14 10:00:00');

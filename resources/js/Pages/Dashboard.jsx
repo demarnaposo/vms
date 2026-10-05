@@ -1,3 +1,4 @@
+import { paymentsEnabled, paymentLinkVisible } from '@/utils/paymentModule';
 import { Link, usePage } from '@inertiajs/react';
 import {
     AdminLayout,
@@ -14,7 +15,7 @@ import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function Dashboard() {
     const { t } = useLanguage();
-    const { auth } = usePage().props;
+    const { auth, features } = usePage().props;
     const user = auth?.user;
     const roles = auth?.roles || [];
     const isVendor = roles.includes('vendor');
@@ -75,37 +76,45 @@ export default function Dashboard() {
                 <div className="grid lg:grid-cols-2 gap-6">
                     <Card title="Recent Updates">
                         <div className="divide-y divide-(--color-border-secondary)">
-                            {updates.map((item) => (
-                                <div key={`${item.title}-${item.time}`} className="px-5 py-4">
-                                    <div className="flex items-center justify-between gap-4">
-                                        <div>
-                                            <p className="font-medium text-(--color-text-primary)">
-                                                {t(item.title)}
-                                            </p>
-                                            <p className="text-sm text-(--color-text-tertiary)">
-                                                {item.detail}
-                                            </p>
+                            {updates
+                                .filter(
+                                    (item) =>
+                                        paymentsEnabled(features) ||
+                                        item.title !== 'Payment Requested'
+                                )
+                                .map((item) => (
+                                    <div key={`${item.title}-${item.time}`} className="px-5 py-4">
+                                        <div className="flex items-center justify-between gap-4">
+                                            <div>
+                                                <p className="font-medium text-(--color-text-primary)">
+                                                    {t(item.title)}
+                                                </p>
+                                                <p className="text-sm text-(--color-text-tertiary)">
+                                                    {item.detail}
+                                                </p>
+                                            </div>
+                                            <Badge status="info" size="sm">
+                                                {item.time}
+                                            </Badge>
                                         </div>
-                                        <Badge status="info" size="sm">
-                                            {item.time}
-                                        </Badge>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
                         </div>
                     </Card>
 
                     <Card title="Quick Links">
                         <div className="grid grid-cols-2 gap-3 p-4">
-                            {quickLinks.map((link) => (
-                                <Link
-                                    key={link.href}
-                                    href={link.href}
-                                    className="btn-secondary justify-center"
-                                >
-                                    {t(link.label)}
-                                </Link>
-                            ))}
+                            {quickLinks
+                                .filter((link) => paymentLinkVisible(link.href, features))
+                                .map((link) => (
+                                    <Link
+                                        key={link.href}
+                                        href={link.href}
+                                        className="btn-secondary justify-center"
+                                    >
+                                        {t(link.label)}
+                                    </Link>
+                                ))}
                         </div>
                     </Card>
                 </div>

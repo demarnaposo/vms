@@ -1,5 +1,15 @@
 // Centralize Indonesian translations while English remains the source-language fallback.
 export const INDONESIAN_TRANSLATIONS = Object.freeze({
+    'Streamline onboarding and track compliance - all from one powerful platform.':
+        'Sederhanakan onboarding dan pantau kepatuhan dari satu platform yang andal.',
+    'Your vendor account is active.': 'Akun vendor Anda aktif.',
+    'Manage onboarding and compliance from one unified workspace with cleaner workflows and faster decisions.':
+        'Kelola onboarding dan kepatuhan dari satu ruang kerja terpadu dengan alur yang lebih rapi dan keputusan yang lebih cepat.',
+    'VMS helps teams replace scattered spreadsheets and email chains with one structured workflow for onboarding and compliance.':
+        'VMS membantu tim mengganti spreadsheet yang tersebar dan rangkaian email dengan satu alur terstruktur untuk onboarding dan kepatuhan.',
+    'VMS keeps vendor onboarding, compliance, and documents in one clean workspace.':
+        'VMS menyatukan onboarding vendor, kepatuhan, dan dokumen dalam satu ruang kerja yang rapi.',
+
     'Theme options': 'Pilihan tema',
     'Balanced teal': 'Hijau kebiruan seimbang',
     'Cool blue tones': 'Nuansa biru sejuk',
@@ -506,7 +516,13 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Remember your password?': 'Ingat kata sandi Anda?',
     'Set New Password': 'Buat Kata Sandi Baru',
     'Enter your new password below.': 'Masukkan kata sandi baru Anda di bawah ini.',
+    'Unable to update the user. Please check the highlighted fields.':
+        'Pengguna gagal diubah. Periksa kembali kolom yang ditandai.',
+    'Permanently delete this internal user? This cannot be undone. Historical records will be retained.':
+        'Hapus permanen pengguna internal ini? Tindakan ini tidak dapat dibatalkan. Catatan historis tetap disimpan.',
     'New Password': 'Kata Sandi Baru',
+    'Leave blank if you do not want to change the password.':
+        'Kosongkan jika tidak ingin mengubah kata sandi.',
     'Resetting...': 'Mengatur ulang...',
     "Don't have an account?": 'Belum memiliki akun?',
     'Create one': 'Buat akun',

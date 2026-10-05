@@ -6,8 +6,12 @@ return [
     'rbac_invalid_role' => 'Pilih peran staff yang valid.',
     'rbac_invalid_permission' => 'Pilih izin dari katalog operasional.',
     'rbac_role_in_use' => 'Peran bawaan dan peran yang digunakan pengguna tidak dapat dihapus.',
+    'rbac_user_updated' => 'Pengguna staff berhasil diubah.',
+    'rbac_user_password_updated' => 'Pengguna staff dan kata sandi berhasil diubah.',
     'rbac_user_saved' => 'Pengguna staff berhasil disimpan.',
-    'rbac_user_deleted' => 'Pengguna staff berhasil dihapus.',
+    'staff_deletion_schema_required' => 'Migration penyimpanan riwayat penghapusan staff harus dijalankan sebelum akun ini dapat dihapus.',
+    'staff_deletion_vendor_owner' => 'Akun ini memiliki data vendor dan tidak dapat dihapus melalui pengelolaan pengguna internal.',
+    'rbac_user_deleted' => 'Pengguna staff berhasil dihapus permanen.',
     'rbac_role_saved' => 'Peran staff berhasil disimpan.',
     'rbac_role_deleted' => 'Peran staff berhasil dihapus.',
 

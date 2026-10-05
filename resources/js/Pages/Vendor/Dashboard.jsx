@@ -1,3 +1,4 @@
+import { paymentsEnabled } from '@/utils/paymentModule';
 import { ActionLink } from '@/Components/ActionControls';
 import { Link, usePage } from '@inertiajs/react';
 import { AppIcon, Badge, Card, PageHeader, VendorLayout } from '@/Components';
@@ -12,7 +13,8 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
     // Read the language used for system document types.
     const { language, t } = useLanguage();
     // Read the shared IDR settings supplied by Laravel.
-    const { auth, currency } = usePage().props;
+    const { auth, currency, features } = usePage().props;
+    const enabled = paymentsEnabled(features);
     const user = auth?.user;
 
     const displayVendor = vendor || {
@@ -46,7 +48,9 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
         },
         active: {
             title: 'Account Active',
-            message: 'Your vendor account is active. You can now submit payment requests.',
+            message: enabled
+                ? 'Your vendor account is active. You can now submit payment requests.'
+                : 'Your vendor account is active.',
             action: null,
         },
         suspended: {
@@ -124,7 +128,7 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                 </div>
 
                 {displayVendor.status !== 'draft' && (
-                    <div className="grid md:grid-cols-3 gap-6">
+                    <div className={`grid ${enabled ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-6`}>
                         <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-xl p-6 shadow-token-sm">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="font-semibold text-lg text-(--color-text-primary)">
@@ -176,30 +180,32 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                             </p>
                         </div>
 
-                        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-xl p-6 shadow-token-sm">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="font-semibold text-lg text-(--color-text-primary)">
-                                    {t('Pending Payments')}
-                                </h3>
-                                <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-(--color-warning-light) text-(--color-warning)">
-                                    <AppIcon name="payments" className="h-5 w-5" />
-                                </span>
+                        {enabled && (
+                            <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-xl p-6 shadow-token-sm">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="font-semibold text-lg text-(--color-text-primary)">
+                                        {t('Pending Payments')}
+                                    </h3>
+                                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-(--color-warning-light) text-(--color-warning)">
+                                        <AppIcon name="payments" className="h-5 w-5" />
+                                    </span>
+                                </div>
+                                <div className="text-4xl font-bold mb-2 text-(--color-text-primary)">
+                                    {/* Format pending payments as IDR. */}
+                                    {formatCurrency(stats.pending_payments, currency)}
+                                </div>
+                                {displayVendor.status === 'active' && (
+                                    <ActionLink
+                                        href="/vendor/payments"
+                                        variant="primary"
+                                        className="w-full mt-4 text-center justify-center text-white!"
+                                    >
+                                        {/* Translate the payment request action. */}
+                                        {t('Request Payment')}
+                                    </ActionLink>
+                                )}
                             </div>
-                            <div className="text-4xl font-bold mb-2 text-(--color-text-primary)">
-                                {/* Format pending payments as IDR. */}
-                                {formatCurrency(stats.pending_payments, currency)}
-                            </div>
-                            {displayVendor.status === 'active' && (
-                                <ActionLink
-                                    href="/vendor/payments"
-                                    variant="primary"
-                                    className="w-full mt-4 text-center justify-center text-white!"
-                                >
-                                    {/* Translate the payment request action. */}
-                                    {t('Request Payment')}
-                                </ActionLink>
-                            )}
-                        </div>
+                        )}
                     </div>
                 )}
 

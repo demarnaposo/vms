@@ -30,12 +30,18 @@ class WeeklySummaryGenerated extends Notification implements ShouldQueue
     {
         $period = (string) ($this->summary['period'] ?? 'This week');
         $newVendors = (int) ($this->summary['vendors']['new_this_week'] ?? 0);
-        $approvedPayments = (int) ($this->summary['payments']['approved'] ?? 0);
+        $summary = $this->summary;
+        if (! \App\Support\PaymentsModule::enabled()) {
+            unset($summary['payments']);
+        }
+        $approvedPayments = (int) ($summary['payments']['approved'] ?? 0);
 
         return [
             'title' => 'Weekly Summary Available',
-            'message' => "Week of {$period}: {$newVendors} new vendors, {$approvedPayments} payments approved.",
-            'summary' => $this->summary,
+            'message' => isset($summary['payments'])
+                ? "Week of {$period}: {$newVendors} new vendors, {$approvedPayments} payments approved."
+                : "Week of {$period}: {$newVendors} new vendors.",
+            'summary' => $summary,
             'severity' => 'info',
         ];
     }

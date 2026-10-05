@@ -34,6 +34,7 @@ class GenerateWeeklySummary extends Command
             $weekStart = Carbon::now()->startOfWeek();
             $weekEnd = Carbon::now()->endOfWeek();
 
+            // [VMS_PAYMENTS_DISABLED] config/features.php excludes external payments; vendor/compliance summaries continue.
             // Gather statistics
             $summary = [
                 'period' => $weekStart->format('M d').' - '.$weekEnd->format('M d, Y'),
@@ -52,18 +53,20 @@ class GenerateWeeklySummary extends Command
                         ->where('evaluated_at', '>=', $weekStart)
                         ->count(),
                 ],
-                'payments' => [
-                    'requested' => PaymentRequest::where('created_at', '>=', $weekStart)->count(),
-                    'approved' => PaymentRequest::where('status', 'approved')
-                        ->where('updated_at', '>=', $weekStart)
-                        ->count(),
-                    'paid_amount' => PaymentRequest::where('status', 'paid')
-                        ->where('paid_date', '>=', $weekStart)
-                        ->sum('amount'),
-                    'rejected' => PaymentRequest::where('status', 'rejected')
-                        ->where('updated_at', '>=', $weekStart)
-                        ->count(),
-                ],
+                ...(\App\Support\PaymentsModule::enabled() ? [
+                    'payments' => [
+                        'requested' => PaymentRequest::where('created_at', '>=', $weekStart)->count(),
+                        'approved' => PaymentRequest::where('status', 'approved')
+                            ->where('updated_at', '>=', $weekStart)
+                            ->count(),
+                        'paid_amount' => PaymentRequest::where('status', 'paid')
+                            ->where('paid_date', '>=', $weekStart)
+                            ->sum('amount'),
+                        'rejected' => PaymentRequest::where('status', 'rejected')
+                            ->where('updated_at', '>=', $weekStart)
+                            ->count(),
+                    ],
+                ] : []),
             ];
 
             // Display summary
@@ -94,16 +97,18 @@ class GenerateWeeklySummary extends Command
                 ]
             );
 
-            $this->info("\nPAYMENTS:");
-            $this->table(
-                ['Metric', 'Value'],
-                [
-                    ['Requested', $summary['payments']['requested']],
-                    ['Approved', $summary['payments']['approved']],
-                    ['Paid Amount', Currency::format($summary['payments']['paid_amount'])],
-                    ['Rejected', $summary['payments']['rejected']],
-                ]
-            );
+            if (\App\Support\PaymentsModule::enabled()) {
+                $this->info("\nPAYMENTS:");
+                $this->table(
+                    ['Metric', 'Value'],
+                    [
+                        ['Requested', $summary['payments']['requested']],
+                        ['Approved', $summary['payments']['approved']],
+                        ['Paid Amount', Currency::format($summary['payments']['paid_amount'])],
+                        ['Rejected', $summary['payments']['rejected']],
+                    ]
+                );
+            }
 
             // Notify ops managers
             $this->notifyManagers($summary);

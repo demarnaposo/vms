@@ -1,3 +1,4 @@
+import { paymentsEnabled } from '@/utils/paymentModule';
 // Read centralized currency settings on the login page.
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import Logo from '@/Components/Logo';
@@ -12,7 +13,7 @@ import { formatCurrency } from '@/utils/currencyFormatters';
 export default function Login() {
     const { t } = useLanguage();
     // Use the default currency shared by Laravel.
-    const { currency } = usePage().props;
+    const { currency, features } = usePage().props;
 
     const form = useForm({
         email: '',
@@ -77,7 +78,9 @@ export default function Login() {
                             </h1>
                             <p className="text-white/90 text-lg leading-relaxed max-w-md">
                                 {t(
-                                    'Streamline onboarding, track compliance, and process payments - all from one powerful platform.'
+                                    paymentsEnabled(features)
+                                        ? 'Streamline onboarding, track compliance, and process payments - all from one powerful platform.'
+                                        : 'Streamline onboarding and track compliance - all from one powerful platform.'
                                 )}
                             </p>
 
@@ -210,9 +213,9 @@ export default function Login() {
                                 </p>
                                 {/* Translate demo role labels without altering the actual credentials. */}
                                 <div className="grid gap-1 text-xs text-(--color-text-muted)">
-                                    <div>{t('Admin')}: admin@vendorflow.com / password</div>
-                                    <div>{t('Ops')}: ops@vendorflow.com / password</div>
-                                    <div>{t('Finance')}: finance@vendorflow.com / password</div>
+                                    <div>{t('Admin')}: admin@test.com / password</div>
+                                    <div>{t('Ops')}: ops@test.com / password</div>
+                                    <div>{t('Finance')}: finance@test.com / password</div>
                                 </div>
                             </div>
                         )}

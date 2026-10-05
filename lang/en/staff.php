@@ -12,4 +12,7 @@ return [
     'permissions_present' => 'The permission selection must be provided, even when empty.',
     'builtin_role_code' => 'Built-in role codes cannot be used for a custom role.',
     'email_lowercase' => 'The email address must be lowercase.',
+    'password_required_with_confirmation' => 'Enter a new password when providing password confirmation.',
+    'password_confirmation_required' => 'Confirm the new password.',
+    'password_confirmation_mismatch' => 'The password confirmation does not match the new password.',
 ];

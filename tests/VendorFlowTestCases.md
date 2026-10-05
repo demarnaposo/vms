@@ -336,9 +336,9 @@
 ## Test Data Requirements
 
 ### Required Test Users
-1. **Super Admin** - admin@vendorflow.com
-2. **Ops Manager** - ops@vendorflow.com
-3. **Finance Manager** - finance@vendorflow.com
+1. **Super Admin** - admin@test.com
+2. **Ops Manager** - ops@test.com
+3. **Finance Manager** - finance@test.com
 4. **Vendor 1 (Active, Compliant)** - vendor1@test.com
 5. **Vendor 2 (Suspended)** - vendor2@test.com
 6. **Vendor 3 (Non-compliant)** - vendor3@test.com

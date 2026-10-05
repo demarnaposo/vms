@@ -1,3 +1,4 @@
+import { paymentsEnabled } from '@/utils/paymentModule';
 // Read centralized currency settings on the public About page.
 import { Link, usePage } from '@inertiajs/react';
 import AppIcon from '@/Components/AppIcon';
@@ -32,7 +33,8 @@ const principles = [
 
 export default function About() {
     // Use the default currency shared by Laravel.
-    const { currency } = usePage().props;
+    const { currency, features } = usePage().props;
+    const enabled = paymentsEnabled(features);
     // Resolve About-page copy through the bilingual dictionary.
     const { t } = useLanguage();
 
@@ -50,12 +52,16 @@ export default function About() {
                         </h1>
                         <p className="mt-5 text-lg text-(--color-text-tertiary)">
                             {t(
-                                'VMS helps teams replace scattered spreadsheets and email chains with one structured workflow for onboarding, compliance, and payments.'
+                                enabled
+                                    ? 'VMS helps teams replace scattered spreadsheets and email chains with one structured workflow for onboarding, compliance, and payments.'
+                                    : 'VMS helps teams replace scattered spreadsheets and email chains with one structured workflow for onboarding and compliance.'
                             )}
                         </p>
                     </div>
 
-                    <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div
+                        className={`mt-12 grid sm:grid-cols-2 ${enabled ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4`}
+                    >
                         <div className="surface-panel p-5">
                             <p className="text-xs uppercase tracking-wide text-(--color-text-muted)">
                                 {t('Vendors Managed')}
@@ -72,15 +78,17 @@ export default function About() {
                                 500K+
                             </p>
                         </div>
-                        <div className="surface-panel p-5">
-                            <p className="text-xs uppercase tracking-wide text-(--color-text-muted)">
-                                {t('Payment Value')}
-                            </p>
-                            <p className="mt-2 text-3xl font-bold text-(--color-text-primary)">
-                                {/* Replace crore notation with the full Indonesian-formatted amount. */}
-                                {formatCurrency(2000000000, currency)}+
-                            </p>
-                        </div>
+                        {enabled && (
+                            <div className="surface-panel p-5">
+                                <p className="text-xs uppercase tracking-wide text-(--color-text-muted)">
+                                    {t('Payment Value')}
+                                </p>
+                                <p className="mt-2 text-3xl font-bold text-(--color-text-primary)">
+                                    {/* Replace crore notation with the full Indonesian-formatted amount. */}
+                                    {formatCurrency(2000000000, currency)}+
+                                </p>
+                            </div>
+                        )}
                         <div className="surface-panel p-5">
                             <p className="text-xs uppercase tracking-wide text-(--color-text-muted)">
                                 {t('Team Satisfaction')}

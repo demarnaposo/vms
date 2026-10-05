@@ -1,4 +1,5 @@
-import { Link, useForm } from '@inertiajs/react';
+import { paymentsEnabled } from '@/utils/paymentModule';
+import { Link, useForm, usePage } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
 import Logo from '@/Components/Logo';
 // Reuse the accessible password visibility input on registration.
@@ -9,6 +10,7 @@ import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function Register() {
     const { t } = useLanguage();
+    const { features } = usePage().props;
     const form = useForm({
         name: '',
         email: '',
@@ -62,22 +64,28 @@ export default function Register() {
                                     'Real-time compliance tracking',
                                     'Multi-level payment approvals',
                                     'Performance analytics dashboard',
-                                ].map((benefit, idx) => (
-                                    <div key={idx} className="flex items-center gap-3">
-                                        <svg
-                                            className="w-5 h-5 text-(--color-success)"
-                                            fill="currentColor"
-                                            viewBox="0 0 20 20"
-                                        >
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                                clipRule="evenodd"
-                                            />
-                                        </svg>
-                                        <span className="text-white/90">{t(benefit)}</span>
-                                    </div>
-                                ))}
+                                ]
+                                    .filter(
+                                        (benefit) =>
+                                            paymentsEnabled(features) ||
+                                            benefit !== 'Multi-level payment approvals'
+                                    )
+                                    .map((benefit, idx) => (
+                                        <div key={idx} className="flex items-center gap-3">
+                                            <svg
+                                                className="w-5 h-5 text-(--color-success)"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                            <span className="text-white/90">{t(benefit)}</span>
+                                        </div>
+                                    ))}
                             </div>
                         </div>
 

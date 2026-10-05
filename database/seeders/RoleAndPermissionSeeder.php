@@ -18,7 +18,7 @@ class RoleAndPermissionSeeder extends Seeder
 
         if ($this->command) {
             $this->command->info('Roles, permissions, and default users created successfully!');
-            $this->command->info('Default admin login: admin@vendorflow.com / '.(env('DEFAULT_STAFF_PASSWORD') ?: 'password'));
+            $this->command->info('Default admin login: admin@test.com / '.(env('DEFAULT_STAFF_PASSWORD') ?: 'password'));
         }
     }
 }

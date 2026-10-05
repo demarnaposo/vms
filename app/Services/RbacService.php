@@ -68,6 +68,9 @@ class RbacService
                 $user->email_verified_at = null;
             }
             $user->fill(collect($data)->only($target ? ['name', 'email'] : ['name', 'email', 'password'])->all());
+            if ($target && filled($data['password'] ?? null)) {
+                $user->password = $data['password'];
+            }
             $user->save();
             $user->syncRoles($roles);
             $this->clearUserCaches([$user->id]);
@@ -84,8 +87,10 @@ class RbacService
             $user = User::lockForUpdate()->findOrFail($target->id);
             abort_unless($user->isStaff() && ! $user->isVendor(), 404);
             $this->assertNotLastAdmin($user, [], 'user');
-            app(AccountDeletionService::class)->assertNoHistory($user);
-            AuditLog::log(AuditLog::EVENT_DELETED, $user, ['role_ids' => $user->roles->pluck('id')->all()], null, 'Staff user deleted');
+            $deletion = app(AccountDeletionService::class);
+            $deletion->assertStaffDeletionReady($user);
+            $deletion->revokeStaffCredentials($user);
+            AuditLog::log(AuditLog::EVENT_DELETED, $user, ['name' => $user->name, 'role_ids' => $user->roles->pluck('id')->all()], null, 'Staff user deleted permanently');
             $user->delete();
             $this->clearUserCaches([$user->id]);
         });

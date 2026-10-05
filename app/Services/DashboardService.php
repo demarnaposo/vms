@@ -19,7 +19,7 @@ class DashboardService
             'stats' => $this->stats(),
             'pendingVendors' => $this->pendingVendors(),
             'pendingDocuments' => $this->pendingDocuments(),
-            'pendingPayments' => $this->pendingPayments(),
+            'pendingPayments' => \App\Support\PaymentsModule::enabled() ? $this->pendingPayments() : collect(),
             'recentActivity' => $this->recentActivity(),
         ];
     }
@@ -34,12 +34,14 @@ class DashboardService
             'active_vendors' => Vendor::where('status', Vendor::STATUS_ACTIVE)->count(),
             'pending_review' => Vendor::whereIn('status', [Vendor::STATUS_SUBMITTED, Vendor::STATUS_UNDER_REVIEW])->count(),
             'non_compliant' => Vendor::whereIn('compliance_status', [Vendor::COMPLIANCE_NON_COMPLIANT, Vendor::COMPLIANCE_BLOCKED])->count(),
-            'pending_payments' => PaymentRequest::whereIn('status', [
-                PaymentRequest::STATUS_REQUESTED,
-                PaymentRequest::STATUS_PENDING_OPS,
-                PaymentRequest::STATUS_PENDING_FINANCE,
-            ])->count(),
-            'approved_payments' => (float) PaymentRequest::where('status', PaymentRequest::STATUS_APPROVED)->sum('amount'),
+            ...(\App\Support\PaymentsModule::enabled() ? [
+                'pending_payments' => PaymentRequest::whereIn('status', [
+                    PaymentRequest::STATUS_REQUESTED,
+                    PaymentRequest::STATUS_PENDING_OPS,
+                    PaymentRequest::STATUS_PENDING_FINANCE,
+                ])->count(),
+                'approved_payments' => (float) PaymentRequest::where('status', PaymentRequest::STATUS_APPROVED)->sum('amount'),
+            ] : []),
         ];
     }
 

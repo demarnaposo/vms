@@ -1,3 +1,4 @@
+import { paymentsEnabled, paymentLinkVisible } from '@/utils/paymentModule';
 import { Link, usePage } from '@inertiajs/react';
 import AppIcon from './AppIcon';
 import Logo from './Logo';
@@ -28,7 +29,7 @@ const adminLinks = [
 
 export default function Footer({ links = defaultLinks, showSocial = true, className = '' }) {
     const year = new Date().getFullYear();
-    const { auth } = usePage().props;
+    const { auth, features } = usePage().props;
     const { t } = useLanguage();
     const showVendorTools = Boolean(auth?.user && auth?.roles?.includes('vendor'));
 
@@ -44,7 +45,9 @@ export default function Footer({ links = defaultLinks, showSocial = true, classN
                         </div>
                         <p className="max-w-md text-sm text-(--color-text-tertiary)">
                             {t(
-                                'VMS keeps vendor onboarding, compliance, documents, and payments in one clean workspace.'
+                                paymentsEnabled(features)
+                                    ? 'VMS keeps vendor onboarding, compliance, documents, and payments in one clean workspace.'
+                                    : 'VMS keeps vendor onboarding, compliance, and documents in one clean workspace.'
                             )}
                         </p>
 
@@ -98,15 +101,17 @@ export default function Footer({ links = defaultLinks, showSocial = true, classN
                                 {t('Create Tools')}
                             </h3>
                             <div className="space-y-2">
-                                {toolLinks.map((item) => (
-                                    <Link
-                                        key={item.href}
-                                        href={item.href}
-                                        className="block text-sm text-(--color-text-tertiary) hover:text-(--color-brand-primary) transition-colors"
-                                    >
-                                        {t(item.label)}
-                                    </Link>
-                                ))}
+                                {toolLinks
+                                    .filter((item) => paymentLinkVisible(item.href, features))
+                                    .map((item) => (
+                                        <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            className="block text-sm text-(--color-text-tertiary) hover:text-(--color-brand-primary) transition-colors"
+                                        >
+                                            {t(item.label)}
+                                        </Link>
+                                    ))}
                             </div>
                         </div>
                     )}
@@ -117,15 +122,17 @@ export default function Footer({ links = defaultLinks, showSocial = true, classN
                                 Admin
                             </h3>
                             <div className="space-y-2">
-                                {adminLinks.map((item) => (
-                                    <Link
-                                        key={item.href}
-                                        href={item.href}
-                                        className="block text-sm text-(--color-text-tertiary) hover:text-(--color-brand-primary) transition-colors"
-                                    >
-                                        {t(item.label)}
-                                    </Link>
-                                ))}
+                                {adminLinks
+                                    .filter((item) => paymentLinkVisible(item.href, features))
+                                    .map((item) => (
+                                        <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            className="block text-sm text-(--color-text-tertiary) hover:text-(--color-brand-primary) transition-colors"
+                                        >
+                                            {t(item.label)}
+                                        </Link>
+                                    ))}
                             </div>
                         </div>
                     )}

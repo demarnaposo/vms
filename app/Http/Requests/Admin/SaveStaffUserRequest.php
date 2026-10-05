@@ -30,7 +30,8 @@ class SaveStaffUserRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique('users', 'email')->ignore($target?->id)],
-            'password' => [$target ? 'prohibited' : 'required', 'confirmed', Password::defaults()],
+            'password' => ['bail', $target ? 'nullable' : 'required', 'required_with:password_confirmation', 'string', Password::defaults()],
+            'password_confirmation' => ['bail', 'nullable', 'required_with:password', 'string', ...($this->filled('password') ? ['same:password'] : [])],
             'role_ids' => ['required', 'array', 'min:1'],
             'role_ids.*' => ['required', 'integer', 'distinct', Rule::exists('roles', 'id')->where('guard_name', 'web')->where('is_staff', true)->whereNot('name', Role::VENDOR)],
             'guard_name' => ['prohibited'], 'is_staff' => ['prohibited'],
@@ -47,6 +48,11 @@ class SaveStaffUserRequest extends FormRequest
 
     public function messages(): array
     {
-        return ['email.lowercase' => __('staff.email_lowercase')];
+        return [
+            'email.lowercase' => __('staff.email_lowercase'),
+            'password.required_with' => __('staff.password_required_with_confirmation'),
+            'password_confirmation.same' => __('staff.password_confirmation_mismatch'),
+            'password_confirmation.required_with' => __('staff.password_confirmation_required'),
+        ];
     }
 }

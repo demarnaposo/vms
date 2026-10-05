@@ -89,7 +89,8 @@ class RbacManagementTest extends TestCase
         $this->put('/admin/staff-roles/'.$role->id, ['name' => 'reviewer', 'display_name' => 'Label Baru', 'permission_ids' => [$this->permission('documents.list')]])->assertSessionHasNoErrors();
         $this->assertEquals('Label Baru', $role->fresh()->display_name);
         $this->delete('/admin/staff-roles/'.$role->id)->assertSessionHasErrors('role');
-        $this->delete('/admin/staff-users/'.$user->id)->assertSessionHasErrors('user');
+        $this->delete('/admin/staff-users/'.$user->id)->assertSessionHasNoErrors();
+        $this->assertDatabaseMissing('users', ['id' => $user->id]);
         $unused = $this->custom([], 'unused');
         $this->delete('/admin/staff-roles/'.$unused->id)->assertSessionHasNoErrors();
         $this->assertDatabaseMissing('roles', ['id' => $unused->id]);

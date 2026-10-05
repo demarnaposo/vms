@@ -1,3 +1,4 @@
+import { paymentLinkVisible } from '@/utils/paymentModule';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useEffect, useId, useRef, useState } from 'react';
 import AppIcon from './AppIcon';
@@ -326,7 +327,7 @@ export default function Sidebar({
     isOpen = false,
     onClose = () => {},
 }) {
-    const { auth } = usePage().props;
+    const { auth, features } = usePage().props;
     // Read the selected language for sidebar labels and role master data.
     const { language, t } = useLanguage();
     const user = auth?.user;
@@ -341,6 +342,7 @@ export default function Sidebar({
     const navConfig = customNav || (variant === 'vendor' ? vendorNavConfig : adminNavConfig);
 
     const canSeeItem = (item) => {
+        if (!paymentLinkVisible(item.href, features)) return false;
         const hasPermission = !item.permission || can[item.permission];
         const hasRoleAccess =
             !item.allowedRoles || item.allowedRoles.some((role) => roles.includes(role));

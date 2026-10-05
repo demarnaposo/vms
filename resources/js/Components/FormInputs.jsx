@@ -14,6 +14,7 @@ export function FormInput({
     required = false,
     showRequiredIndicator = false,
     inputMode,
+    autoComplete,
     disabled = false,
     icon = null,
     className = '',
@@ -57,6 +58,7 @@ export function FormInput({
                     id={id}
                     type={resolvedType}
                     inputMode={inputMode}
+                    autoComplete={autoComplete}
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={t(placeholder)}

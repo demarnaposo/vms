@@ -90,6 +90,6 @@ The system is pre-configured with the following RBAC accounts for validation and
 ### Internal Stakeholders
 | Role | Username | Password | Operational Scope |
 |------|----------|----------|-------------------|
-| **Super Admin** | `admin@vendorflow.com` | `password` | System-wide Audit & Control |
-| **Ops Manager** | `ops@vendorflow.com` | `password` | Vendor Onboarding & Doc Verification |
-| **Finance Controller** | `finance@vendorflow.com` | `password` | Payment Approvals & Disbursement |
+| **Super Admin** | `admin@test.com` | `password` | System-wide Audit & Control |
+| **Ops Manager** | `ops@test.com` | `password` | Vendor Onboarding & Doc Verification |
+| **Finance Controller** | `finance@test.com` | `password` | Payment Approvals & Disbursement |

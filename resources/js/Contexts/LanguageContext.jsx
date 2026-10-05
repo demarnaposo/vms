@@ -4,30 +4,14 @@ import { toast } from 'sonner';
 // Use the centralized bilingual message resolver.
 import { translateMessage } from '@/i18n/translations';
 
-// Keep supported languages and VMS persistence keys centralized.
-const SUPPORTED_LANGUAGES = Object.freeze(['en', 'id']);
-const STORAGE_KEY = 'vms.preferences.v1';
-const COOKIE_NAME = 'vms_locale';
+import {
+    SUPPORTED_LANGUAGES,
+    COOKIE_NAME,
+    getInitialLanguage,
+    persistLanguage,
+} from '@/utils/languagePreferences';
+
 const LanguageContext = createContext(null);
-
-// Restore a validated language preference from versioned browser storage or cookie.
-function getInitialLanguage() {
-    if (typeof window === 'undefined') return 'en';
-
-    try {
-        const preferences = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '{}');
-        if (SUPPORTED_LANGUAGES.includes(preferences.language)) return preferences.language;
-    } catch {
-        // Ignore malformed local preferences and continue with the cookie/default.
-    }
-
-    const cookieLanguage = document.cookie
-        .split('; ')
-        .find((cookie) => cookie.startsWith(`${COOKIE_NAME}=`))
-        ?.split('=')[1];
-
-    return SUPPORTED_LANGUAGES.includes(cookieLanguage) ? cookieLanguage : 'en';
-}
 
 // Provide reactive bilingual state once for the entire Inertia application.
 export function LanguageProvider({ children }) {
@@ -36,15 +20,7 @@ export function LanguageProvider({ children }) {
     useEffect(() => {
         let active = true;
         document.documentElement.lang = language === 'id' ? 'id-ID' : 'en';
-        document.cookie = `${COOKIE_NAME}=${language}; path=/; max-age=31536000; samesite=lax`;
-
-        let preferences = {};
-        try {
-            preferences = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '{}');
-        } catch {
-            preferences = {};
-        }
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...preferences, language }));
+        persistLanguage(language);
 
         axios.post('/locale').catch(() => {
             if (active) {

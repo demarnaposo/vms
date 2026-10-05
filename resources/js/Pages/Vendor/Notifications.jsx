@@ -1,5 +1,6 @@
+import { paymentsEnabled, paymentLinkVisible } from '@/utils/paymentModule';
 import { ActionButton, ActionAnchor } from '@/Components/ActionControls';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { VendorLayout, PageHeader, Card, AppIcon } from '@/Components';
 import { formatRelativeTime } from '@/utils/dateFormatters';
 // Translate vendor notification controls without altering stored notification content.
@@ -15,6 +16,7 @@ export default function Notifications({
 }) {
     // Use the selected language for static labels and relative timestamps.
     const { language, t } = useLanguage();
+    const { features } = usePage().props;
     const dateLocale = language === 'id' ? 'id-ID' : 'en-US';
     const displayNotifications = notifications.data || [];
 
@@ -202,17 +204,21 @@ export default function Notifications({
                                                     {notification.data?.message}
                                                 </p>
 
-                                                {notification.data?.action_url && (
-                                                    <ActionAnchor
-                                                        variant="outline"
-                                                        href={notification.data.action_url}
-                                                        className="mt-2"
-                                                    >
-                                                        {/* Preserve stored action text and translate only the system fallback. */}
-                                                        {notification.data.action_text ||
-                                                            t('View Details')}
-                                                    </ActionAnchor>
-                                                )}
+                                                {notification.data?.action_url &&
+                                                    paymentLinkVisible(
+                                                        notification.data.action_url,
+                                                        features
+                                                    ) && (
+                                                        <ActionAnchor
+                                                            variant="outline"
+                                                            href={notification.data.action_url}
+                                                            className="mt-2"
+                                                        >
+                                                            {/* Preserve stored action text and translate only the system fallback. */}
+                                                            {notification.data.action_text ||
+                                                                t('View Details')}
+                                                        </ActionAnchor>
+                                                    )}
                                             </div>
 
                                             {isUnread && (
@@ -259,21 +265,25 @@ export default function Notifications({
                                     title: 'Account Updates',
                                     desc: 'Status changes and important announcements',
                                 },
-                            ].map((item, index) => (
-                                <div key={index} className="flex items-start gap-3">
-                                    <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-(--color-brand-primary-light) text-(--color-brand-primary)">
-                                        <AppIcon name={item.icon} className="h-5 w-5" />
-                                    </span>
-                                    <div className="min-w-0">
-                                        <div className="font-medium text-(--color-text-primary)">
-                                            {t(item.title)}
-                                        </div>
-                                        <div className="text-sm text-(--color-text-secondary)">
-                                            {t(item.desc)}
+                            ]
+                                .filter(
+                                    (item) => paymentsEnabled(features) || item.icon !== 'payments'
+                                )
+                                .map((item, index) => (
+                                    <div key={index} className="flex items-start gap-3">
+                                        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-(--color-brand-primary-light) text-(--color-brand-primary)">
+                                            <AppIcon name={item.icon} className="h-5 w-5" />
+                                        </span>
+                                        <div className="min-w-0">
+                                            <div className="font-medium text-(--color-text-primary)">
+                                                {t(item.title)}
+                                            </div>
+                                            <div className="text-sm text-(--color-text-secondary)">
+                                                {t(item.desc)}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
                         </div>
                     </Card>
                 )}

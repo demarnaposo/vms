@@ -6,6 +6,10 @@ The VMS (Vendor Management System) changelog starts on 2026-09-18. Changes befor
 
 ### Fixed
 
+- 2026-10-05 — Displayed staff-user validation once beside each field, moved password mismatch errors to confirmation, and tailored Sonner feedback for user updates and optional password changes.
+
+- 2026-10-02 — Gave the Messages Total, New, Replied and Read summary cards explicit theme-primary backgrounds and shared shadows, retaining status colors, counts and responsive layout.
+
 - 2026-10-02 — Typed the configured RBAC role and permission relations for PHPStan and simplified the primary-role display fallback, preserving Spatie relations and legacy grants.
 
 - 2026-10-01 — Right-aligned the Internal Users table action header and buttons to match the Performance table, retaining wrapping, action handlers and staff access rules.
@@ -78,6 +82,8 @@ The VMS (Vendor Management System) changelog starts on 2026-09-18. Changes befor
 
 ### Added
 
+- 2026-10-05 — Added optional password and confirmation fields when editing internal staff, retaining the existing hash for blank input, enforcing server confirmation and password rules, and keeping credentials out of staff responses and audit payloads.
+
 - 2026-09-30 — Added seven optional vendor document master types, a data-preserving additive migration, bilingual labels/descriptions, catalogue audit guidance and regression coverage; retained legacy document codes and requirements.
 
 - 2026-09-30 — Added Spatie-backed staff and role CRUD, multi-role assignments, an operational permission catalogue, safe legacy schema conversion, and RBAC regression/audit documentation.
@@ -103,6 +109,24 @@ The VMS (Vendor Management System) changelog starts on 2026-09-18. Changes befor
 - 2026-09-18 — Added agent guidelines and a project changelog for recording future changes.
 
 ### Changed
+
+- 2026-10-05 — Ignored docs/ and removed its contents from Git tracking while retaining all local documentation files.
+
+- 2026-10-05 — Kept root AGENTS.md and .agents guidance local by ignoring them and removing AGENTS.md from Git tracking without deleting its local contents.
+
+- 2026-10-05 — Required backend-only form validation in agent guidelines, disabling native browser validation and HTML required attributes while retaining visual required indicators and semantic input types.
+
+- 2026-10-05 — Added repository rules for per-field server/UI validation, non-duplicated field errors, action-specific bilingual Sonner feedback for create/update/delete, and CRUD failure-state verification.
+
+- 2026-10-05 — Enabled permanent internal-staff deletion while preserving history through nullable actor references, retaining last-admin/vendor-ownership safeguards, revoking account credentials, and adding explicit bilingual confirmation plus a manual history-preserving migration with guarded rollback.
+
+- 2026-10-05 — Removed the Internal Users View button, right-aligned Staff Roles actions, and gave the Permission Catalogue proportional column widths with contained scrolling and long-content wrapping; preserved staff routes, handlers and access rules.
+
+- 2026-10-03 — Commented out the four currency settings in `.env.example`, retaining the existing currency defaults.
+
+- 2026-10-02 — Defaulted first-visit language to Indonesian while preserving saved English/Indonesian preferences, English translation fallback and language switching when browser storage is unavailable.
+
+- 2026-10-02 — Disabled VMS payments by default behind a reversible feature flag, closing UI and server access for every role, suppressing payment automation and retaining all code, permissions, relations and historical data.
 
 - 2026-10-01 — Moved the existing theme switcher from page headers beside the sidebar logo in admin and vendor layouts, replacing the portal/panel branding labels; retained theme preferences and added localized labels and keyboard focus styling.
 

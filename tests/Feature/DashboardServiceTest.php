@@ -16,6 +16,12 @@ class DashboardServiceTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config(['features.payments.enabled' => true]);
+    }
+
     public function test_admin_dashboard_data_includes_stats_pending_items_and_activity(): void
     {
         $vendorUser = User::factory()->create();

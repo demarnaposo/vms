@@ -99,7 +99,7 @@ export default function Index() {
             <div className="space-y-6">
                 {/* Stats Overview */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="card p-5 rounded-2xl border-2 border-(--color-text-tertiary)">
+                    <div className="bg-(--color-bg-primary) shadow-token-sm p-5 rounded-2xl border-2 border-(--color-text-tertiary)">
                         <div className="flex items-center justify-between">
                             <div>
                                 {/* Localize the fixed total summary label. */}
@@ -127,7 +127,7 @@ export default function Index() {
                             </div>
                         </div>
                     </div>
-                    <div className="card p-5 rounded-2xl border-2 border-(--color-info)">
+                    <div className="bg-(--color-bg-primary) shadow-token-sm p-5 rounded-2xl border-2 border-(--color-info)">
                         <div className="flex items-center justify-between">
                             <div>
                                 {/* Localize the fixed new-status summary label. */}
@@ -153,7 +153,7 @@ export default function Index() {
                             </div>
                         </div>
                     </div>
-                    <div className="card p-5 rounded-2xl border-2 border-(--color-success)">
+                    <div className="bg-(--color-bg-primary) shadow-token-sm p-5 rounded-2xl border-2 border-(--color-success)">
                         <div className="flex items-center justify-between">
                             <div>
                                 {/* Localize the fixed replied-status summary label. */}
@@ -181,7 +181,7 @@ export default function Index() {
                             </div>
                         </div>
                     </div>
-                    <div className="card p-5 rounded-2xl border-2 border-(--color-text-primary)">
+                    <div className="bg-(--color-bg-primary) shadow-token-sm p-5 rounded-2xl border-2 border-(--color-text-primary)">
                         <div className="flex items-center justify-between">
                             <div>
                                 {/* Localize the fixed read-status summary label. */}

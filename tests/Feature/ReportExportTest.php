@@ -54,6 +54,7 @@ class ReportExportTest extends TestCase
     // Verify exported payment amounts use the configured IDR code and Indonesian separators.
     public function test_payment_csv_uses_idr_currency_format(): void
     {
+        config(['features.payments.enabled' => true]);
         $user = $this->createOpsUser();
         $vendor = Vendor::factory()->create();
 

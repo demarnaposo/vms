@@ -24,12 +24,14 @@ class ReportService
             'total_vendors' => $totalVendors,
             'active_vendors' => Vendor::where('status', Vendor::STATUS_ACTIVE)->count(),
             'compliance_rate' => round(($compliantVendors / max($totalVendors, 1)) * 100),
-            'pending_payments' => PaymentRequest::whereIn('status', [
-                PaymentRequest::STATUS_REQUESTED,
-                PaymentRequest::STATUS_PENDING_OPS,
-                PaymentRequest::STATUS_PENDING_FINANCE,
-            ])->count(),
-            'total_paid' => PaymentRequest::where('status', PaymentRequest::STATUS_PAID)->sum('amount'),
+            ...(\App\Support\PaymentsModule::enabled() ? [
+                'pending_payments' => PaymentRequest::whereIn('status', [
+                    PaymentRequest::STATUS_REQUESTED,
+                    PaymentRequest::STATUS_PENDING_OPS,
+                    PaymentRequest::STATUS_PENDING_FINANCE,
+                ])->count(),
+                'total_paid' => PaymentRequest::where('status', PaymentRequest::STATUS_PAID)->sum('amount'),
+            ] : []),
         ];
     }
 
@@ -98,6 +100,7 @@ class ReportService
 
     public function exportPaymentCsv(Request $request): Response
     {
+        abort_unless(\App\Support\PaymentsModule::enabled(), 404);
         $query = PaymentRequest::with('vendor:id,company_name');
 
         if ($request->filled('start_date')) {

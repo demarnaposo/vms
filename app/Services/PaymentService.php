@@ -35,6 +35,9 @@ class PaymentService
         ?string $invoiceNumber = null,
         ?string $dueDate = null
     ): PaymentRequest {
+        // [VMS_PAYMENTS_DISABLED] External payments; config/features.php must enable writes.
+        abort_unless(\App\Support\PaymentsModule::enabled(), 404);
+
         return DB::transaction(function () use ($vendor, $requestedBy, $amount, $description, $invoiceNumber, $dueDate) {
             // Check if vendor can request payments
             $this->validateVendorCanRequestPayment($vendor);
@@ -87,6 +90,9 @@ class PaymentService
      */
     public function validateByOps(PaymentRequest $request, User $opsManager, bool $approve, ?string $comment = null): bool
     {
+        // [VMS_PAYMENTS_DISABLED] External payments; config/features.php must enable writes.
+        abort_unless(\App\Support\PaymentsModule::enabled(), 404);
+
         return DB::transaction(function () use ($request, $opsManager, $approve, $comment) {
             // Lock the record for update to prevent race conditions
             $request = PaymentRequest::lockForUpdate()->find($request->id);
@@ -150,6 +156,9 @@ class PaymentService
      */
     public function approveByFinance(PaymentRequest $request, User $financeManager, bool $approve, ?string $comment = null): bool
     {
+        // [VMS_PAYMENTS_DISABLED] External payments; config/features.php must enable writes.
+        abort_unless(\App\Support\PaymentsModule::enabled(), 404);
+
         return DB::transaction(function () use ($request, $financeManager, $approve, $comment) {
             // Lock the record for update to prevent race conditions
             $request = PaymentRequest::lockForUpdate()->find($request->id);
@@ -223,6 +232,9 @@ class PaymentService
      */
     public function markAsPaid(PaymentRequest $request, User $user, string $paymentReference, ?string $paymentMethod = null): bool
     {
+        // [VMS_PAYMENTS_DISABLED] External payments; config/features.php must enable writes.
+        abort_unless(\App\Support\PaymentsModule::enabled(), 404);
+
         return DB::transaction(function () use ($request, $user, $paymentReference, $paymentMethod) {
             $request = PaymentRequest::lockForUpdate()->find($request->id);
 

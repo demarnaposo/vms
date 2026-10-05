@@ -11,6 +11,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->prepend(\App\Http\Middleware\EnsurePaymentsEnabled::class);
+
         // Accept the plain, non-sensitive locale cookie written by the browser language switcher.
         $middleware->encryptCookies(except: ['vms_locale']);
 
