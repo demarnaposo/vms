@@ -349,4 +349,13 @@ class DocumentTypeManagementTest extends TestCase
         app(\App\Services\ComplianceService::class)->evaluateVendor($vendor);
         $this->assertSame('fail', \App\Models\ComplianceResult::latest('id')->first()->status);
     }
+
+    public function test_upload_size_defaults_and_bounds_remain_valid_without_a_document_type(): void
+    {
+        $this->assertSame(10, \App\Support\DocumentUploadRules::maxMb(null));
+        $this->assertSame(10, \App\Support\DocumentUploadRules::maxMb(new DocumentType));
+        foreach ([0 => 1, 2 => 2, 11 => 10] as $configured => $expected) {
+            $this->assertSame($expected, \App\Support\DocumentUploadRules::maxMb(new DocumentType(['max_file_size_mb' => $configured])));
+        }
+    }
 }

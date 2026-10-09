@@ -88,6 +88,8 @@ The VMS (Vendor Management System) changelog starts on 2026-09-18. Changes befor
 
 ### Fixed
 
+- 2026-10-09 — Fixed six PHPStan findings by representing legacy business-type options as unsaved models, declaring the nullable category description and removing redundant guards after established validation; preserved rating bounds, upload defaults and final onboarding validation.
+
 - 2026-10-09 — Fixed default-language feature assertions to inspect the HTML lang attribute independently of attribute order and the existing theme attribute.
 
 - 2026-10-08 — Show bilingual onboarding file-size errors in MB beside the affected document, retain upload context, and turn oversized server POST requests into inline validation errors after authorization instead of a standalone 413 page.

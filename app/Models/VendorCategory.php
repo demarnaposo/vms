@@ -6,6 +6,9 @@ use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property string|null $description
+ */
 class VendorCategory extends Model
 {
     use Auditable;

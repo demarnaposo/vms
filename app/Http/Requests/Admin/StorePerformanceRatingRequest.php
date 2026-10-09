@@ -111,7 +111,7 @@ class StorePerformanceRatingRequest extends FormRequest
                     continue;
                 }
 
-                if ($maxScore > 0 && $score > $maxScore) {
+                if ($score > $maxScore) {
                     $validator->errors()->add(
                         "ratings.{$index}.score",
                         // Localize the custom maximum-score validation response.

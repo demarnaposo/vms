@@ -33,7 +33,7 @@ class DocumentUploadRules
 
     public static function maxMb(?DocumentType $type): int
     {
-        return max(1, min(self::MAX_MB, (int) ($type?->max_file_size_mb ?? self::MAX_MB)));
+        return max(1, min(self::MAX_MB, (int) ($type->max_file_size_mb ?? self::MAX_MB)));
     }
 
     public static function messages(?DocumentType $type): array

@@ -36,7 +36,7 @@ class BusinessTypeService
         })->orderBy('display_name')->get(['id', 'code', 'display_name', 'is_active']);
 
         if (filled($current) && ! $types->contains('code', $current)) {
-            $types->push(['code' => $current, 'display_name' => $current, 'is_active' => false]);
+            $types->push(new BusinessType(['code' => $current, 'display_name' => $current, 'is_active' => false]));
         }
 
         return $types;

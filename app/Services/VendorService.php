@@ -286,8 +286,8 @@ class VendorService
             $data['step3']['documents'] = array_values(array_filter($data['step3']['documents'] ?? [], fn ($doc) => ! in_array((int) ($doc['document_type_id'] ?? 0), $removedIds, true)));
             // 1. Create or Update Vendor (Ensure it exists first)
             $vendorData = array_merge(
-                $data['step1'] ?? [],
-                $data['step2'] ?? []
+                $data['step1'],
+                $data['step2']
             );
             unset($vendorData['category'], $vendorData['category_description'], $vendorData['description']);
             // Keep new and resubmitted vendor profiles aligned with Indonesian regions.

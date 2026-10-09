@@ -269,4 +269,16 @@ class BusinessTypeManagementTest extends TestCase
         $this->get('/admin/business-types?search=custom&page=2')->assertInertia(fn (Assert $page) => $page->has('types.data', 2));
         $this->get('/admin/business-types?search='.str_repeat('x', 256))->assertSessionHasErrors('search');
     }
+
+    public function test_unknown_legacy_option_retains_its_payload_without_creating_a_catalogue_record(): void
+    {
+        $value = 'Unknown Historical Entity';
+        $count = BusinessType::count();
+        $option = app(BusinessTypeService::class)->options($value)->last();
+
+        $this->assertInstanceOf(BusinessType::class, $option);
+        $this->assertFalse($option->exists);
+        $this->assertSame(['code' => $value, 'display_name' => $value, 'is_active' => false], $option->toArray());
+        $this->assertSame($count, BusinessType::count());
+    }
 }
