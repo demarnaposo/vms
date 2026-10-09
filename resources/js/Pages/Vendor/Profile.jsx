@@ -1,16 +1,10 @@
+import VendorCategoryDescription from '@/Components/VendorCategoryDescription';
+import { vendorCategoryLabel } from '@/i18n/vendorCategories';
+import VendorFormSelect from './Components/VendorFormSelect';
 import { ActionButton } from '@/Components/ActionControls';
 import { usePage, useForm } from '@inertiajs/react';
 import { useState, useMemo } from 'react';
-import {
-    VendorLayout,
-    PageHeader,
-    Card,
-    Button,
-    Badge,
-    AppIcon,
-    FormInput,
-    FormSelect,
-} from '@/Components';
+import { VendorLayout, PageHeader, Card, Button, Badge, AppIcon, FormInput } from '@/Components';
 import { formatDate } from '@/utils/dateFormatters';
 // Use the centralized Indonesian province and regency/city dataset.
 import { INDONESIAN_PROVINCES, getRegenciesForProvince } from '@/data/indonesianProvincesAndCities';
@@ -19,6 +13,7 @@ import { findIndonesianBankByCode } from '@/data/indonesianBanks';
 // Translate vendor profile tabs, fields, and actions.
 import { useLanguage } from '@/Contexts/LanguageContext';
 import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
+import { businessTypeOptions } from '@/i18n/businessTypes';
 // Match VMS profile phone input to Indonesian onboarding rules.
 import {
     sanitizeIndonesianMobileInput,
@@ -28,7 +23,7 @@ import {
 // Use Indonesia's three-digit bank transfer code format.
 const BANK_CODE_REGEX = /^[0-9]{3}$/;
 
-export default function Profile({ vendor }) {
+export default function Profile({ vendor, businessTypes = [] }) {
     const { language, t } = useLanguage();
     const { auth } = usePage().props;
     const user = auth.user;
@@ -61,7 +56,7 @@ export default function Profile({ vendor }) {
     const cityOptions = useMemo(() => getRegenciesForProvince(form.data.state), [form.data.state]);
     // Derive Indonesian bank resolution without extra state or external requests.
     const resolvedBank = findIndonesianBankByCode(form.data.code_bank);
-    const categoryLabel = vendor?.vendor_category?.display_name || '-';
+    const categoryLabel = vendorCategoryLabel(language, vendor?.vendor_category) || '-';
     const vendorStatus = vendor?.status || 'draft';
     const vendorStatusLabel = translateSystemMasterDataField(
         language,
@@ -173,7 +168,7 @@ export default function Profile({ vendor }) {
             title="Profile"
             subtitle="Manage your company information"
             actions={
-                <div className="flex items-center gap-3">
+                <div className="flex min-w-0 flex-wrap items-center gap-3">
                     <Badge status={vendorStatus} size="lg" translateLabel={false}>
                         {vendorStatusLabel}
                     </Badge>
@@ -181,7 +176,10 @@ export default function Profile({ vendor }) {
                         vendor?.status !== 'draft' &&
                         activeTab !== 'company' &&
                         activeTab !== 'status' && (
-                            <ActionButton onClick={() => setIsEditing(true)}>
+                            <ActionButton
+                                className="min-h-9 justify-center whitespace-normal"
+                                onClick={() => setIsEditing(true)}
+                            >
                                 {t('Edit Profile')}
                             </ActionButton>
                         )}
@@ -192,7 +190,7 @@ export default function Profile({ vendor }) {
 
     // Helper for input field class with error styling
     const inputClass = (field) =>
-        `w-full px-4 py-3 bg-(--color-bg-primary) border rounded-lg text-sm focus:ring-2 outline-none transition-all ${
+        `w-full min-w-0 px-4 py-3 bg-(--color-bg-primary) border rounded-lg text-sm focus:ring-2 outline-none transition-all ${
             getError(field)
                 ? 'border-(--color-danger) focus:border-(--color-danger) focus:ring-(--color-danger)/20'
                 : 'border-(--color-border-primary) focus:border-(--color-border-focus) focus:ring-(--color-brand-primary)/20'
@@ -200,13 +198,14 @@ export default function Profile({ vendor }) {
 
     return (
         <VendorLayout title="Profile" activeNav="Profile" header={header} vendor={vendor}>
-            <div className="space-y-6">
+            <div className="min-w-0 space-y-6">
                 {/* Tabs */}
-                <div className="flex gap-2 p-1 bg-(--color-bg-secondary) rounded-xl border border-(--color-border-secondary)">
+                <div className="grid grid-cols-2 gap-2 p-1 sm:flex sm:flex-wrap bg-(--color-bg-secondary) rounded-xl border border-(--color-border-secondary)">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
                             type="button"
+                            aria-pressed={activeTab === tab.id}
                             onClick={() => {
                                 setActiveTab(tab.id);
                                 setClientErrors({});
@@ -214,7 +213,7 @@ export default function Profile({ vendor }) {
                                     setIsEditing(false);
                                 }
                             }}
-                            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                            className={`min-h-9 min-w-0 flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-brand-primary) ${
                                 activeTab === tab.id
                                     ? 'bg-(--color-bg-primary) text-(--color-brand-primary) shadow-sm'
                                     : 'text-(--color-text-tertiary) hover:text-(--color-text-primary)'
@@ -223,16 +222,16 @@ export default function Profile({ vendor }) {
                             <span className="inline-flex">
                                 <AppIcon name={tab.icon} className="h-4 w-4" />
                             </span>
-                            <span className="hidden sm:inline">{t(tab.label)}</span>
+                            <span className="min-w-0 whitespace-normal">{t(tab.label)}</span>
                         </button>
                     ))}
                 </div>
 
-                <form onSubmit={handleSubmit}>
+                <form noValidate onSubmit={handleSubmit}>
                     {/* ===== Company Details Tab (ALWAYS DISABLED) ===== */}
                     {activeTab === 'company' && (
                         <Card title="Company Details">
-                            <div className="grid md:grid-cols-2 gap-6 p-6">
+                            <div className="grid min-w-0 grid-cols-1 gap-4 xl:grid-cols-2 [&>div]:min-w-0">
                                 <FormInput
                                     label="Vendor ID"
                                     value={vendor?.vendor_number || '-'}
@@ -243,7 +242,7 @@ export default function Profile({ vendor }) {
                                     label="Company Name"
                                     value={form.data.company_name}
                                     onChange={() => {}}
-                                    required
+                                    showRequiredIndicator
                                     disabled={true}
                                 />
                                 {/* Display Indonesian company identifiers on the vendor profile. */}
@@ -265,21 +264,13 @@ export default function Profile({ vendor }) {
                                     onChange={() => {}}
                                     disabled={true}
                                 />
-                                <div className="md:col-span-2">
-                                    <FormSelect
+                                <div className="xl:col-span-2">
+                                    <VendorFormSelect
                                         label="Business Type"
                                         value={form.data.business_type}
                                         onChange={() => {}}
-                                        options={[
-                                            {
-                                                value: 'sole_proprietor',
-                                                label: 'Sole Proprietorship',
-                                            },
-                                            { value: 'partnership', label: 'Partnership' },
-                                            { value: 'pvt_ltd', label: 'Private Limited' },
-                                            { value: 'public_ltd', label: 'Public Limited' },
-                                            { value: 'llp', label: 'LLP' },
-                                        ]}
+                                        options={businessTypeOptions(language, businessTypes)}
+                                        translateOptions={false}
                                         disabled={true}
                                     />
                                 </div>
@@ -289,15 +280,19 @@ export default function Profile({ vendor }) {
                                     onChange={() => {}}
                                     disabled={true}
                                 />
-                                <div className="md:col-span-2">
+                                <VendorCategoryDescription
+                                    category={vendor?.vendor_category}
+                                    className="xl:col-span-2"
+                                />
+                                <div className="xl:col-span-2">
                                     <label className="text-sm font-medium text-(--color-text-secondary)">
                                         {t('Experience')}
                                     </label>
-                                    <p className="mt-2 min-h-[80px] whitespace-pre-wrap rounded-lg border border-(--color-border-primary) bg-(--color-bg-secondary) px-4 py-3 text-sm text-(--color-text-primary)">
+                                    <p className="mt-2 min-h-[80px] whitespace-pre-wrap [overflow-wrap:anywhere] rounded-lg border border-(--color-border-primary) bg-(--color-bg-secondary) px-4 py-3 text-sm text-(--color-text-primary)">
                                         {form.data.experience || '-'}
                                     </p>
                                 </div>
-                                <div className="md:col-span-2 p-4 bg-(--color-bg-secondary) rounded-xl">
+                                <div className="xl:col-span-2 p-4 bg-(--color-bg-secondary) rounded-xl">
                                     <p className="text-sm text-(--color-text-tertiary) flex items-center gap-2">
                                         <svg
                                             className="w-4 h-4"
@@ -324,15 +319,25 @@ export default function Profile({ vendor }) {
                     {/* ===== Contact Info Tab (EDITABLE with Validations) ===== */}
                     {activeTab === 'contact' && (
                         <Card title="Contact Information">
-                            <div className="grid md:grid-cols-2 gap-6 p-6">
+                            <div className="grid min-w-0 grid-cols-1 gap-4 xl:grid-cols-2 [&>div]:min-w-0">
                                 {/* Contact Person */}
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-(--color-text-secondary)">
+                                    <label
+                                        htmlFor="profile-contact_person"
+                                        className="text-sm font-medium text-(--color-text-secondary)"
+                                    >
                                         {t('Contact Person')}{' '}
                                         <span className="text-(--color-danger)">*</span>
                                     </label>
                                     <input
                                         type="text"
+                                        id="profile-contact_person"
+                                        aria-invalid={!!getError('contact_person')}
+                                        aria-describedby={
+                                            getError('contact_person')
+                                                ? 'profile-contact_person-error'
+                                                : undefined
+                                        }
                                         value={form.data.contact_person}
                                         onChange={(e) => {
                                             form.setData('contact_person', e.target.value);
@@ -360,7 +365,11 @@ export default function Profile({ vendor }) {
                                         disabled={!isEditing}
                                     />
                                     {getError('contact_person') && (
-                                        <p className="text-sm text-(--color-danger)">
+                                        <p
+                                            id="profile-contact_person-error"
+                                            role="alert"
+                                            className="text-sm text-(--color-danger)"
+                                        >
                                             {getError('contact_person')}
                                         </p>
                                     )}
@@ -368,7 +377,10 @@ export default function Profile({ vendor }) {
 
                                 {/* WhatsApp Number */}
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-(--color-text-secondary)">
+                                    <label
+                                        htmlFor="profile-contact_phone"
+                                        className="text-sm font-medium text-(--color-text-secondary)"
+                                    >
                                         {t('WhatsApp Number')}{' '}
                                         <span className="text-(--color-danger)">*</span>
                                     </label>
@@ -376,6 +388,13 @@ export default function Profile({ vendor }) {
                                         type="tel"
                                         inputMode="tel"
                                         autoComplete="tel"
+                                        id="profile-contact_phone"
+                                        aria-invalid={!!getError('contact_phone')}
+                                        aria-describedby={
+                                            getError('contact_phone')
+                                                ? 'profile-contact_phone-error'
+                                                : undefined
+                                        }
                                         value={form.data.contact_phone}
                                         onChange={(e) => {
                                             const val = sanitizeIndonesianMobileInput(
@@ -410,7 +429,11 @@ export default function Profile({ vendor }) {
                                         </p>
                                     )}
                                     {getError('contact_phone') && (
-                                        <p className="text-sm text-(--color-danger)">
+                                        <p
+                                            id="profile-contact_phone-error"
+                                            role="alert"
+                                            className="text-sm text-(--color-danger)"
+                                        >
                                             {getError('contact_phone')}
                                         </p>
                                     )}
@@ -426,12 +449,22 @@ export default function Profile({ vendor }) {
                                 />
 
                                 {/* Address */}
-                                <div className="md:col-span-2 space-y-2">
-                                    <label className="text-sm font-medium text-(--color-text-secondary)">
+                                <div className="xl:col-span-2 space-y-2">
+                                    <label
+                                        htmlFor="profile-address"
+                                        className="text-sm font-medium text-(--color-text-secondary)"
+                                    >
                                         {t('Registered Address')}{' '}
                                         <span className="text-(--color-danger)">*</span>
                                     </label>
                                     <textarea
+                                        id="profile-address"
+                                        aria-invalid={!!getError('address')}
+                                        aria-describedby={
+                                            getError('address')
+                                                ? 'profile-address-error'
+                                                : undefined
+                                        }
                                         value={form.data.address}
                                         onChange={(e) => {
                                             form.setData('address', e.target.value);
@@ -455,18 +488,20 @@ export default function Profile({ vendor }) {
                                         disabled={!isEditing}
                                     />
                                     {getError('address') && (
-                                        <p className="text-sm text-(--color-danger)">
+                                        <p
+                                            id="profile-address-error"
+                                            role="alert"
+                                            className="text-sm text-(--color-danger)"
+                                        >
                                             {getError('address')}
                                         </p>
                                     )}
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-(--color-text-secondary)">
-                                        {t('Province')}{' '}
-                                        <span className="text-(--color-danger)">*</span>
-                                    </label>
-                                    <FormSelect
+                                    <VendorFormSelect
+                                        label="Province"
+                                        showRequiredIndicator
                                         value={form.data.state}
                                         onChange={(value) => {
                                             form.setData((prev) => ({
@@ -484,6 +519,7 @@ export default function Profile({ vendor }) {
                                         }}
                                         placeholder="Select Province"
                                         options={INDONESIAN_PROVINCES}
+                                        translateOptions={false}
                                         error={getError('state')}
                                         disabled={!isEditing}
                                     />
@@ -491,11 +527,9 @@ export default function Profile({ vendor }) {
 
                                 {/* Replace the city dropdown with Indonesian regencies and cities. */}
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-(--color-text-secondary)">
-                                        {t('Regency / City')}{' '}
-                                        <span className="text-(--color-danger)">*</span>
-                                    </label>
-                                    <FormSelect
+                                    <VendorFormSelect
+                                        label="Regency / City"
+                                        showRequiredIndicator
                                         value={form.data.city}
                                         onChange={(value) => {
                                             form.setData('city', value);
@@ -512,6 +546,7 @@ export default function Profile({ vendor }) {
                                                 : 'Select Province first'
                                         }
                                         options={cityOptions}
+                                        translateOptions={false}
                                         disabled={!isEditing || !form.data.state}
                                         error={getError('city')}
                                     />
@@ -519,12 +554,22 @@ export default function Profile({ vendor }) {
 
                                 {/* Use Indonesia's postal code label and five-digit input rules. */}
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-(--color-text-secondary)">
+                                    <label
+                                        htmlFor="profile-pincode"
+                                        className="text-sm font-medium text-(--color-text-secondary)"
+                                    >
                                         {t('Postal Code')}{' '}
                                         <span className="text-(--color-danger)">*</span>
                                     </label>
                                     <input
                                         type="text"
+                                        id="profile-pincode"
+                                        aria-invalid={!!getError('pincode')}
+                                        aria-describedby={
+                                            getError('pincode')
+                                                ? 'profile-pincode-error'
+                                                : undefined
+                                        }
                                         value={form.data.pincode}
                                         onChange={(e) => {
                                             const val = e.target.value.replace(/\D/g, '');
@@ -550,7 +595,11 @@ export default function Profile({ vendor }) {
                                         disabled={!isEditing}
                                     />
                                     {getError('pincode') && (
-                                        <p className="text-sm text-(--color-danger)">
+                                        <p
+                                            id="profile-pincode-error"
+                                            role="alert"
+                                            className="text-sm text-(--color-danger)"
+                                        >
                                             {getError('pincode')}
                                         </p>
                                     )}
@@ -562,15 +611,25 @@ export default function Profile({ vendor }) {
                     {/* ===== Bank Details Tab (EDITABLE with Validations) ===== */}
                     {activeTab === 'bank' && (
                         <Card title="Bank Details">
-                            <div className="grid md:grid-cols-2 gap-6 p-6">
+                            <div className="grid min-w-0 grid-cols-1 gap-4 xl:grid-cols-2 [&>div]:min-w-0">
                                 {/* Use Indonesian bank naming and local bank-code resolution. */}
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-(--color-text-secondary)">
+                                    <label
+                                        htmlFor="profile-bank_name"
+                                        className="text-sm font-medium text-(--color-text-secondary)"
+                                    >
                                         {t('Bank Name')}{' '}
                                         <span className="text-(--color-danger)">*</span>
                                     </label>
                                     <input
                                         type="text"
+                                        id="profile-bank_name"
+                                        aria-invalid={!!getError('bank_name')}
+                                        aria-describedby={
+                                            getError('bank_name')
+                                                ? 'profile-bank_name-error'
+                                                : undefined
+                                        }
                                         value={form.data.bank_name}
                                         onChange={(e) => {
                                             form.setData('bank_name', e.target.value);
@@ -597,7 +656,11 @@ export default function Profile({ vendor }) {
                                         disabled={!isEditing}
                                     />
                                     {getError('bank_name') && (
-                                        <p className="text-sm text-(--color-danger)">
+                                        <p
+                                            id="profile-bank_name-error"
+                                            role="alert"
+                                            className="text-sm text-(--color-danger)"
+                                        >
                                             {getError('bank_name')}
                                         </p>
                                     )}
@@ -605,12 +668,22 @@ export default function Profile({ vendor }) {
 
                                 {/* Account Number */}
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-(--color-text-secondary)">
+                                    <label
+                                        htmlFor="profile-bank_account_number"
+                                        className="text-sm font-medium text-(--color-text-secondary)"
+                                    >
                                         {t('Account Number')}{' '}
                                         <span className="text-(--color-danger)">*</span>
                                     </label>
                                     <input
                                         type="text"
+                                        id="profile-bank_account_number"
+                                        aria-invalid={!!getError('bank_account_number')}
+                                        aria-describedby={
+                                            getError('bank_account_number')
+                                                ? 'profile-bank_account_number-error'
+                                                : undefined
+                                        }
                                         value={form.data.bank_account_number}
                                         onChange={(e) => {
                                             const val = e.target.value.replace(/\D/g, '');
@@ -638,7 +711,11 @@ export default function Profile({ vendor }) {
                                         disabled={!isEditing}
                                     />
                                     {getError('bank_account_number') && (
-                                        <p className="text-sm text-(--color-danger)">
+                                        <p
+                                            id="profile-bank_account_number-error"
+                                            role="alert"
+                                            className="text-sm text-(--color-danger)"
+                                        >
                                             {getError('bank_account_number')}
                                         </p>
                                     )}
@@ -646,13 +723,23 @@ export default function Profile({ vendor }) {
 
                                 {/* Use an Indonesian bank code field with local name lookup. */}
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-(--color-text-secondary)">
+                                    <label
+                                        htmlFor="profile-code_bank"
+                                        className="text-sm font-medium text-(--color-text-secondary)"
+                                    >
                                         {t('Bank Code')}{' '}
                                         <span className="text-(--color-danger)">*</span>
                                     </label>
                                     <div className="relative">
                                         <input
                                             type="text"
+                                            id="profile-code_bank"
+                                            aria-invalid={!!getError('code_bank')}
+                                            aria-describedby={
+                                                getError('code_bank')
+                                                    ? 'profile-code_bank-error'
+                                                    : undefined
+                                            }
                                             value={form.data.code_bank}
                                             onChange={(e) => {
                                                 const code = e.target.value
@@ -714,7 +801,11 @@ export default function Profile({ vendor }) {
                                         )}
                                     </p>
                                     {getError('code_bank') && (
-                                        <p className="text-sm text-(--color-danger)">
+                                        <p
+                                            id="profile-code_bank-error"
+                                            role="alert"
+                                            className="text-sm text-(--color-danger)"
+                                        >
                                             {getError('code_bank')}
                                         </p>
                                     )}
@@ -722,12 +813,22 @@ export default function Profile({ vendor }) {
 
                                 {/* Keep branch manual because Indonesian bank codes do not identify an individual branch. */}
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-(--color-text-secondary)">
+                                    <label
+                                        htmlFor="profile-bank_branch"
+                                        className="text-sm font-medium text-(--color-text-secondary)"
+                                    >
                                         {t('Branch Name')}{' '}
                                         <span className="text-(--color-danger)">*</span>
                                     </label>
                                     <input
                                         type="text"
+                                        id="profile-bank_branch"
+                                        aria-invalid={!!getError('bank_branch')}
+                                        aria-describedby={
+                                            getError('bank_branch')
+                                                ? 'profile-bank_branch-error'
+                                                : undefined
+                                        }
                                         value={form.data.bank_branch}
                                         onChange={(e) => {
                                             form.setData('bank_branch', e.target.value);
@@ -756,7 +857,11 @@ export default function Profile({ vendor }) {
                                         {t('Enter the branch registered for this account.')}
                                     </p>
                                     {getError('bank_branch') && (
-                                        <p className="text-sm text-(--color-danger)">
+                                        <p
+                                            id="profile-bank_branch-error"
+                                            role="alert"
+                                            className="text-sm text-(--color-danger)"
+                                        >
                                             {getError('bank_branch')}
                                         </p>
                                     )}
@@ -767,10 +872,10 @@ export default function Profile({ vendor }) {
 
                     {/* ===== Account Status Tab ===== */}
                     {activeTab === 'status' && (
-                        <div className="space-y-6">
+                        <div className="min-w-0 space-y-6">
                             <Card title="Account Status">
-                                <div className="p-6 space-y-6">
-                                    <div className="flex items-center justify-between p-4 bg-(--color-bg-secondary) rounded-xl">
+                                <div className="min-w-0 space-y-6">
+                                    <div className="flex min-w-0 flex-wrap items-center justify-between gap-3 p-4 bg-(--color-bg-secondary) rounded-xl">
                                         <div>
                                             <div className="text-sm text-(--color-text-tertiary)">
                                                 {t('Current Status')}
@@ -832,7 +937,7 @@ export default function Profile({ vendor }) {
 
                     {/* Action Buttons - Only show on editable tabs */}
                     {isEditing && (activeTab === 'contact' || activeTab === 'bank') && (
-                        <div className="flex justify-end gap-3 mt-6">
+                        <div className="flex flex-col-reverse gap-3 mt-6 sm:flex-row sm:justify-end [&>button]:min-h-9">
                             {/* Reset form data without obsolete external bank lookup state. */}
                             <Button
                                 variant="outline"
@@ -844,7 +949,11 @@ export default function Profile({ vendor }) {
                             >
                                 {t('Cancel')}
                             </Button>
-                            <Button type="submit" disabled={form.processing}>
+                            <Button
+                                type="submit"
+                                disabled={form.processing}
+                                disabledReason={'A request is in progress. Please wait.'}
+                            >
                                 {form.processing ? t('Saving...') : t('Save Changes')}
                             </Button>
                         </div>

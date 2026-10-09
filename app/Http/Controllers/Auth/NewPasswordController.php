@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -41,6 +42,19 @@ class NewPasswordController extends Controller
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user) use ($request) {
+                if ($user->isVendor()) {
+                    $vendor = $user->vendor;
+                    $error = match (true) {
+                        $vendor?->blocksUserAccess() => __('alerts.vendor_account_status', ['status' => __('alerts.actions.'.$vendor->status)]),
+                        ! $user->is_active => __('alerts.user_account_inactive'),
+                        default => null,
+                    };
+
+                    if ($error !== null) {
+                        throw ValidationException::withMessages(['email' => $error]);
+                    }
+                }
+
                 $user->forceFill([
                     'password' => Hash::make($request->password),
                     'remember_token' => Str::random(60),

@@ -1,5 +1,136 @@
 // Centralize Indonesian translations while English remains the source-language fallback.
 export const INDONESIAN_TRANSLATIONS = Object.freeze({
+    'Not selected': 'Belum dipilih',
+    'Not rated': 'Belum dinilai',
+    'Category Description': 'Deskripsi Kategori',
+    'No category description available.': 'Deskripsi kategori belum tersedia.',
+    'Category Description must be text.': 'Deskripsi Kategori harus berupa teks.',
+    'Category Description may not exceed 1000 characters.':
+        'Deskripsi Kategori maksimal 1000 karakter.',
+    'e.g., Cleaning services and building security':
+        'contoh: Layanan kebersihan dan keamanan gedung',
+    'General Services & Facility': 'Layanan Umum & Fasilitas',
+    'Cleaning Services, Security Services, Pest Control, Landscaping':
+        'Cleaning Service, Security, Pest Control, Landscaping',
+    'MEP & Maintenance': 'MEP & Pemeliharaan',
+    'Air Conditioning, Electrical, Plumbing, Elevators, Generators':
+        'AC, Listrik, Plumbing, Lift, Genset',
+    'Construction & Maintenance': 'Konstruksi & Pemeliharaan',
+    'Renovation Contractors, Interiors, Furniture, Signage':
+        'Kontraktor Renovasi, Interior, Furniture, Signage',
+    'IT & Digital': 'TI & Digital',
+    'Hardware, Software/LMS, Websites, Networks, Zoom/M365 Licenses':
+        'Hardware, Software/LMS, Website, Network, Lisensi Zoom/M365',
+    'Marketing & Creative': 'Pemasaran & Kreatif',
+    'Event Organizers, Printing, Merchandise, Agencies, Photographers, MCs':
+        'Event Organizer, Printing, Merchandise, Agency, Fotografer, MC',
+    'Food & Beverages': 'Makanan & Minuman',
+    'Catering, Coffee Breaks, Snack Boxes, Partner Restaurants':
+        'Catering, Coffee Break, Snack Box, Restoran Rekanan',
+    'Education & Professional Service': 'Pendidikan & Layanan Profesional',
+    'Speakers, Facilitators, Certification Bodies, Translators, Consultants':
+        'Narasumber, Fasilitator, Lembaga Sertifikasi, Penerjemah, Konsultan',
+    'Logistic & Transport': 'Logistik & Transportasi',
+    'Travel Agents, Vehicle Rentals, Freight Forwarding, Couriers':
+        'Travel Agent, Rental Kendaraan, Ekspedisi, Kurir',
+    'Operational Supply': 'Perlengkapan Operasional',
+    'Stationery, Uniforms, Consumables, Drinking Water, Tissues':
+        'ATK, Uniform, Consumable, Air Minum, Tissue',
+    'Finance & Legal': 'Keuangan & Hukum',
+    'Auditors, Notaries, Insurance, Banks, Tax': 'Auditor, Notaris, Asuransi, Bank, Pajak',
+
+    'Performance Configuration': 'Konfigurasi Kinerja',
+    'Edit Configuration': 'Ubah Konfigurasi',
+    'Save Configuration': 'Simpan Konfigurasi',
+    'Search Performance Metrics': 'Cari Metrik Kinerja',
+    'Search by name or description…': 'Cari berdasarkan nama atau deskripsi…',
+    'Weight (%)': 'Bobot (%)',
+    'Active total: :total%': 'Total aktif: :total%',
+    'Remaining: :total%': 'Sisa: :total%',
+    'Excess: :total%': 'Kelebihan: :total%',
+    'Adjust all active weights together. The final total must be 100%.':
+        'Sesuaikan seluruh bobot aktif sekaligus. Total akhir harus 100%.',
+    'Maximum score is 4. Minimum score is 1.': 'Skor maksimum 4. Skor minimum 1.',
+    'Stage Deletion': 'Siapkan Penghapusan',
+    'Delete this metric when the configuration is saved?':
+        'Hapus metrik ini saat konfigurasi disimpan?',
+    'Pending deletion': 'Menunggu penghapusan',
+    'Undo Deletion': 'Batalkan Penghapusan',
+    'No performance metrics found.': 'Tidak ada metrik kinerja ditemukan.',
+    'Performance configuration updated.': 'Konfigurasi kinerja diperbarui.',
+    'e.g., 25.00': 'contoh: 25.00',
+    'Work Quality': 'Kualitas Pekerjaan',
+    'Quality of the goods/services provided meets specifications':
+        'Kualitas barang/jasa yang diberikan sesuai spesifikasi',
+    'Work Quantity': 'Kuantitas Pekerjaan',
+    'Quantity of goods/services matches the order': 'Ketepatan jumlah barang/jasa sesuai pesanan',
+    'Price of Goods/Services': 'Harga Barang/Jasa',
+    'Assessment of how competitive the vendor’s price quotation is':
+        'Penilaian terhadap seberapa kompetitif penawaran harga yang diberikan oleh vendor',
+    'Provision of Goods/Services': 'Penyediaan Barang/Jasa',
+    'Timeliness of goods/services delivery, including replacement goods/services or complaint handling':
+        'Ketepatan waktu pengiriman barang/jasa termasuk penyediaan barang/jasa pengganti atau penanganan komplain',
+    Mechanism: 'Mekanisme',
+    'Payment flexibility (payment on credit terms is possible)':
+        'Fleksibilitas pembayaran (bisa pembayaran tempo)',
+    'Invoice Delivery': 'Pengiriman Invoice',
+    'Timely delivery of complete and correct invoices':
+        'Ketepatan waktu pengiriman tagihan dengan lengkap dan benar',
+
+    'A request is in progress. Please wait.': 'Permintaan sedang diproses. Silakan tunggu.',
+    'Enter your password before deleting your account.':
+        'Masukkan kata sandi sebelum menghapus akun Anda.',
+    'Select a document type before uploading.': 'Pilih jenis dokumen sebelum mengunggah.',
+    'Select a file before uploading.': 'Pilih berkas sebelum mengunggah.',
+    'Enter the document expiry date before uploading.':
+        'Masukkan tanggal kedaluwarsa dokumen sebelum mengunggah.',
+    'Payment approval is blocked by vendor compliance.':
+        'Persetujuan pembayaran diblokir oleh kepatuhan vendor.',
+    'Enter the payment reference before continuing.':
+        'Masukkan referensi pembayaran sebelum melanjutkan.',
+    'Enter a rejection reason before continuing.': 'Masukkan alasan penolakan sebelum melanjutkan.',
+    'No active performance metrics are available for rating.':
+        'Tidak ada metrik kinerja aktif yang tersedia untuk penilaian.',
+    'Built-in metrics cannot be deleted. Deactivate this metric instead.':
+        'Metrik bawaan tidak dapat dihapus. Nonaktifkan metrik ini jika tidak digunakan.',
+    'Rated metrics cannot be deleted. Deactivate this metric instead.':
+        'Metrik yang sudah dinilai tidak dapat dihapus. Nonaktifkan metrik ini jika tidak digunakan.',
+    'Built-in roles cannot be deleted.': 'Peran bawaan tidak dapat dihapus.',
+    'This role is assigned to staff users and cannot be deleted.':
+        'Peran ini digunakan oleh pengguna staff dan tidak dapat dihapus.',
+    'You do not have permission to edit compliance rules.':
+        'Anda tidak memiliki izin untuk mengubah aturan kepatuhan.',
+    'You are already on the first page.': 'Anda sudah berada di halaman pertama.',
+    'You are already on the last page.': 'Anda sudah berada di halaman terakhir.',
+    'This pagination item is not a navigable page.':
+        'Item pagination ini bukan halaman yang dapat dibuka.',
+    'This is the current page.': 'Ini adalah halaman saat ini.',
+    'This report is not available yet.': 'Laporan ini belum tersedia.',
+    'Select a province before choosing a city.': 'Pilih provinsi sebelum memilih kota.',
+
+    'Manage metrics used to rate vendor performance.':
+        'Kelola metrik untuk menilai kinerja vendor.',
+    'Metric Code': 'Kode Metrik',
+    'Metric Name': 'Nama Metrik',
+    'Maximum Score': 'Skor Maksimum',
+    'Add Performance Metric': 'Tambah Metrik Kinerja',
+    'Edit Performance Metric': 'Ubah Metrik Kinerja',
+    'Delete Performance Metric': 'Hapus Metrik Kinerja',
+    'Delete this unused custom performance metric?':
+        'Hapus metrik kinerja custom yang belum digunakan ini?',
+    'No performance metrics yet.': 'Belum ada metrik kinerja.',
+    'Metric codes are fixed. Rated metrics keep their maximum score. Deactivate built-in or rated metrics instead of deleting them.':
+        'Kode metrik tetap. Skor maksimum metrik yang sudah dinilai tidak dapat diubah. Nonaktifkan metrik bawaan atau yang sudah dinilai untuk berhenti menggunakannya.',
+    'Unable to delete the metric. Please try again.':
+        'Metrik tidak dapat dihapus. Silakan coba lagi.',
+    'e.g., service_quality': 'contoh: kualitas_layanan',
+    'e.g., Service Quality': 'contoh: Kualitas Layanan',
+    'e.g., 1.00': 'contoh: 1.00',
+    'e.g., 100': 'contoh: 100',
+    'e.g., Quality of services delivered': 'contoh: Kualitas layanan yang diberikan',
+    'Weight: :weight': 'Bobot: :weight',
+    'No active performance metrics.': 'Tidak ada metrik kinerja aktif.',
+
     'Streamline onboarding and track compliance - all from one powerful platform.':
         'Sederhanakan onboarding dan pantau kepatuhan dari satu platform yang andal.',
     'Your vendor account is active.': 'Akun vendor Anda aktif.',
@@ -15,7 +146,19 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Cool blue tones': 'Nuansa biru sejuk',
     'Warm contrast': 'Kontras hangat',
     'Dark workspace': 'Ruang kerja gelap',
-    'Company Deed of Establishment': 'Akta Pendirian Perusahaan',
+    'NIB/OSS (Business Identification Number)': 'NIB/OSS (Nomor Induk Berusaha)',
+    'NPWP (Taxpayer Identification Number)': 'NPWP (Nomor Pokok Wajib Pajak)',
+    'Taxable Entrepreneur Confirmation (SPPKP)': 'Pengukuhan Pengusaha Kena Pajak (SPPKP)',
+    'Company Owner/Officer Identity Card (KTP)': 'KTP Pemilik/Pejabat Perusahaan',
+    'Company Domicile Certificate': 'Surat Keterangan Domisili Perusahaan',
+    ':document verified successfully.': ':document berhasil diverifikasi.',
+    ':document rejected.': ':document ditolak.',
+    'Company Profile': 'Profil Perusahaan',
+    'Other Supporting Documents': 'Dokumen Pendukung lainnya',
+    'Company overview and capabilities': 'Gambaran umum dan kemampuan perusahaan',
+    'Additional supporting documents supplied by the vendor':
+        'Dokumen pendukung tambahan yang disediakan vendor',
+    'Company Deed of Establishment': 'Akta Pendirian Usaha',
     'Deed establishing the company': 'Akta pendirian perusahaan',
     'Bank Account Confirmation Letter': 'Surat Keterangan Rekening Bank',
     'Bank letter confirming the company account':
@@ -148,6 +291,10 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     English: 'Inggris',
     Indonesian: 'Indonesia',
     Loading: 'Memuat',
+    'Select...': 'Pilih...',
+    Select: 'Pilih',
+    'Select date range': 'Pilih rentang tanggal',
+    'No options available': 'Tidak ada pilihan tersedia',
     'Loading...': 'Memuat...',
     Home: 'Beranda',
     About: 'Tentang',
@@ -487,6 +634,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     Office: 'Kantor',
     'Tech corridor, central operations hub': 'Kawasan teknologi, pusat operasional utama',
     'Send a message': 'Kirim pesan',
+    'Fields marked with * are required.': 'Kolom bertanda * wajib diisi.',
     'Fields marked here are required.': 'Kolom yang ditandai wajib diisi.',
     'Your name': 'Nama Anda',
     Subject: 'Subjek',
@@ -609,6 +757,48 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Legal Entity Name': 'Nama badan hukum',
     'e.g., PPM Manajemen': 'contoh: PPM Manajemen',
     'Business Type': 'Jenis Usaha',
+    'Business Types': 'Jenis Usaha',
+    'Business Type must be text.': 'Jenis usaha harus berupa teks.',
+    'Business Type may not exceed 50 characters.':
+        'Jenis usaha tidak boleh lebih dari 50 karakter.',
+    'Please check the highlighted fields.': 'Silakan periksa kolom yang ditandai.',
+    'Business Type Code': 'Kode Jenis Usaha',
+    'Business Type Name': 'Nama Jenis Usaha',
+    'Add Business Type': 'Tambah Jenis Usaha',
+    'Edit Business Type': 'Ubah Jenis Usaha',
+    'Delete Business Type': 'Hapus Jenis Usaha',
+    'Manage business types used during vendor registration.':
+        'Kelola jenis usaha yang digunakan saat registrasi vendor.',
+    'Search Business Types': 'Cari Jenis Usaha',
+    'Search by name or code…': 'Cari berdasarkan nama atau kode…',
+    'No business types found.': 'Tidak ada jenis usaha yang ditemukan.',
+    'Delete this business type?': 'Hapus jenis usaha ini?',
+    'Business types used by vendors, applications or history cannot be deleted. Deactivate them instead.':
+        'Jenis usaha yang digunakan oleh vendor, aplikasi atau histori tidak dapat dihapus. Nonaktifkan saja.',
+    'Business type added.': 'Jenis usaha berhasil ditambahkan.',
+    'Business type updated.': 'Jenis usaha berhasil diubah.',
+    'Business type deleted.': 'Jenis usaha berhasil dihapus.',
+    'This business type is used by vendors, applications or history. Deactivate it instead.':
+        'Jenis usaha ini digunakan oleh vendor, aplikasi atau histori. Nonaktifkan saja.',
+    'Business type codes cannot be changed after creation.':
+        'Kode jenis usaha tidak dapat diubah setelah dibuat.',
+    'Business Type Code is required.': 'Kode jenis usaha wajib diisi.',
+    'Business Type Code must be text.': 'Kode jenis usaha harus berupa teks.',
+    'Business Type Code may not exceed 50 characters.':
+        'Kode jenis usaha tidak boleh lebih dari 50 karakter.',
+    'Business Type Code must start with a lowercase letter and contain only lowercase letters, digits and underscores.':
+        'Kode jenis usaha harus diawali huruf kecil dan hanya berisi huruf kecil, angka dan garis bawah.',
+    'Business Type Code has already been used.': 'Kode jenis usaha sudah digunakan.',
+    'Business Type Name is required.': 'Nama jenis usaha wajib diisi.',
+    'Business Type Name must be text.': 'Nama jenis usaha harus berupa teks.',
+    'Business Type Name may not exceed 255 characters.':
+        'Nama jenis usaha tidak boleh lebih dari 255 karakter.',
+    'Business type status is required.': 'Status jenis usaha wajib diisi.',
+    'Business type status must be active or inactive.':
+        'Status jenis usaha harus aktif atau nonaktif.',
+    'Please select an active business type.': 'Silakan pilih jenis usaha yang aktif.',
+    'e.g., cooperative': 'contoh: koperasi',
+    'e.g., Cooperative': 'contoh: Koperasi',
     'Select Type': 'Pilih jenis usaha',
     Category: 'Kategori',
     'Select Category': 'Pilih kategori',
@@ -624,19 +814,25 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'e.g., 0123456789012345': 'contoh: 0123456789012345',
     'Describe projects or work previously completed by your company.':
         'Jelaskan proyek atau pekerjaan yang pernah diselesaikan oleh perusahaan Anda.',
-    'Registration Instructions': 'Petunjuk Pengisian',
+    'FILLING INSTRUCTIONS:': 'INSTRUKSI PENGISIAN:',
     'Complete all fields using your company’s information.':
         'Isi seluruh kolom sesuai data perusahaan Anda.',
     'Select a Category from the available dropdown.':
         'Kolom Kategori pilih dari dropdown yang tersedia.',
+    'General Information (Company Name, Business Type, Registered Address, Province, Regency / City, Postal Code, Contact Person, WhatsApp Number, NIB, NPWP, Deed of Establishment Number)':
+        'Informasi Umum (Nama Perusahaan, Jenis Usaha, Alamat Terdaftar, Provinsi, Kabupaten / Kota, Kode Pos, Narahubung, Nomor WhatsApp, NIB, NPWP, Nomor Akta Pendirian)',
+    'Bank Information (Bank Code, Bank Name, Account Number, Branch Name)':
+        'Informasi Bank (Kode Bank, Nama Bank, Nomor Rekening, Nama Cabang)',
+    'Upload the administrative documents requested in the Documents step.':
+        'Unggah dokumen administratif yang diminta pada langkah Dokumen.',
     'Enter the WhatsApp Number in the format 08xxxxxxxxxx.':
-        'Nomor WhatsApp diisi dengan format 08xxxxxxxxxx.',
+        'Nomor WA diisi dengan format 08xxxxxxxxxx.',
     'Ensure the NIB & NPWP match the official documents.':
         'Pastikan NIB & NPWP sesuai dokumen resmi.',
     'Enter examples of projects or work previously completed in the Experience field.':
-        'Kolom Pengalaman diisi dengan contoh proyek atau pekerjaan yang pernah dikerjakan.',
-    'This information will be used for the Vendor PPM 2026 registration process.':
-        'Data ini akan digunakan sebagai bahan registrasi Vendor PPM 2026.',
+        'Kolom Pengalaman diisi contoh proyek/pekerjaan yang pernah dikerjakan.',
+    'This file will be used as material for Vendor PPM 2026 registration.':
+        'File ini akan digunakan sebagai bahan registrasi Vendor PPM 2026.',
     // Translate only the fixed VMS business-type option labels.
     'Sole Proprietorship': 'Usaha Perseorangan',
     Partnership: 'Kemitraan',
@@ -681,6 +877,9 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Regency or city is required.': 'Kabupaten atau kota wajib dipilih.',
     'Postal code is required.': 'Kode pos wajib diisi.',
     'Postal code must be exactly 5 digits.': 'Kode pos harus tepat 5 digit.',
+    'Upload not saved. Correct the document fields or choose another file.':
+        'Unggahan belum tersimpan. Perbaiki kolom dokumen atau pilih berkas lain.',
+    Continue: 'Lanjutkan',
     'Save & Continue': 'Simpan & Lanjutkan',
     'Saving...': 'Menyimpan...',
     Back: 'Kembali',
@@ -715,6 +914,8 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     Delete: 'Hapus',
     Close: 'Tutup',
     Submit: 'Kirim',
+    'Choose File': 'Pilih Berkas',
+    'No file selected': 'Belum ada berkas dipilih',
     Search: 'Cari',
     'Search...': 'Cari...',
     Remove: 'Hapus',
@@ -1264,8 +1465,8 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
     'Rating Period': 'Periode Penilaian',
     'Start Date': 'Tanggal Mulai',
     'End Date': 'Tanggal Selesai',
-    'Rate each metric from 0 up to that metric max score. Scores are immutable once submitted.':
-        'Nilai setiap metrik dari 0 hingga skor maksimalnya. Skor tidak dapat diubah setelah dikirim.',
+    'Rate each metric from 1 to 4. Scores are immutable once submitted.':
+        'Nilai setiap metrik dari 1 sampai 4. Skor tidak dapat diubah setelah dikirim.',
     'Optional notes...': 'Catatan opsional...',
     'Submit Ratings': 'Kirim Penilaian',
     Excellent: 'Sangat Baik',

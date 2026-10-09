@@ -1,3 +1,4 @@
+import { DisabledButton } from '@/Components/DisabledActionTooltip';
 import { paymentsEnabled } from '@/utils/paymentModule';
 // Read centralized currency settings on the login page.
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
@@ -187,13 +188,14 @@ export default function Login() {
                                 </Link>
                             </div>
 
-                            <button
+                            <DisabledButton
                                 type="submit"
                                 disabled={form.processing}
-                                className="w-full py-3 px-4 bg-(--color-brand-primary) hover:bg-(--color-brand-primary-hover) text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabledReason={'A request is in progress. Please wait.'}
+                                className="w-full py-3 px-4 theme-primary-action font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {form.processing ? t('Signing in...') : t('Sign in')}
-                            </button>
+                            </DisabledButton>
                         </form>
 
                         <p className="mt-8 text-center text-(--color-text-tertiary)">

@@ -60,6 +60,7 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'id' => $hasFlash ? (string) Str::uuid() : null,
                 'success' => fn () => $request->session()->get('success'),
+                'success_i18n' => fn () => $request->session()->get('success_i18n'),
                 'error' => fn () => $request->session()->get('error'),
                 'status' => fn () => $request->session()->get('status'),
             ],

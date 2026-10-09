@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'payments_disabled' => 'Izin pembayaran tidak dapat diubah saat modul pembayaran dinonaktifkan.',
     'role_code' => 'kode peran',
     'role_name' => 'nama peran',
     'roles' => 'peran staff',

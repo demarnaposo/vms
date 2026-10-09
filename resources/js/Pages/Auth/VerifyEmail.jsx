@@ -1,3 +1,4 @@
+import { DisabledButton } from '@/Components/DisabledActionTooltip';
 import { Head, router, useForm } from '@inertiajs/react';
 import Logo from '@/Components/Logo';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
@@ -37,15 +38,16 @@ export default function VerifyEmail({ email }) {
                     </p>
 
                     <form onSubmit={resend}>
-                        <button
+                        <DisabledButton
                             type="submit"
                             disabled={resendForm.processing}
-                            className="w-full rounded-lg bg-(--color-brand-primary) px-4 py-3 font-semibold text-white transition-colors hover:bg-(--color-brand-primary-hover) disabled:cursor-not-allowed disabled:opacity-50"
+                            disabledReason={'A request is in progress. Please wait.'}
+                            className="w-full rounded-lg theme-primary-action px-4 py-3 font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             {resendForm.processing
                                 ? t('Sending...')
                                 : t('Resend Verification Email')}
-                        </button>
+                        </DisabledButton>
                     </form>
 
                     <button

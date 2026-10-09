@@ -218,7 +218,7 @@ export function FilterPills({ items, selected, onChange }) {
                     onClick={() => onChange(item.value)}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                         selected === item.value
-                            ? 'bg-(--color-brand-primary) text-white'
+                            ? 'theme-primary-action'
                             : 'bg-(--color-bg-tertiary) text-(--color-text-secondary) hover:text-(--color-text-primary)'
                     }`}
                 >

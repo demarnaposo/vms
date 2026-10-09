@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { DisabledButton } from '@/Components/DisabledActionTooltip';
+import { useMemo, useRef, useState } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import { formatDate } from '@/utils/dateFormatters';
 // Translate the document onboarding step through the global language context.
@@ -10,26 +11,16 @@ import { Modal, ModalCancelButton, ModalPrimaryButton } from '@/Components';
 export default function StepDocuments({ documentTypes, sessionData }) {
     // Read the active language for master-data translation.
     const { language, t } = useLanguage();
-    const [removedTypeIds, setRemovedTypeIds] = useState([]);
     const [uploadedDocs, setUploadedDocs] = useState([]);
     const [expiryByType, setExpiryByType] = useState({});
-    const [localErrors, setLocalErrors] = useState({});
     const [processing, setProcessing] = useState(false);
+    const processingRef = useRef(false);
+    const [requestTypeId, setRequestTypeId] = useState(null);
     const [pendingRemovalTypeId, setPendingRemovalTypeId] = useState(null);
     const sessionDocs = useMemo(() => sessionData?.step3?.documents || [], [sessionData]);
     const normalizeTypeId = (typeId) => String(typeId ?? '');
     const { props } = usePage();
     const errors = props.errors || {};
-
-    const documentTypesById = useMemo(() => {
-        const map = new Map();
-
-        (Array.isArray(documentTypes) ? documentTypes : []).forEach((type) => {
-            map.set(normalizeTypeId(type.id), type);
-        });
-
-        return map;
-    }, [documentTypes]);
 
     const sessionDocsByType = useMemo(() => {
         const docsMap = new Map();
@@ -41,97 +32,76 @@ export default function StepDocuments({ documentTypes, sessionData }) {
         return docsMap;
     }, [sessionDocs]);
 
+    const persist = (formData, typeId = null, intent = 'autosave') => {
+        if (processingRef.current) return;
+        processingRef.current = true;
+        setProcessing(true);
+        setRequestTypeId(typeId);
+        formData.append('intent', intent);
+        router.post('/vendor/onboarding/step3', formData, {
+            forceFormData: true,
+            preserveScroll: true,
+            preserveState: true,
+            headers: formData.has('documents[0][file]')
+                ? { 'X-Onboarding-Document-Type': typeId }
+                : {},
+            onFinish: () => {
+                processingRef.current = false;
+                setProcessing(false);
+            },
+            onSuccess: () => {
+                setUploadedDocs((docs) => docs.filter((doc) => doc.typeId !== typeId));
+                setExpiryByType((dates) => {
+                    const next = { ...dates };
+                    delete next[typeId];
+                    return next;
+                });
+                setPendingRemovalTypeId(null);
+            },
+        });
+    };
+
+    const upload = (typeId, file) => {
+        const data = new FormData();
+        data.append('documents[0][document_type_id]', typeId);
+        data.append('documents[0][file]', file);
+        persist(data, typeId);
+    };
+
     const handleFileUpload = (typeId, file) => {
+        if (processingRef.current) return;
         const normalizedTypeId = normalizeTypeId(typeId);
-        const existingExpiry = sessionDocsByType.get(normalizedTypeId)?.expiry_date ?? '';
-
-        setUploadedDocs((prev) => {
-            const filtered = prev.filter((d) => d.typeId !== normalizedTypeId);
-            return [...filtered, { typeId: normalizedTypeId, file, name: file.name }];
-        });
-
-        setExpiryByType((prev) => ({
-            ...prev,
-            [normalizedTypeId]: prev[normalizedTypeId] ?? existingExpiry,
-        }));
-
-        setLocalErrors((prev) => {
-            const next = { ...prev };
-            delete next[normalizedTypeId];
-            return next;
-        });
+        setUploadedDocs((docs) => [
+            ...docs.filter((doc) => doc.typeId !== normalizedTypeId),
+            { typeId: normalizedTypeId, file, name: file.name },
+        ]);
+        upload(normalizedTypeId, file);
     };
 
     const handleExpiryChange = (typeId, expiryDate) => {
+        if (processingRef.current) return;
         const normalizedTypeId = normalizeTypeId(typeId);
-
-        setExpiryByType((prev) => ({
-            ...prev,
-            [normalizedTypeId]: expiryDate,
-        }));
-
-        setLocalErrors((prev) => {
-            const next = { ...prev };
-            delete next[normalizedTypeId];
-            return next;
-        });
+        setExpiryByType((dates) => ({ ...dates, [normalizedTypeId]: expiryDate }));
+        if (sessionDocsByType.has(normalizedTypeId)) {
+            const data = new FormData();
+            data.append(`expiry_dates[${normalizedTypeId}]`, expiryDate);
+            persist(data, normalizedTypeId);
+        }
     };
 
-    const submit = (e) => {
-        e.preventDefault();
+    const submit = (event) => {
+        event.preventDefault();
+        persist(new FormData(), null, 'continue');
+    };
 
-        const nextLocalErrors = {};
-        uploadedDocs
-            .filter((doc) => !removedTypeIds.includes(Number(doc.typeId)))
-            .forEach((doc) => {
-                const docType = documentTypesById.get(doc.typeId);
-                const expiryDate = expiryByType[doc.typeId] || '';
-
-                if (docType?.has_expiry && !expiryDate) {
-                    nextLocalErrors[doc.typeId] = 'Expiry date is required for this document type.';
-                }
-            });
-
-        setLocalErrors(nextLocalErrors);
-        if (Object.keys(nextLocalErrors).length > 0) {
-            return;
-        }
-
-        const formData = new FormData();
-        uploadedDocs
-            .filter((doc) => !removedTypeIds.includes(Number(doc.typeId)))
-            .forEach((doc, index) => {
-                formData.append(`documents[${index}][document_type_id]`, doc.typeId);
-                formData.append(`documents[${index}][file]`, doc.file);
-
-                const expiryDate = expiryByType[doc.typeId] || '';
-                if (expiryDate && documentTypesById.get(doc.typeId)?.has_expiry) {
-                    formData.append(`documents[${index}][expiry_date]`, expiryDate);
-                }
-            });
-        removedTypeIds.forEach((id, index) =>
-            formData.append(`removed_document_type_ids[${index}]`, id)
-        );
-        router.post('/vendor/onboarding/step3', formData, {
-            forceFormData: true,
-            onStart: () => setProcessing(true),
-            onFinish: () => setProcessing(false),
-        });
+    const removeDocument = () => {
+        const data = new FormData();
+        data.append('removed_document_type_ids[0]', pendingRemovalTypeId);
+        persist(data, normalizeTypeId(pendingRemovalTypeId));
     };
 
     const viewDocument = (typeId) => {
-        const normalizedTypeId = normalizeTypeId(typeId);
-        const uploaded = uploadedDocs.find((d) => d.typeId === normalizedTypeId);
-        if (uploaded) {
-            const url = URL.createObjectURL(uploaded.file);
-            window.open(url, '_blank');
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
-        } else {
-            const sessionDoc = sessionDocsByType.get(normalizedTypeId);
-            if (sessionDoc) {
-                window.open(`/vendor/onboarding/document/${sessionDoc.document_type_id}`, '_blank');
-            }
-        }
+        window.open(`/vendor/onboarding/document/${typeId}`, '_blank', 'noopener,noreferrer');
     };
 
     const getFileError = (index) => {
@@ -143,7 +113,7 @@ export default function StepDocuments({ documentTypes, sessionData }) {
     };
 
     return (
-        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl p-8 md:p-12 shadow-token-lg animate-fade-in">
+        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl min-w-0 p-4 sm:p-8 md:p-12 shadow-token-lg animate-fade-in">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold mb-2 text-(--color-text-primary)">
                     {t('Upload Documents')}
@@ -153,15 +123,19 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                         'Upload required documents for verification. Files marked with * are mandatory.'
                     )}
                 </p>
-                {errors.documents && (
-                    <div className="mt-4 p-4 bg-(--color-danger-light) border border-(--color-danger) rounded-lg text-(--color-danger) text-sm">
-                        {/* Localize static document-step errors. */}
-                        {t(errors.documents)}
-                    </div>
-                )}
+                {errors.documents &&
+                    !documentTypes?.some((type) => errors[`documents_by_type.${type.id}`]) && (
+                        <div
+                            role="alert"
+                            className="mt-4 p-4 bg-(--color-danger-light) border border-(--color-danger) rounded-lg text-(--color-danger) text-sm"
+                        >
+                            {/* Localize static document-step errors. */}
+                            {t(errors.documents)}
+                        </div>
+                    )}
             </div>
 
-            <form onSubmit={submit} className="space-y-6">
+            <form noValidate onSubmit={submit} className="space-y-6">
                 <div className="grid gap-4">
                     {(!documentTypes || documentTypes.length === 0) && (
                         <div className="p-4 rounded-xl border border-(--color-warning) bg-(--color-warning-light) text-(--color-warning-dark) text-sm">
@@ -174,35 +148,25 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                     {documentTypes
                         ?.filter(
                             (type) =>
-                                (type.is_active ||
-                                    sessionDocsByType.has(normalizeTypeId(type.id))) &&
-                                !removedTypeIds.includes(type.id)
+                                type.is_active || sessionDocsByType.has(normalizeTypeId(type.id))
                         )
                         .map((docType) => {
                             const normalizedTypeId = normalizeTypeId(docType.id);
-                            const uploadedDoc =
-                                uploadedDocs.find((d) => d.typeId === normalizedTypeId) || null;
-                            const uploadedIndex = uploadedDocs.findIndex(
-                                (d) => d.typeId === normalizedTypeId
+                            const uploadedDoc = uploadedDocs.find(
+                                (doc) => doc.typeId === normalizedTypeId
                             );
                             const sessionDoc = sessionDocsByType.get(normalizedTypeId);
-                            const hasUploadedDoc = Boolean(uploadedDoc || sessionDoc);
+                            const hasUploadedDoc = Boolean(sessionDoc);
                             const backendError =
-                                uploadedIndex !== -1
-                                    ? getFileError(uploadedIndex)
-                                    : getFileError(
-                                          sessionDocs.findIndex(
-                                              (doc) =>
-                                                  normalizeTypeId(doc.document_type_id) ===
-                                                  normalizedTypeId
-                                          )
-                                      );
-                            const error = backendError || localErrors[normalizedTypeId] || null;
+                                errors[`documents_by_type.${docType.id}`] ||
+                                errors[`expiry_dates.${docType.id}`] ||
+                                (requestTypeId === normalizedTypeId ? getFileError(0) : null);
+                            const error = backendError || null;
+                            const errorId = `document-${docType.id}-error`;
                             const typeRequiresExpiry = Boolean(docType.has_expiry);
-                            const canEditExpiry = Boolean(uploadedDoc);
-                            const expiryValue = canEditExpiry
-                                ? expiryByType[normalizedTypeId] || ''
-                                : (sessionDoc?.expiry_date ?? '');
+                            const canEditExpiry = Boolean(docType.is_active) && hasUploadedDoc;
+                            const expiryValue =
+                                expiryByType[normalizedTypeId] ?? sessionDoc?.expiry_date ?? '';
 
                             return (
                                 <div
@@ -213,13 +177,16 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                                             : 'border-(--color-border-primary) bg-(--color-bg-secondary)'
                                     } ${error ? 'border-(--color-danger) bg-(--color-danger-light)' : ''}`}
                                 >
-                                    <div className="flex items-center justify-between">
-                                        <div>
+                                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                        <div className="min-w-0 flex-1 break-words">
                                             <div className="font-medium text-(--color-text-primary)">
                                                 {/* Translate only the recognized system document type. */}
                                                 {translateDocumentTypeLabel(language, docType)}
-                                                {docType.is_mandatory && (
-                                                    <span className="text-(--color-danger) ml-1">
+                                                {docType.is_active && docType.is_mandatory && (
+                                                    <span
+                                                        className="text-(--color-danger) ml-1"
+                                                        aria-hidden="true"
+                                                    >
                                                         *
                                                     </span>
                                                 )}
@@ -250,13 +217,29 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                                             )}
                                             {typeRequiresExpiry && (
                                                 <div className="mt-3 max-w-xs">
-                                                    <label className="block text-xs font-semibold text-(--color-text-secondary) mb-1">
+                                                    <label
+                                                        htmlFor={`document-${docType.id}-expiry`}
+                                                        className="block text-xs font-semibold text-(--color-text-secondary) mb-1"
+                                                    >
                                                         {t('Expiry Date')}
+                                                        {canEditExpiry && (
+                                                            <span
+                                                                className="ml-1 text-(--color-danger)"
+                                                                aria-hidden="true"
+                                                            >
+                                                                *
+                                                            </span>
+                                                        )}
                                                     </label>
                                                     <input
+                                                        id={`document-${docType.id}-expiry`}
+                                                        aria-invalid={Boolean(error)}
+                                                        aria-describedby={
+                                                            error ? errorId : undefined
+                                                        }
                                                         type="date"
                                                         value={expiryValue}
-                                                        disabled={!canEditExpiry}
+                                                        disabled={processing || !canEditExpiry}
                                                         min={new Date().toISOString().split('T')[0]}
                                                         onChange={(event) =>
                                                             handleExpiryChange(
@@ -270,23 +253,33 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                                                                 : 'border-(--color-border-secondary) text-(--color-text-tertiary) cursor-not-allowed'
                                                         }`}
                                                     />
+                                                    {!hasUploadedDoc && (
+                                                        <p className="mt-1 text-xs text-[var(--text-muted)]">
+                                                            {t(
+                                                                'Upload file first, then set expiry date.'
+                                                            )}
+                                                        </p>
+                                                    )}
                                                     {sessionDoc?.expiry_date && !canEditExpiry && (
                                                         <p className="mt-1 text-xs text-(--color-text-tertiary)">
                                                             {t('Current expiry:')}{' '}
                                                             {formatDate(sessionDoc.expiry_date)}
                                                         </p>
                                                     )}
-                                                    {!sessionDoc?.expiry_date && !canEditExpiry && (
-                                                        <p className="mt-1 text-xs text-(--color-text-tertiary)">
-                                                            {t(
-                                                                'Upload file first, then set expiry date.'
-                                                            )}
-                                                        </p>
-                                                    )}
                                                 </div>
                                             )}
+                                            {uploadedDoc && (
+                                                <p className="text-sm text-(--color-text-secondary) mt-2 break-all">
+                                                    {uploadedDoc.name} —{' '}
+                                                    {processing
+                                                        ? t('Uploading...')
+                                                        : t(
+                                                              'Upload not saved. Correct the document fields or choose another file.'
+                                                          )}
+                                                </p>
+                                            )}
                                             {hasUploadedDoc && (
-                                                <p className="text-sm text-(--color-success) mt-2 flex items-center gap-1">
+                                                <p className="text-sm text-(--color-success) mt-2 flex min-w-0 items-center gap-1 wrap-anywhere">
                                                     <svg
                                                         className="w-4 h-4"
                                                         fill="currentColor"
@@ -298,30 +291,31 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                                                             clipRule="evenodd"
                                                         />
                                                     </svg>
-                                                    {uploadedDoc?.name || sessionDoc?.file_name}
+                                                    {sessionDoc?.file_name}
                                                 </p>
                                             )}
                                             {typeRequiresExpiry && hasUploadedDoc && (
                                                 <p className="text-xs text-(--color-text-tertiary) mt-1">
                                                     {t('Expires on:')}{' '}
-                                                    {formatDate(
-                                                        canEditExpiry
-                                                            ? expiryByType[normalizedTypeId]
-                                                            : sessionDoc?.expiry_date
-                                                    )}
+                                                    {formatDate(sessionDoc?.expiry_date)}
                                                 </p>
                                             )}
                                             {/* Localize document upload and expiry feedback. */}
                                             {error && (
-                                                <p className="text-sm text-(--color-danger) mt-1">
+                                                <p
+                                                    id={errorId}
+                                                    role="alert"
+                                                    className="text-sm text-(--color-danger) mt-1"
+                                                >
                                                     {t(error)}
                                                 </p>
                                             )}
                                         </div>
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex flex-wrap items-center gap-3">
                                             {sessionDoc && (
                                                 <button
                                                     type="button"
+                                                    disabled={processing}
                                                     className="text-sm text-(--color-danger)"
                                                     onClick={() =>
                                                         setPendingRemovalTypeId(docType.id)
@@ -341,6 +335,8 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                                             )}
                                             <label className="cursor-pointer">
                                                 <input
+                                                    aria-invalid={Boolean(error)}
+                                                    aria-describedby={error ? errorId : undefined}
                                                     type="file"
                                                     className="sr-only peer"
                                                     aria-label={`${t('Upload')} ${translateDocumentTypeLabel(language, docType)}`}
@@ -354,13 +350,14 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                                                     )
                                                         .map((extension) => `.${extension}`)
                                                         .join(',')}
-                                                    disabled={!docType.is_active}
+                                                    disabled={processing || !docType.is_active}
                                                     onChange={(e) => {
                                                         if (e.target.files[0])
                                                             handleFileUpload(
                                                                 normalizedTypeId,
                                                                 e.target.files[0]
                                                             );
+                                                        e.target.value = '';
                                                     }}
                                                 />
                                                 <span className="peer-focus-visible:ring-2 peer-focus-visible:ring-(--color-brand-primary) px-4 py-2 rounded-lg bg-(--color-bg-primary) border border-(--color-border-primary) hover:border-(--color-brand-primary) text-(--color-text-secondary) text-sm font-medium transition-colors">
@@ -374,20 +371,22 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                         })}
                 </div>
 
-                <div className="flex justify-between pt-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:justify-between pt-4">
                     <button
                         type="button"
+                        disabled={processing}
                         onClick={() => router.get('/vendor/onboarding?step=2')}
                         className="px-6 py-3 rounded-xl border border-(--color-border-primary) text-(--color-text-secondary) hover:bg-(--color-bg-hover) transition-colors font-medium"
                     >
                         {t('Back')}
                     </button>
-                    <button
+                    <DisabledButton
                         type="submit"
                         disabled={processing}
-                        className="bg-gradient-primary text-white font-semibold rounded-lg shadow-token-primary hover:-translate-y-px hover:shadow-token-primary transition-all flex items-center gap-2 text-lg px-8 py-3 disabled:opacity-70 disabled:cursor-not-allowed"
+                        disabledReason={'A request is in progress. Please wait.'}
+                        className="theme-primary-action font-semibold rounded-lg shadow-token-primary hover:-translate-y-px hover:shadow-token-primary transition-all flex items-center gap-2 text-lg px-8 py-3 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
-                        {processing ? t('Saving...') : t('Save & Continue')}
+                        {processing ? t('Saving...') : t('Continue')}
                         {!processing && (
                             <svg
                                 className="w-5 h-5"
@@ -403,22 +402,25 @@ export default function StepDocuments({ documentTypes, sessionData }) {
                                 />
                             </svg>
                         )}
-                    </button>
+                    </DisabledButton>
                 </div>
             </form>
             <Modal
                 isOpen={pendingRemovalTypeId !== null}
-                onClose={() => setPendingRemovalTypeId(null)}
+                onClose={() => {
+                    if (!processing) setPendingRemovalTypeId(null);
+                }}
                 title="Remove from draft"
                 footer={
                     <>
-                        <ModalCancelButton onClick={() => setPendingRemovalTypeId(null)} />
+                        <ModalCancelButton
+                            disabled={processing}
+                            onClick={() => setPendingRemovalTypeId(null)}
+                        />
                         <ModalPrimaryButton
                             variant="danger"
-                            onClick={() => {
-                                setRemovedTypeIds((ids) => [...ids, pendingRemovalTypeId]);
-                                setPendingRemovalTypeId(null);
-                            }}
+                            disabled={processing}
+                            onClick={removeDocument}
                         >
                             Remove from draft
                         </ModalPrimaryButton>

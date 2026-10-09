@@ -1,3 +1,4 @@
+import { DisabledButton } from '@/Components/DisabledActionTooltip';
 import { useForm, router } from '@inertiajs/react';
 import { useState } from 'react';
 // Resolve Indonesian bank names locally from three-digit transfer codes.
@@ -12,7 +13,11 @@ export default function StepBank({ vendor, sessionData }) {
     const { t } = useLanguage();
     const step2Session = sessionData?.step2 || {};
     const { data, setData, post, processing, errors } = useForm({
-        bank_name: step2Session.bank_name || vendor?.bank_name || '',
+        bank_name:
+            step2Session.bank_name ||
+            vendor?.bank_name ||
+            findIndonesianBankByCode(step2Session.code_bank || vendor?.code_bank || '')?.name ||
+            '',
         bank_account_number: step2Session.bank_account_number || vendor?.bank_account_number || '',
         code_bank: step2Session.code_bank || vendor?.code_bank || '',
         bank_branch: step2Session.bank_branch || vendor?.bank_branch || '',
@@ -70,6 +75,7 @@ export default function StepBank({ vendor, sessionData }) {
 
     const submit = (e) => {
         e.preventDefault();
+        if (processing) return;
 
         const nameErr = validateBankName(data.bank_name);
         const accErr = validateAccountNumber(data.bank_account_number);
@@ -98,7 +104,7 @@ export default function StepBank({ vendor, sessionData }) {
         }`;
 
     return (
-        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl p-8 md:p-12 shadow-token-lg animate-fade-in">
+        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl min-w-0 p-4 sm:p-8 md:p-12 shadow-token-lg animate-fade-in">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold mb-2 text-(--color-text-primary)">
                     {t('Bank Information')}
@@ -108,14 +114,31 @@ export default function StepBank({ vendor, sessionData }) {
                 </p>
             </div>
 
-            <form onSubmit={submit} className="space-y-8">
-                <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {t('Bank Code')} <span className="text-(--color-danger)">*</span>
+            <p className="mb-4 text-sm text-(--color-text-tertiary)">
+                {t('Fields marked with * are required.')}
+            </p>
+            <form noValidate onSubmit={submit} className="space-y-8">
+                <div className="grid min-w-0 md:grid-cols-2 gap-6">
+                    <div className="min-w-0 space-y-2">
+                        <label
+                            className="text-sm font-medium text-(--color-text-secondary)"
+                            htmlFor="onboarding-code_bank"
+                        >
+                            {t('Bank Code')}{' '}
+                            <span className="text-(--color-danger)" aria-hidden="true">
+                                *
+                            </span>
                         </label>
                         <div className="relative">
                             <input
+                                id="onboarding-code_bank"
+                                name="code_bank"
+                                aria-invalid={Boolean(clientErrors.code_bank || errors.code_bank)}
+                                aria-describedby={
+                                    clientErrors.code_bank || errors.code_bank
+                                        ? 'onboarding-code_bank-error'
+                                        : undefined
+                                }
                                 type="text"
                                 value={data.code_bank}
                                 onChange={handleBankCodeChange}
@@ -149,18 +172,38 @@ export default function StepBank({ vendor, sessionData }) {
                             )}
                         </p>
                         {(clientErrors.code_bank || errors.code_bank) && (
-                            <p className="text-sm text-(--color-danger)">
+                            <p
+                                className="text-sm text-(--color-danger)"
+                                id="onboarding-code_bank-error"
+                                role="alert"
+                            >
                                 {t(clientErrors.code_bank || errors.code_bank)}
                             </p>
                         )}
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {t('Bank Name')} <span className="text-(--color-danger)">*</span>
+                    <div className="min-w-0 space-y-2">
+                        <label
+                            className="text-sm font-medium text-(--color-text-secondary)"
+                            htmlFor="onboarding-bank_name"
+                        >
+                            {t('Bank Name')}{' '}
+                            {!resolvedBank && (
+                                <span className="text-(--color-danger)" aria-hidden="true">
+                                    *
+                                </span>
+                            )}
                         </label>
                         {/* Use an Indonesian bank example and lock locally resolved names. */}
                         <input
+                            id="onboarding-bank_name"
+                            name="bank_name"
+                            aria-invalid={Boolean(clientErrors.bank_name || errors.bank_name)}
+                            aria-describedby={
+                                clientErrors.bank_name || errors.bank_name
+                                    ? 'onboarding-bank_name-error'
+                                    : undefined
+                            }
                             type="text"
                             value={data.bank_name}
                             onChange={(e) => {
@@ -183,17 +226,37 @@ export default function StepBank({ vendor, sessionData }) {
                             readOnly={Boolean(resolvedBank)}
                         />
                         {(clientErrors.bank_name || errors.bank_name) && (
-                            <p className="text-sm text-(--color-danger)">
+                            <p
+                                className="text-sm text-(--color-danger)"
+                                id="onboarding-bank_name-error"
+                                role="alert"
+                            >
                                 {t(clientErrors.bank_name || errors.bank_name)}
                             </p>
                         )}
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {t('Account Number')} <span className="text-(--color-danger)">*</span>
+                    <div className="min-w-0 space-y-2">
+                        <label
+                            className="text-sm font-medium text-(--color-text-secondary)"
+                            htmlFor="onboarding-bank_account_number"
+                        >
+                            {t('Account Number')}{' '}
+                            <span className="text-(--color-danger)" aria-hidden="true">
+                                *
+                            </span>
                         </label>
                         <input
+                            id="onboarding-bank_account_number"
+                            name="bank_account_number"
+                            aria-invalid={Boolean(
+                                clientErrors.bank_account_number || errors.bank_account_number
+                            )}
+                            aria-describedby={
+                                clientErrors.bank_account_number || errors.bank_account_number
+                                    ? 'onboarding-bank_account_number-error'
+                                    : undefined
+                            }
                             type="text"
                             value={data.bank_account_number}
                             onChange={(e) => {
@@ -219,18 +282,36 @@ export default function StepBank({ vendor, sessionData }) {
                             maxLength={18}
                         />
                         {(clientErrors.bank_account_number || errors.bank_account_number) && (
-                            <p className="text-sm text-(--color-danger)">
+                            <p
+                                className="text-sm text-(--color-danger)"
+                                id="onboarding-bank_account_number-error"
+                                role="alert"
+                            >
                                 {t(clientErrors.bank_account_number || errors.bank_account_number)}
                             </p>
                         )}
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {t('Branch Name')} <span className="text-(--color-danger)">*</span>
+                    <div className="min-w-0 space-y-2">
+                        <label
+                            className="text-sm font-medium text-(--color-text-secondary)"
+                            htmlFor="onboarding-bank_branch"
+                        >
+                            {t('Branch Name')}{' '}
+                            <span className="text-(--color-danger)" aria-hidden="true">
+                                *
+                            </span>
                         </label>
                         {/* Keep branch manual because Indonesian bank codes identify banks, not individual branches. */}
                         <input
+                            id="onboarding-bank_branch"
+                            name="bank_branch"
+                            aria-invalid={Boolean(clientErrors.bank_branch || errors.bank_branch)}
+                            aria-describedby={
+                                clientErrors.bank_branch || errors.bank_branch
+                                    ? 'onboarding-bank_branch-error'
+                                    : undefined
+                            }
                             type="text"
                             value={data.bank_branch}
                             onChange={(e) => {
@@ -255,25 +336,31 @@ export default function StepBank({ vendor, sessionData }) {
                             {t('Enter the branch registered for this account.')}
                         </p>
                         {(clientErrors.bank_branch || errors.bank_branch) && (
-                            <p className="text-sm text-(--color-danger)">
+                            <p
+                                className="text-sm text-(--color-danger)"
+                                id="onboarding-bank_branch-error"
+                                role="alert"
+                            >
                                 {t(clientErrors.bank_branch || errors.bank_branch)}
                             </p>
                         )}
                     </div>
                 </div>
 
-                <div className="flex justify-between pt-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:justify-between pt-4">
                     <button
                         type="button"
+                        disabled={processing}
                         onClick={() => router.get('/vendor/onboarding?step=1')}
                         className="px-6 py-3 rounded-xl border border-(--color-border-primary) text-(--color-text-secondary) hover:bg-(--color-bg-hover) transition-colors font-medium"
                     >
                         {t('Back')}
                     </button>
-                    <button
+                    <DisabledButton
                         type="submit"
                         disabled={processing}
-                        className="bg-gradient-primary text-white font-semibold rounded-lg shadow-token-primary hover:-translate-y-px hover:shadow-token-primary transition-all flex items-center gap-2 text-lg px-8 py-3"
+                        disabledReason={'A request is in progress. Please wait.'}
+                        className="theme-primary-action font-semibold rounded-lg shadow-token-primary hover:-translate-y-px hover:shadow-token-primary transition-all flex items-center gap-2 text-lg px-8 py-3"
                     >
                         {processing ? t('Saving...') : t('Save & Continue')}
                         <svg
@@ -289,7 +376,7 @@ export default function StepBank({ vendor, sessionData }) {
                                 d="M17 8l4 4m0 0l-4 4m4-4H3"
                             />
                         </svg>
-                    </button>
+                    </DisabledButton>
                 </div>
             </form>
         </div>

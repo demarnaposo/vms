@@ -9,6 +9,8 @@ import { translateMessage } from '../../resources/js/i18n/translations.js';
 // Verify every display-oriented VMS master-data category is registered centrally.
 test('registers all display-oriented system master-data categories', () => {
     assert.deepEqual(Object.keys(SYSTEM_MASTER_DATA), [
+        'business_types',
+        'vendor_categories',
         'roles',
         'permissions',
         'vendor_states',
@@ -19,9 +21,9 @@ test('registers all display-oriented system master-data categories', () => {
     assert.equal(Object.keys(SYSTEM_MASTER_DATA.roles).length, 4);
     assert.equal(Object.keys(SYSTEM_MASTER_DATA.permissions).length, 21);
     assert.equal(Object.keys(SYSTEM_MASTER_DATA.vendor_states).length, 8);
-    assert.equal(Object.keys(SYSTEM_MASTER_DATA.document_types).length, 14);
+    assert.equal(Object.keys(SYSTEM_MASTER_DATA.document_types).length, 16);
     assert.equal(Object.keys(SYSTEM_MASTER_DATA.compliance_rules).length, 3);
-    assert.equal(Object.keys(SYSTEM_MASTER_DATA.performance_metrics).length, 4);
+    assert.equal(Object.keys(SYSTEM_MASTER_DATA.performance_metrics).length, 10);
 });
 
 // Ensure every registered master label and description has an Indonesian display value.
@@ -133,4 +135,41 @@ test('document type labels and descriptions edited by admin remain verbatim', ()
         ),
         'Custom description'
     );
+});
+
+test('eight current document defaults have exact bilingual labels', () => {
+    const expected = [
+        ['company_deed', 'Akta Pendirian Usaha'],
+        ['nib_oss', 'NIB/OSS (Nomor Induk Berusaha)'],
+        ['npwp', 'NPWP (Nomor Pokok Wajib Pajak)'],
+        ['pkp_certificate', 'Pengukuhan Pengusaha Kena Pajak (SPPKP)'],
+        ['pic_identity_card', 'KTP Pemilik/Pejabat Perusahaan'],
+        ['domicile_letter', 'Surat Keterangan Domisili Perusahaan'],
+        ['company_profile', 'Profil Perusahaan'],
+        ['other_supporting_documents', 'Dokumen Pendukung lainnya'],
+    ];
+    for (const [name, label] of expected) {
+        const record = { name, ...SYSTEM_MASTER_DATA.document_types[name] };
+        assert.equal(translateSystemMasterDataField('id', 'document_types', record), label);
+        assert.equal(
+            translateSystemMasterDataField('en', 'document_types', record),
+            record.display_name
+        );
+        assert.equal(
+            translateSystemMasterDataField('id', 'document_types', {
+                ...record,
+                display_name: 'Nama kustom',
+            }),
+            'Nama kustom'
+        );
+        assert.equal(
+            translateSystemMasterDataField(
+                'id',
+                'document_types',
+                { ...record, description: 'Deskripsi kustom' },
+                'description'
+            ),
+            'Deskripsi kustom'
+        );
+    }
 });

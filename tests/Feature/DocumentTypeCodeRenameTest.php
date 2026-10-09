@@ -37,6 +37,8 @@ class DocumentTypeCodeRenameTest extends TestCase
     {
         $definitions = collect((require database_path('data/system_master_data.php'))['document_types'])->keyBy('name');
 
+        $definitions->put('bank_account_proof', ['name' => 'bank_account_proof', 'display_name' => 'Bank Account Proof', 'is_mandatory' => true, 'is_active' => true]);
+
         return collect(['gst_certificate' => 'npwp', 'pan_card' => 'nib_oss', 'cancelled_cheque' => 'bank_account_proof'])
             ->map(fn ($new, $old) => DocumentType::create([...$definitions[$new], 'name' => $old]))->all();
     }
@@ -142,7 +144,7 @@ class DocumentTypeCodeRenameTest extends TestCase
         $this->actingAs($user);
         foreach ($types as $type) {
             $file = fn () => UploadedFile::fake()->createWithContent('fixture.pdf', "%PDF-1.4\n%%EOF");
-            $this->post('/vendor/onboarding/step3', ['documents' => [['document_type_id' => $type->id, 'file' => $file()]]])->assertSessionHasNoErrors();
+            $this->post('/vendor/onboarding/step3', ['intent' => 'autosave', 'documents' => [['document_type_id' => $type->id, 'file' => $file()]]])->assertSessionHasNoErrors();
             $this->post('/vendor/documents/upload', ['document_type_id' => $type->id, 'file' => $file()])->assertSessionHasNoErrors();
             $this->assertDatabaseHas('vendor_documents', ['vendor_id' => $vendor->id, 'document_type_id' => $type->id]);
         }
@@ -152,7 +154,7 @@ class DocumentTypeCodeRenameTest extends TestCase
             ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page->has('documents.data', 1)->where('documents.data.0.document_type.name', 'nib_oss'));
         $document = VendorDocument::where('document_type_id', $type->id)->firstOrFail();
         $this->withUnencryptedCookie('vms_locale', 'id')->post(route('admin.documents.verify', $document))
-            ->assertSessionHas('success', 'NIB OSS berhasil diverifikasi.');
+            ->assertSessionHas('success', 'NIB/OSS (Nomor Induk Berusaha) berhasil diverifikasi.');
     }
 
     public function test_compliance_and_successful_activation_readiness_are_unchanged(): void

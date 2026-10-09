@@ -2,15 +2,24 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\Permission;
 use App\Models\Role;
+use App\Support\PaymentsModule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class SaveStaffRoleRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->isSuperAdmin() === true;
+        if ($this->user()?->isSuperAdmin() !== true) {
+            return false;
+        }
+
+        abort_if(! PaymentsModule::enabled() && $this->route('staffRole')?->name === Role::FINANCE_MANAGER, 404);
+
+        return true;
     }
 
     public function rules(): array
@@ -24,6 +33,27 @@ class SaveStaffRoleRequest extends FormRequest
             'permission_ids.*' => ['required', 'integer', 'distinct', Rule::exists('permissions', 'id')->where('guard_name', 'web')->whereIn('name', array_keys(config('rbac.permissions')))],
             'guard_name' => ['prohibited'], 'is_staff' => ['prohibited'],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            if (PaymentsModule::enabled() || ! is_array($this->input('permission_ids'))) {
+                return;
+            }
+            $ids = array_filter($this->input('permission_ids'), fn ($id) => is_int($id) || (is_string($id) && ctype_digit($id)));
+            $blockedIds = Permission::where('guard_name', 'web')->whereIn('id', $ids)->get()
+                ->filter(fn (Permission $permission) => PaymentsModule::isPaymentPermission($permission->name, $permission->group))
+                ->pluck('id')->all();
+            if ($blockedIds !== []) {
+                foreach ($this->input('permission_ids') as $index => $id) {
+                    if (in_array($id, $blockedIds)) {
+                        $validator->errors()->forget('permission_ids.'.$index);
+                    }
+                }
+                $validator->errors()->add('permission_ids', __('staff.payments_disabled'));
+            }
+        });
     }
 
     public function attributes(): array

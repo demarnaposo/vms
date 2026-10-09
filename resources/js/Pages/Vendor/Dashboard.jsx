@@ -1,6 +1,6 @@
 import { paymentsEnabled } from '@/utils/paymentModule';
 import { ActionLink } from '@/Components/ActionControls';
-import { Link, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { AppIcon, Badge, Card, PageHeader, VendorLayout } from '@/Components';
 // Reuse the centralized Indonesian currency formatter.
 import { formatCurrency } from '@/utils/currencyFormatters';
@@ -70,7 +70,7 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                 name: user?.name?.split(' ')[0] || t('Vendor'),
             })}
             actions={
-                <div className="flex items-center gap-3">
+                <div className="flex min-w-0 flex-wrap items-center gap-3">
                     {displayVendor.vendor_number ? (
                         <span className="text-sm font-semibold text-(--color-text-secondary)">
                             {t('Vendor ID')}: {displayVendor.vendor_number}
@@ -89,9 +89,9 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
             header={header}
             vendor={displayVendor}
         >
-            <div className="space-y-8">
+            <div className="min-w-0 space-y-6">
                 <div
-                    className={`bg-(--color-bg-primary) border rounded-xl p-6 shadow-token-sm border-l-4 ${
+                    className={`bg-(--color-bg-primary) border rounded-xl min-w-0 p-4 sm:p-6 shadow-token-sm border-l-4 ${
                         displayVendor.status === 'active'
                             ? 'border-l-(--color-success)'
                             : displayVendor.status === 'suspended'
@@ -106,7 +106,11 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                     </h3>
                     <p className="text-(--color-text-tertiary) mb-4">{t(currentStatus.message)}</p>
                     {currentStatus.action && (
-                        <ActionLink href={currentStatus.link} variant="primary">
+                        <ActionLink
+                            href={currentStatus.link}
+                            variant="primary"
+                            className="min-h-9 justify-center whitespace-normal"
+                        >
                             {/* Translate only the static onboarding action. */}
                             {t(currentStatus.action)}
                             <svg
@@ -128,9 +132,11 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                 </div>
 
                 {displayVendor.status !== 'draft' && (
-                    <div className={`grid ${enabled ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-6`}>
-                        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-xl p-6 shadow-token-sm">
-                            <div className="flex items-center justify-between mb-4">
+                    <div
+                        className={`grid ${enabled ? 'xl:grid-cols-3' : 'lg:grid-cols-2'} min-w-0 grid-cols-1 gap-4 [&>div]:min-w-0`}
+                    >
+                        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-xl min-w-0 p-4 sm:p-6 shadow-token-sm">
+                            <div className="flex min-w-0 flex-wrap items-center justify-between gap-3 mb-4">
                                 <h3 className="font-semibold text-lg text-(--color-text-primary)">
                                     {t('Compliance')}
                                 </h3>
@@ -163,8 +169,8 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                             </div>
                         </div>
 
-                        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-xl p-6 shadow-token-sm">
-                            <div className="flex items-center justify-between mb-4">
+                        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-xl min-w-0 p-4 sm:p-6 shadow-token-sm">
+                            <div className="flex min-w-0 flex-wrap items-center justify-between gap-3 mb-4">
                                 <h3 className="font-semibold text-lg text-(--color-text-primary)">
                                     {t('Performance')}
                                 </h3>
@@ -181,8 +187,8 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                         </div>
 
                         {enabled && (
-                            <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-xl p-6 shadow-token-sm">
-                                <div className="flex items-center justify-between mb-4">
+                            <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-xl min-w-0 p-4 sm:p-6 shadow-token-sm">
+                                <div className="flex min-w-0 flex-wrap items-center justify-between gap-3 mb-4">
                                     <h3 className="font-semibold text-lg text-(--color-text-primary)">
                                         {t('Pending Payments')}
                                     </h3>
@@ -198,7 +204,7 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                                     <ActionLink
                                         href="/vendor/payments"
                                         variant="primary"
-                                        className="w-full mt-4 text-center justify-center text-white!"
+                                        className="w-full min-h-9 mt-4 text-center justify-center whitespace-normal text-white!"
                                     >
                                         {/* Translate the payment request action. */}
                                         {t('Request Payment')}
@@ -212,26 +218,28 @@ export default function Dashboard({ vendor, recentDocuments = [], stats = {} }) 
                 {recentDocuments.length > 0 && (
                     <Card
                         title="Recent Documents"
+                        className="min-w-0 [&>div:first-child]:flex-wrap [&>div:first-child]:gap-3"
                         action={
-                            <Link
+                            <ActionLink
                                 href="/vendor/documents"
-                                className="text-(--color-brand-primary) hover:text-(--color-brand-primary-hover) text-sm font-medium"
+                                variant="outline"
+                                className="min-h-9 justify-center whitespace-normal"
                             >
                                 {t('View All')}
-                            </Link>
+                            </ActionLink>
                         }
                     >
                         <div className="divide-y divide-(--color-border-secondary)">
                             {recentDocuments.map((doc) => (
                                 <div
                                     key={doc.id}
-                                    className="flex items-center justify-between p-4 hover:bg-(--color-bg-hover) transition-colors"
+                                    className="flex min-w-0 flex-wrap items-center justify-between gap-3 p-3 sm:p-4 hover:bg-(--color-bg-hover) transition-colors"
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-(--color-bg-tertiary) text-(--color-brand-primary)">
+                                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                                        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-(--color-bg-tertiary) text-(--color-brand-primary)">
                                             <AppIcon name="documents" className="h-4 w-4" />
                                         </span>
-                                        <div>
+                                        <div className="min-w-0 [overflow-wrap:anywhere]">
                                             <div className="text-(--color-text-primary) text-sm font-medium">
                                                 {doc.file_name}
                                             </div>

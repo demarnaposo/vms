@@ -1,22 +1,21 @@
-import { translateMessage } from './translations.js';
+import { translateSystemMasterDataField } from './systemMasterData.js';
 
-// Map fixed VMS business-type codes to display labels without changing stored values.
-const BUSINESS_TYPE_LABELS = Object.freeze({
-    sole_proprietor: 'Sole Proprietorship',
-    proprietorship: 'Sole Proprietorship',
-    partnership: 'Partnership',
-    llp: 'LLP',
-    pvt_ltd: 'Private Limited',
-    private_limited: 'Private Limited',
-    public_ltd: 'Public Limited',
-    public_limited: 'Public Limited',
-});
+export function businessTypeLabel(language, record) {
+    return translateSystemMasterDataField(language, 'business_types', {
+        ...record,
+        name: record.code,
+    });
+}
 
-// Translate only recognized static business types and preserve manual values verbatim.
-export function translateBusinessType(language, value, fallback = '-') {
+export function businessTypeOptions(language, records) {
+    return records.map((record) => ({
+        value: record.code,
+        label: businessTypeLabel(language, record),
+    }));
+}
+
+export function translateBusinessType(language, value, records = [], fallback = '-') {
     if (!value) return fallback;
-
-    const label = Object.hasOwn(BUSINESS_TYPE_LABELS, value) ? BUSINESS_TYPE_LABELS[value] : null;
-
-    return label ? translateMessage(language, label) : value;
+    const record = records.find((record) => record.code === value);
+    return record ? businessTypeLabel(language, record) : value;
 }

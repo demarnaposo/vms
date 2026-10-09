@@ -86,15 +86,27 @@ export default function ReportsIndex({ stats = {} }) {
         <PageHeader
             title="Reports"
             subtitle="Generate and download reports"
-            actions={<FormSelect value={dateRange} onChange={setDateRange} options={dateOptions} />}
+            actions={
+                <FormSelect
+                    label="Date Range"
+                    size="compact"
+                    placeholder="Select date range"
+                    className="w-52 min-w-0 max-w-full"
+                    value={dateRange}
+                    onChange={setDateRange}
+                    options={dateOptions}
+                />
+            }
         />
     );
 
     return (
         <AdminLayout title="Reports" activeNav="Reports" header={header}>
-            <div className="space-y-8">
+            <div className="min-w-0 space-y-6">
                 {/* Quick Stats - from backend */}
-                <div className={`grid ${enabled ? 'md:grid-cols-5' : 'md:grid-cols-3'} gap-4`}>
+                <div
+                    className={`grid ${enabled ? 'sm:grid-cols-2 xl:grid-cols-5' : 'sm:grid-cols-2 xl:grid-cols-3'} gap-4`}
+                >
                     <StatCard
                         label="Total Vendors"
                         value={stats.total_vendors || 0}
@@ -134,14 +146,14 @@ export default function ReportsIndex({ stats = {} }) {
                 {/* Available Reports */}
                 <Card title="Available Reports">
                     {allowedReports.length > 0 ? (
-                        <div className="p-4 grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="grid min-w-0 grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4 [&>div]:min-w-0">
                             {allowedReports.map((report) => (
                                 <div
                                     key={report.id}
                                     className="p-5 rounded-xl bg-(--color-bg-secondary) border border-(--color-border-secondary) hover:border-(--color-brand-primary-light) hover:shadow-lg transition-all cursor-pointer group"
                                 >
                                     <div className="flex items-start gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-gradient-primary text-white flex items-center justify-center shadow-token-primary group-hover:scale-110 transition-transform">
+                                        <div className="w-12 h-12 shrink-0 rounded-xl bg-gradient-primary text-white flex items-center justify-center shadow-token-primary group-hover:scale-110 transition-transform">
                                             <AppIcon
                                                 name={report.icon}
                                                 className="h-6 w-6"
@@ -152,7 +164,7 @@ export default function ReportsIndex({ stats = {} }) {
                                                 }
                                             />
                                         </div>
-                                        <div className="flex-1">
+                                        <div className="min-w-0 flex-1 [overflow-wrap:anywhere]">
                                             <h3 className="text-(--color-text-primary) font-semibold mb-1">
                                                 {/* Translate fixed report names without changing route identifiers. */}
                                                 {t(report.title)}
@@ -165,11 +177,19 @@ export default function ReportsIndex({ stats = {} }) {
                                                     <ActionLink
                                                         variant="outline"
                                                         href={report.route}
+                                                        className="min-h-9 justify-center whitespace-normal"
                                                     >
                                                         {t('View')}
                                                     </ActionLink>
                                                 ) : (
-                                                    <ActionButton variant="outline" disabled>
+                                                    <ActionButton
+                                                        variant="outline"
+                                                        disabled
+                                                        disabledReason={
+                                                            'This report is not available yet.'
+                                                        }
+                                                        className="min-h-9 justify-center whitespace-normal"
+                                                    >
                                                         View
                                                     </ActionButton>
                                                 )}
@@ -198,14 +218,14 @@ export default function ReportsIndex({ stats = {} }) {
 
                 {/* Scheduled Jobs */}
                 <Card title="Scheduled Jobs">
-                    <div className="p-4">
+                    <div className="min-w-0">
                         <p className="text-(--color-text-tertiary) text-sm mb-4">
                             {/* Translate scheduled-job guidance while retaining command text. */}
                             {t(
                                 'These commands run automatically but can also be triggered manually:'
                             )}
                         </p>
-                        <div className="grid md:grid-cols-3 gap-4">
+                        <div className="grid min-w-0 grid-cols-1 xl:grid-cols-3 gap-4 [&>div]:min-w-0">
                             <div className="relative p-4 rounded-xl overflow-hidden shadow-lg shadow-token-sm border border-(--color-brand-primary-light)">
                                 <div
                                     className="absolute inset-0 opacity-50"
@@ -219,7 +239,7 @@ export default function ReportsIndex({ stats = {} }) {
                                     <div className="text-xs text-(--color-text-secondary) mb-2">
                                         {t('Runs daily at 2:00 AM')}
                                     </div>
-                                    <code className="text-xs bg-(--color-bg-primary)/60 px-2 py-1 rounded block text-(--color-text-primary)">
+                                    <code className="[overflow-wrap:anywhere] text-xs bg-(--color-bg-primary)/60 px-2 py-1 rounded block text-(--color-text-primary)">
                                         php artisan vendors:evaluate-compliance
                                     </code>
                                 </div>
@@ -237,7 +257,7 @@ export default function ReportsIndex({ stats = {} }) {
                                     <div className="text-xs text-(--color-text-secondary) mb-2">
                                         {t('Runs daily at 8:00 AM')}
                                     </div>
-                                    <code className="text-xs bg-(--color-bg-primary)/60 px-2 py-1 rounded block text-(--color-text-primary)">
+                                    <code className="[overflow-wrap:anywhere] text-xs bg-(--color-bg-primary)/60 px-2 py-1 rounded block text-(--color-text-primary)">
                                         php artisan vendors:expiry-reminders
                                     </code>
                                 </div>
@@ -253,7 +273,7 @@ export default function ReportsIndex({ stats = {} }) {
                                     <div className="text-xs text-(--color-text-secondary) mb-2">
                                         {t('Runs every Monday')}
                                     </div>
-                                    <code className="text-xs bg-(--color-bg-primary)/60 px-2 py-1 rounded block text-(--color-text-primary)">
+                                    <code className="[overflow-wrap:anywhere] text-xs bg-(--color-bg-primary)/60 px-2 py-1 rounded block text-(--color-text-primary)">
                                         php artisan vendors:weekly-summary
                                     </code>
                                 </div>

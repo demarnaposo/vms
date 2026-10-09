@@ -82,7 +82,11 @@ export default function PaymentReport({ payments, stats, filters }) {
             title="Payment Report"
             subtitle="View and export payment request data"
             actions={
-                <ActionLink variant="outline" href="/admin/reports">
+                <ActionLink
+                    variant="outline"
+                    href="/admin/reports"
+                    className="min-h-9 justify-center whitespace-normal"
+                >
                     {t('Back to Reports')}
                 </ActionLink>
             }
@@ -91,10 +95,10 @@ export default function PaymentReport({ payments, stats, filters }) {
 
     return (
         <AdminLayout title="Payment Report" activeNav="Reports" header={header}>
-            <div className="space-y-6">
+            <div className="min-w-0 space-y-6">
                 {/* Summary Stats */}
                 {/* Format every payment summary amount with shared IDR settings. */}
-                <div className="grid md:grid-cols-4 gap-4">
+                <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 [&>div]:min-w-0 [&>div]:[overflow-wrap:anywhere]">
                     <StatCard
                         label="Total Amount"
                         value={formatCurrency(stats.total_amount, currency)}
@@ -123,13 +127,10 @@ export default function PaymentReport({ payments, stats, filters }) {
 
                 {/* Filters */}
                 <Card title="Filters" allowOverflow>
-                    <div className="p-4 flex flex-wrap items-end gap-4">
-                        <div className="flex-1 min-w-[150px]">
-                            <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
-                                {/* Translate the fixed date-filter label. */}
-                                {t('Start Date')}
-                            </label>
+                    <div className="flex min-w-0 flex-col items-stretch gap-4 xl:flex-row xl:flex-wrap xl:items-end">
+                        <div className="min-w-0 flex-1 xl:min-w-[150px]">
                             <FormInput
+                                label="Start Date"
                                 type="date"
                                 value={localFilters.start_date}
                                 onChange={(value) =>
@@ -137,12 +138,9 @@ export default function PaymentReport({ payments, stats, filters }) {
                                 }
                             />
                         </div>
-                        <div className="flex-1 min-w-[150px]">
-                            <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
-                                {/* Translate the fixed date-filter label. */}
-                                {t('End Date')}
-                            </label>
+                        <div className="min-w-0 flex-1 xl:min-w-[150px]">
                             <FormInput
+                                label="End Date"
                                 type="date"
                                 value={localFilters.end_date}
                                 onChange={(value) =>
@@ -150,12 +148,9 @@ export default function PaymentReport({ payments, stats, filters }) {
                                 }
                             />
                         </div>
-                        <div className="flex-1 min-w-[150px]">
-                            <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
-                                {/* Translate the fixed status-filter label. */}
-                                {t('Status')}
-                            </label>
+                        <div className="min-w-0 flex-1 xl:min-w-[150px]">
                             <FormSelect
+                                label="Status"
                                 value={localFilters.status}
                                 onChange={(val) =>
                                     setLocalFilters({ ...localFilters, status: val })
@@ -164,11 +159,19 @@ export default function PaymentReport({ payments, stats, filters }) {
                             />
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
-                            <ActionButton variant="primary" onClick={handleFilter}>
+                            <ActionButton
+                                variant="outline"
+                                onClick={handleFilter}
+                                className="min-h-9 justify-center whitespace-normal"
+                            >
                                 Apply Filters
                             </ActionButton>
                             {can['reports.export'] && (
-                                <ActionButton variant="primary" onClick={handleExport}>
+                                <ActionButton
+                                    variant="primary"
+                                    onClick={handleExport}
+                                    className="min-h-9 justify-center whitespace-normal"
+                                >
                                     Export CSV
                                 </ActionButton>
                             )}
@@ -183,12 +186,14 @@ export default function PaymentReport({ payments, stats, filters }) {
                         count: payments?.data?.length || 0,
                     })}
                 >
-                    <DataTable
-                        columns={columns}
-                        data={payments?.data || []}
-                        links={payments?.links || []}
-                        emptyMessage="No payment records found for the selected filters."
-                    />
+                    <div className="min-w-0 [&_table]:min-w-[760px] [&_table]:table-fixed [&_td]:[overflow-wrap:anywhere] [&_nav]:flex-wrap [&_nav]:gap-1 [&_nav_a]:min-h-9 [&_nav_a]:focus-visible:outline-2">
+                        <DataTable
+                            columns={columns}
+                            data={payments?.data || []}
+                            links={payments?.links || []}
+                            emptyMessage="No payment records found for the selected filters."
+                        />
+                    </div>
                 </Card>
             </div>
         </AdminLayout>

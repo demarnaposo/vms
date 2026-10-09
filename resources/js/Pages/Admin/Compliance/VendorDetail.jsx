@@ -1,5 +1,5 @@
-import { Link } from '@inertiajs/react';
-import { AdminLayout, PageHeader, Card, StatCard, StatGrid, Badge, Button } from '@/Components';
+import { ActionLink } from '@/Components/ActionControls';
+import { AdminLayout, PageHeader, Card, StatCard, StatGrid, Badge } from '@/Components';
 // Translate static compliance detail labels without altering vendor or rule data.
 import { useLanguage } from '@/Contexts/LanguageContext';
 // Localize recognized compliance rule master labels.
@@ -16,14 +16,20 @@ export default function VendorComplianceDetail({ vendor, results, summary }) {
         <PageHeader
             title={
                 <>
-                    {t('Compliance Detail:')} {vendor?.company_name || t('Vendor')}
+                    <span className="[overflow-wrap:anywhere]">
+                        {t('Compliance Detail:')} {vendor?.company_name || t('Vendor')}
+                    </span>
                 </>
             }
             subtitle="Latest rule-wise compliance evaluation"
             actions={
-                <Link href="/admin/compliance">
-                    <Button variant="outline">Back to Dashboard</Button>
-                </Link>
+                <ActionLink
+                    href="/admin/compliance"
+                    variant="outline"
+                    className="min-h-9 justify-center whitespace-normal"
+                >
+                    {t('Back to Dashboard')}
+                </ActionLink>
             }
         />
     );
@@ -31,8 +37,8 @@ export default function VendorComplianceDetail({ vendor, results, summary }) {
     return (
         <AdminLayout title="Vendor Compliance Detail" activeNav="Compliance" header={header}>
             {/* Translate result headings and labels without changing stored result values. */}
-            <div className="space-y-8">
-                <StatGrid>
+            <div className="min-w-0 space-y-6">
+                <StatGrid cols={4}>
                     <StatCard
                         label="Passing Rules"
                         value={summary?.passing || 0}
@@ -60,10 +66,10 @@ export default function VendorComplianceDetail({ vendor, results, summary }) {
                 </StatGrid>
 
                 <Card title="Vendor Status">
-                    <div className="p-4 grid md:grid-cols-3 gap-4 text-sm">
+                    <div className="grid min-w-0 grid-cols-1 md:grid-cols-3 gap-4 text-sm [&>div]:min-w-0">
                         <div>
                             <div className="text-(--color-text-tertiary)">{t('Company')}</div>
-                            <div className="text-(--color-text-primary) font-medium">
+                            <div className="min-w-0 [overflow-wrap:anywhere] text-(--color-text-primary) font-medium">
                                 {vendor?.company_name}
                             </div>
                         </div>
@@ -89,8 +95,13 @@ export default function VendorComplianceDetail({ vendor, results, summary }) {
                 </Card>
 
                 <Card title="Rule Results">
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
+                    <div
+                        className="min-w-0 overflow-x-auto overscroll-x-contain"
+                        role="region"
+                        aria-label={t('Rule Results')}
+                        tabIndex={0}
+                    >
+                        <table className="w-full min-w-[720px] table-fixed [&_td]:[overflow-wrap:anywhere]">
                             <thead>
                                 <tr className="border-b border-(--color-border-primary) bg-(--color-bg-secondary)">
                                     <th className="text-left p-4 text-xs font-semibold text-(--color-text-tertiary) uppercase tracking-wider">

@@ -558,6 +558,7 @@ class VendorOnboardingTest extends TestCase
                     'bank_name' => 'Bank Mandiri',
                     'bank_account_number' => '1234567890',
                     'code_bank' => '008',
+                    'bank_branch' => 'Jakarta',
                 ],
                 // Step 3 will be set up with a real temp file
             ],
@@ -619,5 +620,61 @@ class VendorOnboardingTest extends TestCase
         ]);
 
         Notification::assertSentTo($this->opsUser, VendorApplicationSubmitted::class);
+    }
+
+    public function test_final_submission_revalidates_each_persisted_company_and_bank_field(): void
+    {
+        Notification::fake();
+        $this->withoutMiddleware(\Illuminate\Routing\Middleware\ThrottleRequests::class);
+        $path = 'vendor-applications/1/temp/test.pdf';
+        Storage::disk('private')->put($path, "%PDF-1.4\n%%EOF");
+        $valid = [
+            'step1' => ['company_name' => 'PPM Manajemen', 'business_identification_number' => '1234567890123', 'tax_id' => '0123456789012345', 'deed_number' => 'DEED-1', 'business_type' => 'pvt_ltd', 'category_id' => $this->categoryId, 'experience' => 'Software project', 'contact_person' => 'Test Person', 'contact_phone' => '081234567890', 'address' => 'Address', 'city' => 'Kota Bandung', 'state' => 'Jawa Barat', 'pincode' => '40115'],
+            'step2' => ['bank_name' => 'Bank Mandiri', 'bank_account_number' => '1234567890', 'code_bank' => '008', 'bank_branch' => 'Jakarta'],
+            'step3' => ['documents' => [['document_type_id' => $this->documentType->id, 'file_path' => $path, 'file_name' => 'test.pdf']]],
+        ];
+        $draft = VendorApplication::create(['id' => 1, 'user_id' => $this->vendorUser->id, 'current_step' => 4, 'status' => 'draft', 'data' => $valid]);
+        foreach ([1, 2] as $step) {
+            foreach (array_keys($valid['step'.$step]) as $field) {
+                $data = $valid;
+                unset($data['step'.$step][$field]);
+                $draft->update(['data' => $data]);
+                $this->actingAs($this->vendorUser)->post(route('vendor.onboarding.submit'))
+                    ->assertSessionHasErrors($field)->assertRedirect(route('vendor.onboarding', ['step' => $step]));
+                $this->assertSame($data, $draft->fresh()->data);
+                $this->assertSame('draft', $draft->fresh()->status);
+                $this->assertDatabaseCount('vendors', 0);
+                Storage::disk('private')->assertExists($path);
+                Notification::assertNothingSent();
+            }
+        }
+        foreach (['contact_phone' => '12345', 'state' => ['bad'], 'tax_id' => 'abc', 'category_id' => 999999, 'business_type' => ['bad']] as $field => $invalid) {
+            $data = $valid;
+            $data['step1'][$field] = $invalid;
+            $draft->update(['data' => $data]);
+            $this->post(route('vendor.onboarding.submit'))->assertSessionHasErrors($field);
+            $this->assertDatabaseCount('vendors', 0);
+        }
+    }
+
+    public function test_registration_confirmation_errors_belong_to_confirmation_and_create_no_user(): void
+    {
+        $count = User::count();
+        $this->post('/register', ['name' => 'Test Person', 'email' => 'person@example.test', 'password' => 'password123', 'password_confirmation' => 'different123'])
+            ->assertSessionHasErrors('password_confirmation')->assertSessionDoesntHaveErrors('password');
+        $this->assertDatabaseCount('users', $count);
+        $this->withUnencryptedCookie('vms_locale', 'id')->post('/register', ['name' => 'Test Person', 'email' => 'person@example.test', 'password' => 'password123', 'password_confirmation' => 'different123'])
+            ->assertSessionHasErrors(['password_confirmation' => 'Konfirmasi kata sandi tidak cocok.']);
+        $this->assertDatabaseCount('users', $count);
+    }
+
+    public function test_missing_step_fields_cannot_persist_or_advance_a_direct_request(): void
+    {
+        $this->actingAs($this->vendorUser)->post(route('vendor.onboarding.step1'), [])
+            ->assertSessionHasErrors(['company_name', 'business_identification_number', 'tax_id', 'deed_number', 'business_type', 'category_id', 'experience', 'contact_person', 'contact_phone', 'address', 'city', 'state', 'pincode']);
+        $this->post(route('vendor.onboarding.step2'), [])
+            ->assertSessionHasErrors(['bank_name', 'bank_account_number', 'code_bank', 'bank_branch']);
+        $this->assertDatabaseCount('vendor_applications', 0);
+        $this->assertDatabaseCount('vendors', 0);
     }
 }

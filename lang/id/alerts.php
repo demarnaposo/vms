@@ -2,6 +2,19 @@
 
 // Translate dynamic alerts while preserving names, status codes, and counts verbatim.
 return [
+    'document_file_too_large' => 'Ukuran file tidak boleh melebihi :max MB.',
+    'document_upload_failed' => 'File gagal diunggah. Batas upload server: :max. Pilih file yang lebih kecil dan coba lagi.',
+    'onboarding_upload_too_large' => 'Upload melebihi batas request server (:max MB). Pilih file yang lebih kecil dan coba lagi.',
+    'onboarding_document_uploaded' => 'Dokumen berhasil diunggah.',
+    'onboarding_document_removed' => 'Dokumen berhasil dihapus.',
+    'onboarding_document_expiry_updated' => 'Tanggal kedaluwarsa dokumen berhasil diperbarui.',
+
+    'onboarding_document_save_failed' => 'Dokumen belum berhasil disimpan. Silakan coba kembali.',
+    'onboarding_document_required' => 'Unggah dokumen wajib ini sebelum melanjutkan.',
+    'onboarding_document_unavailable' => 'Dokumen tersimpan ini tidak tersedia atau jenisnya tidak aktif. Ganti atau hapus dari draft.',
+    'onboarding_documents_invalid' => 'Periksa kolom dokumen dan unggah seluruh dokumen wajib.',
+
+    'compliance_payment_setting_disabled' => 'Pengaturan pemblokiran pembayaran tidak dapat diubah saat modul pembayaran dinonaktifkan. Anda tetap dapat mengubah pengaturan aturan lainnya.',
     'rbac_last_admin' => 'Super admin terakhir tidak dapat dihapus atau dicabut perannya.',
     'rbac_invalid_role' => 'Pilih peran staff yang valid.',
     'rbac_invalid_permission' => 'Pilih izin dari katalog operasional.',

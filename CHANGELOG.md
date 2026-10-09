@@ -4,7 +4,115 @@ The VMS (Vendor Management System) changelog starts on 2026-09-18. Changes befor
 
 ## [Unreleased]
 
+### Changed
+
+- 2026-10-08 — Restored the original performance slider initial value of 3/4 and native change behavior as requested; retained only the new integer range 1–4 and backend bounds.
+
+- 2026-10-08 — Removed the visible unselected-score wording from the performance slider; show its score value only after interaction while retaining empty submission state and accessible state information.
+
+- 2026-10-08 — Restored the existing performance rating slider appearance with integer steps 1–4; retained unselected form state until pointer/keyboard interaction and existing backend validation.
+
+- 2026-10-08 — Restricted new performance ratings to integer scores 1–4, removed automatic score defaults while retaining the existing rating slider, localized scale guidance, and distinguished unrated metrics from historical zero values; retained six baseline weights, percentage normalization, thresholds and immutable historical snapshots, with documented caller/rule verification.
+
+- 2026-10-08 — Localized document verification/rejection Sonner outcomes in the active UI language using stable message templates and document master keys, including Company Profile; preserved custom names, existing server flash text and single-toast delivery.
+
+- 2026-10-08 — Aligned vendor registration/onboarding required indicators, accessible inline errors and responsive step layouts; disabled native form validation, moved registration confirmation errors to their field, and revalidated persisted company/bank drafts before final writes while preserving document autosave and upload-first expiry checks; documented the field/rule/error mapping and isolated verification.
+
+- 2026-10-08 — Updated agent verification rules to run live browser checks only on explicit user request, while retaining code review, isolated tests, linting and builds as the default checks.
+
+- 2026-10-08 — Save expiring onboarding documents before enabling expiry entry; allow only initial autosave uploads to omit expiry, retain mandatory expiry checks on Continue/final submission, and verify file extension, MIME and configured size limits.
+
+- 2026-10-08 — Automatically persist onboarding document uploads, replacements, expiry edits and confirmed removals on the server; removed the manual Save Draft action and kept required-document validation on Continue and final submission.
+
+- 2026-10-08 — Standardized all active VMS single-select controls on the shared FormSelect, with form/field/compact sizing, bilingual choice placeholders and empty states, accessible keyboard navigation and modal-contained popups; preserved option codes, typed callbacks, legacy values, dependent selections and report filter/export contracts.
+
+- 2026-10-08 — Replaced the onboarding company/review category description field with an information icon using the existing VMS explanation tooltip; retained selected-master descriptions, custom text and empty legacy compatibility.
+
+- 2026-10-08 — Updated the vendor category verification report with native Arc viewport/keyboard measurements, isolated onboarding/review UI fixtures, reproduced JS-suite failures and remaining MySQL/browser coverage limits.
+
+- 2026-10-08 — Added ten bilingual vendor category defaults with separate optional master descriptions, editable CRUD descriptions and automatic readonly onboarding/review/profile displays; added guarded additive manual alignment, immutable codes and reference-safe deletion while preserving custom categories and historical data; documented relations, verification and manual execution steps.
+
+- 2026-10-08 — Replaced the performance baseline with six bilingual metrics weighted 25/25/25/10/5/10 percent and maximum score four; added atomic, version-checked configuration editing, exact active-weight validation, localized paginated search, preserved score snapshots, and a guarded manual legacy replacement that retains audited defaults.
+
+- 2026-10-08 — Aligned bilingual onboarding instructions with the actual company and bank fields; removed unavailable fields and replaced checklist guidance with the existing document upload step.
+
+- 2026-10-08 — Replaced the company onboarding instructions with the requested bilingual wording and six numbered items, including three nested document/information bullets, while preserving form fields, validation and onboarding behavior.
+
+- 2026-10-07 — Expanded the Send Notification form to the admin content width used by Performance Metrics.
+
+- 2026-10-07 — Aligned category, document-type, staff and notification forms with performance metric controls, retaining red required indicators and adding accessible inline errors without changing backend rules.
+
+- 2026-10-07 — Aligned the default document catalogue to eight bilingual types with explicit backend ordering; added guarded legacy-default cleanup that preserves custom types, upload settings, references and administrator seed protection.
+
+- 2026-10-06 — Localized the vendor upload file chooser and empty selection state through application labels while retaining native file selection, filenames, reset behavior and accessible status/error associations.
+
+- 2026-10-06 — Removed the plus icon from the vendor Documents upload opener and matched its 36px height to the admin compliance evaluation action, preserving its theme styling and upload modal behavior.
+
+- 2026-10-06 — Matched the Rate Performance Back link and vendor-detail compliance evaluation button to 36px controls; replaced Vendor and Contact Messages Search button text with accessible search icons while retaining submission behavior.
+
+- 2026-10-06 — Matched vendor detail Back, Activate, Suspend and Terminate actions and the Compliance dashboard Run Evaluation action to the 36px control height, preserving styling, permissions and behavior.
+
+- 2026-10-06 — Matched the admin Dashboard View All Vendors button and Reports period select to the compact 36px controls, retaining their placement, theme styles and behavior.
+
+- 2026-10-06 — Matched the Vendor and Contact Messages search controls and vendor Performance score badge to the compact document-type filter sizing, preserving their placement, colors and behavior.
+
+- 2026-10-06 — Moved the compact Document Verification document-type filter and adjacent gradient Reset icon below the header, aligned to the right of the status tabs with responsive wrapping.
+
+- 2026-10-06 — Hid the visible Document Verification filter label while retaining its accessible name, and replaced the Reset text button with a labelled theme-gradient reset icon button without changing reset behavior.
+
+- 2026-10-06 — Moved the Document Verification document-type filter and conditional Reset action into responsive page-header actions, with an opt-in action-width class to keep tablet titles readable; preserved filter queries, status tabs, pagination and document actions.
+
+- 2026-10-06 — Removed Master Data submenu icons and their reserved space; applied theme gradients to main sidebar hover/active states and light brand highlights to submenus, preserving navigation, permissions and group controls.
+
+- 2026-10-05 — Matched the Compliance Rules Back link to the vendor detail small outline action link, preserving its compliance dashboard destination and bilingual label.
+
+- 2026-10-05 — Matched Apply Filter buttons across available report pages to the small outline View action, preserving filtering and export behavior.
+
+- 2026-10-05 — Aligned the active Staff Users, Roles and Permissions tabs with the shared theme gradient and white text, preserving tab navigation and inactive styles.
+
+- 2026-10-05 — Aligned active language switches and status/filter controls with the shared sidebar theme gradient, preserving inactive styles, selected values and filter navigation.
+
+- 2026-10-05 — Made Ocean the fallback theme before and after React initialization, retained valid saved themes, and aligned primary buttons and action links with the active sidebar gradient while preserving semantic variants.
+
 ### Fixed
+
+- 2026-10-08 — Show bilingual onboarding file-size errors in MB beside the affected document, retain upload context, and turn oversized server POST requests into inline validation errors after authorization instead of a standalone 413 page.
+
+- 2026-10-08 — Enforced every active mandatory onboarding document before continuing and again at final submission, with owned-file validation, per-type errors, atomic upload failure cleanup and an explicit partial-draft action that does not complete the document step.
+
+- 2026-10-07 — Improved admin Profile and Notifications responsive tabs, forms, inline error accessibility, long-content wrapping, action sizing and account dialog without changing vendor views or business behavior.
+
+- 2026-10-07: Added bilingual, accessible disabled-action explanations across VMS forms, business actions and pagination, preserving native disabled controls and existing eligibility rules.
+
+- 2026-10-07 — Improved admin dashboard grids, long-content wrapping, statistic readability and action controls across narrow and wide screens while preserving permissions and payment visibility.
+
+- 2026-10-07 — Improved responsive audit logs, contact messages, notification forms, reports and system health with local table pagination, wrapping controls and accessible field labels/errors, preserving business flows.
+
+- 2026-10-07 — Improved responsive vendor dashboard, profile, documents, compliance, performance and notifications with wrapping actions, bounded dialogs and accessible local form controls, preserving business rules and stored data.
+
+- 2026-10-07 — Improved responsive admin document, compliance and performance layouts, action links, contained tables and dialogs while preserving permissions, payment visibility and business flows.
+
+- 2026-10-07 — Improved vendor-detail responsiveness for long information, wrapped actions and tabs, contained document-table scrolling and viewport-bounded confirmation dialogs without changing business actions.
+
+- 2026-10-07 — Matched the Vendor Categories Active checkbox and label styling to Performance Metrics while preserving its state, validation and submission behavior.
+
+- 2026-10-07 — Translated the built-in Company Profile document type to Profil Perusahaan in Indonesian while preserving English labels, custom records and administrator overrides.
+
+- 2026-10-07 — Hid payment role management and permission catalogues while payments are disabled, rejected direct payment-grant requests, and preserved hidden assignments during staff role edits.
+
+- 2026-10-07 — Hid the compliance dashboard payment-blocking column when the payments module is disabled, restoring its stored values when enabled.
+
+- 2026-10-07 — Fixed fresh migration and seeding by syncing legacy RBAC data without Spatie models before the guard columns exist, leaving operational grants to the later RBAC conversion; added non-testing-path migration/seed regression coverage.
+
+- 2026-10-07 — Gated compliance rule payment-blocking controls, updates and evaluation effects with the existing payments flag, preserving stored settings, penalties, flags, activation blocking and evaluation history.
+
+- 2026-10-07 — Localized blocked vendor status labels in login, existing-session and password-reset errors using existing English/Indonesian translations, preserving account access restrictions and stored status codes.
+
+- 2026-10-06 — Aligned the sidebar logo divider with the measured admin/vendor header height, including vendor status banners and wrapping header content, while preserving sticky headers and the mobile drawer layout.
+
+- 2026-10-05 — Aligned terminated vendor metadata and lifecycle scenarios with reactivation into review; added a targeted metadata migration for existing installations, preserved login while awaiting activation, and associated lifecycle comment errors with their textarea without native required validation.
+
+- 2026-10-05 — Restored white text on admin dashboard Quick Actions with scoped link overrides, preserving destinations, permissions, payment visibility and responsive layout.
 
 - 2026-10-05 — Aligned Artisan/PHPUnit test locale overrides and explicitly enabled payments in payment authorization/RBAC scenarios, fixing CI expectations without changing the Indonesian application default or disabled payment module.
 
@@ -83,6 +191,10 @@ The VMS (Vendor Management System) changelog starts on 2026-09-18. Changes befor
 - 2026-09-18 — An email verification link opened in another browser now resumes automatically after the vendor signs in, without bypassing account and signed-link checks.
 
 ### Added
+
+- 2026-10-08 — Added Super Admin Business Types CRUD above Vendor Categories, with immutable string codes, active choices, protected vendor/application/audit references, and shared catalogue locking. Integrated onboarding, review, vendor profile and admin details with bilingual master labels while preserving legacy values; prepared an idempotent bootstrap migration with a non-destructive rollback.
+
+- 2026-10-07 — Added super-admin performance metric management under Master Data with immutable metric codes, protected rated/built-in metrics, atomic rating batches, current-score recalculation and preserved historical scores.
 
 - 2026-10-05 — Added optional password and confirmation fields when editing internal staff, retaining the existing hash for blank input, enforcing server confirmation and password rules, and keeping credentials out of staff responses and audit payloads.
 
@@ -163,6 +275,8 @@ The VMS (Vendor Management System) changelog starts on 2026-09-18. Changes befor
 - 2026-09-18 — Change-marker comments were restricted to explicit user requests.
 
 ### Security
+
+- 2026-10-05 — Applied vendor account restrictions to email verification endpoints and both password-reset stages, including previously issued reset tokens, while retaining access for enabled vendors under review.
 
 - 2026-09-30 — Protected the last super admin across staff assignment/deletion and profile deletion with a shared transaction lock, preserved account history, and refreshed authorization plus affected caches after RBAC changes.
 

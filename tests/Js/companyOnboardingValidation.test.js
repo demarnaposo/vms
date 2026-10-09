@@ -35,7 +35,7 @@ test('company category, experience, and registration guidance are bilingual', ()
     const examples = [
         ['Category', 'Kategori'],
         ['Experience', 'Pengalaman'],
-        ['Registration Instructions', 'Petunjuk Pengisian'],
+        ['FILLING INSTRUCTIONS:', 'INSTRUKSI PENGISIAN:'],
         [
             'e.g., Software procurement for PPM Manajemen in 2025.',
             'contoh: Pengadaan software untuk PPM Manajemen pada 2025.',

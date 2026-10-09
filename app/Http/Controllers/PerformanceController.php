@@ -30,7 +30,7 @@ class PerformanceController extends Controller
             ->orderBy('performance_score', 'desc')
             ->get();
 
-        $metrics = PerformanceMetric::where('is_active', true)->get();
+        $metrics = PerformanceMetric::active()->ordered()->get();
 
         $topPerformers = $vendors->take(5);
         $lowPerformers = $vendors->sortBy('performance_score')->take(5);
@@ -67,7 +67,7 @@ class PerformanceController extends Controller
     {
         $this->authorize('ratePerformance');
 
-        $metrics = PerformanceMetric::where('is_active', true)->get();
+        $metrics = PerformanceMetric::active()->ordered()->get();
 
         return Inertia::render('Admin/Performance/Rate', [
             'vendor' => $vendor,
@@ -82,34 +82,9 @@ class PerformanceController extends Controller
     {
         $this->authorize('ratePerformance');
 
-        // Validation handled by FormRequest
-
-        $metrics = PerformanceMetric::whereIn('id', collect($request->ratings)->pluck('metric_id'))->get()->keyBy('id');
-
-        foreach ($request->ratings as $rating) {
-            $metric = $metrics[$rating['metric_id']];
-
-            $this->performanceService->recordScore(
-                $vendor,
-                $metric,
-                $rating['score'],
-                Auth::user(),
-                $request->period_start,
-                $request->period_end,
-                $rating['notes'] ?? null,
-                false
-            );
-        }
-
-        // Recalculate once for the whole rating submission to avoid duplicate history entries.
-        $this->performanceService->recalculateVendorScore($vendor, Auth::user(), [
-            'source' => 'rating_batch',
-            'period_start' => $request->period_start,
-            'period_end' => $request->period_end,
-            'metric_count' => count($request->ratings),
-        ]);
+        $this->performanceService->recordRatings($vendor, $request->validated(), Auth::user());
 
         return redirect()->route('admin.performance.index')
-            ->with('success', 'Performance ratings recorded successfully.');
+            ->with('success', __('performance.ratings_recorded'));
     }
 }

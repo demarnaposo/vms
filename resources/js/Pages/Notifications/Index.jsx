@@ -43,9 +43,20 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
         // Localize the unread count while preserving its dynamic value.
         <PageHeader
             title="Notifications"
+            actionsClassName={
+                isVendor ? undefined : 'w-full md:w-auto [&>div]:w-full md:[&>div]:w-auto'
+            }
             subtitle={t(':count unread', { count: resolvedUnreadCount })}
             actions={
-                <ActionButton variant="primary" onClick={markAllAsRead}>
+                <ActionButton
+                    className={
+                        isVendor
+                            ? undefined
+                            : 'min-h-9 w-full justify-center whitespace-normal md:w-auto'
+                    }
+                    variant="primary"
+                    onClick={markAllAsRead}
+                >
                     Mark all as read
                 </ActionButton>
             }
@@ -68,7 +79,7 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
                     description="You are all caught up. New notifications will appear here."
                 />
             ) : (
-                <Card>
+                <Card className={isVendor ? undefined : 'min-w-0'} noPadding={!isVendor}>
                     <div className="divide-y divide-(--color-border-secondary)">
                         {displayNotifications.map((notification) => (
                             <div
@@ -78,9 +89,27 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
                                     'border-l-(--color-border-hover)'
                                 } ${!notification.read_at ? 'bg-(--color-bg-tertiary)/20' : 'hover:bg-(--color-bg-hover)/10'}`}
                             >
-                                <div className="flex items-start justify-between gap-4">
-                                    <div className="flex items-start gap-4 flex-1">
-                                        <span className="text-2xl mt-0.5 inline-flex">
+                                <div
+                                    className={
+                                        isVendor
+                                            ? 'flex items-start justify-between gap-4'
+                                            : 'flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4'
+                                    }
+                                >
+                                    <div
+                                        className={
+                                            isVendor
+                                                ? 'flex items-start gap-4 flex-1'
+                                                : 'flex min-w-0 flex-1 items-start gap-3 sm:gap-4'
+                                        }
+                                    >
+                                        <span
+                                            className={
+                                                isVendor
+                                                    ? 'text-2xl mt-0.5 inline-flex'
+                                                    : 'mt-0.5 inline-flex shrink-0 text-2xl'
+                                            }
+                                        >
                                             <AppIcon
                                                 name={
                                                     severityIcons[notification.data?.severity] ||
@@ -90,15 +119,39 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
                                             />
                                         </span>
                                         <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 mb-1">
+                                            <div
+                                                className={
+                                                    isVendor
+                                                        ? 'flex items-center gap-2 mb-1'
+                                                        : 'mb-1 flex min-w-0 items-start gap-2'
+                                                }
+                                            >
                                                 {!notification.read_at && (
-                                                    <span className="w-2 h-2 rounded-full bg-(--color-brand-primary) flex-shrink-0" />
+                                                    <span
+                                                        className={
+                                                            isVendor
+                                                                ? 'w-2 h-2 rounded-full bg-(--color-brand-primary) flex-shrink-0'
+                                                                : 'mt-1.5 h-2 w-2 shrink-0 rounded-full bg-(--color-brand-primary)'
+                                                        }
+                                                    />
                                                 )}
-                                                <h3 className="font-semibold text-(--color-text-primary)">
+                                                <h3
+                                                    className={
+                                                        isVendor
+                                                            ? 'font-semibold text-(--color-text-primary)'
+                                                            : 'min-w-0 font-semibold text-(--color-text-primary) [overflow-wrap:anywhere]'
+                                                    }
+                                                >
                                                     {notification.data?.title}
                                                 </h3>
                                             </div>
-                                            <p className="text-(--color-text-tertiary) text-sm mb-2">
+                                            <p
+                                                className={
+                                                    isVendor
+                                                        ? 'text-(--color-text-tertiary) text-sm mb-2'
+                                                        : 'mb-2 whitespace-pre-line text-sm text-(--color-text-tertiary) [overflow-wrap:anywhere]'
+                                                }
+                                            >
                                                 {notification.data?.message}
                                             </p>
                                             <div className="text-xs text-(--color-text-tertiary)">
@@ -111,6 +164,11 @@ export default function NotificationsIndex({ notifications, unreadCount }) {
                                     </div>
                                     {!notification.read_at && (
                                         <ActionButton
+                                            className={
+                                                isVendor
+                                                    ? undefined
+                                                    : 'min-h-9 w-full shrink-0 justify-center whitespace-normal sm:w-auto'
+                                            }
                                             variant="ghost"
                                             onClick={() => markAsRead(notification.id)}
                                         >

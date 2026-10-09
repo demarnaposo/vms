@@ -17,90 +17,105 @@ class PerformanceService
     public function recordScore(
         Vendor $vendor,
         PerformanceMetric $metric,
-        int $score,
+        mixed $score,
         User $scoredBy,
         string $periodStart,
         string $periodEnd,
         ?string $notes = null,
         bool $recalculate = true
     ): PerformanceScore {
-        // Validate score range
-        $score = max(0, min($metric->max_score, $score));
-
-        $performanceScore = PerformanceScore::create([
-            'vendor_id' => $vendor->id,
-            'performance_metric_id' => $metric->id,
-            'scored_by' => $scoredBy->id,
-            'score' => $score,
-            'notes' => $notes,
-            'period_start' => $periodStart,
-            'period_end' => $periodEnd,
-        ]);
-
-        if ($recalculate) {
-            // Recalculate overall vendor performance score
-            $this->recalculateVendorScore($vendor, $scoredBy, [
-                'metric_id' => $metric->id,
-                'period_start' => $periodStart,
-                'period_end' => $periodEnd,
+        return PerformanceMetricService::locked(function () use ($vendor, $metric, $score, $scoredBy, $periodStart, $periodEnd, $notes, $recalculate) {
+            $metric = PerformanceMetric::find($metric->id);
+            if (! $metric || ! $metric->is_active) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['metric_id' => __('performance.validation.metric_unavailable')]);
+            }
+            if ((int) $metric->max_score !== PerformanceMetric::MAX_SCORE) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['metric_id' => __('performance.validation.maximum_four')]);
+            }
+            if (! is_int($score) || $score < PerformanceMetric::MIN_SCORE || $score > PerformanceMetric::MAX_SCORE) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['score' => __('performance.validation.score_range', ['max' => PerformanceMetric::MAX_SCORE])]);
+            }
+            $performanceScore = PerformanceScore::create([
+                'vendor_id' => $vendor->id, 'performance_metric_id' => $metric->id,
+                'scored_by' => $scoredBy->id, 'score' => $score, 'notes' => $notes,
+                'period_start' => $periodStart, 'period_end' => $periodEnd,
             ]);
-        }
+            if ($recalculate) {
+                $this->recalculateVendorScore($vendor, $scoredBy, [
+                    'metric_id' => $metric->id, 'period_start' => $periodStart, 'period_end' => $periodEnd,
+                ]);
+            }
 
-        return $performanceScore;
+            return $performanceScore;
+        });
+    }
+
+    public function recordRatings(Vendor $vendor, array $data, User $actor): void
+    {
+        abort_unless($actor->staffCan('performance.rate'), 403);
+        PerformanceMetricService::locked(function () use ($vendor, $data, $actor): void {
+            // Validate again under the same locks as metric edits, including forms opened before deactivation.
+            $request = new \App\Http\Requests\Admin\StorePerformanceRatingRequest;
+            $request->replace($data);
+            $validator = \Illuminate\Support\Facades\Validator::make($data, $request->rules(), $request->messages(), $request->attributes());
+            $request->withValidator($validator);
+            $data = $validator->validate();
+            $metrics = PerformanceMetric::whereIn('id', array_column($data['ratings'], 'metric_id'))->get()->keyBy('id');
+            foreach ($data['ratings'] as $rating) {
+                $this->recordScore($vendor, $metrics[$rating['metric_id']], (int) $rating['score'], $actor,
+                    $data['period_start'], $data['period_end'], $rating['notes'] ?? null, false);
+            }
+            $this->recalculateVendorScore($vendor, $actor, [
+                'source' => 'rating_batch', 'period_start' => $data['period_start'],
+                'period_end' => $data['period_end'], 'metric_count' => count($data['ratings']),
+            ]);
+        });
     }
 
     /**
-     * Recalculate a vendor's overall performance score.
-     * Uses weighted average of most recent scores per metric.
+     * Recalculate using the most recent score per active metric and current weights.
      */
     public function recalculateVendorScore(Vendor $vendor, ?User $actor = null, array $metadata = []): int
     {
-        $metrics = PerformanceMetric::where('is_active', true)->get();
-
-        if ($metrics->isEmpty()) {
-            return 0;
-        }
-
-        $totalWeight = 0;
-        $weightedSum = 0;
-
-        $latestScoresByMetric = PerformanceScore::query()
-            ->where('vendor_id', $vendor->id)
-            ->whereIn('performance_metric_id', $metrics->pluck('id'))
-            ->orderByDesc('period_end')
-            ->orderByDesc('id')
-            ->get()
-            ->groupBy('performance_metric_id')
-            ->map(fn ($scores) => $scores->first());
-
-        foreach ($metrics as $metric) {
-            $latestScore = $latestScoresByMetric->get($metric->id);
-            if (! $latestScore || $metric->max_score <= 0) {
-                continue;
+        return PerformanceMetricService::locked(function () use ($vendor, $actor, $metadata) {
+            $currentVendor = Vendor::withTrashed()->lockForUpdate()->findOrFail($vendor->id);
+            $metrics = PerformanceMetric::active()->ordered()->get();
+            $latestScores = PerformanceScore::where('vendor_id', $vendor->id)
+                ->whereIn('performance_metric_id', $metrics->pluck('id'))
+                ->orderByDesc('period_end')->orderByDesc('id')->get()
+                ->groupBy('performance_metric_id')->map(fn ($scores) => $scores->first());
+            PerformanceMetricService::assertTotal($metrics->toArray());
+            $weightedUnits = 0;
+            $snapshot = [];
+            foreach ($metrics as $metric) {
+                $score = $latestScores->get($metric->id)?->score;
+                $score = $score === null ? null : (int) $score;
+                $weightedUnits += ($score ?? 0) * PerformanceMetricService::units($metric->weight);
+                $snapshot[] = ['metric_id' => $metric->id, 'name' => $metric->name,
+                    'display_name' => $metric->display_name, 'description' => $metric->description,
+                    'weight' => $metric->weight, 'max_score' => $metric->max_score, 'score' => $score];
             }
+            // Basis points avoid floating-point totals: scale 4 / 4 * 100, rounded half up.
+            // Missing scores contribute zero; their weights are never silently redistributed.
+            $overallScore = intdiv($weightedUnits + 200, 400);
+            $metadata = [...$metadata, 'metric_ids' => $metrics->pluck('id')->all(),
+                'metrics' => $snapshot, 'weight_unit' => 'percent', 'output_scale' => 100];
+            $configurationChange = ($metadata['source'] ?? null) === 'metric_configuration';
+            if ($configurationChange && (int) $currentVendor->performance_score === $overallScore) {
+                $vendor->performance_score = $overallScore;
 
-            // Normalize score to 0-100
-            $normalizedScore = ($latestScore->score / $metric->max_score) * 100;
-            $weightedSum += $normalizedScore * $metric->weight;
-            $totalWeight += $metric->weight;
-        }
+                return $overallScore;
+            }
+            $currentVendor->update(['performance_score' => $overallScore]);
+            $vendor->performance_score = $overallScore;
+            ScoreHistory::create([
+                'vendor_id' => $vendor->id, 'user_id' => $actor?->id, 'performance_score' => $overallScore,
+                'source' => $configurationChange ? 'metric_configuration' : ($actor ? 'manual_rating' : 'system'),
+                'metadata' => $metadata, 'recorded_at' => now(),
+            ]);
 
-        $overallScore = $totalWeight > 0
-            ? (int) round($weightedSum / $totalWeight)
-            : 0;
-
-        $vendor->update(['performance_score' => $overallScore]);
-
-        ScoreHistory::create([
-            'vendor_id' => $vendor->id,
-            'user_id' => $actor?->id,
-            'performance_score' => $overallScore,
-            'source' => $actor ? 'manual_rating' : 'system',
-            'metadata' => $metadata,
-            'recorded_at' => now(),
-        ]);
-
-        return $overallScore;
+            return $overallScore;
+        });
     }
 
     /**
@@ -108,39 +123,15 @@ class PerformanceService
      */
     public function getVendorHistory(Vendor $vendor, int $months = 12): array
     {
-        $scores = PerformanceScore::with('metric')
-            ->where('vendor_id', $vendor->id)
-            ->where('period_end', '>=', now()->subMonths($months))
-            ->orderBy('period_end', 'asc')
-            ->get();
-
-        // Group by month for trend analysis
-        $monthlyData = [];
-        foreach ($scores as $score) {
-            $month = $score->period_end->format('Y-m');
-            if (! isset($monthlyData[$month])) {
-                $monthlyData[$month] = [
-                    'month' => $month,
-                    'scores' => [],
-                    'average' => 0,
-                ];
-            }
-            $maxScore = max(1, (int) $score->metric->max_score);
-            $monthlyData[$month]['scores'][] = [
-                'metric' => $score->metric->name,
-                'score' => $score->score,
-                'max' => $maxScore,
-                'normalized' => ($score->score / $maxScore) * 100,
-            ];
-        }
-
-        // Calculate monthly averages
-        foreach ($monthlyData as &$data) {
-            $total = array_sum(array_column($data['scores'], 'normalized'));
-            $data['average'] = round($total / count($data['scores']));
-        }
-
-        return array_values($monthlyData);
+        return ScoreHistory::where('vendor_id', $vendor->id)
+            ->where('recorded_at', '>=', now()->subMonths($months))
+            ->orderBy('recorded_at')->orderBy('id')->get()
+            ->groupBy(fn ($history) => $history->recorded_at->format('Y-m'))
+            ->map(fn ($entries, $month) => [
+                'month' => $month,
+                'average' => (int) $entries->last()->performance_score,
+                'scores' => $entries->last()->metadata['metrics'] ?? [],
+            ])->values()->toArray();
     }
 
     /**
@@ -148,7 +139,7 @@ class PerformanceService
      */
     public function getMetricBreakdown(Vendor $vendor): array
     {
-        $metrics = PerformanceMetric::where('is_active', true)->get();
+        $metrics = PerformanceMetric::active()->ordered()->get();
         $scoresByMetric = PerformanceScore::query()
             ->where('vendor_id', $vendor->id)
             ->whereIn('performance_metric_id', $metrics->pluck('id'))
@@ -170,11 +161,11 @@ class PerformanceService
                 'metric' => $metric->only(['name', 'display_name']),
                 'metric_name' => $metric->display_name,
                 'weight' => $metric->weight,
-                'current_score' => optional($latestScore)->score ?? 0,
+                'current_score' => optional($latestScore)->score,
                 'max_score' => $metric->max_score,
                 'average_score' => $allScores->isNotEmpty()
                     ? round($allScores->average())
-                    : 0,
+                    : null,
                 'score_count' => $allScores->count(),
             ];
         }

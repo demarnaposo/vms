@@ -14,7 +14,7 @@ class AuthenticationTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/login')
-                ->type('email', 'admin@vendorflow.com')
+                ->type('email', 'admin@test.com')
                 ->type('password', 'password')
                 ->press('Sign in')
                 ->waitForLocation('/admin/dashboard')
@@ -30,7 +30,7 @@ class AuthenticationTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/login')
-                ->type('email', 'ops@vendorflow.com')
+                ->type('email', 'ops@test.com')
                 ->type('password', 'password')
                 ->press('Sign in')
                 ->waitForLocation('/admin/dashboard')
@@ -45,7 +45,7 @@ class AuthenticationTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/login')
-                ->type('email', 'finance@vendorflow.com')
+                ->type('email', 'finance@test.com')
                 ->type('password', 'password')
                 ->press('Sign in')
                 ->waitForLocation('/admin/dashboard')
@@ -60,7 +60,7 @@ class AuthenticationTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/login')
-                ->type('email', 'admin@vendorflow.com')
+                ->type('email', 'admin@test.com')
                 ->type('password', 'wrongpassword')
                 ->press('Sign in')
                 ->waitForText('credentials')
@@ -90,7 +90,7 @@ class AuthenticationTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/login')
-                ->type('email', 'admin@vendorflow.com')
+                ->type('email', 'admin@test.com')
                 ->type('password', 'password')
                 ->press('Sign in')
                 ->waitForLocation('/admin/dashboard')
@@ -124,7 +124,7 @@ class AuthenticationTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->visit('/register')
                 ->type('name', 'Duplicate User')
-                ->type('email', 'admin@vendorflow.com')
+                ->type('email', 'admin@test.com')
                 ->type('password', 'password123')
                 ->type('password_confirmation', 'password123')
                 ->press('Register')

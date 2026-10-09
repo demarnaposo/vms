@@ -34,6 +34,10 @@ class StoreStep2Request extends FormRequest
     public function messages(): array
     {
         return [
+            'bank_name.required' => 'Bank Name is required.',
+            'bank_account_number.required' => 'Account Number is required.',
+            'code_bank.required' => 'Bank Code is required.',
+            'bank_branch.required' => 'Branch Name is required.',
             'bank_account_number.regex' => 'Account number must be 9 to 18 digits.',
             // Return Indonesian bank code terminology in validation errors.
             'code_bank.regex' => 'Bank Code must be exactly 3 digits.',

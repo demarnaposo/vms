@@ -4,6 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use App\Models\PerformanceMetric;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 class StorePerformanceRatingRequest extends FormRequest
@@ -25,8 +26,12 @@ class StorePerformanceRatingRequest extends FormRequest
     {
         return [
             'ratings' => 'required|array|min:1',
-            'ratings.*.metric_id' => 'required|integer|distinct|exists:performance_metrics,id',
-            'ratings.*.score' => 'required|integer|min:0',
+            'ratings.*.metric_id' => ['required', 'integer', 'distinct', Rule::exists('performance_metrics', 'id')->where('is_active', true)],
+            'ratings.*.score' => ['bail', 'required', 'integer', 'min:'.PerformanceMetric::MIN_SCORE, 'max:'.PerformanceMetric::MAX_SCORE, function ($attribute, $value, $fail): void {
+                if (! is_int($value) && (! is_string($value) || ! preg_match('/^[1-4]$/', $value))) {
+                    $fail(__('performance.validation.score_range', ['max' => PerformanceMetric::MAX_SCORE]));
+                }
+            }],
             'ratings.*.notes' => 'nullable|string|max:500',
             'period_start' => 'required|date',
             'period_end' => 'required|date|after_or_equal:period_start',
@@ -60,6 +65,10 @@ class StorePerformanceRatingRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'ratings.*.score.integer' => __('performance.validation.score_range', ['max' => PerformanceMetric::MAX_SCORE]),
+            'ratings.*.score.min' => __('performance.validation.score_range', ['max' => PerformanceMetric::MAX_SCORE]),
+            'ratings.*.score.max' => __('performance.validation.score_range', ['max' => PerformanceMetric::MAX_SCORE]),
+            'ratings.*.metric_id.exists' => __('performance.validation.metric_unavailable'),
             'period_end.after_or_equal' => __('performance.validation.end_after_start'),
         ];
     }
@@ -67,6 +76,9 @@ class StorePerformanceRatingRequest extends FormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator): void {
+            if ($validator->errors()->isNotEmpty()) {
+                return;
+            }
             $ratings = collect($this->input('ratings', []));
             if ($ratings->isEmpty()) {
                 return;
@@ -77,14 +89,27 @@ class StorePerformanceRatingRequest extends FormRequest
                 return;
             }
 
+            $activeIds = PerformanceMetric::active()->pluck('id')->sort()->values()->all();
+            if ($metricIds->map(fn ($id) => (int) $id)->sort()->values()->all() !== $activeIds) {
+                $validator->errors()->add('ratings', __('performance.validation.complete_ratings'));
+
+                return;
+            }
+
             $metrics = PerformanceMetric::query()
                 ->whereIn('id', $metricIds)
                 ->pluck('max_score', 'id');
 
             foreach ($ratings as $index => $rating) {
                 $metricId = (int) ($rating['metric_id'] ?? 0);
-                $score = (int) ($rating['score'] ?? 0);
+                $score = (int) $rating['score'];
                 $maxScore = (int) ($metrics[$metricId] ?? 0);
+
+                if ($maxScore !== PerformanceMetric::MAX_SCORE) {
+                    $validator->errors()->add("ratings.{$index}.metric_id", __('performance.validation.maximum_four'));
+
+                    continue;
+                }
 
                 if ($maxScore > 0 && $score > $maxScore) {
                     $validator->errors()->add(

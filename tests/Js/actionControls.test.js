@@ -12,6 +12,10 @@ before(async () => {
     const result = await build({
         stdin: {
             contents: `export * from './resources/js/Components/ActionControls.jsx';
+                export { Button, LinkButton, IconButton } from './resources/js/Components/index.jsx';
+                export { FormButton } from './resources/js/Components/FormInputs.jsx';
+                export { ModalPrimaryButton } from './resources/js/Components/Modal.jsx';
+                export { default as ThemeSwitcher } from './resources/js/Components/ThemeSwitcher.jsx';
                 export { LanguageProvider } from './resources/js/Contexts/LanguageContext.jsx';`,
             resolveDir: root,
         },
@@ -26,7 +30,7 @@ before(async () => {
                 name: 'existing-runtime-packages',
                 setup(builder) {
                     builder.onResolve(
-                        { filter: /^(react(?:\/.*)?|@inertiajs\/react|axios|sonner)$/ },
+                        { filter: /^(react(?:-dom)?(?:\/.*)?|@inertiajs\/react|axios|sonner)$/ },
                         (args) => ({
                             path: import.meta.resolve(args.path),
                             external: true,
@@ -113,4 +117,58 @@ test('action button source labels follow both locales while icon children remain
         render(controls.ActionButton, { children: icon, 'aria-label': 'View' }),
         /<svg aria-hidden="true"><\/svg>/
     );
+});
+
+test('primary buttons and action links share the theme gradient while semantic variants remain distinct', () => {
+    for (const component of [controls.ActionButton, controls.ActionLink, controls.ActionAnchor]) {
+        assert.match(
+            render(component, { variant: 'primary', href: '/test', children: 'View' }),
+            /theme-primary-action/
+        );
+        for (const variant of ['danger', 'success', 'warning', 'outline', 'ghost']) {
+            const html = render(component, { variant, href: '/test', children: 'View' });
+            assert.doesNotMatch(html, /theme-primary-action/);
+            if (['danger', 'success', 'warning'].includes(variant)) {
+                assert.ok(html.includes(`--color-${variant}`));
+            }
+        }
+    }
+});
+
+test('shared primary controls keep labels, icons, disabled and loading behavior', () => {
+    for (const component of [controls.Button, controls.FormButton, controls.ModalPrimaryButton]) {
+        const html = render(
+            component,
+            { disabled: true, children: component === controls.FormButton ? 'Simpan' : 'Save' },
+            'id'
+        );
+        assert.match(html, /theme-primary-action/);
+        assert.match(html, /disabled=""/);
+        assert.match(html, />Simpan<\/button>$/);
+        assert.doesNotMatch(
+            render(component, { variant: 'danger', children: 'Delete' }),
+            /theme-primary-action/
+        );
+    }
+    assert.match(render(controls.FormButton, { loading: true, children: 'Save' }), /disabled=""/);
+    assert.match(
+        render(controls.FormButton, { loading: true, children: 'Save' }),
+        /stroke="currentColor"/
+    );
+    assert.match(
+        render(controls.IconButton, { variant: 'primary', icon: 'success', title: 'Save' }),
+        /theme-primary-action/
+    );
+    assert.match(
+        render(controls.LinkButton, { href: '/dashboard', children: 'View' }),
+        /theme-primary-action/
+    );
+});
+
+test('theme selector displays Ocean for invalid preferences in both locales', () => {
+    for (const locale of ['en', 'id']) {
+        const html = render(controls.ThemeSwitcher, {}, locale);
+        assert.match(html, />Ocean<\/span>/);
+        assert.match(html, /aria-expanded="false"/);
+    }
 });

@@ -1,10 +1,15 @@
+import VendorCategoryTooltip from '@/Components/VendorCategoryTooltip';
+import { vendorCategoryLabel } from '@/i18n/vendorCategories';
+import { DisabledButton } from '@/Components/DisabledActionTooltip';
 import { useForm } from '@inertiajs/react';
 import { FormSelect } from '@/Components/index.jsx';
+import VendorFormSelect from '@/Pages/Vendor/Components/VendorFormSelect';
 import { useState, useMemo } from 'react';
 // Use the centralized Indonesian province and regency/city dataset.
 import { INDONESIAN_PROVINCES, getRegenciesForProvince } from '@/data/indonesianProvincesAndCities';
 // Translate the company onboarding step through the global language context.
 import { useLanguage } from '@/Contexts/LanguageContext';
+import { businessTypeOptions } from '@/i18n/businessTypes';
 // Reuse VMS Indonesian mobile-number input and validation rules.
 import {
     sanitizeIndonesianMobileInput,
@@ -17,8 +22,13 @@ import {
     validateNpwp,
 } from '@/utils/indonesianBusinessIdentifiers';
 
-export default function StepCompany({ vendor, sessionData, vendorCategories = [] }) {
-    const { t } = useLanguage();
+export default function StepCompany({
+    vendor,
+    sessionData,
+    vendorCategories = [],
+    businessTypes = [],
+}) {
+    const { language, t } = useLanguage();
     const step1Session = sessionData?.step1 || {};
     const { data, setData, post, processing, errors } = useForm({
         company_name: step1Session.company_name || vendor?.company_name || '',
@@ -108,7 +118,10 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
     const validateCategory = (value) => {
         if (!value) return 'Category is required.';
         return vendorCategories.some(
-            (category) => String(category.id) === String(value) && category.is_active !== false
+            (category) =>
+                String(category.id) === String(value) &&
+                (category.is_active !== false ||
+                    String(value) === String(step1Session.category_id || vendor?.category_id))
         )
             ? ''
             : 'Please select a valid category.';
@@ -136,16 +149,21 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
     const categoryOptions = useMemo(
         () =>
             vendorCategories
-                .filter((category) => category.is_active !== false)
+                .filter(
+                    (category) =>
+                        category.is_active !== false ||
+                        String(category.id) === String(data.category_id)
+                )
                 .map((category) => ({
                     value: String(category.id),
-                    label: category.display_name,
+                    label: vendorCategoryLabel(language, category),
                 })),
-        [vendorCategories]
+        [vendorCategories, language, data.category_id]
     );
 
     const submit = (e) => {
         e.preventDefault();
+        if (processing) return;
 
         // Validate all required company fields before submitting company data.
         const companyNameError = validateCompanyName(data.company_name);
@@ -201,7 +219,7 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
     };
 
     return (
-        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl p-8 md:p-12 shadow-token-lg animate-fade-in">
+        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl min-w-0 p-4 sm:p-8 md:p-12 shadow-token-lg animate-fade-in">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold mb-2 text-(--color-text-primary)">
                     {t('Company Information')}
@@ -213,11 +231,30 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
 
             <div className="mb-8 rounded-xl border border-(--color-border-secondary) bg-(--color-bg-secondary) p-5">
                 <h2 className="mb-3 text-sm font-semibold text-(--color-text-primary)">
-                    {t('Registration Instructions')}
+                    {t('FILLING INSTRUCTIONS:')}
                 </h2>
-                <ol className="list-decimal space-y-1 pl-5 text-sm text-(--color-text-secondary)">
+                <ol className="list-decimal space-y-2 pl-5 text-sm leading-relaxed wrap-break-word text-(--color-text-secondary)">
                     <li>{t('Complete all fields using your company’s information.')}</li>
-                    <li>{t('Select a Category from the available dropdown.')}</li>
+                    <li>
+                        {t('Select a Category from the available dropdown.')}
+                        <ul className="mt-2 list-disc space-y-2 pl-5">
+                            <li>
+                                {t(
+                                    'General Information (Company Name, Business Type, Registered Address, Province, Regency / City, Postal Code, Contact Person, WhatsApp Number, NIB, NPWP, Deed of Establishment Number)'
+                                )}
+                            </li>
+                            <li>
+                                {t(
+                                    'Bank Information (Bank Code, Bank Name, Account Number, Branch Name)'
+                                )}
+                            </li>
+                            <li>
+                                {t(
+                                    'Upload the administrative documents requested in the Documents step.'
+                                )}
+                            </li>
+                        </ul>
+                    </li>
                     <li>{t('Enter the WhatsApp Number in the format 08xxxxxxxxxx.')}</li>
                     <li>{t('Ensure the NIB & NPWP match the official documents.')}</li>
                     <li>
@@ -226,20 +263,35 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
                         )}
                     </li>
                     <li>
-                        {t(
-                            'This information will be used for the Vendor PPM 2026 registration process.'
-                        )}
+                        {t('This file will be used as material for Vendor PPM 2026 registration.')}
                     </li>
                 </ol>
             </div>
 
-            <form onSubmit={submit} className="space-y-8">
-                <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {t('Company Name')} <span className="text-(--color-danger)">*</span>
+            <p className="mb-4 text-sm text-(--color-text-tertiary)">
+                {t('Fields marked with * are required.')}
+            </p>
+            <form noValidate onSubmit={submit} className="space-y-8">
+                <div className="grid min-w-0 md:grid-cols-2 gap-6">
+                    <div className="min-w-0 space-y-2">
+                        <label
+                            className="text-sm font-medium text-(--color-text-secondary)"
+                            htmlFor="onboarding-company_name"
+                        >
+                            {t('Company Name')}{' '}
+                            <span className="text-(--color-danger)" aria-hidden="true">
+                                *
+                            </span>
                         </label>
                         <input
+                            id="onboarding-company_name"
+                            name="company_name"
+                            aria-invalid={Boolean(clientErrors.company_name || errors.company_name)}
+                            aria-describedby={
+                                clientErrors.company_name || errors.company_name
+                                    ? 'onboarding-company_name-error'
+                                    : undefined
+                            }
                             type="text"
                             value={data.company_name}
                             onChange={(e) => {
@@ -268,17 +320,20 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
                         />
                         {/* Show company-name validation from both client and server checks. */}
                         {(clientErrors.company_name || errors.company_name) && (
-                            <p className="text-sm text-(--color-danger)">
+                            <p
+                                className="text-sm text-(--color-danger)"
+                                id="onboarding-company_name-error"
+                                role="alert"
+                            >
                                 {t(clientErrors.company_name || errors.company_name)}
                             </p>
                         )}
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {t('Business Type')} <span className="text-(--color-danger)">*</span>
-                        </label>
-                        <FormSelect
+                    <div className="min-w-0 space-y-2">
+                        <VendorFormSelect
+                            label="Business Type"
+                            showRequiredIndicator
                             value={data.business_type}
                             onChange={(value) => {
                                 setData('business_type', value);
@@ -290,22 +345,34 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
                                 }
                             }}
                             placeholder={t('Select Type')}
-                            options={[
-                                { value: 'sole_proprietor', label: 'Sole Proprietorship' },
-                                { value: 'partnership', label: 'Partnership' },
-                                { value: 'llp', label: 'LLP' },
-                                { value: 'pvt_ltd', label: 'Private Limited' },
-                                { value: 'public_ltd', label: 'Public Limited' },
-                            ]}
+                            options={businessTypeOptions(language, businessTypes)}
+                            translateOptions={false}
                             error={clientErrors.business_type || errors.business_type}
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {t('Category')} <span className="text-(--color-danger)">*</span>
-                        </label>
+                    <div className="min-w-0 space-y-2">
+                        <div className="flex min-w-0 items-center gap-1">
+                            <label
+                                htmlFor="company-category"
+                                className="text-sm font-medium text-(--color-text-secondary)"
+                            >
+                                {t('Category')}{' '}
+                                <span className="text-(--color-danger)" aria-hidden="true">
+                                    *
+                                </span>
+                            </label>
+                            <VendorCategoryTooltip
+                                category={vendorCategories.find(
+                                    (category) => String(category.id) === String(data.category_id)
+                                )}
+                            />
+                        </div>
                         <FormSelect
+                            size="field"
+                            showRequiredIndicator
+                            id="company-category"
+                            aria-label="Category"
                             value={String(data.category_id)}
                             onChange={(value) => {
                                 setData('category_id', value);
@@ -318,15 +385,30 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
                             }}
                             placeholder={t('Select Category')}
                             options={categoryOptions}
+                            translateOptions={false}
                             error={clientErrors.category_id || errors.category_id}
                         />
                     </div>
 
                     <div className="md:col-span-2 space-y-2">
-                        <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {t('Experience')} <span className="text-(--color-danger)">*</span>
+                        <label
+                            className="text-sm font-medium text-(--color-text-secondary)"
+                            htmlFor="onboarding-experience"
+                        >
+                            {t('Experience')}{' '}
+                            <span className="text-(--color-danger)" aria-hidden="true">
+                                *
+                            </span>
                         </label>
                         <textarea
+                            id="onboarding-experience"
+                            name="experience"
+                            aria-invalid={Boolean(clientErrors.experience || errors.experience)}
+                            aria-describedby={
+                                clientErrors.experience || errors.experience
+                                    ? 'onboarding-experience-error'
+                                    : undefined
+                            }
                             value={data.experience}
                             onChange={(e) => {
                                 const value = e.target.value;
@@ -356,19 +438,40 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
                             {t('Describe projects or work previously completed by your company.')}
                         </p>
                         {(clientErrors.experience || errors.experience) && (
-                            <p className="text-sm text-(--color-danger)">
+                            <p
+                                className="text-sm text-(--color-danger)"
+                                id="onboarding-experience-error"
+                                role="alert"
+                            >
                                 {t(clientErrors.experience || errors.experience)}
                             </p>
                         )}
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-(--color-text-secondary)">
+                    <div className="min-w-0 space-y-2">
+                        <label
+                            className="text-sm font-medium text-(--color-text-secondary)"
+                            htmlFor="onboarding-business_identification_number"
+                        >
                             {/* Show the complete business identifier label. */}
                             {t('Business Identification Number (NIB)')}{' '}
-                            <span className="text-(--color-danger)">*</span>
+                            <span className="text-(--color-danger)" aria-hidden="true">
+                                *
+                            </span>
                         </label>
                         <input
+                            id="onboarding-business_identification_number"
+                            name="business_identification_number"
+                            aria-invalid={Boolean(
+                                clientErrors.business_identification_number ||
+                                errors.business_identification_number
+                            )}
+                            aria-describedby={
+                                clientErrors.business_identification_number ||
+                                errors.business_identification_number
+                                    ? 'onboarding-business_identification_number-error'
+                                    : undefined
+                            }
                             type="text"
                             value={data.business_identification_number}
                             onChange={(e) => {
@@ -403,7 +506,11 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
                         {/* Localize registration-number validation feedback. */}
                         {(clientErrors.business_identification_number ||
                             errors.business_identification_number) && (
-                            <p className="text-sm text-(--color-danger)">
+                            <p
+                                className="text-sm text-(--color-danger)"
+                                id="onboarding-business_identification_number-error"
+                                role="alert"
+                            >
                                 {t(
                                     clientErrors.business_identification_number ||
                                         errors.business_identification_number
@@ -412,13 +519,26 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
                         )}
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-(--color-text-secondary)">
+                    <div className="min-w-0 space-y-2">
+                        <label
+                            className="text-sm font-medium text-(--color-text-secondary)"
+                            htmlFor="onboarding-tax_id"
+                        >
                             {/* Show the complete taxpayer identifier label. */}
                             {t('Taxpayer Identification Number (NPWP)')}{' '}
-                            <span className="text-(--color-danger)">*</span>
+                            <span className="text-(--color-danger)" aria-hidden="true">
+                                *
+                            </span>
                         </label>
                         <input
+                            id="onboarding-tax_id"
+                            name="tax_id"
+                            aria-invalid={Boolean(clientErrors.tax_id || errors.tax_id)}
+                            aria-describedby={
+                                clientErrors.tax_id || errors.tax_id
+                                    ? 'onboarding-tax_id-error'
+                                    : undefined
+                            }
                             type="text"
                             value={data.tax_id}
                             onChange={(e) => {
@@ -449,19 +569,36 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
                         />
                         {/* Localize tax-number validation feedback. */}
                         {(clientErrors.tax_id || errors.tax_id) && (
-                            <p className="text-sm text-(--color-danger)">
+                            <p
+                                className="text-sm text-(--color-danger)"
+                                id="onboarding-tax_id-error"
+                                role="alert"
+                            >
                                 {t(clientErrors.tax_id || errors.tax_id)}
                             </p>
                         )}
                     </div>
 
                     {/* Match the deed-number field width to the other company identifiers. */}
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-(--color-text-secondary)">
+                    <div className="min-w-0 space-y-2">
+                        <label
+                            className="text-sm font-medium text-(--color-text-secondary)"
+                            htmlFor="onboarding-deed_number"
+                        >
                             {t('Deed of Establishment Number')}{' '}
-                            <span className="text-(--color-danger)">*</span>
+                            <span className="text-(--color-danger)" aria-hidden="true">
+                                *
+                            </span>
                         </label>
                         <input
+                            id="onboarding-deed_number"
+                            name="deed_number"
+                            aria-invalid={Boolean(clientErrors.deed_number || errors.deed_number)}
+                            aria-describedby={
+                                clientErrors.deed_number || errors.deed_number
+                                    ? 'onboarding-deed_number-error'
+                                    : undefined
+                            }
                             type="text"
                             value={data.deed_number}
                             onChange={(e) => {
@@ -489,17 +626,37 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
                             maxLength={100}
                         />
                         {(clientErrors.deed_number || errors.deed_number) && (
-                            <p className="text-sm text-(--color-danger)">
+                            <p
+                                className="text-sm text-(--color-danger)"
+                                id="onboarding-deed_number-error"
+                                role="alert"
+                            >
                                 {t(clientErrors.deed_number || errors.deed_number)}
                             </p>
                         )}
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {t('Contact Person')} <span className="text-(--color-danger)">*</span>
+                    <div className="min-w-0 space-y-2">
+                        <label
+                            className="text-sm font-medium text-(--color-text-secondary)"
+                            htmlFor="onboarding-contact_person"
+                        >
+                            {t('Contact Person')}{' '}
+                            <span className="text-(--color-danger)" aria-hidden="true">
+                                *
+                            </span>
                         </label>
                         <input
+                            id="onboarding-contact_person"
+                            name="contact_person"
+                            aria-invalid={Boolean(
+                                clientErrors.contact_person || errors.contact_person
+                            )}
+                            aria-describedby={
+                                clientErrors.contact_person || errors.contact_person
+                                    ? 'onboarding-contact_person-error'
+                                    : undefined
+                            }
                             type="text"
                             value={data.contact_person}
                             onChange={(e) => {
@@ -527,17 +684,37 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
                         />
                         {/* Localize contact-person validation feedback. */}
                         {(clientErrors.contact_person || errors.contact_person) && (
-                            <p className="text-sm text-(--color-danger)">
+                            <p
+                                className="text-sm text-(--color-danger)"
+                                id="onboarding-contact_person-error"
+                                role="alert"
+                            >
                                 {t(clientErrors.contact_person || errors.contact_person)}
                             </p>
                         )}
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-(--color-text-secondary)">
-                            {t('WhatsApp Number')} <span className="text-(--color-danger)">*</span>
+                    <div className="min-w-0 space-y-2">
+                        <label
+                            className="text-sm font-medium text-(--color-text-secondary)"
+                            htmlFor="onboarding-contact_phone"
+                        >
+                            {t('WhatsApp Number')}{' '}
+                            <span className="text-(--color-danger)" aria-hidden="true">
+                                *
+                            </span>
                         </label>
                         <input
+                            id="onboarding-contact_phone"
+                            name="contact_phone"
+                            aria-invalid={Boolean(
+                                clientErrors.contact_phone || errors.contact_phone
+                            )}
+                            aria-describedby={
+                                clientErrors.contact_phone || errors.contact_phone
+                                    ? 'onboarding-contact_phone-error'
+                                    : undefined
+                            }
                             type="tel"
                             inputMode="tel"
                             autoComplete="tel"
@@ -571,18 +748,35 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
                         </p>
                         {/* Localize contact-phone validation feedback. */}
                         {(clientErrors.contact_phone || errors.contact_phone) && (
-                            <p className="text-sm text-(--color-danger)">
+                            <p
+                                className="text-sm text-(--color-danger)"
+                                id="onboarding-contact_phone-error"
+                                role="alert"
+                            >
                                 {t(clientErrors.contact_phone || errors.contact_phone)}
                             </p>
                         )}
                     </div>
 
                     <div className="md:col-span-2 space-y-2">
-                        <label className="text-sm font-medium text-(--color-text-secondary)">
+                        <label
+                            className="text-sm font-medium text-(--color-text-secondary)"
+                            htmlFor="onboarding-address"
+                        >
                             {t('Registered Address')}{' '}
-                            <span className="text-(--color-danger)">*</span>
+                            <span className="text-(--color-danger)" aria-hidden="true">
+                                *
+                            </span>
                         </label>
                         <textarea
+                            id="onboarding-address"
+                            name="address"
+                            aria-invalid={Boolean(clientErrors.address || errors.address)}
+                            aria-describedby={
+                                clientErrors.address || errors.address
+                                    ? 'onboarding-address-error'
+                                    : undefined
+                            }
                             value={data.address}
                             onChange={(e) => {
                                 const value = e.target.value;
@@ -610,18 +804,32 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
                         ></textarea>
                         {/* Show registered-address validation from both client and server checks. */}
                         {(clientErrors.address || errors.address) && (
-                            <p className="text-sm text-(--color-danger)">
+                            <p
+                                className="text-sm text-(--color-danger)"
+                                id="onboarding-address-error"
+                                role="alert"
+                            >
                                 {t(clientErrors.address || errors.address)}
                             </p>
                         )}
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-(--color-text-secondary)">
+                    <div className="min-w-0 space-y-2">
+                        <label
+                            htmlFor="company-province"
+                            className="text-sm font-medium text-(--color-text-secondary)"
+                        >
                             {/* Use Indonesian address terminology for province selection. */}
-                            {t('Province')} <span className="text-(--color-danger)">*</span>
+                            {t('Province')}{' '}
+                            <span className="text-(--color-danger)" aria-hidden="true">
+                                *
+                            </span>
                         </label>
                         <FormSelect
+                            size="field"
+                            showRequiredIndicator
+                            id="company-province"
+                            aria-label="Province"
                             value={data.state}
                             onChange={(value) => {
                                 setData((prev) => ({ ...prev, state: value, city: '' }));
@@ -635,16 +843,27 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
                             }}
                             placeholder={t('Select Province')}
                             options={INDONESIAN_PROVINCES}
+                            translateOptions={false}
                             error={clientErrors.state || errors.state}
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-(--color-text-secondary)">
+                    <div className="min-w-0 space-y-2">
+                        <label
+                            htmlFor="company-city"
+                            className="text-sm font-medium text-(--color-text-secondary)"
+                        >
                             {/* Include both Indonesian regencies and cities. */}
-                            {t('Regency / City')} <span className="text-(--color-danger)">*</span>
+                            {t('Regency / City')}{' '}
+                            <span className="text-(--color-danger)" aria-hidden="true">
+                                *
+                            </span>
                         </label>
                         <FormSelect
+                            size="field"
+                            showRequiredIndicator
+                            id="company-city"
+                            aria-label="Regency / City"
                             value={data.city}
                             onChange={(value) => {
                                 setData('city', value);
@@ -659,17 +878,33 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
                                 data.state ? t('Select Regency / City') : t('Select Province first')
                             }
                             options={cityOptions}
+                            translateOptions={false}
                             disabled={!data.state}
+                            disabledReason="Select a province before choosing a city."
                             error={clientErrors.city || errors.city}
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-(--color-text-secondary)">
+                    <div className="min-w-0 space-y-2">
+                        <label
+                            className="text-sm font-medium text-(--color-text-secondary)"
+                            htmlFor="onboarding-pincode"
+                        >
                             {/* Use Indonesia's postal code label and five-digit input rules. */}
-                            {t('Postal Code')} <span className="text-(--color-danger)">*</span>
+                            {t('Postal Code')}{' '}
+                            <span className="text-(--color-danger)" aria-hidden="true">
+                                *
+                            </span>
                         </label>
                         <input
+                            id="onboarding-pincode"
+                            name="pincode"
+                            aria-invalid={Boolean(clientErrors.pincode || errors.pincode)}
+                            aria-describedby={
+                                clientErrors.pincode || errors.pincode
+                                    ? 'onboarding-pincode-error'
+                                    : undefined
+                            }
                             type="text"
                             value={data.pincode}
                             onChange={(e) => setData('pincode', e.target.value.replace(/\D/g, ''))}
@@ -691,7 +926,11 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
                         />
                         {/* Localize postal-code validation feedback. */}
                         {(clientErrors.pincode || errors.pincode) && (
-                            <p className="text-sm text-(--color-danger)">
+                            <p
+                                className="text-sm text-(--color-danger)"
+                                id="onboarding-pincode-error"
+                                role="alert"
+                            >
                                 {t(clientErrors.pincode || errors.pincode)}
                             </p>
                         )}
@@ -699,10 +938,11 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
                 </div>
 
                 <div className="flex justify-end pt-4">
-                    <button
+                    <DisabledButton
                         type="submit"
                         disabled={processing}
-                        className="bg-gradient-primary text-white font-semibold rounded-lg shadow-token-primary hover:-translate-y-px hover:shadow-token-primary transition-all flex items-center gap-2 text-lg px-8 py-3"
+                        disabledReason={'A request is in progress. Please wait.'}
+                        className="theme-primary-action font-semibold rounded-lg shadow-token-primary hover:-translate-y-px hover:shadow-token-primary transition-all flex items-center gap-2 text-lg px-8 py-3"
                     >
                         {processing ? t('Saving...') : t('Save & Continue')}
                         <svg
@@ -718,7 +958,7 @@ export default function StepCompany({ vendor, sessionData, vendorCategories = []
                                 d="M17 8l4 4m0 0l-4 4m4-4H3"
                             />
                         </svg>
-                    </button>
+                    </DisabledButton>
                 </div>
             </form>
         </div>

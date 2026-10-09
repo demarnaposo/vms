@@ -21,7 +21,8 @@ test('vendor lifecycle comment requirement matches backend rules', () => {
         /const isCommentRequired = \['reject', 'suspend', 'terminate', 'reactivate'\]\.includes/
     );
     assert.match(source, /label=\{isCommentRequired \? 'Comment' : 'Comment \(Optional\)'\}/);
-    assert.match(source, /required=\{isCommentRequired\}/);
+    assert.match(source, /showRequiredIndicator=\{isCommentRequired\}/);
+    assert.doesNotMatch(source, /\brequired=\{isCommentRequired\}/);
     assert.doesNotMatch(source, /label=(?:"[^"\n]*\*"|\{`[^`\n]*\*[^`\n]*`\})/);
 });
 

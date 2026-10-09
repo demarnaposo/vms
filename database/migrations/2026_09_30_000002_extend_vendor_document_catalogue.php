@@ -12,20 +12,14 @@ return new class extends Migration
         if (! DB::table('document_types')->exists()) {
             return;
         }
-        $types = [
-            ['name' => 'company_deed', 'display_name' => 'Company Deed of Establishment', 'description' => 'Deed establishing the company'],
-            ['name' => 'bank_account_letter', 'display_name' => 'Bank Account Confirmation Letter', 'description' => 'Bank letter confirming the company account'],
-            ['name' => 'domicile_letter', 'display_name' => 'Company Domicile Letter', 'description' => 'Letter confirming the company domicile'],
-            ['name' => 'pic_identity_card', 'display_name' => 'PIC Identity Card (KTP)', 'description' => 'Identity card of the person in charge'],
-            ['name' => 'experience_portfolio', 'display_name' => 'Experience Portfolio', 'description' => 'Portfolio of previous projects and work experience'],
-            ['name' => 'business_license', 'display_name' => 'SIUP / Business License', 'description' => 'Trading license or other applicable business license'],
-            ['name' => 'pkp_certificate', 'display_name' => 'PKP Certificate (if applicable)', 'description' => 'Optional certificate for vendors registered as PKP'],
-        ];
+        $baseline = require database_path('data/system_master_data.php');
+        $types = array_filter($baseline['document_types'], fn ($type) => ! $type['is_mandatory']);
         DB::transaction(function () use ($types): void {
             foreach ($types as $type) {
                 if (DB::table('document_types')->where('name', $type['name'])->exists()) {
                     continue;
                 }
+                unset($type['sort_order']);
                 DB::table('document_types')->insert([
                     ...$type, 'is_mandatory' => false, 'has_expiry' => false,
                     'expiry_warning_days' => 0, 'max_file_size_mb' => 10,

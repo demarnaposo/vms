@@ -57,17 +57,17 @@ class DocumentTypeManagementTest extends TestCase
     public function test_full_catalogue_bootstraps_without_duplicates_or_new_mandatory_requirements(): void
     {
         app(SystemMasterDataService::class)->syncDocumentTypes();
-        $this->assertDatabaseCount('document_types', 14);
-        $this->assertSame(6, DocumentType::active()->mandatory()->count());
+        $this->assertDatabaseCount('document_types', 8);
+        $this->assertSame(2, DocumentType::active()->mandatory()->count());
         $this->assertFalse(DocumentType::where('name', 'pkp_certificate')->firstOrFail()->is_mandatory);
-        $codes = ['company_deed', 'npwp', 'nib_oss', 'domicile_letter', 'pic_identity_card', 'bank_account_letter', 'experience_portfolio', 'business_license', 'pkp_certificate'];
-        $this->assertSame(9, DocumentType::whereIn('name', $codes)->count());
+        $codes = ['company_deed', 'npwp', 'nib_oss', 'domicile_letter', 'pic_identity_card', 'company_profile', 'other_supporting_documents', 'pkp_certificate'];
+        $this->assertSame(8, DocumentType::whereIn('name', $codes)->count());
         $type = DocumentType::where('name', 'pkp_certificate')->firstOrFail();
         $type->update(['display_name' => 'Admin label', 'is_active' => false]);
         app(SystemMasterDataService::class)->syncDocumentTypes();
         $this->assertSame('Admin label', $type->fresh()->display_name);
         $this->assertFalse($type->fresh()->is_active);
-        $this->assertDatabaseCount('document_types', 14);
+        $this->assertDatabaseCount('document_types', 8);
     }
 
     public function test_catalogue_migration_preserves_existing_metadata_documents_drafts_and_cache(): void
@@ -133,7 +133,7 @@ class DocumentTypeManagementTest extends TestCase
             $this->post('/vendor/documents/upload', ['document_type_id' => $type->id, 'file' => $file()])->assertSessionHasNoErrors();
             $this->assertDatabaseHas('vendor_documents', ['vendor_id' => $vendor->id, 'document_type_id' => $type->id]);
         }
-        $this->assertCount(7, VendorApplication::where('user_id', $user->id)->firstOrFail()->data['step3']['documents']);
+        $this->assertCount(6, VendorApplication::where('user_id', $user->id)->firstOrFail()->data['step3']['documents']);
         $pkp = DocumentType::where('name', 'pkp_certificate')->firstOrFail();
         $this->actingAs($this->user('ops_manager'))->get('/admin/documents?status=all&document_type_id='.$pkp->id)
             ->assertOk()->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page->has('documents.data', 1)->where('documents.data.0.document_type_id', $pkp->id));

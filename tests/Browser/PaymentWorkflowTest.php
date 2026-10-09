@@ -89,7 +89,7 @@ class PaymentWorkflowTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->logout();
             $browser->visit('/login')
-                ->type('email', 'admin@vendorflow.com')
+                ->type('email', 'admin@test.com')
                 ->type('password', 'password')
                 ->press('Sign in')
                 ->waitForLocation('/admin/dashboard')
@@ -107,7 +107,7 @@ class PaymentWorkflowTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->logout();
             $browser->visit('/login')
-                ->type('email', 'ops@vendorflow.com')
+                ->type('email', 'ops@test.com')
                 ->type('password', 'password')
                 ->press('Sign in')
                 ->waitForLocation('/admin/dashboard')
@@ -125,7 +125,7 @@ class PaymentWorkflowTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->logout();
             $browser->visit('/login')
-                ->type('email', 'finance@vendorflow.com')
+                ->type('email', 'finance@test.com')
                 ->type('password', 'password')
                 ->press('Sign in')
                 ->waitForLocation('/admin/dashboard')

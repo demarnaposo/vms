@@ -29,6 +29,8 @@ class SystemMasterDataService
         DB::transaction(function () use ($includeDefaultStaffUsers): void {
             $this->syncRolesAndPermissions();
             $this->syncVendorStates();
+            $this->syncBusinessTypes();
+            $this->syncVendorCategories();
             $this->syncDocumentTypes();
             $this->syncComplianceRules();
             $this->syncPerformanceMetrics();
@@ -45,6 +47,40 @@ class SystemMasterDataService
     public function syncCoreData(): void
     {
         $this->sync(false);
+    }
+
+    public function syncVendorCategories(): void
+    {
+        if (! \Illuminate\Support\Facades\Schema::hasTable('vendor_categories')
+            || ! \Illuminate\Support\Facades\Schema::hasColumn('vendor_categories', 'description')) {
+            return;
+        }
+        VendorCategoryService::locked(function (): void {
+            $inserted = DB::table('master_data_initializations')->insertOrIgnore(['name' => 'vendor_categories', 'initialized_at' => now()]);
+            if (! $inserted || \App\Models\VendorCategory::exists()) {
+                return;
+            }
+            foreach ($this->data('vendor_categories') as $category) {
+                DB::table('vendor_categories')->insertOrIgnore($category + ['created_at' => now(), 'updated_at' => now()]);
+            }
+        });
+    }
+
+    public function syncBusinessTypes(): void
+    {
+        if (! \Illuminate\Support\Facades\Schema::hasTable('business_types')) {
+            return;
+        }
+        DB::transaction(function (): void {
+            $inserted = DB::table('master_data_initializations')->insertOrIgnore(['name' => 'business_types', 'initialized_at' => now()]);
+            DB::table('master_data_initializations')->where('name', 'business_types')->lockForUpdate()->firstOrFail();
+            if (! $inserted) {
+                return;
+            }
+            foreach ($this->data('business_types') as $type) {
+                DB::table('business_types')->insertOrIgnore($type + ['created_at' => now(), 'updated_at' => now()]);
+            }
+        });
     }
 
     /**
@@ -99,7 +135,11 @@ class SystemMasterDataService
             }
             // Bootstrap an empty installation only; administrator changes remain authoritative.
             if (! DB::table('document_types')->exists()) {
+                $hasSortOrder = \Illuminate\Support\Facades\Schema::hasColumn('document_types', 'sort_order');
                 foreach ($this->data('document_types') as $type) {
+                    if (! $hasSortOrder) {
+                        unset($type['sort_order']);
+                    }
                     \App\Models\DocumentType::create($type);
                 }
             }
@@ -134,16 +174,21 @@ class SystemMasterDataService
      */
     public function syncPerformanceMetrics(): void
     {
-        foreach ($this->data('performance_metrics') as $metric) {
-            $this->updateOrCreateByName('performance_metrics', [
-                'name' => $metric['name'],
-                'display_name' => $metric['display_name'],
-                'description' => $metric['description'] ?? null,
-                'weight' => $metric['weight'] ?? 1.0,
-                'max_score' => (int) ($metric['max_score'] ?? 10),
-                'is_active' => (bool) ($metric['is_active'] ?? true),
-            ]);
-        }
+        PerformanceMetricService::locked(function (): void {
+            // Bootstrap only an empty catalogue. Existing/admin configurations require an explicit replacement.
+            if (\App\Models\PerformanceMetric::exists()) {
+                return;
+            }
+            foreach ($this->data('performance_metrics') as $metric) {
+                \App\Models\PerformanceMetric::firstOrCreate(['name' => $metric['name']], [
+                    'display_name' => $metric['display_name'],
+                    'description' => $metric['description'] ?? null,
+                    'weight' => $metric['weight'] ?? '0.00',
+                    'max_score' => (int) ($metric['max_score'] ?? 4),
+                    'is_active' => (bool) ($metric['is_active'] ?? true),
+                ]);
+            }
+        });
     }
 
     /**

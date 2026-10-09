@@ -1,3 +1,4 @@
+import { DisabledButton } from '@/Components/DisabledActionTooltip';
 import { paymentsEnabled } from '@/utils/paymentModule';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
@@ -21,6 +22,7 @@ export default function Register() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (form.processing) return;
         form.post('/register');
     };
 
@@ -110,13 +112,19 @@ export default function Register() {
                             </p>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
+                        <p className="mb-4 text-sm text-(--color-text-tertiary)">
+                            {t('Fields marked with * are required.')}
+                        </p>
+                        <form noValidate onSubmit={handleSubmit} className="space-y-4">
                             <div>
                                 <label
                                     htmlFor="register-name"
                                     className="block text-sm font-medium text-(--color-text-secondary) mb-2"
                                 >
                                     {t('Full Name')}
+                                    <span className="text-(--color-danger)" aria-hidden="true">
+                                        *
+                                    </span>
                                 </label>
                                 {/* Localize the static full-name example on registration. */}
                                 <input
@@ -130,7 +138,6 @@ export default function Register() {
                                     onChange={(e) => form.setData('name', e.target.value)}
                                     className="w-full px-4 py-3 rounded-lg border border-(--color-border-primary) focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-primary)/20 transition-colors bg-(--color-bg-primary)"
                                     placeholder={t('John Doe')}
-                                    required
                                 />
                                 {form.errors.name && (
                                     <p
@@ -148,6 +155,9 @@ export default function Register() {
                                     className="block text-sm font-medium text-(--color-text-secondary) mb-2"
                                 >
                                     {t('Email')}
+                                    <span className="text-(--color-danger)" aria-hidden="true">
+                                        *
+                                    </span>
                                 </label>
                                 {/* Localize the static email example on registration. */}
                                 <input
@@ -161,7 +171,6 @@ export default function Register() {
                                     onChange={(e) => form.setData('email', e.target.value)}
                                     className="w-full px-4 py-3 rounded-lg border border-(--color-border-primary) focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-primary)/20 transition-colors bg-(--color-bg-primary)"
                                     placeholder={t('you@company.com')}
-                                    required
                                 />
                                 {form.errors.email && (
                                     <p
@@ -179,6 +188,9 @@ export default function Register() {
                                     className="block text-sm font-medium text-(--color-text-secondary) mb-2"
                                 >
                                     {t('Password')}
+                                    <span className="text-(--color-danger)" aria-hidden="true">
+                                        *
+                                    </span>
                                 </label>
                                 {/* Let users show or hide their new registration password. */}
                                 <PasswordInput
@@ -192,7 +204,6 @@ export default function Register() {
                                     className="w-full px-4 py-3 rounded-lg border border-(--color-border-primary) focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-primary)/20 transition-colors bg-(--color-bg-primary)"
                                     placeholder="Min 8 characters"
                                     autoComplete="new-password"
-                                    required
                                 />
                                 {form.errors.password && (
                                     <p
@@ -210,6 +221,9 @@ export default function Register() {
                                     className="block text-sm font-medium text-(--color-text-secondary) mb-2"
                                 >
                                     {t('Confirm Password')}
+                                    <span className="text-(--color-danger)" aria-hidden="true">
+                                        *
+                                    </span>
                                 </label>
                                 {/* Give password confirmation its own independent visibility control. */}
                                 <PasswordInput
@@ -227,7 +241,6 @@ export default function Register() {
                                     className="w-full px-4 py-3 rounded-lg border border-(--color-border-primary) focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-primary)/20 transition-colors bg-(--color-bg-primary)"
                                     placeholder="Repeat password"
                                     autoComplete="new-password"
-                                    required
                                 />
                                 {form.errors.password_confirmation && (
                                     <p
@@ -239,13 +252,14 @@ export default function Register() {
                                 )}
                             </div>
 
-                            <button
+                            <DisabledButton
                                 type="submit"
                                 disabled={form.processing}
-                                className="w-full py-3 px-4 bg-(--color-brand-primary) hover:bg-(--color-brand-primary-hover) text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+                                disabledReason={'A request is in progress. Please wait.'}
+                                className="w-full py-3 px-4 theme-primary-action font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-6"
                             >
                                 {form.processing ? t('Creating Account...') : t('Create Account')}
-                            </button>
+                            </DisabledButton>
                             <p className="text-center text-sm text-(--color-text-tertiary)">
                                 {t('We will send a verification link to your email address.')}
                             </p>

@@ -68,7 +68,7 @@ Route::middleware(['auth', EnsureVendorAccountIsActive::class, EnsureVendorEmail
             Route::get('/', [VendorOnboardingController::class, 'show']);
             Route::post('/step1', [VendorOnboardingController::class, 'storeStep1'])->name('.step1');
             Route::post('/step2', [VendorOnboardingController::class, 'storeStep2'])->name('.step2');
-            Route::post('/step3', [VendorOnboardingController::class, 'storeStep3'])->name('.step3');
+            Route::post('/step3', [VendorOnboardingController::class, 'storeStep3'])->middleware(\App\Http\Middleware\ValidateOnboardingPostSize::class)->name('.step3');
             Route::post('/submit', [VendorOnboardingController::class, 'submit'])
                 ->middleware('throttle:sensitive-action')
                 ->name('.submit');
@@ -221,6 +221,17 @@ Route::middleware(['auth', EnsureVendorAccountIsActive::class, EnsureVendorEmail
         Route::post('/document-types', [\App\Http\Controllers\Admin\DocumentTypeController::class, 'store'])->name('document-types.store');
         Route::put('/document-types/{documentType}', [\App\Http\Controllers\Admin\DocumentTypeController::class, 'update'])->name('document-types.update');
         Route::delete('/document-types/{documentType}', [\App\Http\Controllers\Admin\DocumentTypeController::class, 'destroy'])->name('document-types.destroy');
+
+        Route::get('/performance-metrics', [\App\Http\Controllers\Admin\PerformanceMetricController::class, 'index'])->name('performance-metrics.index');
+        Route::post('/performance-metrics', [\App\Http\Controllers\Admin\PerformanceMetricController::class, 'store'])->middleware('throttle:sensitive-action')->name('performance-metrics.store');
+        Route::put('/performance-metrics/configuration', [\App\Http\Controllers\Admin\PerformanceMetricController::class, 'configuration'])->middleware('throttle:sensitive-action')->name('performance-metrics.configuration');
+        Route::put('/performance-metrics/{performanceMetric}', [\App\Http\Controllers\Admin\PerformanceMetricController::class, 'update'])->middleware('throttle:sensitive-action')->name('performance-metrics.update');
+        Route::delete('/performance-metrics/{performanceMetric}', [\App\Http\Controllers\Admin\PerformanceMetricController::class, 'destroy'])->middleware('throttle:sensitive-action')->name('performance-metrics.destroy');
+
+        Route::get('/business-types', [\App\Http\Controllers\Admin\BusinessTypeController::class, 'index'])->name('business-types.index');
+        Route::post('/business-types', [\App\Http\Controllers\Admin\BusinessTypeController::class, 'store'])->name('business-types.store');
+        Route::put('/business-types/{businessType}', [\App\Http\Controllers\Admin\BusinessTypeController::class, 'update'])->name('business-types.update');
+        Route::delete('/business-types/{businessType}', [\App\Http\Controllers\Admin\BusinessTypeController::class, 'destroy'])->name('business-types.destroy');
 
         Route::get('/vendor-categories', [VendorCategoryController::class, 'index'])->name('vendor-categories.index');
         Route::post('/vendor-categories', [VendorCategoryController::class, 'store'])->name('vendor-categories.store');

@@ -34,12 +34,14 @@ class DocumentType extends Model
         'allowed_extensions',
         'max_file_size_mb',
         'is_active',
+        'sort_order',
     ];
 
     protected $casts = [
         'is_mandatory' => 'boolean',
         'has_expiry' => 'boolean',
         'is_active' => 'boolean',
+        'sort_order' => 'integer',
         'expiry_warning_days' => 'integer',
         'max_file_size_mb' => 'integer',
         'allowed_extensions' => 'array',
@@ -54,6 +56,11 @@ class DocumentType extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(VendorDocument::class);
+    }
+
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('sort_order')->orderBy('name');
     }
 
     /**

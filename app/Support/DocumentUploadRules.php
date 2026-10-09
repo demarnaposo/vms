@@ -26,25 +26,37 @@ class DocumentUploadRules
             'png' => 'image/png',
             default => throw new \InvalidArgumentException('Unsupported document extension.'),
         }, $extensions)));
-        $configuredMax = $type === null ? self::MAX_MB : ($type->max_file_size_mb ?? self::MAX_MB);
-        $maxMb = max(1, min(self::MAX_MB, (int) $configuredMax));
+        $maxMb = self::maxMb($type);
 
         return ['bail', 'required', 'file', 'extensions:'.implode(',', $extensions), 'mimes:'.implode(',', $extensions), 'mimetypes:'.implode(',', $mimeTypes), 'max:'.($maxMb * 1024)];
     }
 
-    public static function validate(int $id, \Illuminate\Http\UploadedFile $file, ?string $expiryDate): void
+    public static function maxMb(?DocumentType $type): int
+    {
+        return max(1, min(self::MAX_MB, (int) ($type?->max_file_size_mb ?? self::MAX_MB)));
+    }
+
+    public static function messages(?DocumentType $type): array
+    {
+        return [
+            'file.max' => __('alerts.document_file_too_large', ['max' => self::maxMb($type)]),
+            'file.uploaded' => __('alerts.document_upload_failed', ['max' => ini_get('upload_max_filesize')]),
+        ];
+    }
+
+    public static function validate(int $id, \Illuminate\Http\UploadedFile $file, ?string $expiryDate, bool $allowMissingExpiry = false): void
     {
         $type = DocumentType::active()->lockForUpdate()->find($id);
         if (! $type) {
             throw \Illuminate\Validation\ValidationException::withMessages(['document_type_id' => __('validation.exists', ['attribute' => 'document type'])]);
         }
-        \Illuminate\Support\Facades\Validator::make(['file' => $file, 'expiry_date' => $expiryDate], ['file' => self::file($type), 'expiry_date' => self::expiry($type)])->validate();
+        \Illuminate\Support\Facades\Validator::make(['file' => $file, 'expiry_date' => $expiryDate], ['file' => self::file($type), 'expiry_date' => self::expiry($type, $allowMissingExpiry)], self::messages($type))->validate();
     }
 
-    public static function expiry(?DocumentType $type): array
+    public static function expiry(?DocumentType $type, bool $allowMissingExpiry = false): array
     {
         return $type?->has_expiry
-            ? ['required', 'date_format:Y-m-d', 'after_or_equal:today']
+            ? [$allowMissingExpiry ? 'nullable' : 'required', 'date_format:Y-m-d', 'after_or_equal:today']
             : ['prohibited'];
     }
 }

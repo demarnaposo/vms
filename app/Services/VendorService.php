@@ -86,19 +86,26 @@ class VendorService
      */
     public function storeOnboardingStep1(array $data)
     {
-        $user = Auth::user();
-        $application = $this->getDraftApplication($user);
+        return BusinessTypeService::locked(fn () => VendorCategoryService::locked(function () use ($data) {
+            $user = Auth::user();
+            $types = app(BusinessTypeService::class);
+            $types->validateSelection($data['business_type'] ?? null, $types->previousValues($user));
+            $categories = app(VendorCategoryService::class);
+            $categories->validateSelection($data['category_id'] ?? null, $categories->previousValues($user));
+            unset($data['category_description'], $data['description']);
+            $application = $this->getDraftApplication($user);
 
-        $currentData = $application->data ?? [];
-        $currentData['step1'] = $data;
-        $currentData['step1']['contact_email'] = $user->email;
+            $currentData = $application->data ?? [];
+            $currentData['step1'] = $data;
+            $currentData['step1']['contact_email'] = $user->email;
 
-        $application->update([
-            'data' => $currentData,
-            'current_step' => max($application->current_step, 2),
-        ]);
+            $application->update([
+                'data' => $currentData,
+                'current_step' => max($application->current_step, 2),
+            ]);
 
-        return $application;
+            return $application;
+        }));
     }
 
     /**
@@ -106,95 +113,144 @@ class VendorService
      */
     public function storeOnboardingStep2(array $data)
     {
-        $user = Auth::user();
-        $application = $this->getDraftApplication($user);
+        return BusinessTypeService::locked(fn () => VendorCategoryService::locked(function () use ($data) {
+            $user = Auth::user();
+            $application = $this->getDraftApplication($user);
 
-        $currentData = $application->data ?? [];
-        $currentData['step2'] = $data;
+            $currentData = $application->data ?? [];
+            $currentData['step2'] = $data;
 
-        $application->update([
-            'data' => $currentData,
-            'current_step' => max($application->current_step, 3),
-        ]);
+            $application->update([
+                'data' => $currentData,
+                'current_step' => max($application->current_step, 3),
+            ]);
 
-        return $application;
+            return $application;
+        }));
     }
 
     /**
      * Handle Step 3 of onboarding (Document Uploads to Temp).
      */
-    public function storeOnboardingStep3(array $documentsData, array $removedTypeIds = [])
+    public function storeOnboardingStep3(array $documentsData, array $removedTypeIds = [], bool $requireComplete = true, array $expiryDates = [])
     {
-        return DB::transaction(function () use ($documentsData, $removedTypeIds) {
-            $user = Auth::user();
-            $application = $this->getDraftApplication($user);
+        $newPaths = [];
+        try {
+            return BusinessTypeService::locked(function () use ($documentsData, $removedTypeIds, $requireComplete, $expiryDates, &$newPaths) {
+                return VendorCategoryService::locked(function () use ($documentsData, $removedTypeIds, $requireComplete, $expiryDates, &$newPaths) {
+                    $user = Auth::user();
+                    $application = $this->getDraftApplication($user);
 
-            // Store files in application-specific folder
-            $tempFolder = 'vendor-applications/'.$application->id.'/temp';
-            $processedDocuments = [];
+                    $application = \App\Models\VendorApplication::query()->lockForUpdate()->findOrFail($application->id);
 
-            $currentData = $application->data ?? [];
+                    // Store files in application-specific folder
+                    $tempFolder = 'vendor-applications/'.$application->id.'/temp';
+                    $processedDocuments = [];
 
-            // Check for existing documents in draft
-            $existingDocuments = array_map(function ($doc) {
-                $doc['document_type_id'] = (int) ($doc['document_type_id'] ?? 0);
+                    $currentData = $application->data ?? [];
 
-                return $doc;
-            }, $currentData['step3']['documents'] ?? []);
-
-            $existingDocuments = array_values(array_filter($existingDocuments, fn ($doc) => ! in_array($doc['document_type_id'], array_map('intval', $removedTypeIds), true)));
-
-            foreach ($documentsData as $doc) {
-                $documentTypeId = (int) ($doc['document_type_id'] ?? 0);
-                /** @var UploadedFile $file */
-                $file = $doc['file'];
-                \App\Support\DocumentUploadRules::validate($documentTypeId, $file, $doc['expiry_date'] ?? null);
-                $path = $file->store($tempFolder, 'private');
-                if (! $path) {
-                    throw new \RuntimeException('Document storage failed.');
-                }
-
-                $processedDocuments[] = [
-                    'document_type_id' => $documentTypeId,
-                    'file_name' => $this->sanitizeFileName($file->getClientOriginalName()),
-                    'file_path' => $path,
-                    'file_size' => $file->getSize(),
-                    'mime_type' => $file->getMimeType(),
-                    'file_hash' => hash_file('sha256', $file->getRealPath()),
-                    'expiry_date' => $doc['expiry_date'] ?? null,
-                ];
-            }
-
-            // Merge logic
-            $finalDocuments = $existingDocuments;
-
-            foreach ($processedDocuments as $newDoc) {
-                $replaced = false;
-                foreach ($finalDocuments as $key => $existingDoc) {
-                    if ((int) ($existingDoc['document_type_id'] ?? 0) === $newDoc['document_type_id']) {
-                        // Remove old file
-                        if (Storage::disk('private')->exists($existingDoc['file_path'])) {
-                            DB::afterCommit(fn () => Storage::disk('private')->delete($existingDoc['file_path']));
-                        }
-                        $finalDocuments[$key] = $newDoc;
-                        $replaced = true;
-                        break;
+                    $savedDocuments = $currentData['step3']['documents'] ?? [];
+                    if (! is_array($savedDocuments) || collect($savedDocuments)->contains(fn ($doc) => ! is_array($doc))) {
+                        throw \Illuminate\Validation\ValidationException::withMessages(['documents' => __('alerts.onboarding_documents_invalid')]);
                     }
-                }
-                if (! $replaced) {
-                    $finalDocuments[] = $newDoc;
-                }
-            }
 
-            $currentData['step3'] = ['documents' => $finalDocuments];
+                    $removedTypeIds = [...$removedTypeIds, ...(array) ($currentData['step3']['removed_document_type_ids'] ?? [])];
 
-            $application->update([
-                'data' => $currentData,
-                'current_step' => max($application->current_step, 4),
-            ]);
+                    // Check for existing documents in draft
+                    $existingDocuments = array_map(function ($doc) {
+                        $doc['document_type_id'] = (int) ($doc['document_type_id'] ?? 0);
 
-            return $application;
-        });
+                        return $doc;
+                    }, $savedDocuments);
+
+                    $existingDocuments = array_values(array_filter($existingDocuments, fn ($doc) => ! in_array($doc['document_type_id'], array_map('intval', $removedTypeIds), true)));
+
+                    foreach ($expiryDates as $typeId => $expiryDate) {
+                        $found = false;
+                        foreach ($existingDocuments as &$document) {
+                            if ($document['document_type_id'] === (int) $typeId) {
+                                $document['expiry_date'] = $expiryDate;
+                                $found = true;
+                            }
+                        }
+                        unset($document);
+                        if (! $found) {
+                            throw \Illuminate\Validation\ValidationException::withMessages(["documents_by_type.{$typeId}" => __('alerts.onboarding_document_unavailable')]);
+                        }
+                    }
+
+                    $incomingTypeIds = array_map(fn ($doc) => (int) ($doc['document_type_id'] ?? 0), $documentsData);
+                    $candidateDocuments = array_values(array_filter($existingDocuments, fn ($doc) => ! in_array($doc['document_type_id'], $incomingTypeIds, true)));
+                    $changedTypeIds = [...$incomingTypeIds, ...array_map('intval', array_keys($expiryDates))];
+                    $changedExistingDocuments = array_values(array_filter($existingDocuments, fn ($doc) => in_array($doc['document_type_id'], $changedTypeIds, true) && ! in_array($doc['document_type_id'], $incomingTypeIds, true)));
+                    app(DraftDocumentValidator::class)->validate($application, $requireComplete ? [...$candidateDocuments, ...$documentsData] : [...$changedExistingDocuments, ...$documentsData], $requireComplete, $incomingTypeIds);
+
+                    foreach ($documentsData as $doc) {
+                        $documentTypeId = (int) ($doc['document_type_id'] ?? 0);
+                        /** @var UploadedFile $file */
+                        $file = $doc['file'];
+                        \App\Support\DocumentUploadRules::validate($documentTypeId, $file, $doc['expiry_date'] ?? null, ! $requireComplete);
+                        $path = $file->store($tempFolder, 'private');
+                        if (! $path) {
+                            throw new \RuntimeException('Document storage failed.');
+                        }
+
+                        $newPaths[] = $path;
+                        $processedDocuments[] = [
+                            'document_type_id' => $documentTypeId,
+                            'file_name' => $this->sanitizeFileName($file->getClientOriginalName()),
+                            'file_path' => $path,
+                            'file_size' => $file->getSize(),
+                            'mime_type' => $file->getMimeType(),
+                            'file_hash' => hash_file('sha256', $file->getRealPath()),
+                            'expiry_date' => $doc['expiry_date'] ?? null,
+                        ];
+                    }
+
+                    // Merge logic
+                    $finalDocuments = $existingDocuments;
+
+                    foreach ($processedDocuments as $newDoc) {
+                        $replaced = false;
+                        foreach ($finalDocuments as $key => $existingDoc) {
+                            if ((int) ($existingDoc['document_type_id'] ?? 0) === $newDoc['document_type_id']) {
+                                $finalDocuments[$key] = $newDoc;
+                                $replaced = true;
+                                break;
+                            }
+                        }
+                        if (! $replaced) {
+                            $finalDocuments[] = $newDoc;
+                        }
+                    }
+
+                    $documentsToValidate = $requireComplete ? $finalDocuments : array_values(array_filter($finalDocuments, fn ($doc) => in_array($doc['document_type_id'], $changedTypeIds, true)));
+                    app(DraftDocumentValidator::class)->validate($application, $documentsToValidate, $requireComplete, $incomingTypeIds);
+                    $currentData['step3'] = ['documents' => $finalDocuments];
+
+                    $application->update([
+                        'data' => $currentData,
+                        'current_step' => $requireComplete ? max($application->current_step, 4) : 3,
+                    ]);
+
+                    $retainedPaths = array_column($finalDocuments, 'file_path');
+                    foreach ($savedDocuments as $saved) {
+                        $path = $saved['file_path'] ?? null;
+                        $disk = Storage::disk('private');
+                        $root = realpath($disk->path($tempFolder));
+                        $resolved = is_string($path) ? realpath($disk->path($path)) : false;
+                        if ($root && $resolved && str_starts_with($resolved, $root.DIRECTORY_SEPARATOR) && ! in_array($path, $retainedPaths, true)) {
+                            DB::afterCommit(fn () => Storage::disk('private')->delete($path));
+                        }
+                    }
+
+                    return $application;
+                });
+            });
+        } catch (\Throwable $exception) {
+            Storage::disk('private')->delete($newPaths);
+            throw $exception;
+        }
     }
 
     /**
@@ -207,25 +263,33 @@ class VendorService
      */
     public function submitApplication(User $user)
     {
-        $application = $this->getDraftApplication($user);
-        $data = $application->data ?? [];
+        return BusinessTypeService::locked(fn () => VendorCategoryService::locked(function () use ($user) {
+            $application = $this->getDraftApplication($user);
+            \App\Models\VendorApplication::query()->lockForUpdate()->findOrFail($application->id);
+            $application = $this->getDraftApplication($user);
+            $data = $application->data ?? [];
+            if (empty($data['step1']) || empty($data['step2'])) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['step' => 'Please complete all steps before submitting.']);
+            }
 
-        $categoryId = $data['step1']['category_id'] ?? null;
-        if (! $categoryId || ! VendorCategory::query()->whereKey($categoryId)->where('is_active', true)->exists()) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
-                'category_id' => 'Please select a valid category.',
-            ]);
-        }
-
-        return DB::transaction(function () use ($user, $data, $application) {
             \App\Models\DocumentType::query()->whereIn('id', collect($data['step3']['documents'] ?? [])->pluck('document_type_id'))->lockForUpdate()->get();
             app(DraftDocumentValidator::class)->validate($application);
+            // Revalidate persisted drafts with the same rules used by each step before any final writes.
+            foreach ([1 => \App\Http\Requests\Vendor\StoreStep1Request::class, 2 => \App\Http\Requests\Vendor\StoreStep2Request::class] as $step => $requestClass) {
+                $payload = $data['step'.$step];
+                $request = $requestClass::create('/', 'POST', is_array($payload) ? $payload : []);
+                $request->setUserResolver(fn () => $user);
+                \Illuminate\Support\Facades\Validator::make(is_array($payload) ? $payload : [], $request->rules(), $request->messages())->validate();
+            }
+
+            $removedIds = array_map('intval', (array) ($data['step3']['removed_document_type_ids'] ?? []));
+            $data['step3']['documents'] = array_values(array_filter($data['step3']['documents'] ?? [], fn ($doc) => ! in_array((int) ($doc['document_type_id'] ?? 0), $removedIds, true)));
             // 1. Create or Update Vendor (Ensure it exists first)
             $vendorData = array_merge(
                 $data['step1'] ?? [],
                 $data['step2'] ?? []
             );
-            unset($vendorData['category']);
+            unset($vendorData['category'], $vendorData['category_description'], $vendorData['description']);
             // Keep new and resubmitted vendor profiles aligned with Indonesian regions.
             $vendorData['country'] = IndonesiaRegions::country();
 
@@ -258,7 +322,9 @@ class VendorService
                     $newPath = 'vendor-documents/'.$vendor->id.'/'.basename($tempPath);
 
                     if (Storage::disk('private')->exists($tempPath)) {
-                        Storage::disk('private')->move($tempPath, $newPath);
+                        if ($tempPath !== $newPath && ! Storage::disk('private')->move($tempPath, $newPath)) {
+                            throw new \RuntimeException('Document storage failed.');
+                        }
                     } else {
                         // If file not found in temp, check if it's already in final path (re-submission case)
                         if (! Storage::disk('private')->exists($newPath)) {
@@ -316,7 +382,7 @@ class VendorService
             }
 
             return $vendor;
-        }, 3);
+        }));
     }
 
     /**
@@ -389,16 +455,22 @@ class VendorService
      */
     public function updateProfile(Vendor $vendor, array $data)
     {
-        $vendor->update($data);
+        return BusinessTypeService::locked(function () use ($vendor, $data) {
+            $vendor = Vendor::query()->lockForUpdate()->findOrFail($vendor->id);
+            if (filled($data['business_type'] ?? null)) {
+                app(BusinessTypeService::class)->validateSelection($data['business_type'], [$vendor->business_type]);
+            }
+            $vendor->update($data);
 
-        // Sync contact_phone to user's phone field
-        if (! empty($data['contact_phone'])) {
-            $user = $vendor->user;
-            $user->phone = $data['contact_phone'];
-            $user->save();
-        }
+            // Sync contact_phone to user's phone field
+            if (! empty($data['contact_phone'])) {
+                $user = $vendor->user;
+                $user->phone = $data['contact_phone'];
+                $user->save();
+            }
 
-        return $vendor;
+            return $vendor;
+        });
     }
 
     protected function sanitizeFileName(string $fileName): string

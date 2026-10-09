@@ -82,6 +82,11 @@ class Vendor extends Model
         });
     }
 
+    public function businessTypeRecord(): BelongsTo
+    {
+        return $this->belongsTo(BusinessType::class, 'business_type', 'code');
+    }
+
     // Status constants
     const STATUS_DRAFT = 'draft';
 

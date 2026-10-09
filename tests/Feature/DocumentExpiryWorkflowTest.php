@@ -93,9 +93,13 @@ class DocumentExpiryWorkflowTest extends TestCase
             'data' => [
                 'step1' => [
                     'company_name' => 'Expiry Persist Co',
+                    'business_identification_number' => '1234567890123',
+                    'tax_id' => '0123456789012345',
+                    'business_type' => 'pvt_ltd',
+                    'experience' => 'Software project',
                     'category_id' => $category->id,
                     'contact_person' => 'Owner',
-                    'contact_phone' => '9999999999',
+                    'contact_phone' => '081234567890',
                     'deed_number' => 'DEED-000001',
                     'address' => 'Address',
                     // Gunakan fixture lokasi Indonesia pada data aplikasi.
@@ -109,6 +113,7 @@ class DocumentExpiryWorkflowTest extends TestCase
                     'bank_name' => 'Bank Mandiri',
                     'bank_account_number' => '1234567890',
                     'code_bank' => '008',
+                    'bank_branch' => 'Jakarta',
                 ],
             ],
         ]);
@@ -146,7 +151,7 @@ class DocumentExpiryWorkflowTest extends TestCase
             'company_name' => 'Upload Expiry Co',
             'contact_person' => 'Owner',
             'contact_email' => $user->email,
-            'contact_phone' => '9999999999',
+            'contact_phone' => '081234567890',
             'status' => Vendor::STATUS_ACTIVE,
             'deed_number' => 'DEED-000002',
             'address' => 'Address',
@@ -184,7 +189,7 @@ class DocumentExpiryWorkflowTest extends TestCase
             'company_name' => 'General Docs Co',
             'contact_person' => 'Owner',
             'contact_email' => $user->email,
-            'contact_phone' => '9999999999',
+            'contact_phone' => '081234567890',
             'status' => Vendor::STATUS_ACTIVE,
             'deed_number' => 'DEED-000003',
             'address' => 'Address',

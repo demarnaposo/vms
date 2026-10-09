@@ -98,7 +98,7 @@ class VendorController extends Controller
         return Cache::remember('document_types_active', now()->addHours(12), function () {
             return DocumentType::query()
                 ->where('is_active', true)
-                ->orderBy('display_name')
+                ->ordered()
                 ->get();
         });
     }
@@ -220,6 +220,7 @@ class VendorController extends Controller
 
         return Inertia::render('Vendor/Profile', [
             'vendor' => $vendor,
+            'businessTypes' => app(\App\Services\BusinessTypeService::class)->options($vendor?->business_type),
         ]);
     }
 
@@ -313,14 +314,14 @@ class VendorController extends Controller
             'performanceScores' => fn ($q) => $q->with('metric')->latest()->take(10),
         ]);
 
-        $metrics = \App\Models\PerformanceMetric::where('is_active', true)
-            ->orderBy('display_name')
+        $metrics = \App\Models\PerformanceMetric::active()->ordered()
             ->get();
 
         return Inertia::render('Vendor/Performance', [
             'vendor' => $vendor,
             'performanceScores' => $vendor->performanceScores ?? [],
             'metrics' => $metrics,
+            'breakdown' => app(\App\Services\PerformanceService::class)->getMetricBreakdown($vendor),
         ]);
     }
 

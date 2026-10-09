@@ -35,7 +35,7 @@ class EndToEndTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/login')
-                ->type('email', 'admin@vendorflow.com')
+                ->type('email', 'admin@test.com')
                 ->type('password', 'password')
                 ->press('Sign in')
                 ->waitForLocation('/admin/dashboard')

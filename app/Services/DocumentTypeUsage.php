@@ -13,6 +13,19 @@ class DocumentTypeUsage
         if (VendorDocument::withTrashed()->where('document_type_id', $type->id)->exists()) {
             return true;
         }
+        if (DB::table('audit_logs')->where('auditable_type', $type->getMorphClass())->where('auditable_id', $type->id)->exists()) {
+            return true;
+        }
+        foreach (DB::table('audit_logs')->select(['old_values', 'new_values'])->cursor() as $row) {
+            foreach (['old_values', 'new_values'] as $column) {
+                $value = $row->$column;
+                $data = is_string($value) ? json_decode($value, true) : $value;
+                if (($value !== null && $data === null && $value !== 'null')
+                    || $this->references((array) $data, $type, 'audit_logs')) {
+                    return true;
+                }
+            }
+        }
         foreach (['vendor_applications' => 'data', 'compliance_rules' => 'conditions', 'compliance_results' => 'metadata', 'compliance_flags' => 'metadata'] as $table => $column) {
             foreach (DB::table($table)->select(['id', $column])->orderBy('id')->cursor() as $row) {
                 $value = $row->$column;
@@ -33,7 +46,7 @@ class DocumentTypeUsage
     private function references(array $data, DocumentType $type, string $table): bool
     {
         foreach ($data as $key => $value) {
-            if (in_array($key, ['document_type_id', 'document_type_ids'], true)
+            if (in_array($key, ['document_type_id', 'document_type_ids', 'removed_document_type_ids'], true)
                 || ($key === 'missing_document_ids' && in_array($table, ['compliance_results', 'compliance_flags'], true))) {
                 if (in_array((string) $type->id, array_map('strval', (array) $value), true)) {
                     return true;

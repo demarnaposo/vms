@@ -1,3 +1,4 @@
+import { DisabledButton } from '@/Components/DisabledActionTooltip';
 import { Link, useForm } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
 import Logo from '@/Components/Logo';
@@ -61,13 +62,14 @@ export default function ForgotPassword() {
                             )}
                         </div>
 
-                        <button
+                        <DisabledButton
                             type="submit"
                             disabled={form.processing}
-                            className="w-full py-3 px-4 bg-(--color-brand-primary) hover:bg-(--color-brand-primary-hover) text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabledReason={'A request is in progress. Please wait.'}
+                            className="w-full py-3 px-4 theme-primary-action font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {form.processing ? t('Sending...') : t('Send Reset Link')}
-                        </button>
+                        </DisabledButton>
                     </form>
 
                     <p className="mt-8 text-center text-(--color-text-tertiary)">

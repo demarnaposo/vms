@@ -8,6 +8,7 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\RbacService;
+use App\Support\PaymentsModule;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -19,17 +20,20 @@ class StaffUserController extends Controller
         abort_unless(request()->user()?->isSuperAdmin(), 403);
         $roles = Role::where('guard_name', 'web')->where('is_staff', true)->with('permissions')->withCount('users')->orderBy('id')->get();
 
+        $paymentsEnabled = PaymentsModule::enabled();
+        $visiblePermission = fn (Permission $permission) => $paymentsEnabled || ! PaymentsModule::isPaymentPermission($permission->name, $permission->group);
+
         return Inertia::render('Admin/Staff/Index', [
             'staffUsers' => User::whereHas('roles', fn ($q) => $q->where('is_staff', true)->where('guard_name', 'web'))
                 ->with('roles')->select('id', 'name', 'email', 'created_at')->latest()->get()->map(fn (User $user) => $this->present($user)),
             'availableRoles' => $roles->map(fn (Role $role) => ['id' => $role->id, 'value' => $role->name, 'label' => $role->display_name]),
-            'staffRoles' => $roles->map(fn (Role $role) => [
+            'staffRoles' => $roles->filter(fn (Role $role) => $paymentsEnabled || $role->name !== Role::FINANCE_MANAGER)->values()->map(fn (Role $role) => [
                 ...$role->only(['id', 'name', 'display_name', 'description']), 'users_count' => $role->users_count,
                 'protected' => in_array($role->name, Role::builtInNames(), true),
-                'permission_ids' => $role->permissions->whereIn('name', array_keys(config('rbac.permissions')))->pluck('id')->values(),
-                'legacy_permissions' => $role->permissions->whereNotIn('name', array_keys(config('rbac.permissions')))->pluck('name')->values(),
+                'permission_ids' => $role->permissions->filter($visiblePermission)->whereIn('name', array_keys(config('rbac.permissions')))->pluck('id')->values(),
+                'legacy_permissions' => $role->permissions->filter($visiblePermission)->whereNotIn('name', array_keys(config('rbac.permissions')))->pluck('name')->values(),
             ]),
-            'permissions' => Permission::where('guard_name', 'web')->orderBy('group')->orderBy('name')->get()->map(fn (Permission $permission) => [
+            'permissions' => Permission::where('guard_name', 'web')->orderBy('group')->orderBy('name')->get()->filter($visiblePermission)->values()->map(fn (Permission $permission) => [
                 ...$permission->only(['id', 'name', 'display_name', 'group']),
                 'operational' => array_key_exists($permission->name, config('rbac.permissions')),
                 'usage' => config('rbac.permissions')[$permission->name]['usage'] ?? null,

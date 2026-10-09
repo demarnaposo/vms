@@ -1,20 +1,90 @@
+import { DisabledButton } from '@/Components/DisabledActionTooltip';
+import AppIcon from '@/Components/AppIcon';
 import { ActionButton } from '@/Components/ActionControls';
 import { router, useForm } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import {
-    AdminLayout,
-    Badge,
-    Button,
-    Card,
-    DataTable,
-    FormInput,
-    FormTextarea,
-    Modal,
-    PageHeader,
-} from '@/Components';
+import { AdminLayout, Badge, Button, Card, DataTable, Modal, PageHeader } from '@/Components';
 import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
 import { useLanguage } from '@/Contexts/LanguageContext';
+
+// Keep this form presentation local so other pages retain their existing controls.
+function FormInput({
+    label,
+    value,
+    onChange,
+    error,
+    placeholder = '',
+    showRequiredIndicator = false,
+    disabled = false,
+    disabledReason,
+    type = 'text',
+    as: Control = 'input',
+    rows = 4,
+    autoComplete,
+}) {
+    const id = useId();
+    const { t } = useLanguage();
+    const [visible, setVisible] = useState(false);
+    const password = type === 'password';
+    const toggleLabel = t(visible ? 'Hide password' : 'Show password');
+    return (
+        <div className="min-w-0">
+            <label htmlFor={id} className="mb-2 block text-sm font-medium">
+                {t(label)}{' '}
+                {showRequiredIndicator && (
+                    <span aria-hidden="true" className="text-(--color-danger)">
+                        *
+                    </span>
+                )}
+            </label>
+            <div className="relative">
+                <Control
+                    id={id}
+                    type={Control === 'input' ? (password && visible ? 'text' : type) : undefined}
+                    rows={Control === 'textarea' ? rows : undefined}
+                    step={type === 'number' ? 'any' : undefined}
+                    autoComplete={autoComplete}
+                    value={value}
+                    onChange={(event) => onChange(event.target.value)}
+                    placeholder={t(placeholder)}
+                    disabled={disabled}
+                    aria-required={showRequiredIndicator || undefined}
+                    aria-invalid={!!error}
+                    aria-describedby={error ? id + '-error' : undefined}
+                    className={
+                        'input-field w-full disabled:cursor-not-allowed disabled:bg-(--color-bg-secondary) ' +
+                        (password ? 'pr-12 ' : '') +
+                        (error ? '!border-(--color-danger)' : '')
+                    }
+                />
+                {password && (
+                    <DisabledButton
+                        type="button"
+                        onClick={() => setVisible((current) => !current)}
+                        disabled={disabled}
+                        disabledReason={disabledReason}
+                        aria-label={toggleLabel}
+                        title={toggleLabel}
+                        aria-pressed={visible}
+                        className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-xl text-(--color-text-muted) focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-(--color-brand-primary) disabled:opacity-50"
+                    >
+                        <AppIcon name={visible ? 'eye-off' : 'eye'} className="h-5 w-5" />
+                    </DisabledButton>
+                )}
+            </div>
+            {error && (
+                <p id={id + '-error'} role="alert" className="mt-1 text-sm text-(--color-danger)">
+                    {t(error)}
+                </p>
+            )}
+        </div>
+    );
+}
+
+function FormTextarea(props) {
+    return <FormInput {...props} as="textarea" />;
+}
 
 const emptyDocumentType = {
     name: '',
@@ -31,6 +101,7 @@ const buttonFocus =
     'focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) focus-visible:ring-offset-2';
 
 export default function DocumentTypeIndex({ documentTypes = [] }) {
+    const formId = useId();
     const { language, t } = useLanguage();
     const [editingId, setEditingId] = useState(null);
     const [deletingDocumentType, setDeletingDocumentType] = useState(null);
@@ -158,7 +229,7 @@ export default function DocumentTypeIndex({ documentTypes = [] }) {
         <AdminLayout title="Document Types" activeNav="Document Types" header={header}>
             <div className="space-y-6">
                 <Card title={editingId === null ? 'Add Document Type' : 'Edit Document Type'}>
-                    <form onSubmit={submit} className="grid gap-4 md:grid-cols-2">
+                    <form noValidate onSubmit={submit} className="grid gap-4 md:grid-cols-2">
                         <div>
                             <FormInput
                                 label="Document Type Code"
@@ -166,8 +237,8 @@ export default function DocumentTypeIndex({ documentTypes = [] }) {
                                 onChange={(value) => setData('name', value)}
                                 placeholder="e.g., insurance_certificate"
                                 error={errors.name}
-                                disabled={editingId !== null}
-                                required
+                                disabled={processing || editingId !== null}
+                                showRequiredIndicator
                             />
                             {editingId !== null && (
                                 <p className="mt-1 text-xs text-(--color-text-tertiary)">
@@ -176,14 +247,17 @@ export default function DocumentTypeIndex({ documentTypes = [] }) {
                             )}
                         </div>
                         <FormInput
+                            disabled={processing}
+                            disabledReason={'A request is in progress. Please wait.'}
                             label="Document Type Name"
                             value={data.display_name}
                             onChange={(value) => setData('display_name', value)}
                             placeholder="e.g., Insurance Certificate"
                             error={errors.display_name}
-                            required
+                            showRequiredIndicator
                         />
                         <FormTextarea
+                            disabled={processing}
                             label="Description"
                             value={data.description}
                             onChange={(value) => setData('description', value)}
@@ -191,12 +265,14 @@ export default function DocumentTypeIndex({ documentTypes = [] }) {
                             placeholder="e.g., Proof of current insurance coverage"
                         />
                         <FormInput
+                            disabled={processing}
+                            disabledReason={'A request is in progress. Please wait.'}
                             label="Maximum File Size (MB)"
                             type="number"
                             value={data.max_file_size_mb}
                             onChange={(value) => setData('max_file_size_mb', value)}
                             error={errors.max_file_size_mb}
-                            required
+                            showRequiredIndicator
                         />
                         {['is_active', 'is_mandatory', 'has_expiry'].map((field, index) => (
                             <div key={field}>
@@ -204,7 +280,12 @@ export default function DocumentTypeIndex({ documentTypes = [] }) {
                                     <input
                                         type="checkbox"
                                         name={field}
-                                        className={buttonFocus}
+                                        disabled={processing}
+                                        aria-invalid={!!errors[field]}
+                                        aria-describedby={
+                                            errors[field] ? `${formId}-${field}-error` : undefined
+                                        }
+                                        className={`h-5 w-5 accent-(--color-brand-primary) ${buttonFocus}`}
                                         checked={data[field]}
                                         onChange={(event) =>
                                             setData({
@@ -223,7 +304,11 @@ export default function DocumentTypeIndex({ documentTypes = [] }) {
                                     {t(['Active', 'Mandatory', 'Has Expiry'][index])}
                                 </label>
                                 {errors[field] && (
-                                    <p role="alert" className="text-sm text-(--color-danger)">
+                                    <p
+                                        id={`${formId}-${field}-error`}
+                                        role="alert"
+                                        className="mt-1 text-sm text-(--color-danger)"
+                                    >
                                         {t(errors[field])}
                                     </p>
                                 )}
@@ -235,12 +320,15 @@ export default function DocumentTypeIndex({ documentTypes = [] }) {
                             value={data.expiry_warning_days}
                             onChange={(value) => setData('expiry_warning_days', value)}
                             error={errors.expiry_warning_days}
-                            disabled={!data.has_expiry}
-                            required
+                            disabled={processing || !data.has_expiry}
+                            showRequiredIndicator
                         />
                         <fieldset className="md:col-span-2">
                             <legend className="text-sm font-medium mb-2">
-                                {t('Allowed Extensions')}
+                                {t('Allowed Extensions')}{' '}
+                                <span aria-hidden="true" className="text-(--color-danger)">
+                                    *
+                                </span>
                             </legend>
                             <div className="flex flex-wrap gap-4">
                                 {['pdf', 'jpg', 'jpeg', 'png'].map((extension) => (
@@ -248,7 +336,14 @@ export default function DocumentTypeIndex({ documentTypes = [] }) {
                                         <input
                                             type="checkbox"
                                             name="allowed_extensions[]"
-                                            className={buttonFocus}
+                                            disabled={processing}
+                                            aria-invalid={Object.keys(errors).some(
+                                                (key) =>
+                                                    key === 'allowed_extensions' ||
+                                                    key.startsWith('allowed_extensions.')
+                                            )}
+                                            aria-describedby={`${formId}-extensions-help ${formId}-extensions-error`}
+                                            className={`h-5 w-5 accent-(--color-brand-primary) ${buttonFocus}`}
                                             checked={data.allowed_extensions.includes(extension)}
                                             onChange={(event) =>
                                                 setData(
@@ -265,12 +360,31 @@ export default function DocumentTypeIndex({ documentTypes = [] }) {
                                     </label>
                                 ))}
                             </div>
-                            {(errors.allowed_extensions || errors['allowed_extensions.0']) && (
-                                <p role="alert" className="text-sm text-(--color-danger)">
-                                    {t(errors.allowed_extensions || errors['allowed_extensions.0'])}
-                                </p>
-                            )}
-                            <p className="mt-2 text-xs text-(--color-text-tertiary)">
+                            <div id={`${formId}-extensions-error`}>
+                                {[
+                                    ...new Set(
+                                        Object.entries(errors)
+                                            .filter(
+                                                ([key]) =>
+                                                    key === 'allowed_extensions' ||
+                                                    key.startsWith('allowed_extensions.')
+                                            )
+                                            .map(([, message]) => message)
+                                    ),
+                                ].map((message) => (
+                                    <p
+                                        key={message}
+                                        role="alert"
+                                        className="mt-1 text-sm text-(--color-danger)"
+                                    >
+                                        {t(message)}
+                                    </p>
+                                ))}
+                            </div>
+                            <p
+                                id={`${formId}-extensions-help`}
+                                className="mt-2 text-sm text-(--color-text-tertiary)"
+                            >
                                 {t('Supported formats: PDF, JPG, JPEG, PNG. Maximum size: 10 MB.')}
                             </p>
                         </fieldset>
@@ -280,11 +394,17 @@ export default function DocumentTypeIndex({ documentTypes = [] }) {
                                 variant="outline"
                                 onClick={clearForm}
                                 disabled={processing}
+                                disabledReason={'A request is in progress. Please wait.'}
                                 className={buttonFocus}
                             >
                                 {editingId === null ? 'Clear Form' : 'Cancel'}
                             </Button>
-                            <Button type="submit" disabled={processing} className={buttonFocus}>
+                            <Button
+                                type="submit"
+                                disabled={processing}
+                                disabledReason={'A request is in progress. Please wait.'}
+                                className={buttonFocus}
+                            >
                                 {processing
                                     ? 'Saving…'
                                     : editingId === null
@@ -321,6 +441,7 @@ export default function DocumentTypeIndex({ documentTypes = [] }) {
                             variant="danger"
                             onClick={remove}
                             disabled={deleting}
+                            disabledReason={'A request is in progress. Please wait.'}
                             className={buttonFocus}
                         >
                             {deleting ? 'Deleting…' : 'Delete Document Type'}

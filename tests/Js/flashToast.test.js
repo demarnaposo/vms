@@ -38,3 +38,80 @@ test('unknown database text stays unchanged and empty flash creates no toast', (
     });
     assert.equal(resolveFlashToast({}, translate), null);
 });
+
+for (const language of ['id', 'en']) {
+    const t = (message, replacements) => translateMessage(language, message, replacements);
+    for (const [message, expected] of [
+        [
+            ':document verified successfully.',
+            language === 'id'
+                ? 'Profil Perusahaan berhasil diverifikasi.'
+                : 'Company Profile verified successfully.',
+        ],
+        [
+            ':document rejected.',
+            language === 'id' ? 'Profil Perusahaan ditolak.' : 'Company Profile rejected.',
+        ],
+    ]) {
+        test(`${language}: document outcome follows UI language independently of server locale`, () => {
+            for (const serverText of [
+                'Company Profile verified successfully.',
+                'Profil Perusahaan berhasil diverifikasi.',
+            ]) {
+                assert.deepEqual(
+                    resolveFlashToast(
+                        {
+                            success: serverText,
+                            success_i18n: {
+                                message,
+                                document_type: {
+                                    name: 'company_profile',
+                                    display_name: 'Company Profile',
+                                },
+                            },
+                        },
+                        t,
+                        language
+                    ),
+                    { type: 'success', title: expected }
+                );
+            }
+        });
+    }
+    test(`${language}: custom document labels remain verbatim inside localized outcome`, () => {
+        for (const documentType of [
+            { name: 'custom', display_name: 'Company Profile' },
+            { name: 'company_profile', display_name: 'My Custom Profile' },
+        ]) {
+            const title = resolveFlashToast(
+                {
+                    success: 'server fallback',
+                    success_i18n: {
+                        message: ':document verified successfully.',
+                        document_type: documentType,
+                    },
+                },
+                t,
+                language
+            ).title;
+            assert.equal(
+                title,
+                `${documentType.display_name} ${language === 'id' ? 'berhasil diverifikasi.' : 'verified successfully.'}`
+            );
+        }
+    });
+}
+
+test('invalid translation metadata keeps the original flash contract', () => {
+    assert.equal(
+        resolveFlashToast(
+            { success: 'Custom text', success_i18n: { message: 'unknown' } },
+            translate
+        ).title,
+        'Custom text'
+    );
+    assert.equal(
+        resolveFlashToast({ success_i18n: { message: ':document rejected.' } }, translate),
+        null
+    );
+});

@@ -1,4 +1,7 @@
-import { useMemo, useState } from 'react';
+import VendorCategoryTooltip from '@/Components/VendorCategoryTooltip';
+import { vendorCategoryLabel } from '@/i18n/vendorCategories';
+import { DisabledButton } from '@/Components/DisabledActionTooltip';
+import { useMemo, useRef, useState } from 'react';
 import { router } from '@inertiajs/react';
 import { AppIcon } from '@/Components';
 import { formatDate } from '@/utils/dateFormatters';
@@ -6,10 +9,17 @@ import { formatDate } from '@/utils/dateFormatters';
 import { useLanguage } from '@/Contexts/LanguageContext';
 // Reuse selective master document label localization in the review step.
 import { translateDocumentTypeLabel } from '@/i18n/documentTypes';
+import { translateBusinessType } from '@/i18n/businessTypes';
 
 const normalizeDocumentTypeId = (typeId) => String(typeId ?? '');
 
-export default function StepReview({ vendor, sessionData, documentTypes, vendorCategories = [] }) {
+export default function StepReview({
+    vendor,
+    sessionData,
+    documentTypes,
+    vendorCategories = [],
+    businessTypes = [],
+}) {
     // Read the active language for fixed document labels.
     const { language, t } = useLanguage();
     const step1Session = sessionData?.step1 || {};
@@ -25,25 +35,31 @@ export default function StepReview({ vendor, sessionData, documentTypes, vendorC
     }, [documentTypes]);
 
     const [processing, setProcessing] = useState(false);
+    const processingRef = useRef(false);
     const category =
         vendorCategories.find(
             (item) => String(item.id) === String(step1Session.category_id || vendor?.category_id)
         ) || vendor?.vendor_category;
-    const categoryLabel = category?.display_name || 'N/A';
+    const categoryLabel = vendorCategoryLabel(language, category) || 'N/A';
 
     const submitApplication = () => {
+        if (processingRef.current) return;
+        processingRef.current = true;
         router.post(
             '/vendor/onboarding/submit',
             {},
             {
                 onStart: () => setProcessing(true),
-                onFinish: () => setProcessing(false),
+                onFinish: () => {
+                    processingRef.current = false;
+                    setProcessing(false);
+                },
             }
         );
     };
 
     return (
-        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl p-8 md:p-12 shadow-token-lg animate-fade-in">
+        <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl min-w-0 p-4 sm:p-8 md:p-12 shadow-token-lg animate-fade-in">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold mb-2 text-(--color-text-primary)">
                     {t('Review and Submit')}
@@ -60,13 +76,15 @@ export default function StepReview({ vendor, sessionData, documentTypes, vendorC
                             <AppIcon name="vendors" className="h-5 w-5" /> {t('Company Details')}
                         </h3>
                         <button
+                            type="button"
+                            disabled={processing}
                             onClick={() => router.get('/vendor/onboarding?step=1')}
                             className="text-(--color-brand-primary) hover:text-(--color-brand-primary-hover) text-sm font-medium"
                         >
                             {t('Edit')}
                         </button>
                     </div>
-                    <div className="grid md:grid-cols-2 gap-4 text-sm">
+                    <div className="grid min-w-0 md:grid-cols-2 gap-4 text-sm [&>div]:min-w-0 [&>div]:wrap-anywhere">
                         <div>
                             <span className="text-(--color-text-tertiary)">{t('Company')}:</span>{' '}
                             <span className="text-(--color-text-primary) ml-2 font-medium">
@@ -100,10 +118,23 @@ export default function StepReview({ vendor, sessionData, documentTypes, vendorC
                                 {step1Session.deed_number || vendor?.deed_number || 'N/A'}
                             </span>
                         </div>
-                        <div>
-                            <span className="text-(--color-text-tertiary)">{t('Category')}:</span>{' '}
-                            <span className="text-(--color-text-primary) ml-2 font-medium">
+                        <div className="flex min-w-0 flex-wrap items-center gap-1">
+                            <span className="text-(--color-text-tertiary)">{t('Category')}:</span>
+                            <span className="min-w-0 break-words text-(--color-text-primary) font-medium">
                                 {categoryLabel}
+                            </span>
+                            <VendorCategoryTooltip category={category} />
+                        </div>
+                        <div className="min-w-0 wrap-break-word">
+                            <span className="text-(--color-text-tertiary)">
+                                {t('Business Type')}:
+                            </span>{' '}
+                            <span className="text-(--color-text-primary) ml-2 font-medium">
+                                {translateBusinessType(
+                                    language,
+                                    step1Session.business_type || vendor?.business_type,
+                                    businessTypes
+                                )}
                             </span>
                         </div>
                         <div className="md:col-span-2">
@@ -158,13 +189,15 @@ export default function StepReview({ vendor, sessionData, documentTypes, vendorC
                             <AppIcon name="payments" className="h-5 w-5" /> {t('Bank Details')}
                         </h3>
                         <button
+                            type="button"
+                            disabled={processing}
                             onClick={() => router.get('/vendor/onboarding?step=2')}
                             className="text-(--color-brand-primary) hover:text-(--color-brand-primary-hover) text-sm font-medium"
                         >
                             {t('Edit')}
                         </button>
                     </div>
-                    <div className="grid md:grid-cols-2 gap-4 text-sm">
+                    <div className="grid min-w-0 md:grid-cols-2 gap-4 text-sm [&>div]:min-w-0 [&>div]:wrap-anywhere">
                         <div>
                             <span className="text-(--color-text-tertiary)">{t('Bank')}:</span>{' '}
                             <span className="text-(--color-text-primary) ml-2 font-medium">
@@ -202,6 +235,8 @@ export default function StepReview({ vendor, sessionData, documentTypes, vendorC
                             <AppIcon name="documents" className="h-5 w-5" /> {t('Documents')}
                         </h3>
                         <button
+                            type="button"
+                            disabled={processing}
                             onClick={() => router.get('/vendor/onboarding?step=3')}
                             className="text-(--color-brand-primary) hover:text-(--color-brand-primary-hover) text-sm font-medium"
                         >
@@ -231,9 +266,9 @@ export default function StepReview({ vendor, sessionData, documentTypes, vendorC
                                 return (
                                     <div
                                         key={index}
-                                        className="flex items-center justify-between p-3 rounded-lg bg-(--color-bg-primary) border border-(--color-border-primary)"
+                                        className="flex flex-wrap min-w-0 gap-3 items-center justify-between p-3 rounded-lg bg-(--color-bg-primary) border border-(--color-border-primary)"
                                     >
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex min-w-0 items-center gap-3">
                                             <div className="w-8 h-8 rounded bg-(--color-success-light) text-(--color-success) flex items-center justify-center">
                                                 <AppIcon name="success" className="h-4 w-4" />
                                             </div>
@@ -241,11 +276,11 @@ export default function StepReview({ vendor, sessionData, documentTypes, vendorC
                                                 <p className="text-sm font-medium text-(--color-text-primary)">
                                                     {displayName}
                                                 </p>
-                                                <p className="text-xs text-(--color-text-tertiary)">
+                                                <p className="text-xs wrap-anywhere text-(--color-text-tertiary)">
                                                     {doc.file_name}
                                                 </p>
                                                 {requiresExpiry && (
-                                                    <p className="text-xs text-(--color-text-tertiary)">
+                                                    <p className="text-xs wrap-anywhere text-(--color-text-tertiary)">
                                                         {t('Expiry')}: {formatDate(doc.expiry_date)}
                                                     </p>
                                                 )}
@@ -275,18 +310,20 @@ export default function StepReview({ vendor, sessionData, documentTypes, vendorC
                 </div>
             </div>
 
-            <div className="flex justify-between pt-8">
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-between pt-8">
                 <button
                     type="button"
+                    disabled={processing}
                     onClick={() => router.get('/vendor/onboarding?step=3')}
                     className="px-6 py-3 rounded-xl border border-(--color-border-primary) text-(--color-text-secondary) hover:bg-(--color-bg-hover) transition-colors font-medium"
                 >
                     {t('Back')}
                 </button>
-                <button
+                <DisabledButton
                     onClick={submitApplication}
                     disabled={processing}
-                    className="bg-gradient-primary text-white font-semibold rounded-lg shadow-token-primary hover:-translate-y-px hover:shadow-token-primary transition-all flex items-center gap-2 text-lg px-8 py-3"
+                    disabledReason={'A request is in progress. Please wait.'}
+                    className="theme-primary-action font-semibold rounded-lg shadow-token-primary hover:-translate-y-px hover:shadow-token-primary transition-all flex items-center gap-2 text-lg px-8 py-3"
                 >
                     {processing ? t('Submitting...') : t('Submit Application')}
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -297,7 +334,7 @@ export default function StepReview({ vendor, sessionData, documentTypes, vendorC
                             d="M5 13l4 4L19 7"
                         />
                     </svg>
-                </button>
+                </DisabledButton>
             </div>
         </div>
     );

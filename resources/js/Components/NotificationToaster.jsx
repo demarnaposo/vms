@@ -7,7 +7,7 @@ import { resolveFlashToast } from '@/utils/flashToast';
 const TOAST_OFFSET = { top: 72, right: 16 };
 
 export default function NotificationToaster({ initialPage }) {
-    const { t } = useLanguage();
+    const { language, t } = useLanguage();
     const lastPage = useRef(null);
     const shownFlashIds = useRef(new Set());
     const initialPageHandled = useRef(false);
@@ -19,7 +19,7 @@ export default function NotificationToaster({ initialPage }) {
 
             const flash = page.props?.flash;
             if (flash?.id && shownFlashIds.current.has(flash.id)) return;
-            const notification = resolveFlashToast(flash, t);
+            const notification = resolveFlashToast(flash, t, language);
             if (!notification) return;
             if (flash?.id) shownFlashIds.current.add(flash.id);
 
@@ -34,7 +34,7 @@ export default function NotificationToaster({ initialPage }) {
             showFlash(initialPage);
         }
         return router.on('success', (event) => showFlash(event.detail.page));
-    }, [initialPage, t]);
+    }, [initialPage, language, t]);
 
     return (
         <Toaster

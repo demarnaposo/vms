@@ -16,7 +16,7 @@ class DocumentTypeController extends Controller
     public function index(): Response
     {
         return Inertia::render('Admin/DocumentTypes/Index', [
-            'documentTypes' => DocumentType::query()->withCount(['documents' => fn ($query) => $query->withTrashed()])->orderBy('display_name')->get(),
+            'documentTypes' => DocumentType::query()->withCount(['documents' => fn ($query) => $query->withTrashed()])->ordered()->get(),
         ]);
     }
 

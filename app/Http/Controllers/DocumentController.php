@@ -66,7 +66,7 @@ class DocumentController extends Controller
             'filters' => $filters,
             'documentTypes' => DocumentType::query()
                 ->where(fn ($query) => $query->where('is_active', true)->orWhereHas('documents'))
-                ->orderBy('display_name')
+                ->ordered()
                 ->get(['id', 'name', 'display_name']),
             'currentStatus' => $currentStatus,
         ]);
@@ -118,7 +118,11 @@ class DocumentController extends Controller
         );
 
         // Build the verification alert with the selectively localized document label.
-        return back()->with('success', __('alerts.document_verified', ['document' => $documentType]));
+        return back()->with('success', __('alerts.document_verified', ['document' => $documentType]))
+            ->with('success_i18n', [
+                'message' => ':document verified successfully.',
+                'document_type' => $document->documentType->only(['name', 'display_name']),
+            ]);
     }
 
     /**
@@ -167,7 +171,11 @@ class DocumentController extends Controller
         );
 
         // Build the rejection alert with the selectively localized document label.
-        return back()->with('success', __('alerts.document_rejected', ['document' => $documentType]));
+        return back()->with('success', __('alerts.document_rejected', ['document' => $documentType]))
+            ->with('success_i18n', [
+                'message' => ':document rejected.',
+                'document_type' => $document->documentType->only(['name', 'display_name']),
+            ]);
     }
 
     /**

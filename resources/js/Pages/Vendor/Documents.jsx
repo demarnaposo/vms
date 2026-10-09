@@ -1,12 +1,12 @@
+import VendorFormSelect from './Components/VendorFormSelect';
 import { ActionButton, ActionAnchor } from '@/Components/ActionControls';
 import { useForm } from '@inertiajs/react';
-import { useMemo, useRef, useState } from 'react';
+import { useId, useMemo, useRef, useState } from 'react';
 import {
     VendorLayout,
     PageHeader,
     Card,
     Badge,
-    FormSelect,
     AppIcon,
     Modal,
     ModalCancelButton,
@@ -27,6 +27,10 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
     const [selectedDocument, setSelectedDocument] = useState(null);
     const [showViewer, setShowViewer] = useState(false);
     const fileInputRef = useRef(null);
+    const fileInputId = useId();
+    const fileStatusId = `${fileInputId}-status`;
+    const fileHintId = `${fileInputId}-hint`;
+    const fileErrorId = `${fileInputId}-error`;
 
     const uploadForm = useForm({
         document_type_id: '',
@@ -131,15 +135,7 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
             title="Documents"
             subtitle="Manage your uploaded documents"
             actions={
-                <ActionButton onClick={() => setShowUploadModal(true)}>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M12 4v16m8-8H4"
-                        />
-                    </svg>
+                <ActionButton className="min-h-9" onClick={() => setShowUploadModal(true)}>
                     {t('Upload Document')}
                 </ActionButton>
             }
@@ -148,8 +144,8 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
 
     return (
         <VendorLayout title="Documents" activeNav="Documents" header={header} vendor={vendor}>
-            <div className="space-y-8">
-                <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+            <div className="min-w-0 space-y-6">
+                <div className="grid min-w-0 grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5 [&>div]:min-w-0">
                     <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-xl p-4 text-center shadow-token-sm">
                         <div className="text-3xl mb-2 inline-flex justify-center w-full">
                             <AppIcon name="documents" className="h-8 w-8" />
@@ -209,18 +205,18 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                             <p>{t('No documents uploaded yet.')}</p>
                         </div>
                     ) : (
-                        <div className="max-h-[500px] overflow-y-auto divide-y divide-(--color-border-secondary)">
+                        <div className="min-w-0 max-h-[500px] overflow-y-auto overscroll-contain divide-y divide-(--color-border-secondary)">
                             {displayDocuments.map((doc) => (
                                 <div
                                     key={doc.id}
                                     className="p-4 transition-colors hover:bg-(--color-bg-hover)"
                                 >
-                                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                                        <div className="flex items-center gap-4 min-w-0">
-                                            <div className="w-12 h-12 rounded-xl bg-(--color-bg-secondary) border border-(--color-border-secondary) flex items-center justify-center">
+                                    <div className="flex min-w-0 flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                                        <div className="flex items-start gap-3 min-w-0 xl:flex-1">
+                                            <div className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-(--color-bg-secondary) border border-(--color-border-secondary) flex items-center justify-center">
                                                 <AppIcon name="documents" className="h-6 w-6" />
                                             </div>
-                                            <div className="min-w-0">
+                                            <div className="min-w-0 [overflow-wrap:anywhere]">
                                                 <div className="text-(--color-text-primary) font-medium">
                                                     {/* Translate fixed master labels while retaining custom names verbatim. */}
                                                     {translateDocumentTypeLabel(
@@ -230,7 +226,7 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                                                     )}
                                                 </div>
                                                 <div
-                                                    className="text-sm text-(--color-text-tertiary) truncate"
+                                                    className="[overflow-wrap:anywhere] text-sm text-(--color-text-tertiary)"
                                                     title={doc.file_name}
                                                 >
                                                     {doc.file_name}
@@ -253,7 +249,7 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                                                     )}
                                             </div>
                                         </div>
-                                        <div className="flex flex-wrap items-center gap-2 md:justify-end">
+                                        <div className="flex flex-wrap items-center gap-2 xl:justify-end [&>button]:min-h-9 [&>a]:min-h-9 [&>button]:justify-center [&>a]:justify-center">
                                             <ActionButton
                                                 variant="outline"
                                                 type="button"
@@ -299,135 +295,188 @@ export default function Documents({ vendor, documents = [], documentTypes = [] }
                 </Card>
             </div>
 
-            <Modal
-                isOpen={showUploadModal}
-                onClose={closeUploadModal}
-                title="Upload Document"
-                footer={
-                    <>
-                        <ModalCancelButton onClick={closeUploadModal} />
-                        <ModalPrimaryButton onClick={handleUpload} disabled={isUploadDisabled}>
-                            {uploadForm.processing ? t('Uploading...') : t('Upload')}
-                        </ModalPrimaryButton>
-                    </>
-                }
-            >
-                <div className="space-y-4">
-                    {/* Localize only system-defined document options. */}
-                    <FormSelect
-                        label="Document Type"
-                        value={uploadForm.data.document_type_id}
-                        onChange={(val) => {
-                            uploadForm.setData({
-                                ...uploadForm.data,
-                                document_type_id: val,
-                                expiry_date: '',
-                                file: null,
-                            });
-                            if (fileInputRef.current) fileInputRef.current.value = '';
-                        }}
-                        translateOptions={false}
-                        options={documentTypes.map((type) => ({
-                            value: type.id,
-                            label: translateDocumentTypeLabel(language, type),
-                        }))}
-                        placeholder="Select document type"
-                        required
-                    />
-                    {uploadForm.errors.document_type_id && (
-                        <p className="text-sm text-(--color-danger)">
-                            {t(uploadForm.errors.document_type_id)}
-                        </p>
-                    )}
-
-                    <div hidden={!requiresExpiryDate}>
-                        <label className="text-sm font-medium text-(--color-text-secondary) mb-2 block">
-                            {t('Expiry Date')} {requiresExpiryDate ? '' : t('(Optional)')}
-                        </label>
-                        <input
-                            type="date"
-                            value={uploadForm.data.expiry_date}
-                            min={new Date().toISOString().split('T')[0]}
-                            onChange={(event) =>
-                                uploadForm.setData('expiry_date', event.target.value)
-                            }
-                            className="w-full bg-(--color-bg-primary) border-2 border-(--color-border-primary) rounded-xl px-4 py-3 text-(--color-text-primary) focus:outline-none focus:border-(--color-brand-primary)"
-                            required={requiresExpiryDate}
+            <div className="[&_.glass-modal]:max-h-[calc(100vh-2rem)] [&_.glass-modal]:overflow-y-auto [&_.glass-modal]:overscroll-contain [&_.glass-modal]:p-4 sm:[&_.glass-modal]:p-6 [&_.glass-modal_h3]:break-words">
+                <Modal
+                    isOpen={showUploadModal}
+                    onClose={closeUploadModal}
+                    title="Upload Document"
+                    footer={
+                        <div className="flex w-full flex-col-reverse gap-3 sm:flex-row sm:justify-end [&>button]:min-h-9 [&>button]:whitespace-normal [&>button]:focus-visible:outline-2 [&>button]:focus-visible:outline-(--color-brand-primary)">
+                            <ModalCancelButton onClick={closeUploadModal} />
+                            <ModalPrimaryButton
+                                onClick={handleUpload}
+                                disabled={isUploadDisabled}
+                                disabledReason={
+                                    uploadForm.processing
+                                        ? 'A request is in progress. Please wait.'
+                                        : !uploadForm.data.document_type_id
+                                          ? 'Select a document type before uploading.'
+                                          : !uploadForm.data.file
+                                            ? 'Select a file before uploading.'
+                                            : 'Enter the document expiry date before uploading.'
+                                }
+                            >
+                                {uploadForm.processing ? t('Uploading...') : t('Upload')}
+                            </ModalPrimaryButton>
+                        </div>
+                    }
+                >
+                    <div className="space-y-4">
+                        {/* Localize only system-defined document options. */}
+                        <VendorFormSelect
+                            label="Document Type"
+                            value={uploadForm.data.document_type_id}
+                            onChange={(val) => {
+                                uploadForm.setData({
+                                    ...uploadForm.data,
+                                    document_type_id: val,
+                                    expiry_date: '',
+                                    file: null,
+                                });
+                                if (fileInputRef.current) fileInputRef.current.value = '';
+                            }}
+                            translateOptions={false}
+                            options={documentTypes.map((type) => ({
+                                value: type.id,
+                                label: translateDocumentTypeLabel(language, type),
+                            }))}
+                            placeholder="Select document type"
+                            showRequiredIndicator
+                            error={uploadForm.errors.document_type_id}
                         />
-                        <p className="text-xs text-(--color-text-muted) mt-1">
-                            {t(
-                                requiresExpiryDate
-                                    ? 'This document type requires a valid expiry date.'
-                                    : 'Set expiry date if this document has a validity period.'
+
+                        <div hidden={!requiresExpiryDate}>
+                            <label
+                                htmlFor="document-expiry-date"
+                                className="text-sm font-medium text-(--color-text-secondary) mb-2 block"
+                            >
+                                {t('Expiry Date')}{' '}
+                                {requiresExpiryDate ? (
+                                    <span className="text-(--color-danger)">*</span>
+                                ) : (
+                                    t('(Optional)')
+                                )}
+                            </label>
+                            <input
+                                id="document-expiry-date"
+                                aria-required={requiresExpiryDate}
+                                aria-invalid={!!uploadForm.errors.expiry_date}
+                                aria-describedby={`document-expiry-hint${uploadForm.errors.expiry_date ? ' document-expiry-error' : ''}`}
+                                type="date"
+                                value={uploadForm.data.expiry_date}
+                                min={new Date().toISOString().split('T')[0]}
+                                onChange={(event) =>
+                                    uploadForm.setData('expiry_date', event.target.value)
+                                }
+                                className="w-full bg-(--color-bg-primary) border-2 border-(--color-border-primary) rounded-xl px-4 py-3 text-(--color-text-primary) focus:outline-none focus:border-(--color-brand-primary)"
+                            />
+                            <p
+                                id="document-expiry-hint"
+                                className="text-xs text-(--color-text-muted) mt-1"
+                            >
+                                {t(
+                                    requiresExpiryDate
+                                        ? 'This document type requires a valid expiry date.'
+                                        : 'Set expiry date if this document has a validity period.'
+                                )}
+                            </p>
+                            {uploadForm.errors.expiry_date && (
+                                <p
+                                    id="document-expiry-error"
+                                    role="alert"
+                                    className="text-sm text-(--color-danger) mt-1"
+                                >
+                                    {t(uploadForm.errors.expiry_date)}
+                                </p>
                             )}
-                        </p>
-                        {uploadForm.errors.expiry_date && (
-                            <p className="text-sm text-(--color-danger) mt-1">
-                                {t(uploadForm.errors.expiry_date)}
+                        </div>
+
+                        <div>
+                            <label
+                                htmlFor={fileInputId}
+                                className="text-sm font-medium text-(--color-text-secondary) mb-2 block"
+                            >
+                                {t('File')} <span className="text-(--color-danger)">*</span>
+                            </label>
+                            <div className="flex min-w-0 flex-wrap items-center gap-3 bg-(--color-bg-primary) border-2 border-(--color-border-primary) rounded-xl px-4 py-3">
+                                <input
+                                    id={fileInputId}
+                                    aria-invalid={Boolean(uploadForm.errors.file)}
+                                    aria-describedby={`${fileStatusId} ${fileHintId}${uploadForm.errors.file ? ` ${fileErrorId}` : ''}`}
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={(e) =>
+                                        uploadForm.setData('file', e.target.files[0] ?? null)
+                                    }
+                                    className="peer sr-only"
+                                    accept={(
+                                        selectedDocumentType?.allowed_extensions || [
+                                            'pdf',
+                                            'jpg',
+                                            'jpeg',
+                                            'png',
+                                        ]
+                                    )
+                                        .map((extension) => `.${extension}`)
+                                        .join(',')}
+                                    aria-required="true"
+                                />
+                                <label
+                                    htmlFor={fileInputId}
+                                    className="inline-flex shrink-0 cursor-pointer items-center rounded-full bg-(--color-brand-primary)/10 px-4 py-2 text-sm font-semibold text-(--color-brand-primary) hover:bg-(--color-brand-primary)/20 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-(--color-brand-primary)"
+                                >
+                                    {t('Choose File')}
+                                </label>
+                                <span
+                                    id={fileStatusId}
+                                    aria-live="polite"
+                                    className="min-w-0 flex-1 basis-32 break-all text-sm text-(--color-text-primary)"
+                                >
+                                    {uploadForm.data.file?.name ?? t('No file selected')}
+                                </span>
+                            </div>
+                            <p id={fileHintId} className="text-xs text-(--color-text-muted) mt-1">
+                                {t('Allowed: :formats. Maximum: :size MB.', {
+                                    formats: (
+                                        selectedDocumentType?.allowed_extensions || [
+                                            'pdf',
+                                            'jpg',
+                                            'jpeg',
+                                            'png',
+                                        ]
+                                    )
+                                        .join(', ')
+                                        .toUpperCase(),
+                                    size: selectedDocumentType?.max_file_size_mb || 10,
+                                })}
+                            </p>
+                            {uploadForm.errors.file && (
+                                <p id={fileErrorId} className="text-sm text-(--color-danger) mt-1">
+                                    {t(uploadForm.errors.file)}
+                                </p>
+                            )}
+                        </div>
+                        {/* Localize document upload errors from the application. */}
+                        {uploadForm.errors.upload && (
+                            <p className="text-sm text-(--color-danger)">
+                                {t(uploadForm.errors.upload)}
                             </p>
                         )}
                     </div>
+                </Modal>
+            </div>
 
-                    <div>
-                        <label className="text-sm font-medium text-(--color-text-secondary) mb-2 block">
-                            {t('File')}
-                        </label>
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={(e) => uploadForm.setData('file', e.target.files[0])}
-                            className="w-full bg-(--color-bg-primary) border-2 border-(--color-border-primary) rounded-xl px-4 py-3 text-(--color-text-primary) file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-(--color-brand-primary)/10 file:text-(--color-brand-primary) hover:file:bg-(--color-brand-primary)/20 transition-all"
-                            accept={(
-                                selectedDocumentType?.allowed_extensions || [
-                                    'pdf',
-                                    'jpg',
-                                    'jpeg',
-                                    'png',
-                                ]
-                            )
-                                .map((extension) => `.${extension}`)
-                                .join(',')}
-                            required
-                        />
-                        <p className="text-xs text-(--color-text-muted) mt-1">
-                            {t('Allowed: :formats. Maximum: :size MB.', {
-                                formats: (
-                                    selectedDocumentType?.allowed_extensions || [
-                                        'pdf',
-                                        'jpg',
-                                        'jpeg',
-                                        'png',
-                                    ]
-                                )
-                                    .join(', ')
-                                    .toUpperCase(),
-                                size: selectedDocumentType?.max_file_size_mb || 10,
-                            })}
-                        </p>
-                        {uploadForm.errors.file && (
-                            <p className="text-sm text-(--color-danger) mt-1">
-                                {t(uploadForm.errors.file)}
-                            </p>
-                        )}
-                    </div>
-                    {/* Localize document upload errors from the application. */}
-                    {uploadForm.errors.upload && (
-                        <p className="text-sm text-(--color-danger)">
-                            {t(uploadForm.errors.upload)}
-                        </p>
-                    )}
-                </div>
-            </Modal>
-
-            <DocumentViewer
-                key={selectedDocument?.id ?? 'none'}
-                document={selectedDocument}
-                isOpen={showViewer}
-                onClose={() => {
-                    setShowViewer(false);
-                    setSelectedDocument(null);
-                }}
-            />
+            <div className="[&_.glass-modal]:min-w-0 [&_.glass-modal]:max-h-[calc(100vh-2rem)] [&_.glass-modal>div:first-child]:flex-wrap [&_.glass-modal>div:first-child]:gap-3 [&_.glass-modal>div:first-child>div]:max-w-full [&_.glass-modal>div:first-child>div]:min-w-0 [&_.glass-modal>div:first-child>div:first-child]:w-full sm:[&_.glass-modal>div:first-child>div:first-child]:w-auto [&_.glass-modal>div:first-child>div:first-child>span]:shrink-0 [&_.glass-modal>div:first-child>div]:flex-wrap [&_.glass-modal_a]:min-h-9 [&_.glass-modal_a]:justify-center [&_.glass-modal_button]:min-h-9 [&_.glass-modal_button]:min-w-9 [&_.glass-modal_a]:focus-visible:outline-2 [&_.glass-modal_button]:focus-visible:outline-2 [&_.glass-modal>div:nth-child(2)]:min-h-0 [&_.glass-modal>div:nth-child(2)]:overscroll-contain [&_.glass-modal_iframe]:min-h-[240px] sm:[&_.glass-modal_iframe]:min-h-[500px]">
+                <DocumentViewer
+                    key={selectedDocument?.id ?? 'none'}
+                    document={selectedDocument}
+                    isOpen={showViewer}
+                    onClose={() => {
+                        setShowViewer(false);
+                        setSelectedDocument(null);
+                    }}
+                />
+            </div>
         </VendorLayout>
     );
 }

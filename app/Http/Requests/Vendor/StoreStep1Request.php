@@ -41,7 +41,7 @@ class StoreStep1Request extends FormRequest
     public function rules(): array
     {
         // Resolve valid regencies and cities from the submitted Indonesian province.
-        $province = (string) $this->input('state');
+        $province = is_string($this->input('state')) ? $this->input('state') : '';
 
         return [
             'company_name' => 'required|string|max:255',
@@ -50,8 +50,22 @@ class StoreStep1Request extends FormRequest
             'tax_id' => ['required', 'string', 'regex:/^[0-9]{15,16}$/'],
             // Require the deed number as part of vendor company verification.
             'deed_number' => ['required', 'string', 'max:100'],
-            'business_type' => 'required|string|max:50',
-            'category_id' => ['required', 'integer', Rule::exists('vendor_categories', 'id')->where('is_active', true)],
+            'business_type' => ['bail', 'required', 'string', 'max:50', function ($attribute, $value, $fail): void {
+                try {
+                    $service = app(\App\Services\BusinessTypeService::class);
+                    $service->validateSelection($value, $service->previousValues($this->user()));
+                } catch (\Illuminate\Validation\ValidationException $e) {
+                    $fail($e->errors()['business_type'][0]);
+                }
+            }],
+            'category_id' => ['bail', 'required', 'integer', function ($attribute, $value, $fail): void {
+                $service = app(\App\Services\VendorCategoryService::class);
+                try {
+                    $service->validateSelection($value, $service->previousValues($this->user()));
+                } catch (\Illuminate\Validation\ValidationException $e) {
+                    $fail($e->errors()['category_id'][0]);
+                }
+            }],
             'experience' => ['required', 'string', 'max:2000'],
             'contact_person' => 'required|string|max:255',
             // Accept Indonesian mobile numbers of 10 to 13 local digits.
@@ -79,6 +93,8 @@ class StoreStep1Request extends FormRequest
             'deed_number.required' => 'Deed of Establishment Number is required.',
             'deed_number.max' => 'Deed of Establishment Number may not exceed 100 characters.',
             'business_type.required' => 'Business Type is required.',
+            'business_type.string' => 'Business Type must be text.',
+            'business_type.max' => 'Business Type may not exceed 50 characters.',
             'contact_person.required' => 'Contact Person is required.',
             'contact_person.max' => 'Contact Person may not exceed 255 characters.',
             'category_id.required' => 'Category is required.',

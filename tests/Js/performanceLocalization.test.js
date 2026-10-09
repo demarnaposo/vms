@@ -36,6 +36,7 @@ test('performance rating period labels are localized', () => {
     assert.equal(translateMessage('id', 'End Date'), 'Tanggal Selesai');
     assert.match(ratePageSource, /\{t\('Start Date'\)\}/);
     assert.match(ratePageSource, /\{t\('End Date'\)\}/);
-    assert.match(ratePageSource, /Object\.values\(form\.errors\)/);
-    assert.match(ratePageSource, /validationErrors\.map/);
+    assert.match(ratePageSource, /ratingGroupErrors\.map/);
+    assert.match(ratePageSource, /metricErrors\.map/);
+    assert.match(ratePageSource, /<form noValidate/);
 });

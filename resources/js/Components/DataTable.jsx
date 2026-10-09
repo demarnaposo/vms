@@ -1,3 +1,4 @@
+import { DisabledActionTooltip } from './DisabledActionTooltip';
 import { Link } from '@inertiajs/react';
 import AppIcon from './AppIcon';
 // Translate reusable table, card, and pagination labels globally.
@@ -141,13 +142,28 @@ export default function DataTable({
 
                                     if (!link.url) {
                                         return (
-                                            <span
+                                            <DisabledActionTooltip
                                                 key={key}
-                                                aria-disabled="true"
-                                                className={`${baseClass} opacity-50 cursor-not-allowed`}
+                                                disabled
+                                                content={
+                                                    link.active
+                                                        ? 'This is the current page.'
+                                                        : key === 0
+                                                          ? 'You are already on the first page.'
+                                                          : key === links.length - 1
+                                                            ? 'You are already on the last page.'
+                                                            : 'This pagination item is not a navigable page.'
+                                                }
                                             >
-                                                <span>{t(decodePaginationLabel(link.label))}</span>
-                                            </span>
+                                                <span
+                                                    aria-disabled="true"
+                                                    className={`${baseClass} opacity-50 cursor-not-allowed`}
+                                                >
+                                                    <span>
+                                                        {t(decodePaginationLabel(link.label))}
+                                                    </span>
+                                                </span>
+                                            </DisabledActionTooltip>
                                         );
                                     }
 

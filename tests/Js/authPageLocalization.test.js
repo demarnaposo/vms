@@ -40,8 +40,8 @@ test('authentication pages route remaining static copy through the translator', 
     );
 
     assert.match(login, /placeholder=\{t\('you@company\.com'\)\}/);
-    assert.match(login, /\{t\('Ops'\)\}: ops@vendorflow\.com \/ password/);
-    assert.match(login, /\{t\('Finance'\)\}: finance@vendorflow\.com \/ password/);
+    assert.match(login, /\{t\('Ops'\)\}: ops@test\.com \/ password/);
+    assert.match(login, /\{t\('Finance'\)\}: finance@test\.com \/ password/);
     assert.match(register, /placeholder=\{t\('John Doe'\)\}/);
     assert.match(register, /placeholder=\{t\('you@company\.com'\)\}/);
     assert.match(passwordInput, /placeholder=\{t\(placeholder\)\}/);

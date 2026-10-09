@@ -17,6 +17,8 @@ test('translates only known system audit events', () => {
 
 // Keep unknown morph types untouched and leave stored class names unmodified.
 test('translates only known audit entity class labels', () => {
+    assert.equal(translateAuditEntity('id', 'App\\Models\\BusinessType'), 'Jenis Usaha');
+    assert.equal(translateAuditEntity('en', 'App\\Models\\BusinessType'), 'Business Type');
     const paymentType = 'App\\Models\\PaymentRequest';
     assert.equal(translateAuditEntity('id', paymentType), 'Permintaan Pembayaran');
     assert.equal(translateAuditEntity('en', paymentType), 'Payment Request');

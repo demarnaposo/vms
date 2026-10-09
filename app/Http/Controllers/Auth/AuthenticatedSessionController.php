@@ -44,7 +44,7 @@ class AuthenticatedSessionController extends Controller
         if ($user->isVendor()) {
             $vendor = $user->vendor;
             $error = match (true) {
-                $vendor?->blocksUserAccess() => __('alerts.vendor_account_status', ['status' => $vendor->status]),
+                $vendor?->blocksUserAccess() => __('alerts.vendor_account_status', ['status' => __('alerts.actions.'.$vendor->status)]),
                 ! $user->is_active => __('alerts.user_account_inactive'),
                 default => null,
             };

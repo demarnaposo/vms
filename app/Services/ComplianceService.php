@@ -8,6 +8,7 @@ use App\Models\ComplianceRule;
 use App\Models\DocumentType;
 use App\Models\Vendor;
 use App\Models\VendorDocument;
+use App\Support\PaymentsModule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -50,7 +51,7 @@ class ComplianceService
                 if ($result['status'] === ComplianceResult::STATUS_FAIL) {
                     $totalPenalty += $rule->penalty_points;
 
-                    if ($rule->blocks_payment || $rule->blocks_activation) {
+                    if (($rule->blocks_payment && PaymentsModule::enabled()) || $rule->blocks_activation) {
                         $hasBlockingFailure = true;
                     }
                 }

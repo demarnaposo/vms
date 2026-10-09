@@ -1,3 +1,4 @@
+import { DisabledButton } from '@/Components/DisabledActionTooltip';
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import {
@@ -9,7 +10,6 @@ import {
     FormSelect,
     PageHeader,
     StatCard,
-    StatGrid,
 } from '@/Components';
 // Translate static system-health labels and pagination controls.
 import { useLanguage } from '@/Contexts/LanguageContext';
@@ -118,8 +118,8 @@ export default function SystemHealthIndex({ jobs = {}, stats = {}, filters = {} 
 
     return (
         <AdminLayout title="System Health" activeNav="System Health" header={header}>
-            <div className="space-y-6">
-                <StatGrid cols={4}>
+            <div className="min-w-0 space-y-6">
+                <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 [&>div]:min-w-0">
                     <StatCard label="Total Jobs" value={stats.total || 0} icon="jobs" />
                     <StatCard
                         label="Running"
@@ -139,23 +139,22 @@ export default function SystemHealthIndex({ jobs = {}, stats = {}, filters = {} 
                         icon="failed"
                         color="danger"
                     />
-                </StatGrid>
+                </div>
 
                 <Card title="Filters" allowOverflow>
                     <form
+                        noValidate
                         onSubmit={onSubmitFilters}
-                        className="p-4 grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-end"
+                        className="p-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-end"
                     >
-                        <label className="block min-w-0">
-                            <span className="text-xs uppercase tracking-wide text-(--color-text-tertiary)">
-                                {/* Translate fixed system-health filter labels. */}
-                                {t('Status')}
-                            </span>
+                        <div className="min-w-0">
                             <FormSelect
+                                size="field"
+                                label="Status"
                                 name="status"
                                 value={statusFilter}
                                 onChange={setStatusFilter}
-                                className="mt-1"
+                                className="mt-1 [&>button]:h-11"
                                 options={[
                                     { value: 'all', label: 'All' },
                                     { value: 'running', label: 'Running' },
@@ -163,7 +162,7 @@ export default function SystemHealthIndex({ jobs = {}, stats = {}, filters = {} 
                                     { value: 'failed', label: 'Failed' },
                                 ]}
                             />
-                        </label>
+                        </div>
 
                         <label className="block min-w-0">
                             <span className="text-xs uppercase tracking-wide text-(--color-text-tertiary)">
@@ -175,7 +174,7 @@ export default function SystemHealthIndex({ jobs = {}, stats = {}, filters = {} 
                                 name="search"
                                 defaultValue={filters?.search || ''}
                                 placeholder="vendors:evaluate-compliance"
-                                className="mt-1 w-full rounded-xl border-2 border-(--color-border-primary) bg-(--color-bg-primary) px-4 py-3 text-sm text-(--color-text-primary) placeholder:text-(--color-text-placeholder) transition-colors hover:border-(--color-border-secondary) focus:outline-none focus:border-(--color-brand-primary) focus:ring-4 focus:ring-(--color-brand-primary)/10"
+                                className="mt-1 h-11 w-full rounded-xl border-2 border-(--color-border-primary) bg-(--color-bg-primary) px-4 py-2 text-sm text-(--color-text-primary) placeholder:text-(--color-text-placeholder) transition-colors hover:border-(--color-border-secondary) focus:outline-none focus:border-(--color-brand-primary) focus:ring-4 focus:ring-(--color-brand-primary)/10"
                             />
                         </label>
 
@@ -188,15 +187,24 @@ export default function SystemHealthIndex({ jobs = {}, stats = {}, filters = {} 
                     </form>
                 </Card>
 
-                <DataTable columns={columns} data={rows} emptyMessage="No job logs found" />
+                <div className="min-w-0 [&_table]:min-w-[760px] [&_table]:table-fixed [&_td]:[overflow-wrap:anywhere] [&_nav]:flex-wrap [&_nav]:gap-1 [&_nav_a]:min-h-9 [&_nav_a]:focus-visible:outline-2">
+                    <DataTable columns={columns} data={rows} emptyMessage="No job logs found" />
+                </div>
 
                 {Array.isArray(jobs?.links) && jobs.links.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                         {jobs.links.map((link, index) => (
-                            <button
+                            <DisabledButton
                                 key={`${link.label}-${index}`}
                                 type="button"
                                 disabled={!link.url}
+                                disabledReason={
+                                    index === 0
+                                        ? 'You are already on the first page.'
+                                        : index === jobs.links.length - 1
+                                          ? 'You are already on the last page.'
+                                          : 'This pagination item is not a navigable page.'
+                                }
                                 onClick={() =>
                                     link.url &&
                                     router.visit(link.url, {
@@ -204,7 +212,7 @@ export default function SystemHealthIndex({ jobs = {}, stats = {}, filters = {} 
                                         preserveState: true,
                                     })
                                 }
-                                className={`px-3 py-1.5 rounded-lg text-sm border transition-colors ${
+                                className={`min-h-9 focus-visible:outline-2 focus-visible:outline-offset-2 px-3 py-1.5 rounded-lg text-sm border transition-colors ${
                                     link.active
                                         ? 'bg-(--color-brand-primary) text-white border-(--color-brand-primary)'
                                         : 'bg-(--color-bg-primary) text-(--color-text-secondary) border-(--color-border-primary) disabled:opacity-40'
@@ -212,7 +220,7 @@ export default function SystemHealthIndex({ jobs = {}, stats = {}, filters = {} 
                             >
                                 {/* Translate pagination text while retaining page numbers. */}
                                 {t(formatPaginationLabel(link.label))}
-                            </button>
+                            </DisabledButton>
                         ))}
                     </div>
                 )}

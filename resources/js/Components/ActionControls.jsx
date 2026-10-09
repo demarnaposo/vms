@@ -1,9 +1,9 @@
+import { DisabledButton } from './DisabledActionTooltip';
 import { Link } from '@inertiajs/react';
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 const variants = {
-    primary:
-        'bg-(--color-brand-primary) hover:bg-(--color-brand-primary-hover) text-white shadow-md shadow-(--color-brand-primary)/30',
+    primary: 'theme-primary-action shadow-md shadow-(--color-brand-primary)/30',
     secondary:
         'bg-(--color-bg-secondary) hover:bg-(--color-bg-tertiary) text-(--color-text-secondary)',
     success: 'bg-(--color-success) hover:bg-(--color-success-dark) text-white',
@@ -28,9 +28,9 @@ export function ActionButton({
 }) {
     const { t } = useLanguage();
     return (
-        <button {...props} type={type} className={actionClasses(variant, className)}>
+        <DisabledButton {...props} type={type} className={actionClasses(variant, className)}>
             {t(children)}
-        </button>
+        </DisabledButton>
     );
 }
 

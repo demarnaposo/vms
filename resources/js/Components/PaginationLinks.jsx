@@ -1,3 +1,4 @@
+import { DisabledActionTooltip } from './DisabledActionTooltip';
 import { Link } from '@inertiajs/react';
 import { useLanguage } from '@/Contexts/LanguageContext';
 
@@ -23,9 +24,23 @@ export default function PaginationLinks({ links = [] }) {
                         {t(label || (index === 0 ? 'Previous' : 'Next'))}
                     </Link>
                 ) : (
-                    <span key={index} aria-disabled="true" className={`${classes} opacity-50`}>
-                        {t(label || (index === 0 ? 'Previous' : 'Next'))}
-                    </span>
+                    <DisabledActionTooltip
+                        key={index}
+                        disabled
+                        content={
+                            link.active
+                                ? 'This is the current page.'
+                                : index === 0
+                                  ? 'You are already on the first page.'
+                                  : index === links.length - 1
+                                    ? 'You are already on the last page.'
+                                    : 'This pagination item is not a navigable page.'
+                        }
+                    >
+                        <span aria-disabled="true" className={`${classes} opacity-50`}>
+                            {t(label || (index === 0 ? 'Previous' : 'Next'))}
+                        </span>
+                    </DisabledActionTooltip>
                 );
             })}
         </nav>

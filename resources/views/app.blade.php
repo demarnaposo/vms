@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html data-theme="ocean" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="utf-8">
@@ -14,19 +14,21 @@
 
     <script>
         (function() {
+            var theme = 'ocean';
             try {
-                var theme = localStorage.getItem('vms-theme') || 'aurora';
-                document.documentElement.dataset.theme = theme;
-                if (theme === 'midnight') {
-                    document.documentElement.classList.add('dark');
+                var stored = localStorage.getItem('vms-theme');
+                if (['aurora', 'ocean', 'sunset', 'midnight'].indexOf(stored) !== -1) {
+                    theme = stored;
                 }
             } catch (e) {}
+            document.documentElement.dataset.theme = theme;
+            document.documentElement.classList.toggle('dark', theme === 'midnight');
         })();
     </script>
 
     <style>
         html {
-            background: #f6fbff;
+            background: var(--color-bg-primary, #f6fbff);
         }
 
         .page-loader {
@@ -35,7 +37,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(circle at 10% 10%, rgba(13, 148, 136, 0.16), transparent 45%), #f6fbff;
+            background: var(--gradient-page, #f6fbff);
             z-index: 9999;
             transition: opacity 0.45s ease-out, visibility 0.45s ease-out;
         }
@@ -49,8 +51,8 @@
             content: '';
             width: 38px;
             height: 38px;
-            border: 2px solid rgba(15, 118, 110, 0.22);
-            border-top-color: #0f766e;
+            border: 2px solid var(--color-brand-primary-light, #dbeafe);
+            border-top-color: var(--color-brand-primary, #0b4a6f);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }

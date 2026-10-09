@@ -1,16 +1,21 @@
+import { FormSelect } from '@/Components/FormInputs';
+import { DisabledButton } from '@/Components/DisabledActionTooltip';
 import { router, usePage } from '@inertiajs/react';
+import { ActionLink } from '@/Components/ActionControls';
 import { AdminLayout, PageHeader, Card, Badge, AppIcon } from '@/Components';
 // Translate static rule-management controls without translating rule data.
 import { useLanguage } from '@/Contexts/LanguageContext';
 // Localize only compliance rules defined by VMS master data.
 import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
+import { paymentsEnabled } from '@/utils/paymentModule';
 
 export default function ComplianceRules({ rules = [] }) {
     // Keep user-facing labels reactive to the selected language.
     // Read the selected language for rule master data.
     const { language, t } = useLanguage();
-    const { auth } = usePage().props;
+    const { auth, features, errors = {} } = usePage().props;
     const can = auth?.can || {};
+    const isPaymentsEnabled = paymentsEnabled(features);
 
     const updateRule = (ruleId, field, value) => {
         router.patch(
@@ -24,20 +29,33 @@ export default function ComplianceRules({ rules = [] }) {
         <PageHeader
             title="Compliance Rules"
             subtitle="Configure compliance evaluation rules"
-            backLink="/admin/compliance"
+            actions={
+                <ActionLink
+                    href="/admin/compliance"
+                    variant="outline"
+                    className="min-h-9 justify-center"
+                >
+                    {t('Back')}
+                </ActionLink>
+            }
         />
     );
 
     return (
         <AdminLayout title="Compliance Rules" activeNav="Compliance" header={header}>
             {/* Localize rule-management controls while preserving stored names and descriptions. */}
-            <div className="space-y-6">
+            <div className="min-w-0 space-y-6">
+                {!isPaymentsEnabled && errors.blocks_payment && (
+                    <p role="alert" className="text-sm text-(--color-danger)">
+                        {errors.blocks_payment}
+                    </p>
+                )}
                 {rules.map((rule) => (
                     <Card key={rule.id}>
-                        <div className="p-6">
-                            <div className="flex items-start justify-between mb-4">
-                                <div>
-                                    <h3 className="text-lg font-semibold text-(--color-text-primary)">
+                        <div className="min-w-0">
+                            <div className="flex min-w-0 flex-col items-start justify-between gap-4 mb-4 sm:flex-row">
+                                <div className="min-w-0">
+                                    <h3 className="[overflow-wrap:anywhere] text-lg font-semibold text-(--color-text-primary)">
                                         {/* Translate known rule labels and preserve custom rules. */}
                                         {translateSystemMasterDataField(
                                             language,
@@ -47,7 +65,7 @@ export default function ComplianceRules({ rules = [] }) {
                                             rule.name
                                         )}
                                     </h3>
-                                    <p className="text-sm text-(--color-text-tertiary) mt-1">
+                                    <p className="[overflow-wrap:anywhere] text-sm text-(--color-text-tertiary) mt-1">
                                         {/* Translate only the system-defined rule description. */}
                                         {translateSystemMasterDataField(
                                             language,
@@ -59,16 +77,22 @@ export default function ComplianceRules({ rules = [] }) {
                                     {/* Translate the rule-type enum label, not its editable name or description. */}
                                     <Badge status={rule.type} className="mt-2" />
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex shrink-0 items-center gap-2">
                                     <span className="text-sm text-(--color-text-tertiary)">
                                         {t('Active')}
                                     </span>
-                                    <button
+                                    <DisabledButton
+                                        type="button"
+                                        aria-label={t('Active')}
+                                        aria-pressed={!!rule.is_active}
                                         onClick={() =>
                                             updateRule(rule.id, 'is_active', !rule.is_active)
                                         }
                                         disabled={!can.edit_rules}
-                                        className={`relative w-12 h-6 rounded-full transition-colors ${
+                                        disabledReason={
+                                            'You do not have permission to edit compliance rules.'
+                                        }
+                                        className={`relative w-12 h-6 shrink-0 rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-brand-primary) ${
                                             rule.is_active
                                                 ? 'bg-(--color-success)'
                                                 : 'bg-(--color-bg-muted)'
@@ -79,63 +103,75 @@ export default function ComplianceRules({ rules = [] }) {
                                                 rule.is_active ? 'left-7' : 'left-1'
                                             }`}
                                         />
-                                    </button>
+                                    </DisabledButton>
                                 </div>
                             </div>
 
-                            <div className="grid md:grid-cols-3 gap-4 mt-4 p-4 bg-(--color-bg-secondary) rounded-xl border border-(--color-border-secondary)">
-                                <div>
-                                    <label className="text-sm text-(--color-text-tertiary) block mb-1 font-medium">
+                            <div
+                                className={`grid ${isPaymentsEnabled ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-4 mt-4 p-4 bg-(--color-bg-secondary) rounded-xl border border-(--color-border-secondary)`}
+                            >
+                                <div className="min-w-0">
+                                    <label
+                                        htmlFor={`rule-${rule.id}-penalty`}
+                                        className="text-sm text-(--color-text-tertiary) block mb-1 font-medium"
+                                    >
                                         {t('Penalty Points')}
                                     </label>
                                     {can.edit_rules ? (
-                                        <select
+                                        <FormSelect
+                                            id={`rule-${rule.id}-penalty`}
+                                            size="field"
+                                            aria-label="Penalty Points"
+                                            allowEmpty={false}
                                             value={rule.penalty_points}
-                                            onChange={(e) =>
+                                            onChange={(value) =>
                                                 updateRule(
                                                     rule.id,
                                                     'penalty_points',
-                                                    parseInt(e.target.value)
+                                                    parseInt(value)
                                                 )
                                             }
-                                            className="input-field w-full"
-                                        >
-                                            {[0, 1, 2, 3, 5, 10, 15, 20, 25].map((p) => (
-                                                <option key={p} value={p}>
-                                                    {p} {t('points')}
-                                                </option>
-                                            ))}
-                                        </select>
+                                            translateOptions={false}
+                                            options={[0, 1, 2, 3, 5, 10, 15, 20, 25].map(
+                                                (points) => ({
+                                                    value: points,
+                                                    label: `${points} ${t('points')}`,
+                                                })
+                                            )}
+                                        />
                                     ) : (
-                                        <span className="text-(--color-text-primary) font-medium">
+                                        <span className="min-w-0 [overflow-wrap:anywhere] text-(--color-text-primary) font-medium">
                                             {rule.penalty_points} {t('points')}
                                         </span>
                                     )}
                                 </div>
-                                <div>
-                                    <label className="text-sm text-(--color-text-tertiary) block mb-1 font-medium">
-                                        {t('Blocks Payments')}
-                                    </label>
-                                    <label className="flex items-center gap-2 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={rule.blocks_payment}
-                                            onChange={(e) =>
-                                                updateRule(
-                                                    rule.id,
-                                                    'blocks_payment',
-                                                    e.target.checked
-                                                )
-                                            }
-                                            disabled={!can.edit_rules}
-                                            className="w-4 h-4 rounded border-(--color-border-primary) bg-(--color-bg-primary) text-(--color-brand-primary) focus:ring-(--color-brand-primary)"
-                                        />
-                                        <span className="text-(--color-text-primary) text-sm">
-                                            {t(rule.blocks_payment ? 'Yes' : 'No')}
-                                        </span>
-                                    </label>
-                                </div>
-                                <div>
+                                {isPaymentsEnabled && (
+                                    <div className="min-w-0">
+                                        <label className="text-sm text-(--color-text-tertiary) block mb-1 font-medium">
+                                            {t('Blocks Payments')}
+                                        </label>
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={rule.blocks_payment}
+                                                onChange={(e) =>
+                                                    updateRule(
+                                                        rule.id,
+                                                        'blocks_payment',
+                                                        e.target.checked
+                                                    )
+                                                }
+                                                disabled={!can.edit_rules}
+                                                aria-label={t('Blocks Payments')}
+                                                className="w-4 h-4 rounded border-(--color-border-primary) bg-(--color-bg-primary) text-(--color-brand-primary) focus:ring-(--color-brand-primary)"
+                                            />
+                                            <span className="text-(--color-text-primary) text-sm">
+                                                {t(rule.blocks_payment ? 'Yes' : 'No')}
+                                            </span>
+                                        </label>
+                                    </div>
+                                )}
+                                <div className="min-w-0">
                                     <label className="text-sm text-(--color-text-tertiary) block mb-1 font-medium">
                                         {t('Blocks Activation')}
                                     </label>
@@ -151,6 +187,7 @@ export default function ComplianceRules({ rules = [] }) {
                                                 )
                                             }
                                             disabled={!can.edit_rules}
+                                            aria-label={t('Blocks Activation')}
                                             className="w-4 h-4 rounded border-(--color-border-primary) bg-(--color-bg-primary) text-(--color-brand-primary) focus:ring-(--color-brand-primary)"
                                         />
                                         <span className="text-(--color-text-primary) text-sm">
@@ -162,6 +199,12 @@ export default function ComplianceRules({ rules = [] }) {
                         </div>
                     </Card>
                 ))}
+
+                {isPaymentsEnabled && errors.blocks_payment && (
+                    <p role="alert" className="text-sm text-(--color-danger)">
+                        {errors.blocks_payment}
+                    </p>
+                )}
 
                 {rules.length === 0 && (
                     <div className="glass-card p-12 text-center text-(--color-text-tertiary)">

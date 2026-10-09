@@ -1,17 +1,10 @@
+import { DisabledButton } from '@/Components/DisabledActionTooltip';
+import AppIcon from '@/Components/AppIcon';
 import { ActionButton } from '@/Components/ActionControls';
 import { router, useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { toast } from 'sonner';
-import {
-    AdminLayout,
-    Button,
-    Card,
-    DataTable,
-    FormInput,
-    FormTextarea,
-    Modal,
-    PageHeader,
-} from '@/Components';
+import { AdminLayout, Button, Card, DataTable, Modal, PageHeader } from '@/Components';
 import { useLanguage } from '@/Contexts/LanguageContext';
 import { translateStaffRoleOption } from '@/i18n/staffRoles';
 import {
@@ -19,6 +12,84 @@ import {
     translateStaffPermissionGroup,
 } from '@/i18n/staffPermissions';
 import { formatDateTime } from '@/utils/dateFormatters';
+
+// Keep this form presentation local so other pages retain their existing controls.
+function FormInput({
+    label,
+    value,
+    onChange,
+    error,
+    placeholder = '',
+    showRequiredIndicator = false,
+    disabled = false,
+    disabledReason,
+    type = 'text',
+    as: Control = 'input',
+    rows = 4,
+    autoComplete,
+}) {
+    const id = useId();
+    const { t } = useLanguage();
+    const [visible, setVisible] = useState(false);
+    const password = type === 'password';
+    const toggleLabel = t(visible ? 'Hide password' : 'Show password');
+    return (
+        <div className="min-w-0">
+            <label htmlFor={id} className="mb-2 block text-sm font-medium">
+                {t(label)}{' '}
+                {showRequiredIndicator && (
+                    <span aria-hidden="true" className="text-(--color-danger)">
+                        *
+                    </span>
+                )}
+            </label>
+            <div className="relative">
+                <Control
+                    id={id}
+                    type={Control === 'input' ? (password && visible ? 'text' : type) : undefined}
+                    rows={Control === 'textarea' ? rows : undefined}
+                    step={type === 'number' ? 'any' : undefined}
+                    autoComplete={autoComplete}
+                    value={value}
+                    onChange={(event) => onChange(event.target.value)}
+                    placeholder={t(placeholder)}
+                    disabled={disabled}
+                    aria-required={showRequiredIndicator || undefined}
+                    aria-invalid={!!error}
+                    aria-describedby={error ? id + '-error' : undefined}
+                    className={
+                        'input-field w-full disabled:cursor-not-allowed disabled:bg-(--color-bg-secondary) ' +
+                        (password ? 'pr-12 ' : '') +
+                        (error ? '!border-(--color-danger)' : '')
+                    }
+                />
+                {password && (
+                    <DisabledButton
+                        type="button"
+                        onClick={() => setVisible((current) => !current)}
+                        disabled={disabled}
+                        disabledReason={disabledReason}
+                        aria-label={toggleLabel}
+                        title={toggleLabel}
+                        aria-pressed={visible}
+                        className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-xl text-(--color-text-muted) focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-(--color-brand-primary) disabled:opacity-50"
+                    >
+                        <AppIcon name={visible ? 'eye-off' : 'eye'} className="h-5 w-5" />
+                    </DisabledButton>
+                )}
+            </div>
+            {error && (
+                <p id={id + '-error'} role="alert" className="mt-1 text-sm text-(--color-danger)">
+                    {t(error)}
+                </p>
+            )}
+        </div>
+    );
+}
+
+function FormTextarea(props) {
+    return <FormInput {...props} as="textarea" />;
+}
 
 const focus =
     'focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) focus-visible:ring-offset-2';
@@ -28,12 +99,13 @@ const emptyRole = { name: '', display_name: '', description: '', permission_ids:
 function FormErrors({ errors }) {
     return Object.keys(errors).length ? (
         <div role="alert" className="text-sm text-(--color-danger)">
-            {Object.values(errors).join(' ')}
+            {[...new Set(Object.values(errors))].join(' ')}
         </div>
     ) : null;
 }
 
 function StaffUserForm({ roles, editing, onDone }) {
+    const roleErrorId = useId();
     const { language, t } = useLanguage();
     const form = useForm(
         editing
@@ -80,42 +152,50 @@ function StaffUserForm({ roles, editing, onDone }) {
         );
     return (
         <Card title={editing ? 'Edit Staff User' : 'Create Internal User'}>
-            <form onSubmit={submit} className="p-4 space-y-4">
+            <form noValidate onSubmit={submit} className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
                     <FormInput
+                        disabled={form.processing}
+                        disabledReason={'A request is in progress. Please wait.'}
                         label="Full Name"
                         value={form.data.name}
                         onChange={(value) => form.setData('name', value)}
                         error={form.errors.name}
                         placeholder="e.g., John Doe"
-                        required
+                        showRequiredIndicator
                     />
                     <FormInput
+                        disabled={form.processing}
+                        disabledReason={'A request is in progress. Please wait.'}
                         label="Email"
                         type="email"
                         value={form.data.email}
                         onChange={(value) => form.setData('email', value)}
                         error={form.errors.email}
                         placeholder="e.g., johndoe@example.com"
-                        required
+                        showRequiredIndicator
                     />
                     <FormInput
+                        disabled={form.processing}
+                        disabledReason={'A request is in progress. Please wait.'}
                         label={editing ? 'New Password' : 'Password'}
                         type="password"
                         autoComplete="new-password"
                         value={form.data.password}
                         onChange={(value) => form.setData('password', value)}
                         error={form.errors.password}
-                        required={!editing}
+                        showRequiredIndicator={!editing}
                     />
                     <FormInput
+                        disabled={form.processing}
+                        disabledReason={'A request is in progress. Please wait.'}
                         label="Confirm Password"
                         type="password"
                         autoComplete="new-password"
                         value={form.data.password_confirmation}
                         onChange={(value) => form.setData('password_confirmation', value)}
                         error={form.errors.password_confirmation}
-                        required={!editing}
+                        showRequiredIndicator={!editing}
                     />
                     {editing && (
                         <p className="text-sm text-(--color-text-tertiary) md:col-span-2">
@@ -123,16 +203,26 @@ function StaffUserForm({ roles, editing, onDone }) {
                         </p>
                     )}
                 </div>
-                <fieldset className="space-y-2">
-                    <legend className="font-medium">
-                        {t('Staff Roles')} <span aria-hidden="true">*</span>
+                <fieldset
+                    className="space-y-2"
+                    aria-describedby={Object.keys(roleErrors).length ? roleErrorId : undefined}
+                >
+                    <legend className="text-sm font-medium">
+                        {t('Staff Roles')}{' '}
+                        <span aria-hidden="true" className="text-(--color-danger)">
+                            *
+                        </span>
                     </legend>
                     <div className="flex flex-wrap gap-4">
                         {roles.map((role) => (
                             <label key={role.id} className="inline-flex items-center gap-2">
                                 <input
                                     type="checkbox"
-                                    className={focus}
+                                    aria-invalid={Object.keys(roleErrors).length > 0}
+                                    aria-describedby={
+                                        Object.keys(roleErrors).length ? roleErrorId : undefined
+                                    }
+                                    className={'h-5 w-5 accent-(--color-brand-primary) ' + focus}
                                     checked={form.data.role_ids.includes(role.id)}
                                     onChange={() => toggle(role.id)}
                                     disabled={form.processing}
@@ -141,10 +231,12 @@ function StaffUserForm({ roles, editing, onDone }) {
                             </label>
                         ))}
                     </div>
-                    <FormErrors errors={roleErrors} />
+                    <div id={roleErrorId}>
+                        <FormErrors errors={roleErrors} />
+                    </div>
                 </fieldset>
                 <FormErrors errors={generalErrors} />
-                <div className="flex justify-end gap-3">
+                <div className="flex flex-wrap justify-end gap-3">
                     <Button
                         type="button"
                         variant="outline"
@@ -154,10 +246,15 @@ function StaffUserForm({ roles, editing, onDone }) {
                             onDone();
                         }}
                         disabled={form.processing}
+                        disabledReason={'A request is in progress. Please wait.'}
                     >
                         {editing ? 'Cancel' : 'Clear Form'}
                     </Button>
-                    <Button type="submit" disabled={form.processing}>
+                    <Button
+                        type="submit"
+                        disabled={form.processing}
+                        disabledReason={'A request is in progress. Please wait.'}
+                    >
                         {form.processing ? 'Saving...' : 'Save User'}
                     </Button>
                 </div>
@@ -168,15 +265,33 @@ function StaffUserForm({ roles, editing, onDone }) {
 
 function StaffRoleForm({ permissions, editing, onDone }) {
     const { language, t } = useLanguage();
+    const editableIds = new Set(
+        permissions
+            .filter((permission) => permission.operational)
+            .map((permission) => permission.id)
+    );
     const form = useForm(
         editing
             ? {
                   name: editing.name,
                   display_name: editing.display_name,
                   description: editing.description || '',
-                  permission_ids: editing.permission_ids,
+                  permission_ids: editing.permission_ids.filter((id) => editableIds.has(id)),
               }
             : emptyRole
+    );
+    const permissionErrors = Object.fromEntries(
+        Object.entries(form.errors).filter(
+            ([field]) => field === 'permission_ids' || field.startsWith('permission_ids.')
+        )
+    );
+    const otherErrors = Object.fromEntries(
+        Object.entries(form.errors).filter(
+            ([field]) =>
+                !['name', 'display_name', 'description', ...Object.keys(permissionErrors)].includes(
+                    field
+                )
+        )
     );
     const groups = permissions
         .filter((permission) => permission.operational)
@@ -206,27 +321,30 @@ function StaffRoleForm({ permissions, editing, onDone }) {
     };
     return (
         <Card title={editing ? 'Edit Staff Role' : 'Create Staff Role'}>
-            <form onSubmit={submit} className="p-4 space-y-4">
+            <form noValidate onSubmit={submit} className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
                     <FormInput
                         label="Role Code"
                         value={form.data.name}
                         onChange={(value) => form.setData('name', value)}
-                        disabled={Boolean(editing)}
+                        disabled={form.processing || Boolean(editing)}
                         error={form.errors.name}
                         placeholder="e.g., document_reviewer"
-                        required
+                        showRequiredIndicator
                     />
                     <FormInput
+                        disabled={form.processing}
+                        disabledReason={'A request is in progress. Please wait.'}
                         label="Role Name"
                         value={form.data.display_name}
                         onChange={(value) => form.setData('display_name', value)}
                         error={form.errors.display_name}
                         placeholder="e.g., Document Reviewer"
-                        required
+                        showRequiredIndicator
                     />
                 </div>
                 <FormTextarea
+                    disabled={form.processing}
                     label="Description"
                     value={form.data.description}
                     onChange={(value) => form.setData('description', value)}
@@ -249,7 +367,16 @@ function StaffRoleForm({ permissions, editing, onDone }) {
                                     <label key={permission.id} className="flex items-start gap-2">
                                         <input
                                             type="checkbox"
-                                            className={`mt-1 ${focus}`}
+                                            aria-invalid={
+                                                Object.keys(permissionErrors).length > 0 ||
+                                                undefined
+                                            }
+                                            aria-describedby={
+                                                Object.keys(permissionErrors).length > 0
+                                                    ? 'role-permission-errors'
+                                                    : undefined
+                                            }
+                                            className={`mt-1 h-5 w-5 shrink-0 accent-(--color-brand-primary) ${focus}`}
                                             checked={form.data.permission_ids.includes(
                                                 permission.id
                                             )}
@@ -276,14 +403,17 @@ function StaffRoleForm({ permissions, editing, onDone }) {
                         </fieldset>
                     ))
                 )}
+                <div id="role-permission-errors">
+                    <FormErrors errors={permissionErrors} />
+                </div>
                 {editing?.legacy_permissions.length > 0 && (
                     <p className="text-sm text-(--color-text-secondary)">
                         {t('Legacy permissions are preserved and cannot be edited here.')}{' '}
                         <span translate="no">{editing.legacy_permissions.join(', ')}</span>
                     </p>
                 )}
-                <FormErrors errors={form.errors} />
-                <div className="flex justify-end gap-3">
+                <FormErrors errors={otherErrors} />
+                <div className="flex flex-wrap justify-end gap-3">
                     <Button
                         type="button"
                         variant="outline"
@@ -293,10 +423,15 @@ function StaffRoleForm({ permissions, editing, onDone }) {
                             onDone();
                         }}
                         disabled={form.processing}
+                        disabledReason={'A request is in progress. Please wait.'}
                     >
                         {editing ? 'Cancel' : 'Clear Form'}
                     </Button>
-                    <Button type="submit" disabled={form.processing}>
+                    <Button
+                        type="submit"
+                        disabled={form.processing}
+                        disabledReason={'A request is in progress. Please wait.'}
+                    >
                         {form.processing ? 'Saving...' : 'Save Role'}
                     </Button>
                 </div>
@@ -364,6 +499,11 @@ export default function StaffIndex({
                     <ActionButton
                         variant="danger"
                         disabled={row.protected || row.users_count > 0}
+                        disabledReason={
+                            row.protected
+                                ? 'Built-in roles cannot be deleted.'
+                                : 'This role is assigned to staff users and cannot be deleted.'
+                        }
                         onClick={() => setDeleting({ kind: 'roles', row })}
                     >
                         Delete
@@ -429,7 +569,7 @@ export default function StaffIndex({
                             type="button"
                             aria-current={tab === value ? 'page' : undefined}
                             onClick={() => setTab(value)}
-                            className={`rounded-lg px-4 py-2 text-sm font-medium ${focus} ${tab === value ? 'bg-(--color-brand-primary) text-white shadow-token-primary' : 'text-(--color-text-tertiary) hover:bg-(--color-bg-primary)'}`}
+                            className={`rounded-lg px-4 py-2 text-sm font-medium ${focus} ${tab === value ? 'theme-primary-action shadow-token-primary' : 'text-(--color-text-tertiary) hover:bg-(--color-bg-primary)'}`}
                         >
                             {t(label)}
                         </button>
@@ -512,10 +652,20 @@ export default function StaffIndex({
                 title="Confirm Deletion"
                 footer={
                     <>
-                        <Button variant="outline" onClick={() => setDeleting(null)} disabled={busy}>
+                        <Button
+                            variant="outline"
+                            onClick={() => setDeleting(null)}
+                            disabled={busy}
+                            disabledReason={'A request is in progress. Please wait.'}
+                        >
                             Cancel
                         </Button>
-                        <Button variant="danger" onClick={remove} disabled={busy}>
+                        <Button
+                            variant="danger"
+                            onClick={remove}
+                            disabled={busy}
+                            disabledReason={'A request is in progress. Please wait.'}
+                        >
                             {busy ? 'Deleting...' : 'Delete'}
                         </Button>
                     </>

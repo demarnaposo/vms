@@ -23,7 +23,7 @@ export default function LanguageSwitcher({ compact = false }) {
                     onClick={() => setLanguage(option.code)}
                     className={`${compact ? 'h-7 min-w-8 text-[10px]' : 'h-8 min-w-9 text-xs'} rounded-md px-2 font-semibold transition-colors ${
                         language === option.code
-                            ? 'bg-(--color-brand-primary) text-white shadow-sm'
+                            ? 'theme-primary-action shadow-sm'
                             : 'text-(--color-text-tertiary) hover:bg-(--color-bg-hover) hover:text-(--color-text-primary)'
                     }`}
                     aria-pressed={language === option.code}

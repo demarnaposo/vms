@@ -2,6 +2,19 @@
 
 // Keep dynamic alert copy separate from database and user-provided values.
 return [
+    'document_file_too_large' => 'File size must not exceed :max MB.',
+    'document_upload_failed' => 'File could not be uploaded. Server upload limit: :max. Choose a smaller file and try again.',
+    'onboarding_upload_too_large' => 'Upload exceeds the server request limit (:max MB). Choose a smaller file and try again.',
+    'onboarding_document_uploaded' => 'Document uploaded successfully.',
+    'onboarding_document_removed' => 'Document removed successfully.',
+    'onboarding_document_expiry_updated' => 'Document expiry date updated successfully.',
+
+    'onboarding_document_save_failed' => 'Documents could not be saved. Please try again.',
+    'onboarding_document_required' => 'Upload this required document before continuing.',
+    'onboarding_document_unavailable' => 'This saved document is unavailable or its type is inactive. Replace or remove it.',
+    'onboarding_documents_invalid' => 'Review the document fields and upload all required documents.',
+
+    'compliance_payment_setting_disabled' => 'Payment blocking cannot be changed while the payments module is disabled. You can still update the other rule settings.',
     'rbac_last_admin' => 'The last super admin cannot be removed.',
     'rbac_invalid_role' => 'Select valid staff roles.',
     'rbac_invalid_permission' => 'Select permissions from the operational catalogue.',

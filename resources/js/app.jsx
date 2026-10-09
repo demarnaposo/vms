@@ -70,7 +70,7 @@ function GlobalErrorFallback() {
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <button
                         onClick={() => window.location.reload()}
-                        className="px-6 py-3 rounded-xl bg-(--color-brand-primary) text-white font-medium hover:opacity-90 transition-opacity"
+                        className="px-6 py-3 rounded-xl theme-primary-action font-medium hover:opacity-90 transition-opacity"
                     >
                         {t('Refresh Page')}
                     </button>

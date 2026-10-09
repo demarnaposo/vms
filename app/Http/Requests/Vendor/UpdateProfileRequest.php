@@ -79,7 +79,13 @@ class UpdateProfileRequest extends FormRequest
             'tax_id' => ['required', 'string', 'regex:/^[0-9]{15,16}$/'],
             // Keep draft company verification aligned with onboarding.
             'deed_number' => ['required', 'string', 'max:100'],
-            'business_type' => 'nullable|string|max:50',
+            'business_type' => ['bail', 'nullable', 'string', 'max:50', function ($attribute, $value, $fail) use ($vendor): void {
+                try {
+                    app(\App\Services\BusinessTypeService::class)->validateSelection($value, [$vendor?->business_type]);
+                } catch (\Illuminate\Validation\ValidationException $e) {
+                    $fail($e->errors()['business_type'][0]);
+                }
+            }],
             'contact_person' => 'required|string|max:255',
             // Apply the same Indonesian mobile rule to draft profiles.
             'contact_phone' => ['required', 'string', 'regex:'.IndonesianMobilePhone::LOCAL_REGEX],
@@ -100,6 +106,8 @@ class UpdateProfileRequest extends FormRequest
     {
         return [
             // Keep profile identifier errors aligned with onboarding.
+            'business_type.string' => 'Business Type must be text.',
+            'business_type.max' => 'Business Type may not exceed 50 characters.',
             'business_identification_number.required' => 'Business Identification Number (NIB) is required.',
             'business_identification_number.regex' => 'Business Identification Number (NIB) must be exactly 13 digits.',
             'tax_id.required' => 'Taxpayer Identification Number (NPWP) is required.',

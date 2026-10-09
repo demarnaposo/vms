@@ -95,6 +95,7 @@
     --backdrop-grid: rgba(15, 23, 42, 0.035);
 }
 
+:root:not([data-theme]),
 :root[data-theme='ocean'] {
     --color-brand-primary: #0b4a6f;
     --color-brand-primary-hover: #083b58;
@@ -257,6 +258,21 @@ a {
     border: 1px solid var(--color-border-primary);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-sm);
+}
+
+/* Share the active sidebar gradient without changing control dimensions. */
+.theme-primary-action {
+    background: var(--gradient-primary);
+    color: #ffffff;
+}
+
+.theme-primary-action:hover:not(:disabled):not([aria-disabled='true']) {
+    filter: saturate(1.08);
+}
+
+.theme-primary-action:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
 }
 
 .btn-primary {
@@ -834,4 +850,26 @@ a {
 
 .sidebar-active-label {
     color: #ffffff;
+}
+
+.sidebar-main-item {
+    color: var(--color-text-secondary);
+}
+
+.sidebar-main-item:hover,
+.sidebar-main-item[aria-current='page'],
+.sidebar-main-item[data-active='true'] {
+    background: var(--gradient-primary);
+    color: var(--color-white);
+    box-shadow: var(--shadow-primary);
+}
+
+.sidebar-sub-item {
+    color: var(--color-text-secondary);
+}
+
+.sidebar-sub-item:hover,
+.sidebar-sub-item[aria-current='page'] {
+    background: var(--color-brand-primary-light);
+    color: var(--color-brand-primary);
 }

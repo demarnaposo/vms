@@ -1,3 +1,4 @@
+import { FormSelect } from '@/Components/FormInputs';
 import { ActionButton } from '@/Components/ActionControls';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
@@ -178,6 +179,9 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                                 <ActionButton
                                     variant="success"
                                     disabled={isFinanceApprovalBlocked}
+                                    disabledReason={
+                                        'Payment approval is blocked by vendor compliance.'
+                                    }
                                     onClick={() => handleAction(row.id, 'finance', 'approve')}
                                 >
                                     {isFinanceApprovalBlocked ? 'Blocked' : 'Approve'}
@@ -257,7 +261,7 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                             aria-current={currentStatus === status ? 'page' : undefined}
                             className={`staff-status-filter px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) focus-visible:ring-offset-2 ${
                                 currentStatus === status
-                                    ? 'bg-(--color-brand-primary) text-white shadow-token-primary'
+                                    ? 'theme-primary-action shadow-token-primary'
                                     : 'text-(--color-text-tertiary) hover:bg-(--color-bg-primary)'
                             }`}
                         >
@@ -282,7 +286,11 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                 footer={
                     <>
                         <ModalCancelButton onClick={() => setShowMarkPaidModal(false)} />
-                        <ModalPrimaryButton onClick={handleMarkPaid} disabled={!paymentRef}>
+                        <ModalPrimaryButton
+                            onClick={handleMarkPaid}
+                            disabled={!paymentRef}
+                            disabledReason={'Enter the payment reference before continuing.'}
+                        >
                             Confirm Payment
                         </ModalPrimaryButton>
                     </>
@@ -303,24 +311,28 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                         />
                     </div>
                     <div>
-                        <label className="text-sm font-medium text-(--color-text-secondary) mb-2 block">
+                        <label
+                            htmlFor="payment_method"
+                            className="text-sm font-medium text-(--color-text-secondary) mb-2 block"
+                        >
                             {/* Translate only the method field label. */}
                             {t('Payment Method')}
                         </label>
-                        <select
+                        <FormSelect
+                            id="payment_method"
+                            size="field"
+                            aria-label="Payment Method"
                             value={paymentMethod}
-                            onChange={(e) => setPaymentMethod(e.target.value)}
-                            className="input-field w-full"
-                        >
-                            {/* Keep payment-method option values unchanged. */}
-                            <option value="">{t('Select method')}</option>
-                            <option value="NEFT">NEFT</option>
-                            <option value="RTGS">RTGS</option>
-                            <option value="IMPS">IMPS</option>
-                            <option value="UPI">UPI</option>
-                            {/* Translate the fixed method label, not its stored value. */}
-                            <option value="Cheque">{t('Cheque')}</option>
-                        </select>
+                            onChange={setPaymentMethod}
+                            placeholder="Select method"
+                            options={[
+                                { value: 'NEFT', label: 'NEFT' },
+                                { value: 'RTGS', label: 'RTGS' },
+                                { value: 'IMPS', label: 'IMPS' },
+                                { value: 'UPI', label: 'UPI' },
+                                { value: 'Cheque', label: 'Cheque' },
+                            ]}
+                        />
                     </div>
                 </div>
             </Modal>
@@ -336,6 +348,7 @@ export default function PaymentsIndex({ payments, stats, currentStatus }) {
                             variant="danger"
                             onClick={handleReject}
                             disabled={!rejectComment.trim()}
+                            disabledReason={'Enter a rejection reason before continuing.'}
                         >
                             Reject
                         </ModalPrimaryButton>

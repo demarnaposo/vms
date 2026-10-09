@@ -162,6 +162,7 @@ class RbacManagementTest extends TestCase
 
     public function test_legacy_permissions_stay_preserved_and_do_not_activate_finance_admin_access(): void
     {
+        config(['features.payments.enabled' => true]);
         $finance = Role::where('name', 'finance_manager')->first();
         $finance->givePermissionTo('documents.view', 'compliance.view');
         $user = User::factory()->create();

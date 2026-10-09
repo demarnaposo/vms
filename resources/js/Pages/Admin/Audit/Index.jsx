@@ -74,14 +74,16 @@ export default function AuditIndex({ logs = {} }) {
 
     return (
         <AdminLayout title="Audit Logs" activeNav="Audit Logs" header={header}>
-            <Card className="overflow-hidden">
-                <DataTable
-                    columns={columns}
-                    data={logs?.data || []}
-                    links={logs?.links || []}
-                    emptyMessage="No audit logs recorded"
-                    stickyHeader={true}
-                />
+            <Card className="min-w-0">
+                <div className="min-w-0 [&_table]:min-w-[760px] [&_table]:table-fixed [&_td]:[overflow-wrap:anywhere] [&_nav]:flex-wrap [&_nav]:gap-1 [&_nav_a]:min-h-9 [&_nav_a]:focus-visible:outline-2">
+                    <DataTable
+                        columns={columns}
+                        data={logs?.data || []}
+                        links={logs?.links || []}
+                        emptyMessage="No audit logs recorded"
+                        stickyHeader={true}
+                    />
+                </div>
             </Card>
         </AdminLayout>
     );

@@ -120,7 +120,7 @@ export default function Error({ status }) {
                     </button>
                     <Link
                         href="/dashboard"
-                        className="px-6 py-3 rounded-xl bg-(--color-brand-primary) text-white font-medium hover:opacity-90 transition-opacity"
+                        className="px-6 py-3 rounded-xl theme-primary-action font-medium hover:opacity-90 transition-opacity"
                     >
                         {t('Go to Dashboard')}
                     </Link>

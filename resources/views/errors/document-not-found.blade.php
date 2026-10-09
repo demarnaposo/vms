@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html data-theme="ocean" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="utf-8">
@@ -16,6 +16,11 @@
             --brand: #0f766e;
             --brand-soft: #ccfbf1;
             --shadow: 0 20px 28px -12px rgba(15, 23, 42, 0.16), 0 8px 12px -10px rgba(15, 23, 42, 0.12);
+        }
+
+        html[data-theme='ocean'] {
+            --brand: #0b4a6f;
+            --brand-soft: #dbeafe;
         }
 
         html[data-theme='midnight'] {
@@ -98,10 +103,15 @@
     </style>
     <script>
         (function() {
+            var theme = 'ocean';
             try {
-                var theme = localStorage.getItem('vms-theme') || 'aurora';
-                document.documentElement.dataset.theme = theme;
+                var stored = localStorage.getItem('vms-theme');
+                if (['aurora', 'ocean', 'sunset', 'midnight'].indexOf(stored) !== -1) {
+                    theme = stored;
+                }
             } catch (e) {}
+            document.documentElement.dataset.theme = theme;
+            document.documentElement.classList.toggle('dark', theme === 'midnight');
         })();
     </script>
 </head>

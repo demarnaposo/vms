@@ -98,7 +98,11 @@ export default function VendorSummaryReport({ vendors, stats, filters }) {
             title="Vendor Summary Report"
             subtitle="Overview of all vendors by status and compliance"
             actions={
-                <ActionLink variant="outline" href="/admin/reports">
+                <ActionLink
+                    variant="outline"
+                    href="/admin/reports"
+                    className="min-h-9 justify-center whitespace-normal"
+                >
                     {t('Back to Reports')}
                 </ActionLink>
             }
@@ -107,9 +111,9 @@ export default function VendorSummaryReport({ vendors, stats, filters }) {
 
     return (
         <AdminLayout title="Vendor Summary Report" activeNav="Reports" header={header}>
-            <div className="space-y-6">
+            <div className="min-w-0 space-y-6">
                 {/* Summary Stats */}
-                <div className="grid md:grid-cols-4 gap-4">
+                <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 [&>div]:min-w-0 [&>div]:[overflow-wrap:anywhere]">
                     <StatCard
                         label="Total Vendors"
                         value={stats.total}
@@ -133,13 +137,10 @@ export default function VendorSummaryReport({ vendors, stats, filters }) {
 
                 {/* Filters */}
                 <Card title="Filters" allowOverflow>
-                    <div className="p-4 flex flex-wrap items-end gap-4">
-                        <div className="flex-1 min-w-[150px]">
-                            <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
-                                {/* Translate the fixed lifecycle filter label. */}
-                                {t('Status')}
-                            </label>
+                    <div className="flex min-w-0 flex-col items-stretch gap-4 xl:flex-row xl:flex-wrap xl:items-end">
+                        <div className="min-w-0 flex-1 xl:min-w-[150px]">
                             <FormSelect
+                                label="Status"
                                 value={localFilters.status}
                                 onChange={(val) =>
                                     setLocalFilters({ ...localFilters, status: val })
@@ -147,12 +148,9 @@ export default function VendorSummaryReport({ vendors, stats, filters }) {
                                 options={statusOptions}
                             />
                         </div>
-                        <div className="flex-1 min-w-[150px]">
-                            <label className="block text-sm font-medium text-(--color-text-secondary) mb-1">
-                                {/* Translate the fixed compliance filter label. */}
-                                {t('Compliance')}
-                            </label>
+                        <div className="min-w-0 flex-1 xl:min-w-[150px]">
                             <FormSelect
+                                label="Compliance"
                                 value={localFilters.compliance}
                                 onChange={(val) =>
                                     setLocalFilters({ ...localFilters, compliance: val })
@@ -161,11 +159,19 @@ export default function VendorSummaryReport({ vendors, stats, filters }) {
                             />
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
-                            <ActionButton variant="primary" onClick={handleFilter}>
+                            <ActionButton
+                                variant="outline"
+                                onClick={handleFilter}
+                                className="min-h-9 justify-center whitespace-normal"
+                            >
                                 Apply Filters
                             </ActionButton>
                             {can['reports.export'] && (
-                                <ActionButton variant="primary" onClick={handleExport}>
+                                <ActionButton
+                                    variant="primary"
+                                    onClick={handleExport}
+                                    className="min-h-9 justify-center whitespace-normal"
+                                >
                                     Export CSV
                                 </ActionButton>
                             )}
@@ -180,12 +186,14 @@ export default function VendorSummaryReport({ vendors, stats, filters }) {
                         count: vendors?.data?.length || 0,
                     })}
                 >
-                    <DataTable
-                        columns={columns}
-                        data={vendors?.data || []}
-                        links={vendors?.links || []}
-                        emptyMessage="No vendors found for the selected filters."
-                    />
+                    <div className="min-w-0 [&_table]:min-w-[760px] [&_table]:table-fixed [&_td]:[overflow-wrap:anywhere] [&_nav]:flex-wrap [&_nav]:gap-1 [&_nav_a]:min-h-9 [&_nav_a]:focus-visible:outline-2">
+                        <DataTable
+                            columns={columns}
+                            data={vendors?.data || []}
+                            links={vendors?.links || []}
+                            emptyMessage="No vendors found for the selected filters."
+                        />
+                    </div>
                 </Card>
             </div>
         </AdminLayout>

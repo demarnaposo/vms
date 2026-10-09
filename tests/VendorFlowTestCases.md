@@ -79,11 +79,12 @@
 | VST-003 | Under Review → Approved | Vendor under review | 1. Admin approves with comment 2. Confirm | Status = 'approved', approved_at set | Critical |
 | VST-004 | Approved → Active | Vendor approved, docs verified | 1. Admin activates vendor | Status = 'active', activated_at set | Critical |
 | VST-005 | Active → Suspended | Vendor active | 1. Admin suspends with comment | Status = 'suspended', suspended_at set | High |
-| VST-006 | Suspended → Active | Vendor suspended | 1. Admin reactivates | Status = 'active' | High |
+| VST-006 | Suspended → Active | Vendor suspended and activation readiness passed | 1. Authorized staff activates | Status = 'active'; vendor can log in again | High |
 | VST-007 | Active → Terminated | Vendor active | 1. Admin terminates | Status = 'terminated', terminated_at set | High |
 | VST-008 | Invalid: Draft → Active | Vendor in Draft | 1. Try to activate directly | Error: Invalid transition | Critical |
-| VST-009 | Invalid: Terminated → Active | Vendor terminated | 1. Try to reactivate | Error: Invalid transition (terminal state) | Critical |
+| VST-009 | Invalid: Terminated → Active | Vendor terminated | 1. Try to activate directly | Error: Invalid transition; review and approval are required first | Critical |
 | VST-010 | Rejection requires comment | Vendor submitted | 1. Admin rejects without comment | Error: Comment required | High |
+| VST-011 | Terminated → Under Review | Vendor terminated | 1. Staff with terminate permission reactivates with a reason | Status = 'under_review'; login is allowed while awaiting approval and activation | High |
 
 ### 2.3 Vendor Profile Management
 

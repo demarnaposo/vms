@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'payments_disabled' => 'Payment permissions cannot be changed while the payments module is disabled.',
     'role_code' => 'role code',
     'role_name' => 'role name',
     'roles' => 'staff roles',

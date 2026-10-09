@@ -1,3 +1,4 @@
+import { DisabledButton } from '@/Components/DisabledActionTooltip';
 import { router, useForm } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -273,13 +274,14 @@ export default function Contact() {
                                     )}
                                 </div>
 
-                                <button
+                                <DisabledButton
                                     type="submit"
                                     disabled={form.processing}
+                                    disabledReason={'A request is in progress. Please wait.'}
                                     className="btn-primary w-full justify-center"
                                 >
                                     {form.processing ? t('Sending...') : t('Send Message')}
-                                </button>
+                                </DisabledButton>
                             </form>
                         </div>
                     </div>

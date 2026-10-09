@@ -5,7 +5,12 @@ import { useLanguage } from '@/Contexts/LanguageContext';
 // Localize fixed performance metric master records for vendors.
 import { translateSystemMasterDataField } from '@/i18n/systemMasterData';
 
-export default function Performance({ vendor, performanceScores = [], metrics = [] }) {
+export default function Performance({
+    vendor,
+    performanceScores = [],
+    metrics = [],
+    breakdown = [],
+}) {
     // Use the selected UI locale for labels and score-period dates.
     const { language, t } = useLanguage();
     const dateLocale = language === 'id' ? 'id-ID' : 'en-IN';
@@ -41,7 +46,7 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
             subtitle="Track your performance metrics and scores"
             actions={
                 <div
-                    className={`px-4 py-2 rounded-xl font-semibold ${
+                    className={`px-3 py-2 text-sm rounded-xl font-semibold ${
                         overallScore >= 80
                             ? 'bg-(--color-success-light) text-(--color-success-dark)'
                             : overallScore >= 60
@@ -60,17 +65,17 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
 
     return (
         <VendorLayout title="Performance" activeNav="Performance" header={header} vendor={vendor}>
-            <div className="space-y-8">
+            <div className="min-w-0 space-y-6">
                 <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl overflow-hidden shadow-token-sm">
-                    <div className="bg-gradient-primary p-8 text-white">
-                        <div className="flex flex-col md:flex-row items-center gap-8">
+                    <div className="bg-gradient-primary min-w-0 p-4 sm:p-6 lg:p-8 text-white">
+                        <div className="flex min-w-0 flex-col xl:flex-row items-center gap-6">
                             <div className="text-center">
                                 <div className="text-7xl font-bold mb-2">{overallScore}</div>
                                 {/* Translate the fixed score scale label. */}
                                 <div className="text-lg opacity-90">{t('out of 100')}</div>
                             </div>
 
-                            <div className="flex-1 w-full max-w-md">
+                            <div className="min-w-0 flex-1 w-full max-w-md">
                                 <div className="relative h-4 bg-(--color-bg-primary)/20 rounded-full overflow-hidden">
                                     <div
                                         className="absolute left-0 top-0 h-full bg-(--color-bg-primary) rounded-full transition-all duration-1000"
@@ -88,7 +93,7 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                         </div>
                     </div>
 
-                    <div className="p-6">
+                    <div className="min-w-0 p-4 sm:p-6">
                         <p className="text-(--color-text-tertiary)">
                             {/* Translate only system-generated score guidance. */}
                             {t(
@@ -122,8 +127,14 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                                 const scoreData = performanceScores.find(
                                     (s) => s.performance_metric_id === metric.id
                                 );
-                                const maxScore = Number(metric.max_score || 10);
-                                const score = Number(scoreData?.score || 0);
+                                const maxScore = Number(metric.max_score || 4);
+                                const current = breakdown.find(
+                                    (entry) => entry.metric_id === metric.id
+                                );
+                                const score = Number(
+                                    current?.current_score ?? scoreData?.score ?? 0
+                                );
+                                const hasScore = current ? current.score_count > 0 : !!scoreData;
                                 const scorePercentage = toPercentage(score, maxScore);
 
                                 return (
@@ -131,8 +142,8 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                                         key={metric.id}
                                         className="p-4 hover:bg-(--color-bg-hover) transition-colors"
                                     >
-                                        <div className="flex items-center justify-between mb-3">
-                                            <div>
+                                        <div className="flex min-w-0 flex-col items-start justify-between gap-3 mb-3 sm:flex-row">
+                                            <div className="min-w-0 flex-1 [overflow-wrap:anywhere]">
                                                 <h3 className="font-semibold text-(--color-text-primary)">
                                                     {/* Translate known metric labels and retain custom values. */}
                                                     {translateSystemMasterDataField(
@@ -151,16 +162,23 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                                                         'description'
                                                     )}
                                                 </p>
+                                                <p className="mt-1 text-xs text-(--color-brand-primary)">
+                                                    {t('Weight: :weight%', {
+                                                        weight: new Intl.NumberFormat(
+                                                            language === 'id' ? 'id-ID' : 'en-US'
+                                                        ).format(Number(metric.weight)),
+                                                    })}
+                                                </p>
                                             </div>
                                             <div
-                                                className={`text-2xl font-bold ${score > 0 ? getScoreColor(scorePercentage) : 'text-(--color-text-muted)'}`}
+                                                className={`shrink-0 text-2xl font-bold ${hasScore ? getScoreColor(scorePercentage) : 'text-(--color-text-muted)'}`}
                                             >
-                                                {score > 0 ? `${score}/${maxScore}` : 'N/A'}
+                                                {hasScore ? `${score}/${maxScore}` : 'N/A'}
                                             </div>
                                         </div>
                                         <div className="relative h-2 bg-(--color-bg-tertiary) rounded-full overflow-hidden">
                                             <div
-                                                className={`absolute left-0 top-0 h-full rounded-full transition-all duration-700 ${score > 0 ? getScoreBgClass(scorePercentage) : 'bg-(--color-bg-muted)'}`}
+                                                className={`absolute left-0 top-0 h-full rounded-full transition-all duration-700 ${hasScore ? getScoreBgClass(scorePercentage) : 'bg-(--color-bg-muted)'}`}
                                                 style={{ width: `${scorePercentage}%` }}
                                             />
                                         </div>
@@ -172,7 +190,7 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                 </Card>
 
                 <Card title="Recent Performance">
-                    <div className="p-6">
+                    <div className="min-w-0">
                         {performanceScores.length === 0 ? (
                             <div className="text-center text-(--color-text-tertiary) py-8">
                                 <div className="text-4xl mb-4 inline-flex justify-center w-full">
@@ -187,15 +205,15 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                         ) : (
                             <div className="space-y-4">
                                 {performanceScores.slice(0, 5).map((score) => {
-                                    const maxScore = Number(score.metric?.max_score || 100);
+                                    const maxScore = Number(score.metric?.max_score || 4);
                                     const normalizedScore = toPercentage(score.score, maxScore);
 
                                     return (
                                         <div
                                             key={score.id}
-                                            className="flex items-center justify-between p-3 bg-(--color-bg-secondary) rounded-xl"
+                                            className="flex min-w-0 flex-wrap items-center justify-between gap-3 p-3 bg-(--color-bg-secondary) rounded-xl"
                                         >
-                                            <div>
+                                            <div className="min-w-0 flex-1 [overflow-wrap:anywhere]">
                                                 <div className="font-medium text-(--color-text-primary)">
                                                     {/* Translate fixed master metrics in history and preserve custom names. */}
                                                     {translateSystemMasterDataField(
@@ -213,7 +231,7 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                                                 </div>
                                             </div>
                                             <div
-                                                className={`text-xl font-bold ${getScoreColor(normalizedScore)}`}
+                                                className={`shrink-0 text-xl font-bold ${getScoreColor(normalizedScore)}`}
                                             >
                                                 {score.score}/{maxScore}
                                             </div>
@@ -226,8 +244,8 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                 </Card>
 
                 <Card title="Improve Your Score">
-                    <div className="p-6">
-                        <div className="grid md:grid-cols-2 gap-4">
+                    <div className="min-w-0">
+                        <div className="grid min-w-0 grid-cols-1 xl:grid-cols-2 gap-4 [&>div]:min-w-0">
                             {[
                                 {
                                     icon: 'running',
@@ -254,10 +272,10 @@ export default function Performance({ vendor, performanceScores = [], metrics = 
                                     key={index}
                                     className="flex items-start gap-3 p-4 bg-(--color-bg-secondary) rounded-xl"
                                 >
-                                    <span className="text-2xl inline-flex">
+                                    <span className="shrink-0 text-2xl inline-flex">
                                         <AppIcon name={tip.icon} className="h-6 w-6" />
                                     </span>
-                                    <div>
+                                    <div className="min-w-0 [overflow-wrap:anywhere]">
                                         <h4 className="font-semibold text-(--color-text-primary)">
                                             {/* Tip copy is static application text. */}
                                             {t(tip.title)}

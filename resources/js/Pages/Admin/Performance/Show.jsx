@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { ActionLink } from '@/Components/ActionControls';
 import { AdminLayout, Badge, Card, DataTable, PageHeader, StatCard, StatGrid } from '@/Components';
 // Translate fixed performance detail copy while retaining vendor and metric data.
 import { useLanguage } from '@/Contexts/LanguageContext';
@@ -44,7 +44,10 @@ export default function PerformanceShow({ vendor, breakdown = [], history = [] }
             align: 'center',
             render: (row) => (
                 <span className="text-(--color-text-secondary)">
-                    {Math.round(row.weight * 100)}%
+                    {new Intl.NumberFormat(language === 'id' ? 'id-ID' : 'en-US').format(
+                        Number(row.weight)
+                    )}
+                    %
                 </span>
             ),
         },
@@ -53,7 +56,9 @@ export default function PerformanceShow({ vendor, breakdown = [], history = [] }
             align: 'center',
             render: (row) => (
                 <span className="font-semibold text-(--color-text-primary)">
-                    {row.current_score}/{row.max_score}
+                    {row.current_score == null
+                        ? t('Not rated')
+                        : `${row.current_score}/${row.max_score}`}
                 </span>
             ),
         },
@@ -61,7 +66,9 @@ export default function PerformanceShow({ vendor, breakdown = [], history = [] }
             header: 'Average',
             align: 'center',
             render: (row) => (
-                <span className="text-(--color-text-secondary)">{row.average_score}</span>
+                <span className="text-(--color-text-secondary)">
+                    {row.average_score ?? t('Not rated')}
+                </span>
             ),
         },
         {
@@ -78,28 +85,32 @@ export default function PerformanceShow({ vendor, breakdown = [], history = [] }
         <PageHeader
             title={
                 <>
-                    {language === 'id' ? `${t('Performance')} ` : ''}
-                    {vendor?.company_name || t('Vendor')}
-                    {language === 'id' ? '' : ` ${t('Performance')}`}
+                    <span className="[overflow-wrap:anywhere]">
+                        {language === 'id' ? `${t('Performance')} ` : ''}
+                        {vendor?.company_name || t('Vendor')}
+                        {language === 'id' ? '' : ` ${t('Performance')}`}
+                    </span>
                 </>
             }
             subtitle="Detailed metric breakdown and monthly trend"
             actions={
-                <div className="flex items-center gap-2">
-                    <Link
+                <div className="flex w-full flex-wrap items-center gap-2 [&>a]:flex-1 sm:[&>a]:flex-none">
+                    <ActionLink
                         href={`/admin/performance/${vendor?.id}/rate`}
-                        className="px-4 py-2 rounded-lg bg-(--color-brand-primary) text-white! text-sm font-medium hover:bg-(--color-brand-primary-hover) transition-colors"
+                        variant="primary"
+                        className="min-h-9 justify-center whitespace-normal"
                     >
                         {/* Translate the fixed rating action. */}
                         {t('Add Rating')}
-                    </Link>
-                    <Link
+                    </ActionLink>
+                    <ActionLink
                         href="/admin/performance"
-                        className="px-4 py-2 rounded-lg border border-(--color-border-primary) text-(--color-text-secondary) text-sm font-medium hover:bg-(--color-bg-secondary) transition-colors"
+                        variant="outline"
+                        className="min-h-9 justify-center whitespace-normal"
                     >
                         {/* Translate the fixed back action. */}
                         {t('Back')}
-                    </Link>
+                    </ActionLink>
                 </div>
             }
         />
@@ -107,7 +118,7 @@ export default function PerformanceShow({ vendor, breakdown = [], history = [] }
 
     return (
         <AdminLayout title="Vendor Performance" activeNav="Performance" header={header}>
-            <div className="space-y-6">
+            <div className="min-w-0 space-y-6">
                 <StatGrid cols={4}>
                     <StatCard
                         label="Current Score"
@@ -146,7 +157,10 @@ export default function PerformanceShow({ vendor, breakdown = [], history = [] }
                     </div>
                 </Card>
 
-                <Card title="Metric Breakdown">
+                <Card
+                    title="Metric Breakdown"
+                    className="min-w-0 [&_table]:min-w-[640px] [&_table]:table-fixed [&_td]:[overflow-wrap:anywhere]"
+                >
                     <DataTable
                         columns={columns}
                         data={breakdown}
@@ -155,7 +169,7 @@ export default function PerformanceShow({ vendor, breakdown = [], history = [] }
                 </Card>
 
                 <Card title="Monthly Trend">
-                    <div className="p-4 space-y-3">
+                    <div className="min-w-0 space-y-3">
                         {history.length === 0 && (
                             <p className="text-(--color-text-tertiary)">
                                 {/* Translate the fixed empty history message. */}
@@ -166,7 +180,7 @@ export default function PerformanceShow({ vendor, breakdown = [], history = [] }
                         {history.map((entry) => (
                             <div
                                 key={entry.month}
-                                className="rounded-lg border border-(--color-border-primary) p-3 flex items-center justify-between"
+                                className="rounded-lg border border-(--color-border-primary) p-3 flex min-w-0 flex-wrap items-center justify-between gap-3 [&>div]:[overflow-wrap:anywhere]"
                             >
                                 <div>
                                     <div className="font-medium text-(--color-text-primary)">

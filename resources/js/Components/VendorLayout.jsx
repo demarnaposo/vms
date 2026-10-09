@@ -2,6 +2,7 @@ import { Head } from '@inertiajs/react';
 import React from 'react';
 import AppIcon from './AppIcon';
 import Sidebar from './Sidebar';
+import LayoutHeader from './LayoutHeader';
 // Translate vendor layout titles and status banners globally.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
@@ -102,27 +103,29 @@ export default function VendorLayout({
                         )}
                     </div>
 
-                    {/* Vendor Status Banner */}
-                    {currentBanner && (
-                        <div
-                            className={`px-4 md:px-8 py-4 text-center text-sm font-medium ${currentBanner.bg} ${currentBanner.text} animate-slide-left`}
-                        >
-                            <span className="inline-flex items-center gap-2">
-                                <AppIcon
-                                    name={currentBanner.icon}
-                                    className="h-5 w-5"
-                                    fallback={
-                                        <span className="text-lg leading-none">
-                                            {currentBanner.icon}
-                                        </span>
-                                    }
-                                />
-                                {t(currentBanner.message)}
-                            </span>
-                        </div>
-                    )}
+                    <LayoutHeader>
+                        {/* Vendor Status Banner */}
+                        {currentBanner && (
+                            <div
+                                className={`px-4 md:px-8 py-4 text-center text-sm font-medium ${currentBanner.bg} ${currentBanner.text} animate-slide-left`}
+                            >
+                                <span className="inline-flex items-center gap-2">
+                                    <AppIcon
+                                        name={currentBanner.icon}
+                                        className="h-5 w-5"
+                                        fallback={
+                                            <span className="text-lg leading-none">
+                                                {currentBanner.icon}
+                                            </span>
+                                        }
+                                    />
+                                    {t(currentBanner.message)}
+                                </span>
+                            </div>
+                        )}
 
-                    {header}
+                        {header}
+                    </LayoutHeader>
 
                     <div className="p-4 md:p-8 animate-fade-in">{children}</div>
                 </main>

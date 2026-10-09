@@ -83,7 +83,11 @@ export default function Notifications({
             )}
             actions={
                 unreadCount > 0 && (
-                    <ActionButton variant="primary" onClick={handleMarkAllAsRead}>
+                    <ActionButton
+                        variant="primary"
+                        className="min-h-9 justify-center whitespace-normal"
+                        onClick={handleMarkAllAsRead}
+                    >
                         Mark All as Read
                     </ActionButton>
                 )
@@ -106,11 +110,13 @@ export default function Notifications({
             header={header}
             vendor={vendor}
         >
-            <div className="space-y-6">
-                <div className="flex gap-2 overflow-x-auto pb-2">
+            <div className="min-w-0 space-y-6">
+                <div className="flex min-w-0 flex-wrap gap-2 pb-2">
                     {filters.map((f) => (
                         <button
                             key={f.id}
+                            type="button"
+                            aria-pressed={filter === f.id}
                             onClick={() =>
                                 router.get(
                                     '/vendor/notifications',
@@ -118,9 +124,9 @@ export default function Notifications({
                                     { preserveScroll: true }
                                 )
                             }
-                            className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
+                            className={`min-h-9 px-3 py-2 rounded-xl text-sm font-medium whitespace-normal transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-brand-primary) ${
                                 filter === f.id
-                                    ? 'bg-(--color-brand-primary) text-white'
+                                    ? 'theme-primary-action'
                                     : 'bg-(--color-bg-secondary) text-(--color-text-secondary) hover:bg-(--color-bg-hover)'
                             }`}
                         >
@@ -143,7 +149,7 @@ export default function Notifications({
 
                 <Card>
                     {displayNotifications.length === 0 ? (
-                        <div className="p-12 text-center text-(--color-text-tertiary)">
+                        <div className="p-4 sm:p-8 text-center text-(--color-text-tertiary)">
                             <div className="text-5xl mb-4 inline-flex justify-center w-full">
                                 <AppIcon name="notifications" className="h-12 w-12" />
                             </div>
@@ -169,15 +175,15 @@ export default function Notifications({
                                             isUnread ? 'bg-(--color-brand-primary-light)/50' : ''
                                         }`}
                                     >
-                                        <div className="flex items-start gap-4">
+                                        <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-3 xl:flex">
                                             <div
                                                 className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${typeInfo.color}`}
                                             >
                                                 <AppIcon name={typeInfo.icon} className="h-5 w-5" />
                                             </div>
 
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-start justify-between gap-2">
+                                            <div className="flex-1 min-w-0 [overflow-wrap:anywhere]">
+                                                <div className="flex min-w-0 flex-col items-start justify-between gap-2 sm:flex-row sm:flex-wrap">
                                                     <h3
                                                         className={`font-medium ${
                                                             isUnread
@@ -212,7 +218,7 @@ export default function Notifications({
                                                         <ActionAnchor
                                                             variant="outline"
                                                             href={notification.data.action_url}
-                                                            className="mt-2"
+                                                            className="mt-2 min-h-9 justify-center whitespace-normal"
                                                         >
                                                             {/* Preserve stored action text and translate only the system fallback. */}
                                                             {notification.data.action_text ||
@@ -227,7 +233,7 @@ export default function Notifications({
                                                     onClick={() =>
                                                         handleMarkAsRead(notification.id)
                                                     }
-                                                    className="shrink-0"
+                                                    className="col-start-2 w-fit min-h-9 shrink-0 justify-center whitespace-normal"
                                                 >
                                                     {t('Mark read')}
                                                 </ActionButton>
@@ -243,7 +249,7 @@ export default function Notifications({
 
                 {totalCount === 0 && (
                     <Card title="What notifications will you receive?">
-                        <div className="grid md:grid-cols-2 gap-4">
+                        <div className="grid min-w-0 grid-cols-1 xl:grid-cols-2 gap-4 [&>div]:min-w-0">
                             {[
                                 {
                                     icon: 'documents',

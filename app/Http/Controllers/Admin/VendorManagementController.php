@@ -75,6 +75,7 @@ class VendorManagementController extends Controller
         }
 
         $vendor->load([
+            'businessTypeRecord',
             'vendorCategory',
             'documents:id,vendor_id,document_type_id,file_name,verification_status,verification_notes,expiry_date,is_current,created_at' => [
                 'documentType:id,name,display_name',
@@ -110,6 +111,7 @@ class VendorManagementController extends Controller
         // Compute mandatory document verification readiness (Feature 3)
         $mandatoryDocTypes = DocumentType::where('is_mandatory', true)
             ->where('is_active', true)
+            ->ordered()
             ->get(['id', 'name', 'display_name', 'has_expiry']);
 
         $currentDocs = $vendor->documents->where('is_current', true);

@@ -15,6 +15,7 @@ const AUDIT_EVENT_LABELS = Object.freeze({
 
 // Map known model class names to UI labels without changing stored morph types.
 const AUDIT_ENTITY_LABELS = Object.freeze({
+    'App\\Models\\BusinessType': 'Business Type',
     'App\\Models\\Vendor': 'Vendor',
     'App\\Models\\VendorDocument': 'Vendor Document',
     'App\\Models\\PaymentRequest': 'Payment Request',

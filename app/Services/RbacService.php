@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use App\Support\PaymentsModule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Spatie\Permission\PermissionRegistrar;
@@ -102,8 +103,13 @@ class RbacService
             $this->assertManager();
             $role = $target ? Role::lockForUpdate()->findOrFail($target->id) : new Role;
             abort_unless(! $target || ($role->guard_name === 'web' && $role->is_staff && $role->name !== Role::VENDOR), 404);
+            abort_if(! PaymentsModule::enabled() && $role->name === Role::FINANCE_MANAGER, 404);
             $codes = array_keys(config('rbac.permissions'));
-            $permissions = Permission::whereIn('id', $data['permission_ids'])->where('guard_name', 'web')->whereIn('name', $codes)->get();
+            $submitted = Permission::whereIn('id', $data['permission_ids'])->where('guard_name', 'web')->get();
+            if (! PaymentsModule::enabled() && $submitted->contains(fn (Permission $permission) => PaymentsModule::isPaymentPermission($permission->name, $permission->group))) {
+                throw ValidationException::withMessages(['permission_ids' => __('staff.payments_disabled')]);
+            }
+            $permissions = $submitted->whereIn('name', $codes);
             if ($permissions->count() !== count($data['permission_ids'])) {
                 throw ValidationException::withMessages(['permission_ids' => __('alerts.rbac_invalid_permission')]);
             }
@@ -111,9 +117,10 @@ class RbacService
             $role->fill(['name' => $target ? $role->name : $data['name'], 'display_name' => $data['display_name'], 'description' => $data['description'] ?? null, 'is_staff' => true, 'guard_name' => 'web']);
             $role->save();
             if ($role->name !== Role::SUPER_ADMIN) {
-                // Preserve dormant legacy grants; they remain outside the operational catalogue.
-                $legacy = $role->permissions()->whereNotIn('name', $codes)->get();
-                $role->syncPermissions($permissions->merge($legacy));
+                // Hidden payment grants and dormant legacy grants are preserved from server state.
+                $preserved = $role->permissions()->get()->filter(fn (Permission $permission) => ! in_array($permission->name, $codes, true)
+                    || (! PaymentsModule::enabled() && PaymentsModule::isPaymentPermission($permission->name, $permission->group)));
+                $role->syncPermissions($permissions->merge($preserved)->unique('id'));
             }
             $this->clearUserCaches($role->users()->pluck('users.id')->all());
             AuditLog::log($target ? AuditLog::EVENT_UPDATED : AuditLog::EVENT_CREATED, $role, $old, ['name' => $role->name, 'permission_ids' => $role->permissions()->pluck('permissions.id')->all()], 'Staff role saved');
@@ -128,6 +135,7 @@ class RbacService
             $this->assertManager();
             $role = Role::lockForUpdate()->findOrFail($target->id);
             abort_unless($role->guard_name === 'web' && $role->is_staff, 404);
+            abort_if(! PaymentsModule::enabled() && $role->name === Role::FINANCE_MANAGER, 404);
             if (in_array($role->name, Role::builtInNames(), true) || $role->users()->exists()) {
                 throw ValidationException::withMessages(['role' => __('alerts.rbac_role_in_use')]);
             }

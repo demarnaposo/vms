@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Vendor;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -32,18 +31,17 @@ class PasswordResetLinkController extends Controller
             'email' => 'required|email',
         ]);
 
-        // Block suspended/terminated vendors from resetting password
         $user = User::where('email', $request->email)->first();
         if ($user && $user->isVendor()) {
             $vendor = $user->vendor;
-            if ($vendor && in_array($vendor->status, [
-                Vendor::STATUS_SUSPENDED,
-                Vendor::STATUS_TERMINATED,
-            ], true)) {
-                return back()->withErrors([
-                    // Localize the reset restriction while preserving the vendor status code.
-                    'email' => __('alerts.vendor_account_status', ['status' => $vendor->status]),
-                ]);
+            $error = match (true) {
+                $vendor?->blocksUserAccess() => __('alerts.vendor_account_status', ['status' => __('alerts.actions.'.$vendor->status)]),
+                ! $user->is_active => __('alerts.user_account_inactive'),
+                default => null,
+            };
+
+            if ($error !== null) {
+                return back()->withErrors(['email' => $error]);
             }
         }
 

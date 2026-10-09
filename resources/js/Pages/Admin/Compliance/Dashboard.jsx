@@ -1,4 +1,4 @@
-import { ActionButton } from '@/Components/ActionControls';
+import { ActionButton, ActionLink } from '@/Components/ActionControls';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import {
@@ -14,6 +14,7 @@ import {
     StatGrid,
 } from '@/Components';
 import { formatDateTime } from '@/utils/dateFormatters';
+import { paymentsEnabled } from '@/utils/paymentModule';
 // Translate compliance dashboard UI while preserving database result content.
 import { useLanguage } from '@/Contexts/LanguageContext';
 // Localize recognized compliance rule master records.
@@ -25,7 +26,8 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
     // Resolve only static dashboard labels through the shared language context.
     const { language, t } = useLanguage();
     const dateLocale = language === 'id' ? 'id-ID' : 'en-IN';
-    const { auth } = usePage().props;
+    const { auth, features } = usePage().props;
+    const isPaymentsEnabled = paymentsEnabled(features);
     const can = auth?.can || {};
     const [showConfirmModal, setShowConfirmModal] = useState(false);
 
@@ -45,7 +47,7 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
             subtitle="Monitor vendor compliance status"
             actions={
                 can.run_compliance && (
-                    <ActionButton onClick={() => setShowConfirmModal(true)}>
+                    <ActionButton className="min-h-9" onClick={() => setShowConfirmModal(true)}>
                         Run Evaluation
                     </ActionButton>
                 )
@@ -56,9 +58,9 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
     return (
         <AdminLayout title="Compliance Dashboard" activeNav="Compliance" header={header}>
             {/* Localize only dashboard labels and controls, not compliance data from the database. */}
-            <div className="space-y-8">
+            <div className="min-w-0 space-y-6">
                 {/* Stats */}
-                <StatGrid>
+                <StatGrid cols={4}>
                     <StatCard
                         label="Compliant"
                         value={stats?.compliant || 0}
@@ -85,23 +87,23 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                     />
                 </StatGrid>
 
-                <div className="grid lg:grid-cols-2 gap-8">
+                <div className="grid min-w-0 grid-cols-1 gap-6 xl:grid-cols-2 [&>div]:min-w-0">
                     {/* At Risk Vendors */}
                     <Card title="Vendors Needing Attention">
-                        <div className="p-4 space-y-3 max-h-[400px] overflow-y-auto">
+                        <div className="min-w-0 space-y-3 max-h-[400px] overflow-y-auto overscroll-contain">
                             {atRiskVendors && atRiskVendors.length > 0 ? (
                                 atRiskVendors.map((vendor) => (
                                     <Link
                                         key={vendor.id}
                                         href={`/admin/vendors/${vendor.id}`}
-                                        className="flex items-center justify-between p-3 rounded-xl bg-(--color-bg-secondary) hover:bg-(--color-bg-tertiary) border border-(--color-border-secondary) transition-colors"
+                                        className="flex min-w-0 flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-(--color-bg-secondary) hover:bg-(--color-bg-tertiary) border border-(--color-border-secondary) transition-colors"
                                     >
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-xl bg-(--color-brand-primary-light) flex items-center justify-center">
+                                        <div className="flex min-w-0 flex-1 items-center gap-3">
+                                            <div className="shrink-0 w-10 h-10 rounded-xl bg-(--color-brand-primary-light) flex items-center justify-center">
                                                 <AppIcon name="vendors" className="h-5 w-5" />
                                             </div>
-                                            <div>
-                                                <div className="text-(--color-text-primary) font-medium">
+                                            <div className="min-w-0">
+                                                <div className="min-w-0 [overflow-wrap:anywhere] text-(--color-text-primary) font-medium">
                                                     {vendor.company_name}
                                                 </div>
                                                 <div className="text-sm text-(--color-text-tertiary)">
@@ -123,22 +125,22 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
 
                     {/* Recent Failures */}
                     <Card title="Recent Compliance Failures">
-                        <div className="p-4 space-y-3 max-h-[400px] overflow-y-auto">
+                        <div className="min-w-0 space-y-3 max-h-[400px] overflow-y-auto overscroll-contain">
                             {recentResults && recentResults.length > 0 ? (
                                 recentResults.map((result) => (
                                     <div
                                         key={result.id}
                                         className="p-3 rounded-xl bg-(--color-bg-secondary) border border-(--color-border-secondary) border-l-4 border-l-(--color-danger)"
                                     >
-                                        <div className="flex items-center justify-between">
-                                            <div className="text-(--color-text-primary) font-medium">
+                                        <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
+                                            <div className="min-w-0 [overflow-wrap:anywhere] text-(--color-text-primary) font-medium">
                                                 {result.vendor?.company_name}
                                             </div>
                                             <div className="text-xs text-(--color-text-muted)">
                                                 {formatDateTime(result.evaluated_at, dateLocale)}
                                             </div>
                                         </div>
-                                        <div className="text-sm text-(--color-danger) mt-1">
+                                        <div className="[overflow-wrap:anywhere] text-sm text-(--color-danger) mt-1">
                                             {/* Translate system rules and preserve custom rules. */}
                                             {translateSystemMasterDataField(
                                                 language,
@@ -148,7 +150,7 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                                                 result.rule?.name
                                             )}
                                         </div>
-                                        <div className="text-sm text-(--color-text-tertiary) mt-1">
+                                        <div className="[overflow-wrap:anywhere] text-sm text-(--color-text-tertiary) mt-1">
                                             {/* Translate known system details and retain custom database text. */}
                                             {translateComplianceDetails(
                                                 language,
@@ -170,17 +172,24 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                 {/* Compliance Rules */}
                 <Card
                     title="Compliance Rules"
+                    className="min-w-0 [&>div:first-child]:flex-wrap [&>div:first-child]:gap-3"
                     action={
-                        <Link
+                        <ActionLink
                             href="/admin/compliance/rules"
-                            className="text-(--color-brand-primary) hover:text-(--color-brand-primary-hover) text-sm font-medium"
+                            variant="outline"
+                            className="min-h-9 justify-center whitespace-normal"
                         >
                             {t('Manage Rules')}
-                        </Link>
+                        </ActionLink>
                     }
                 >
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
+                    <div
+                        className="min-w-0 overflow-x-auto overscroll-x-contain"
+                        role="region"
+                        aria-label={t('Compliance Rules')}
+                        tabIndex={0}
+                    >
+                        <table className="w-full min-w-[640px] table-fixed [&_td]:[overflow-wrap:anywhere]">
                             <thead>
                                 <tr className="border-b border-(--color-border-primary) bg-(--color-bg-secondary)">
                                     <th className="text-left p-4 text-xs font-semibold text-(--color-text-tertiary) uppercase tracking-wider">
@@ -192,9 +201,11 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                                     <th className="text-center p-4 text-xs font-semibold text-(--color-text-tertiary) uppercase tracking-wider">
                                         {t('Penalty')}
                                     </th>
-                                    <th className="text-center p-4 text-xs font-semibold text-(--color-text-tertiary) uppercase tracking-wider">
-                                        {t('Blocks Payment')}
-                                    </th>
+                                    {isPaymentsEnabled && (
+                                        <th className="text-center p-4 text-xs font-semibold text-(--color-text-tertiary) uppercase tracking-wider">
+                                            {t('Blocks Payment')}
+                                        </th>
+                                    )}
                                     <th className="text-center p-4 text-xs font-semibold text-(--color-text-tertiary) uppercase tracking-wider">
                                         {t('Failures')}
                                     </th>
@@ -208,7 +219,7 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                                             className="border-b border-(--color-border-secondary) hover:bg-(--color-bg-hover)"
                                         >
                                             <td className="p-4">
-                                                <div className="text-(--color-text-primary) font-medium">
+                                                <div className="min-w-0 [overflow-wrap:anywhere] text-(--color-text-primary) font-medium">
                                                     {/* Resolve the fixed rule label from its stable name. */}
                                                     {translateSystemMasterDataField(
                                                         language,
@@ -235,17 +246,19 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
                                             <td className="p-4 text-center text-(--color-text-primary) font-medium">
                                                 {rule.penalty_points}
                                             </td>
-                                            <td className="p-4 text-center">
-                                                {rule.blocks_payment ? (
-                                                    <span className="text-(--color-danger) font-medium">
-                                                        {t('Yes')}
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-(--color-text-muted)">
-                                                        {t('No')}
-                                                    </span>
-                                                )}
-                                            </td>
+                                            {isPaymentsEnabled && (
+                                                <td className="p-4 text-center">
+                                                    {rule.blocks_payment ? (
+                                                        <span className="text-(--color-danger) font-medium">
+                                                            {t('Yes')}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-(--color-text-muted)">
+                                                            {t('No')}
+                                                        </span>
+                                                    )}
+                                                </td>
+                                            )}
                                             <td className="p-4 text-center text-(--color-text-primary) font-medium">
                                                 {rule.failures_count || 0}
                                             </td>
@@ -258,25 +271,27 @@ export default function ComplianceDashboard({ stats, atRiskVendors, recentResult
             </div>
 
             {/* Confirm Evaluation Modal */}
-            <Modal
-                isOpen={showConfirmModal}
-                onClose={() => setShowConfirmModal(false)}
-                title="Run Compliance Evaluation"
-                footer={
-                    <>
-                        <ModalCancelButton onClick={() => setShowConfirmModal(false)} />
-                        <ModalPrimaryButton onClick={runEvaluation}>
-                            Run Evaluation
-                        </ModalPrimaryButton>
-                    </>
-                }
-            >
-                <p className="text-(--color-text-secondary)">
-                    {t(
-                        'This will run compliance evaluation for all vendors. Are you sure you want to proceed?'
-                    )}
-                </p>
-            </Modal>
+            <div className="[&_.glass-modal]:max-h-[calc(100vh-2rem)] [&_.glass-modal]:overflow-y-auto [&_.glass-modal]:overscroll-contain [&_.glass-modal]:p-4 sm:[&_.glass-modal]:p-6 [&_.glass-modal_h3]:break-words">
+                <Modal
+                    isOpen={showConfirmModal}
+                    onClose={() => setShowConfirmModal(false)}
+                    title="Run Compliance Evaluation"
+                    footer={
+                        <div className="flex w-full flex-col-reverse gap-3 sm:flex-row sm:justify-end [&>button]:min-h-9 [&>button]:whitespace-normal [&>button]:focus-visible:outline-2 [&>button]:focus-visible:outline-(--color-brand-primary)">
+                            <ModalCancelButton onClick={() => setShowConfirmModal(false)} />
+                            <ModalPrimaryButton onClick={runEvaluation}>
+                                Run Evaluation
+                            </ModalPrimaryButton>
+                        </div>
+                    }
+                >
+                    <p className="text-(--color-text-secondary)">
+                        {t(
+                            'This will run compliance evaluation for all vendors. Are you sure you want to proceed?'
+                        )}
+                    </p>
+                </Modal>
+            </div>
         </AdminLayout>
     );
 }

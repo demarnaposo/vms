@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import AppIcon from './AppIcon';
 import { useLanguage } from '@/Contexts/LanguageContext';
 
-const STORAGE_KEY = 'vms-theme';
-const DEFAULT_THEME = 'aurora';
+import { DEFAULT_THEME, getInitialTheme, persistTheme } from '@/utils/themePreferences';
 
 const THEME_OPTIONS = [
     {
@@ -44,18 +43,6 @@ function applyTheme(theme) {
     }
 }
 
-function getInitialTheme() {
-    if (typeof window === 'undefined') {
-        return DEFAULT_THEME;
-    }
-
-    return (
-        window.localStorage.getItem(STORAGE_KEY) ||
-        document.documentElement.dataset.theme ||
-        DEFAULT_THEME
-    );
-}
-
 export default function ThemeSwitcher({ className = '', compact = false, align = 'right' }) {
     const { t } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
@@ -88,12 +75,14 @@ export default function ThemeSwitcher({ className = '', compact = false, align =
         };
     }, []);
 
-    const currentOption = THEME_OPTIONS.find((option) => option.id === theme) || THEME_OPTIONS[0];
+    const currentOption =
+        THEME_OPTIONS.find((option) => option.id === theme) ||
+        THEME_OPTIONS.find((option) => option.id === DEFAULT_THEME);
 
     const handleSelect = (nextTheme) => {
         setTheme(nextTheme);
         applyTheme(nextTheme);
-        window.localStorage.setItem(STORAGE_KEY, nextTheme);
+        persistTheme(nextTheme);
         setIsOpen(false);
     };
 

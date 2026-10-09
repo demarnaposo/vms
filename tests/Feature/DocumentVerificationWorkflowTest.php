@@ -60,7 +60,7 @@ class DocumentVerificationWorkflowTest extends TestCase
         $this->documentType = DocumentType::create([
             'name' => 'pan_card',
             // Use the Indonesian NIB document label for the stable master key.
-            'display_name' => 'Business Identification Number (NIB) Document',
+            'display_name' => 'NIB/OSS (Business Identification Number)',
             'description' => 'Deed verification',
             'is_mandatory' => true,
             'has_expiry' => false,
@@ -99,7 +99,7 @@ class DocumentVerificationWorkflowTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        $response->assertSessionHas('success', 'Business Identification Number (NIB) Document verified successfully.');
+        $response->assertSessionHas('success', 'NIB/OSS (Business Identification Number) verified successfully.');
 
         $document->refresh();
         $this->assertSame(VendorDocument::STATUS_VERIFIED, $document->verification_status);
@@ -156,12 +156,12 @@ class DocumentVerificationWorkflowTest extends TestCase
         $this->actingAs($this->opsUser)
             ->withUnencryptedCookie('vms_locale', 'id')
             ->post(route('admin.documents.verify', $verifiedDocument))
-            ->assertSessionHas('success', 'NIB OSS berhasil diverifikasi.');
+            ->assertSessionHas('success', 'NIB/OSS (Nomor Induk Berusaha) berhasil diverifikasi.');
 
         $this->actingAs($this->opsUser)
             ->withUnencryptedCookie('vms_locale', 'id')
             ->post(route('admin.documents.reject', $rejectedDocument), ['reason' => 'Not valid'])
-            ->assertSessionHas('success', 'NIB OSS ditolak.');
+            ->assertSessionHas('success', 'NIB/OSS (Nomor Induk Berusaha) ditolak.');
     }
 
     // Preserve custom database document labels inside localized alerts.
@@ -195,5 +195,17 @@ class DocumentVerificationWorkflowTest extends TestCase
             'is_current' => true,
             'verification_status' => $status,
         ]);
+    }
+
+    public function test_company_profile_verification_shares_source_metadata_for_the_toast(): void
+    {
+        $this->documentType = DocumentType::firstOrCreate(['name' => 'company_profile'], ['display_name' => 'Company Profile', 'is_active' => true, 'has_expiry' => false]);
+        $document = $this->createDocument(VendorDocument::STATUS_PENDING, 'profile.pdf');
+        $this->actingAs($this->opsUser)->post(route('admin.documents.verify', $document))
+            ->assertSessionHas('success_i18n', ['message' => ':document verified successfully.', 'document_type' => ['name' => 'company_profile', 'display_name' => 'Company Profile']]);
+        $this->get(route('admin.documents.index'))->assertInertia(fn (Assert $page) => $page
+            ->where('flash.success_i18n.message', ':document verified successfully.')
+            ->where('flash.success_i18n.document_type.name', 'company_profile')
+            ->where('flash.success_i18n.document_type.display_name', 'Company Profile'));
     }
 }

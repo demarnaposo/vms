@@ -229,6 +229,7 @@ export default function Payments({ vendor, payments = { data: [] }, paymentStats
                         <ModalPrimaryButton
                             onClick={handleSubmitRequest}
                             disabled={requestForm.processing}
+                            disabledReason={'A request is in progress. Please wait.'}
                         >
                             {requestForm.processing ? 'Submitting...' : 'Submit Request'}
                         </ModalPrimaryButton>

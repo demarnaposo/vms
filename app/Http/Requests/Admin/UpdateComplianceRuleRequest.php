@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Support\PaymentsModule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,8 +26,15 @@ class UpdateComplianceRuleRequest extends FormRequest
         return [
             'is_active' => 'boolean',
             'penalty_points' => 'integer|min:0|max:100',
-            'blocks_payment' => 'boolean',
+            'blocks_payment' => PaymentsModule::enabled() ? ['sometimes', 'boolean'] : ['missing'],
             'blocks_activation' => 'boolean',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'blocks_payment.missing' => __('alerts.compliance_payment_setting_disabled'),
         ];
     }
 }

@@ -1,3 +1,4 @@
+import { FormSelect } from '@/Components/FormInputs';
 import { ActionButton } from '@/Components/ActionControls';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
@@ -307,6 +308,7 @@ export default function PaymentsShow({ payment }) {
                                         variant="success"
                                         className="w-full justify-center"
                                         disabled={isApproving || isRejecting || isMarkingPaid}
+                                        disabledReason={'A request is in progress. Please wait.'}
                                         onClick={() => handleApprove('ops')}
                                     >
                                         {isApproving ? 'Validating...' : 'Validate Request'}
@@ -315,6 +317,7 @@ export default function PaymentsShow({ payment }) {
                                         variant="danger"
                                         className="w-full justify-center"
                                         disabled={isApproving || isRejecting || isMarkingPaid}
+                                        disabledReason={'A request is in progress. Please wait.'}
                                         onClick={() => openRejectModal('ops')}
                                     >
                                         Reject Request
@@ -338,6 +341,9 @@ export default function PaymentsShow({ payment }) {
                                             variant="success"
                                             className="w-full justify-center"
                                             disabled={isApproving || isRejecting || isMarkingPaid}
+                                            disabledReason={
+                                                'A request is in progress. Please wait.'
+                                            }
                                             onClick={() => handleApprove('finance')}
                                         >
                                             {isApproving ? 'Approving...' : 'Approve Payment'}
@@ -347,6 +353,7 @@ export default function PaymentsShow({ payment }) {
                                         variant="danger"
                                         className="w-full justify-center"
                                         disabled={isApproving || isRejecting || isMarkingPaid}
+                                        disabledReason={'A request is in progress. Please wait.'}
                                         onClick={() => openRejectModal('finance')}
                                     >
                                         Reject Payment
@@ -359,6 +366,7 @@ export default function PaymentsShow({ payment }) {
                                     variant="primary"
                                     className="w-full justify-center"
                                     disabled={isApproving || isRejecting || isMarkingPaid}
+                                    disabledReason={'A request is in progress. Please wait.'}
                                     onClick={() => setShowMarkPaidModal(true)}
                                 >
                                     {isMarkingPaid ? 'Saving...' : 'Mark as Paid'}
@@ -477,6 +485,11 @@ export default function PaymentsShow({ payment }) {
                         <ModalPrimaryButton
                             onClick={handleMarkPaid}
                             disabled={!paymentRef || isMarkingPaid}
+                            disabledReason={
+                                isMarkingPaid
+                                    ? 'A request is in progress. Please wait.'
+                                    : 'Enter the payment reference before continuing.'
+                            }
                         >
                             {isMarkingPaid ? 'Saving...' : 'Confirm Payment'}
                         </ModalPrimaryButton>
@@ -511,24 +524,23 @@ export default function PaymentsShow({ payment }) {
                             {/* Translate the label, not method values. */}
                             {t('Payment Method')}
                         </label>
-                        <select
+                        <FormSelect
                             id="payment_method"
                             name="payment_method"
-                            autoComplete="off"
+                            size="field"
+                            aria-label="Payment Method"
                             value={paymentMethod}
-                            onChange={(e) => setPaymentMethod(e.target.value)}
-                            className="input-field w-full"
-                        >
-                            {/* Preserve payment-method option values. */}
-                            <option value="">{t('Select Method...')}</option>
-                            <option value="NEFT">NEFT</option>
-                            <option value="RTGS">RTGS</option>
-                            <option value="IMPS">IMPS</option>
-                            <option value="UPI">UPI</option>
-                            {/* Translate fixed method labels without changing submitted codes. */}
-                            <option value="Wire Transfer">{t('Wire Transfer')}</option>
-                            <option value="Cheque">{t('Cheque')}</option>
-                        </select>
+                            onChange={setPaymentMethod}
+                            placeholder="Select method"
+                            options={[
+                                { value: 'NEFT', label: 'NEFT' },
+                                { value: 'RTGS', label: 'RTGS' },
+                                { value: 'IMPS', label: 'IMPS' },
+                                { value: 'UPI', label: 'UPI' },
+                                { value: 'Wire Transfer', label: 'Wire Transfer' },
+                                { value: 'Cheque', label: 'Cheque' },
+                            ]}
+                        />
                     </div>
                 </div>
             </Modal>
@@ -544,6 +556,11 @@ export default function PaymentsShow({ payment }) {
                             variant="danger"
                             onClick={handleReject}
                             disabled={!rejectReason || isRejecting}
+                            disabledReason={
+                                isRejecting
+                                    ? 'A request is in progress. Please wait.'
+                                    : 'Enter a rejection reason before continuing.'
+                            }
                         >
                             {isRejecting ? 'Rejecting...' : 'Confirm Rejection'}
                         </Button>

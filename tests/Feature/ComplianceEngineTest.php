@@ -95,6 +95,7 @@ class ComplianceEngineTest extends TestCase
 
     public function test_expired_document_still_blocks_compliance_until_a_valid_replacement_exists(): void
     {
+        config()->set('features.payments.enabled', true);
         $vendor = Vendor::factory()->create(['status' => Vendor::STATUS_ACTIVE]);
         $type = DocumentType::create([
             'name' => 'optional_insurance',

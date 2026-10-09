@@ -14,6 +14,18 @@ abstract class TestCase extends BaseTestCase
         $app = require __DIR__.'/../bootstrap/app.php';
         $app->make(Kernel::class)->bootstrap();
 
+        // Check isolation before Laravel initializes database-writing test traits.
+        $connection = $app->make('db')->connection();
+        if ($app->configurationIsCached()
+            || $connection->getDriverName() !== 'sqlite'
+            || $connection->getDatabaseName() !== ':memory:'
+            || config('cache.default') !== 'array'
+            || config('session.driver') !== 'array'
+            || config('mail.default') !== 'array'
+            || config('queue.default') !== 'sync') {
+            throw new \RuntimeException('Database-writing tests require uncached SQLite :memory: with array cache/session/mail and sync queue.');
+        }
+
         return $app;
     }
 
@@ -31,6 +43,7 @@ abstract class TestCase extends BaseTestCase
     {
         $overrides = [
             'APP_ENV' => 'testing',
+            'APP_CONFIG_CACHE' => sys_get_temp_dir().'/vms-tests-uncached-'.getmypid().'.php',
             'APP_LOCALE' => 'en',
             'APP_FALLBACK_LOCALE' => 'en',
             'DB_CONNECTION' => 'sqlite',

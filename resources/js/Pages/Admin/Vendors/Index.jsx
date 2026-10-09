@@ -1,7 +1,7 @@
-import { ActionLink } from '@/Components/ActionControls';
+import { ActionButton, ActionLink } from '@/Components/ActionControls';
 import { Link, router } from '@inertiajs/react';
 import { useState } from 'react';
-import { AdminLayout, PageHeader, DataTable, Badge, Button } from '@/Components';
+import { AdminLayout, PageHeader, DataTable, Badge, AppIcon } from '@/Components';
 // Translate vendor filters while retaining backend status values.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
@@ -82,17 +82,22 @@ export default function VendorsIndex({ vendors = {}, currentStatus = 'all', sear
             title="Vendor Management"
             subtitle="Manage and review vendor applications"
             actions={
-                <form onSubmit={handleSearch} className="flex gap-2">
+                <form onSubmit={handleSearch} className="flex min-w-0 max-w-full gap-2">
                     <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder={t('Search vendors...')}
-                        className="input-field"
+                        className="input-field h-9! w-52! min-w-0 px-3! py-[7px]! text-sm!"
                     />
-                    <Button type="submit" size="sm" className="self-center">
-                        Search
-                    </Button>
+                    <ActionButton
+                        type="submit"
+                        className="h-9 w-9 shrink-0 self-center justify-center px-0"
+                        aria-label={t('Search')}
+                        title={t('Search')}
+                    >
+                        <AppIcon name="search" className="h-4 w-4" />
+                    </ActionButton>
                 </form>
             }
         />
@@ -109,7 +114,7 @@ export default function VendorsIndex({ vendors = {}, currentStatus = 'all', sear
                             aria-current={currentStatus === status ? 'page' : undefined}
                             className={`staff-status-filter px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) focus-visible:ring-offset-2 ${
                                 currentStatus === status
-                                    ? 'bg-(--color-brand-primary) text-white shadow-token-primary'
+                                    ? 'theme-primary-action shadow-token-primary'
                                     : 'text-(--color-text-tertiary) hover:bg-(--color-bg-primary)'
                             }`}
                         >

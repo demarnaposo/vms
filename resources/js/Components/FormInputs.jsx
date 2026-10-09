@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { DisabledButton } from './DisabledActionTooltip';
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import AppIcon from './AppIcon';
 // Translate reusable form labels, placeholders, options, and errors.
@@ -16,6 +17,7 @@ export function FormInput({
     inputMode,
     autoComplete,
     disabled = false,
+    disabledReason,
     icon = null,
     className = '',
 }) {
@@ -76,19 +78,20 @@ export function FormInput({
                 />
                 {/* Keep password toggles non-submitting, bilingual, and accessible. */}
                 {isPassword && (
-                    <button
+                    <DisabledButton
                         type="button"
                         onClick={() =>
                             setIsPasswordVisible((currentVisibility) => !currentVisibility)
                         }
                         disabled={disabled}
+                        disabledReason={disabledReason}
                         aria-label={passwordToggleLabel}
                         aria-pressed={isPasswordVisible}
                         title={passwordToggleLabel}
                         className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-xl text-(--color-text-muted) transition-colors hover:text-(--color-text-primary) focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-(--color-brand-primary) disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         <AppIcon name={isPasswordVisible ? 'eye-off' : 'eye'} className="h-5 w-5" />
-                    </button>
+                    </DisabledButton>
                 )}
             </div>
             {error && (
@@ -107,6 +110,7 @@ export function FormTextarea({
     error = null,
     placeholder = '',
     required = false,
+    showRequiredIndicator = false,
     disabled = false,
     rows = 4,
     className = '',
@@ -120,7 +124,10 @@ export function FormTextarea({
                     htmlFor={id}
                     className="text-sm font-semibold text-(--color-text-primary) mb-2 block"
                 >
-                    {t(label)} {required && <span className="text-(--color-danger)">*</span>}
+                    {t(label)}{' '}
+                    {(required || showRequiredIndicator) && (
+                        <span className="text-(--color-danger)">*</span>
+                    )}
                 </label>
             )}
             <textarea
@@ -129,6 +136,9 @@ export function FormTextarea({
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={t(placeholder)}
                 required={required}
+                aria-required={required || showRequiredIndicator || undefined}
+                aria-invalid={error ? true : undefined}
+                aria-describedby={error ? `${id}-error` : undefined}
                 disabled={disabled}
                 rows={rows}
                 className={`
@@ -140,7 +150,11 @@ export function FormTextarea({
                 `}
             />
             {error && (
-                <p className="text-sm text-(--color-danger) mt-1.5 flex items-center gap-1">
+                <p
+                    id={`${id}-error`}
+                    role="alert"
+                    className="text-sm text-(--color-danger) mt-1.5 flex items-center gap-1"
+                >
                     <AppIcon name="warning" className="h-4 w-4" /> {t(error)}
                 </p>
             )}
@@ -153,257 +167,301 @@ export function FormSelect({
     value,
     onChange,
     options = [],
-    // Allow database-backed option labels to bypass UI translation.
     translateOptions = true,
     error = null,
     placeholder = 'Select...',
     required = false,
+    showRequiredIndicator = false,
     disabled = false,
+    disabledReason,
     name = '',
+    id,
+    size = 'form',
+    allowEmpty = true,
     className = '',
+    'aria-label': ariaLabel,
+    'aria-describedby': describedBy,
 }) {
     const { t } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
+    const [activeIndex, setActiveIndex] = useState(-1);
     const [menuStyle, setMenuStyle] = useState(null);
+    const [portalTarget, setPortalTarget] = useState(null);
     const selectRef = useRef(null);
+    const triggerRef = useRef(null);
     const menuRef = useRef(null);
-    const buttonId = useId();
+    const typeahead = useRef({ text: '', at: 0 });
+    const generatedId = useId();
+    const buttonId = id || generatedId;
     const listboxId = `${buttonId}-listbox`;
+    const open = isOpen && !disabled;
 
     const normalizedOptions = useMemo(() => {
-        return Array.isArray(options)
+        const rows = Array.isArray(options)
             ? options.map((option) => ({
                   value: option?.value ?? '',
                   label: option?.label ?? String(option?.value ?? ''),
+                  disabled: !!option?.disabled,
               }))
             : [];
-    }, [options]);
-
-    const normalizeValue = (nextValue) => String(nextValue ?? '');
-    const selectedOption = normalizedOptions.find(
-        (option) => normalizeValue(option.value) === normalizeValue(value)
+        return allowEmpty && !rows.some((option) => String(option.value) === '')
+            ? [{ value: '', label: placeholder, placeholder: true }, ...rows]
+            : rows;
+    }, [options, allowEmpty, placeholder]);
+    const selectedIndex = normalizedOptions.findIndex(
+        (option) => String(option.value) === String(value ?? '')
     );
-    const selectedLabel = selectedOption?.label ?? placeholder;
+    const selectedOption = normalizedOptions[selectedIndex];
+    // Retain an edit/draft value even when the current option catalogue excludes it.
+    const selectedLabel = selectedOption?.label ?? (value ? String(value) : placeholder);
+    const optionLabel = (option) =>
+        option.placeholder || translateOptions ? t(option.label) : option.label;
+    const selectedText = selectedOption
+        ? optionLabel(selectedOption)
+        : value != null && value !== ''
+          ? String(value)
+          : t(placeholder);
+    const selectable = normalizedOptions
+        .map((option, index) => (option.disabled ? -1 : index))
+        .filter((index) => index !== -1);
 
     const updateMenuPosition = useCallback(() => {
-        if (!selectRef.current || typeof window === 'undefined') {
-            return;
-        }
-
-        const rect = selectRef.current.getBoundingClientRect();
-        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-        const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
-        const viewportPadding = 8;
-        const offset = 8;
-        const preferredHeight = 240;
-        const minimumHeight = 140;
-
-        const spaceBelow = viewportHeight - rect.bottom - viewportPadding;
-        const spaceAbove = rect.top - viewportPadding;
-        const shouldOpenUpward = spaceBelow < minimumHeight && spaceAbove > spaceBelow;
-        const maxHeight = Math.max(
-            minimumHeight,
-            Math.min(preferredHeight, shouldOpenUpward ? spaceAbove : spaceBelow)
-        );
-        const width = Math.max(180, Math.min(rect.width, viewportWidth - viewportPadding * 2));
-        const left = Math.min(
-            Math.max(viewportPadding, rect.left),
-            Math.max(viewportPadding, viewportWidth - width - viewportPadding)
-        );
-        const top = shouldOpenUpward
-            ? Math.max(viewportPadding, rect.top - maxHeight - offset)
-            : Math.min(viewportHeight - maxHeight - viewportPadding, rect.bottom + offset);
-
+        if (!triggerRef.current) return;
+        const rect = triggerRef.current.getBoundingClientRect();
+        setPortalTarget(triggerRef.current.closest('[role="dialog"]') || document.body);
+        const viewportHeight = window.innerHeight;
+        const viewportWidth = window.innerWidth;
+        const spaceBelow = Math.max(0, viewportHeight - rect.bottom - 16);
+        const spaceAbove = Math.max(0, rect.top - 16);
+        const upward = spaceBelow < 140 && spaceAbove > spaceBelow;
+        const maxHeight = Math.max(1, Math.min(240, upward ? spaceAbove : spaceBelow));
+        const width = Math.max(1, Math.min(rect.width, viewportWidth - 16));
         setMenuStyle({
-            left,
-            maxHeight,
-            top,
+            left: Math.max(8, Math.min(rect.left, viewportWidth - width - 8)),
+            top: upward
+                ? Math.max(8, rect.top - maxHeight - 8)
+                : Math.max(8, Math.min(rect.bottom + 8, viewportHeight - maxHeight - 8)),
             width,
+            maxHeight,
         });
     }, []);
 
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            const target = event.target;
-            const clickedInsideTrigger = selectRef.current?.contains(target);
-            const clickedInsideMenu = menuRef.current?.contains(target);
-
-            if (!clickedInsideTrigger && !clickedInsideMenu) {
+        if (!open) return;
+        const outside = (event) => {
+            if (
+                !selectRef.current?.contains(event.target) &&
+                !menuRef.current?.contains(event.target)
+            ) {
                 setIsOpen(false);
             }
         };
+        document.addEventListener('pointerdown', outside);
+        return () => document.removeEventListener('pointerdown', outside);
+    }, [open]);
 
-        const handleEscape = (event) => {
-            if (event.key === 'Escape') {
-                setIsOpen(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        document.addEventListener('keydown', handleEscape);
-
+    useLayoutEffect(() => {
+        if (!open) return;
+        window.addEventListener('resize', updateMenuPosition);
+        window.addEventListener('scroll', updateMenuPosition, true);
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-            document.removeEventListener('keydown', handleEscape);
+            window.removeEventListener('resize', updateMenuPosition);
+            window.removeEventListener('scroll', updateMenuPosition, true);
         };
-    }, []);
+    }, [open, updateMenuPosition]);
 
     useEffect(() => {
-        if (!isOpen || disabled) {
+        if (open && activeIndex >= 0) {
+            menuRef.current
+                ?.querySelector(`[data-option-index="${activeIndex}"]`)
+                ?.scrollIntoView({ block: 'nearest' });
+        }
+    }, [open, activeIndex]);
+
+    const close = () => setIsOpen(false);
+    const openMenu = (last = false) => {
+        updateMenuPosition();
+        setActiveIndex(
+            selectable.includes(selectedIndex)
+                ? selectedIndex
+                : last
+                  ? (selectable.at(-1) ?? -1)
+                  : (selectable[0] ?? -1)
+        );
+        setIsOpen(true);
+    };
+    const handleSelect = (index) => {
+        const option = normalizedOptions[index];
+        if (!option || option.disabled || disabled) return;
+        onChange(option.value);
+        close();
+        triggerRef.current?.focus();
+    };
+    const handleKeyDown = (event) => {
+        if (disabled) return;
+        if (event.key === 'Tab') {
+            close();
             return;
         }
-
-        updateMenuPosition();
-
-        const handleViewportChange = () => updateMenuPosition();
-        window.addEventListener('resize', handleViewportChange);
-        window.addEventListener('scroll', handleViewportChange, true);
-
-        return () => {
-            window.removeEventListener('resize', handleViewportChange);
-            window.removeEventListener('scroll', handleViewportChange, true);
-        };
-    }, [disabled, isOpen, updateMenuPosition]);
-
-    const handleSelect = (nextValue) => {
-        onChange(nextValue);
-        setIsOpen(false);
+        if (event.key === 'Escape' && open) {
+            event.preventDefault();
+            event.stopPropagation();
+            close();
+            triggerRef.current?.focus();
+            return;
+        }
+        if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+            event.preventDefault();
+            if (!open) {
+                openMenu(event.key === 'ArrowUp' || event.key === 'End');
+                if (event.key === 'Home') setActiveIndex(selectable[0] ?? -1);
+                if (event.key === 'End') setActiveIndex(selectable.at(-1) ?? -1);
+                return;
+            }
+            const current = selectable.indexOf(activeIndex);
+            const next =
+                event.key === 'Home'
+                    ? 0
+                    : event.key === 'End'
+                      ? selectable.length - 1
+                      : (current + (event.key === 'ArrowUp' ? -1 : 1) + selectable.length) %
+                        selectable.length;
+            setActiveIndex(selectable[next] ?? -1);
+        } else if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            if (open) handleSelect(activeIndex);
+            else openMenu();
+        } else if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+            const now = Date.now();
+            typeahead.current = {
+                text:
+                    (now - typeahead.current.at < 700 ? typeahead.current.text : '') +
+                    event.key.toLocaleLowerCase(),
+                at: now,
+            };
+            const index = selectable.find((i) =>
+                String(optionLabel(normalizedOptions[i]))
+                    .toLocaleLowerCase()
+                    .startsWith(typeahead.current.text)
+            );
+            if (index !== undefined) {
+                event.preventDefault();
+                updateMenuPosition();
+                setActiveIndex(index);
+                setIsOpen(true);
+            }
+        }
     };
-
-    const isSelected = (optionValue) => normalizeValue(optionValue) === normalizeValue(value);
-
-    const shouldRenderMenu = isOpen && !disabled && menuStyle && typeof document !== 'undefined';
-
-    const menu = shouldRenderMenu
-        ? createPortal(
-              <div
-                  id={listboxId}
-                  ref={menuRef}
-                  role="listbox"
-                  className="z-[120] overflow-y-auto rounded-xl border border-(--color-border-primary) bg-(--color-bg-primary) shadow-2xl"
-                  style={{
-                      left: menuStyle.left,
-                      maxHeight: menuStyle.maxHeight,
-                      position: 'fixed',
-                      top: menuStyle.top,
-                      width: menuStyle.width,
-                  }}
-              >
-                  <button
-                      type="button"
-                      role="option"
-                      aria-selected={!selectedOption}
-                      onClick={() => handleSelect('')}
-                      className={`w-full px-4 py-2.5 text-left text-sm transition-colors ${
-                          !selectedOption
-                              ? 'bg-(--color-brand-primary)/10 text-(--color-brand-primary) font-semibold'
-                              : 'text-(--color-text-secondary) hover:bg-(--color-bg-secondary)'
-                      }`}
-                  >
-                      {t(placeholder)}
-                  </button>
-
-                  {normalizedOptions.map((option) => {
-                      const optionSelected = isSelected(option.value);
-
-                      return (
-                          <button
-                              key={String(option.value)}
-                              type="button"
-                              role="option"
-                              aria-selected={optionSelected}
-                              onClick={() => handleSelect(option.value)}
-                              className={`w-full px-4 py-2.5 text-left text-sm transition-colors flex items-center justify-between ${
-                                  optionSelected
-                                      ? 'bg-(--color-brand-primary)/10 text-(--color-brand-primary) font-semibold'
-                                      : 'text-(--color-text-secondary) hover:bg-(--color-bg-secondary)'
-                              }`}
-                          >
-                              {/* Preserve original database labels when option translation is disabled. */}
-                              <span>{translateOptions ? t(option.label) : option.label}</span>
-                              {optionSelected && (
-                                  <svg
-                                      className="h-4 w-4"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      viewBox="0 0 24 24"
-                                      aria-hidden="true"
-                                  >
-                                      <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth="2"
-                                          d="M5 13l4 4L19 7"
-                                      />
-                                  </svg>
-                              )}
-                          </button>
-                      );
-                  })}
-              </div>,
-              document.body
-          )
-        : null;
+    const sizes = {
+        form: 'border-2 rounded-xl px-4 py-3',
+        field: 'input-field',
+        compact: 'min-h-9 rounded-lg border px-3 py-[7px] text-sm',
+    };
+    const errorId = `${buttonId}-error`;
 
     return (
-        <div className={`relative ${className}`} ref={selectRef}>
+        <div className={`relative min-w-0 ${className}`} ref={selectRef}>
             {label && (
                 <label
                     htmlFor={buttonId}
                     className="text-sm font-semibold text-(--color-text-primary) mb-2 block"
                 >
-                    {t(label)} {required && <span className="text-(--color-danger)">*</span>}
+                    {t(label)}{' '}
+                    {(required || showRequiredIndicator) && (
+                        <span aria-hidden="true" className="text-(--color-danger)">
+                            *
+                        </span>
+                    )}
                 </label>
             )}
-
-            {name && <input type="hidden" name={name} value={value ?? ''} />}
-
-            <button
+            {name && <input type="hidden" name={name} value={value ?? ''} disabled={disabled} />}
+            <DisabledButton
+                ref={triggerRef}
                 id={buttonId}
                 type="button"
                 disabled={disabled}
-                onClick={() => setIsOpen((prev) => !prev)}
-                className={`
-                    w-full bg-(--color-bg-primary) border-2 rounded-xl px-4 py-3 text-left
-                    transition-colors duration-200 flex items-center justify-between
-                    focus-visible:outline-none focus-visible:border-(--color-brand-primary)
-                    focus-visible:ring-4 focus-visible:ring-(--color-brand-primary)/10
-                    disabled:bg-(--color-bg-secondary) disabled:cursor-not-allowed
-                    ${error ? 'border-(--color-danger) focus-visible:border-(--color-danger) focus-visible:ring-(--color-danger)/10' : 'border-(--color-border-primary) hover:border-(--color-border-secondary)'}
-                `}
+                disabledReason={disabledReason}
+                onClick={() => (open ? close() : openMenu())}
+                onKeyDown={handleKeyDown}
+                onBlur={(event) => {
+                    if (!menuRef.current?.contains(event.relatedTarget)) close();
+                }}
+                className={`w-full min-w-0 bg-(--color-bg-primary) text-(--color-text-primary) text-left transition-colors duration-200 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:border-(--color-brand-primary) focus-visible:ring-4 focus-visible:ring-(--color-brand-primary)/10 disabled:bg-(--color-bg-secondary) disabled:cursor-not-allowed ${sizes[size] || sizes.form} ${error ? 'border-(--color-danger)' : 'border-(--color-border-primary) hover:border-(--color-border-secondary)'}`}
+                role="combobox"
+                aria-label={t(ariaLabel || label || placeholder)}
                 aria-haspopup="listbox"
-                aria-expanded={isOpen}
+                aria-expanded={open}
                 aria-controls={listboxId}
+                aria-activedescendant={
+                    open && activeIndex >= 0 ? `${listboxId}-${activeIndex}` : undefined
+                }
+                aria-required={required || showRequiredIndicator || undefined}
+                aria-invalid={!!error}
+                aria-describedby={
+                    [describedBy, error ? errorId : null].filter(Boolean).join(' ') || undefined
+                }
+                title={selectedOption && !translateOptions ? selectedLabel : selectedText}
             >
                 <span
-                    className={
-                        selectedOption
-                            ? 'text-(--color-text-primary)'
-                            : 'text-(--color-text-placeholder)'
-                    }
+                    className={`min-w-0 flex-1 truncate ${value == null || value === '' ? 'text-(--color-text-placeholder)' : 'text-(--color-text-primary)'}`}
                 >
-                    {/* Translate the placeholder but keep selected database values unchanged. */}
-                    {selectedOption && !translateOptions ? selectedLabel : t(selectedLabel)}
+                    {selectedText}
                 </span>
-                <svg
-                    className={`h-4 w-4 text-(--color-text-tertiary) transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M19 9l-7 7-7-7"
-                    />
-                </svg>
-            </button>
-            {menu}
-
+                <AppIcon
+                    name="chevron-down"
+                    className={`h-4 w-4 shrink-0 text-(--color-text-tertiary) ${open ? 'rotate-180' : ''}`}
+                />
+            </DisabledButton>
+            {open &&
+                menuStyle &&
+                portalTarget &&
+                createPortal(
+                    <div
+                        id={listboxId}
+                        ref={menuRef}
+                        role="listbox"
+                        aria-label={t(ariaLabel || label || placeholder)}
+                        className="z-[120] overflow-y-auto overscroll-contain rounded-xl border border-(--color-border-primary) bg-(--color-bg-primary) shadow-2xl"
+                        style={{ ...menuStyle, position: 'fixed' }}
+                        onKeyDown={handleKeyDown}
+                    >
+                        {normalizedOptions.every((option) => option.placeholder) && (
+                            <p className="px-4 py-2.5 text-sm text-(--color-text-tertiary)">
+                                {t('No options available')}
+                            </p>
+                        )}
+                        {normalizedOptions.map((option, index) => (
+                            <button
+                                key={String(option.value)}
+                                id={`${listboxId}-${index}`}
+                                data-option-index={index}
+                                type="button"
+                                role="option"
+                                tabIndex={-1}
+                                disabled={option.disabled}
+                                aria-disabled={option.disabled || undefined}
+                                aria-selected={index === selectedIndex}
+                                onPointerDown={(event) => event.preventDefault()}
+                                onClick={() => handleSelect(index)}
+                                className={`w-full px-4 py-2.5 text-left text-sm transition-colors flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-(--color-brand-primary) disabled:opacity-50 disabled:cursor-not-allowed ${index === activeIndex ? 'bg-(--color-bg-secondary)' : ''} ${index === selectedIndex ? 'text-(--color-brand-primary) font-semibold' : 'text-(--color-text-secondary) hover:bg-(--color-bg-secondary)'}`}
+                            >
+                                <span className="min-w-0 [overflow-wrap:anywhere]">
+                                    {optionLabel(option)}
+                                </span>
+                                {index === selectedIndex && (
+                                    <AppIcon name="check" className="h-4 w-4 shrink-0" />
+                                )}
+                            </button>
+                        ))}
+                    </div>,
+                    portalTarget
+                )}
             {error && (
-                <p className="text-sm text-(--color-danger) mt-1.5 flex items-center gap-1">
+                <p
+                    id={errorId}
+                    role="alert"
+                    className="text-sm text-(--color-danger) mt-1.5 flex items-center gap-1"
+                >
                     <AppIcon name="warning" className="h-4 w-4" /> {t(error)}
                 </p>
             )}
@@ -456,13 +514,14 @@ export function FormButton({
     type = 'button',
     variant = 'primary',
     disabled = false,
+    disabledReason,
     loading = false,
     onClick,
     className = '',
 }) {
     const variants = {
         primary:
-            'bg-(--color-brand-primary) text-white shadow-lg shadow-(--color-brand-primary)/30 hover:-translate-y-0.5',
+            'theme-primary-action shadow-lg shadow-(--color-brand-primary)/30 hover:-translate-y-0.5',
         secondary:
             'bg-(--color-bg-primary) text-(--color-text-secondary) border-2 border-(--color-border-primary) hover:border-(--color-brand-primary) hover:text-(--color-brand-primary)',
         success: 'bg-(--color-success) text-white shadow-lg shadow-(--color-success)/30',
@@ -470,10 +529,11 @@ export function FormButton({
     };
 
     return (
-        <button
+        <DisabledButton
             type={type}
             onClick={onClick}
             disabled={disabled || loading}
+            disabledReason={loading ? 'A request is in progress. Please wait.' : disabledReason}
             className={`
                 px-6 py-3 rounded-xl font-semibold transition-all duration-300
                 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
@@ -503,6 +563,6 @@ export function FormButton({
             ) : (
                 children
             )}
-        </button>
+        </DisabledButton>
     );
 }

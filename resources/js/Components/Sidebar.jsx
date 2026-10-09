@@ -26,20 +26,27 @@ const adminNavConfig = [
         allowedRoles: ['super_admin'],
         children: [
             {
+                name: 'Business Types',
+                href: '/admin/business-types',
+                allowedRoles: ['super_admin'],
+            },
+            {
                 name: 'Vendor Categories',
-                icon: 'vendors',
                 href: '/admin/vendor-categories',
                 allowedRoles: ['super_admin'],
             },
             {
                 name: 'Document Types',
-                icon: 'documents',
                 href: '/admin/document-types',
                 allowedRoles: ['super_admin'],
             },
             {
+                name: 'Performance Metrics',
+                href: '/admin/performance-metrics',
+                allowedRoles: ['super_admin'],
+            },
+            {
                 name: 'Staff Users',
-                icon: 'staff',
                 href: '/admin/staff-users',
                 permission: 'view_audit',
             },
@@ -237,13 +244,10 @@ function NavItem({ item, isActive }) {
             href={item.href}
             aria-current={isActive ? 'page' : undefined}
             className={`
-                flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
+                sidebar-main-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
                 transition-all duration-200
-                ${
-                    isActive
-                        ? 'text-white'
-                        : 'text-(--color-text-secondary) hover:bg-(--color-bg-hover) hover:text-(--color-text-primary)'
-                }
+                focus-visible:ring-2 focus-visible:ring-(--color-brand-primary)
+                ${isActive ? 'text-white' : 'text-(--color-text-secondary)'}
             `}
             style={
                 isActive
@@ -251,10 +255,10 @@ function NavItem({ item, isActive }) {
                     : undefined
             }
         >
-            <span className={`w-6 flex justify-center ${isActive ? 'text-white!' : ''}`}>
+            <span className="w-6 shrink-0 flex justify-center">
                 <IconRenderer icon={item.icon} />
             </span>
-            <span className={isActive ? 'sidebar-active-label' : undefined}>{t(item.name)}</span>
+            <span className="min-w-0 break-words">{t(item.name)}</span>
             {item.badge && (
                 <span
                     className={`
@@ -266,6 +270,25 @@ function NavItem({ item, isActive }) {
                     }
                 `}
                 >
+                    {item.badge}
+                </span>
+            )}
+        </Link>
+    );
+}
+
+function SubNavItem({ item, isActive }) {
+    const { t } = useLanguage();
+
+    return (
+        <Link
+            href={item.href}
+            aria-current={isActive ? 'page' : undefined}
+            className="sidebar-sub-item flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-(--color-brand-primary)"
+        >
+            <span className="min-w-0 break-words">{t(item.name)}</span>
+            {item.badge && (
+                <span className="ml-auto shrink-0 rounded-full bg-(--color-brand-primary-light) px-2 py-0.5 text-xs font-semibold text-(--color-brand-primary)">
                     {item.badge}
                 </span>
             )}
@@ -286,25 +309,22 @@ function NavGroup({ item, activeItem }) {
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={() => setIsOpen((open) => !open)}
-                className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) ${
-                    hasActiveChild
-                        ? 'text-(--color-brand-primary) bg-(--color-brand-primary-light)'
-                        : 'text-(--color-text-secondary) hover:bg-(--color-bg-hover) hover:text-(--color-text-primary)'
-                }`}
+                data-active={hasActiveChild ? 'true' : undefined}
+                className="sidebar-main-item flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-(--color-brand-primary)"
             >
-                <span className="w-6 flex justify-center">
+                <span className="w-6 shrink-0 flex justify-center">
                     <IconRenderer icon={item.icon} />
                 </span>
-                <span>{t(item.name)}</span>
+                <span className="min-w-0 break-words">{t(item.name)}</span>
                 <AppIcon
                     name="chevron-down"
-                    className={`ml-auto h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                    className={`ml-auto h-4 w-4 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
                 />
             </button>
             {isOpen && (
                 <div id={panelId} className="ml-6 border-l border-(--color-border-primary) pl-2">
                     {item.children.map((child) => (
-                        <NavItem
+                        <SubNavItem
                             key={child.name}
                             item={child}
                             isActive={activeItem === child.name}
@@ -398,8 +418,8 @@ export default function Sidebar({
                 `}
                 aria-label={`${translatedLogoText} navigation`}
             >
-                {/* Logo - matches PageHeader height */}
-                <div className="h-[73px] px-5 border-b border-(--color-border-primary) flex items-center gap-3">
+                {/* Match the measured layout header while retaining the mobile drawer height. */}
+                <div className="h-[73px] md:h-[var(--vms-header-height,73px)] shrink-0 px-5 border-b border-(--color-border-primary) flex items-center gap-3">
                     <Link
                         href="/"
                         className="min-w-0 shrink-0 rounded-lg focus-visible:ring-2 focus-visible:ring-(--color-brand-primary)"

@@ -1,6 +1,6 @@
-import { ActionLink } from '@/Components/ActionControls';
+import { ActionButton, ActionLink } from '@/Components/ActionControls';
 import { Link, usePage, router } from '@inertiajs/react';
-import { AdminLayout, DataTable, Badge, PageHeader, Button } from '@/Components';
+import { AdminLayout, DataTable, Badge, PageHeader, AppIcon } from '@/Components';
 import { formatDateTime } from '@/utils/dateFormatters';
 import { useState } from 'react';
 // Translate fixed contact-status filters without touching message content.
@@ -63,7 +63,11 @@ export default function Index() {
             header: 'Actions',
             align: 'right',
             render: (row) => (
-                <ActionLink variant="outline" href={`/admin/contact-messages/${row.id}`}>
+                <ActionLink
+                    variant="outline"
+                    href={`/admin/contact-messages/${row.id}`}
+                    className="min-h-9 justify-center whitespace-normal"
+                >
                     {t('View')}
                 </ActionLink>
             ),
@@ -77,18 +81,24 @@ export default function Index() {
             title="Contact Messages"
             subtitle="Manage and respond to customer inquiries"
             actions={
-                <form onSubmit={handleSearch} className="flex gap-2">
+                <form onSubmit={handleSearch} className="flex min-w-0 max-w-full gap-2">
                     {/* Localize the fixed message-search placeholder. */}
                     <input
+                        aria-label={t('Search messages...')}
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder={t('Search messages...')}
-                        className="input-field"
+                        className="input-field h-9! w-52! min-w-0 px-3! py-[7px]! text-sm!"
                     />
-                    <Button type="submit" size="sm" className="self-center">
-                        Search
-                    </Button>
+                    <ActionButton
+                        type="submit"
+                        className="h-9 w-9 shrink-0 self-center justify-center px-0"
+                        aria-label={t('Search')}
+                        title={t('Search')}
+                    >
+                        <AppIcon name="search" className="h-4 w-4" />
+                    </ActionButton>
                 </form>
             }
         />
@@ -96,11 +106,11 @@ export default function Index() {
 
     return (
         <AdminLayout title="Contact Messages" activeNav="Messages" header={header}>
-            <div className="space-y-6">
+            <div className="min-w-0 space-y-6">
                 {/* Stats Overview */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid min-w-0 grid-cols-2 xl:grid-cols-4 gap-4 [&>div]:min-w-0">
                     <div className="bg-(--color-bg-primary) shadow-token-sm p-5 rounded-2xl border-2 border-(--color-text-tertiary)">
-                        <div className="flex items-center justify-between">
+                        <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
                             <div>
                                 {/* Localize the fixed total summary label. */}
                                 <p className="text-sm text-(--color-text-tertiary) mb-1">
@@ -110,7 +120,7 @@ export default function Index() {
                                     {stats?.total || 0}
                                 </p>
                             </div>
-                            <div className="w-10 h-10 rounded-xl bg-(--color-bg-tertiary) flex items-center justify-center">
+                            <div className="w-10 h-10 shrink-0 rounded-xl bg-(--color-bg-tertiary) flex items-center justify-center">
                                 <svg
                                     className="w-5 h-5 text-(--color-text-tertiary)"
                                     fill="none"
@@ -128,7 +138,7 @@ export default function Index() {
                         </div>
                     </div>
                     <div className="bg-(--color-bg-primary) shadow-token-sm p-5 rounded-2xl border-2 border-(--color-info)">
-                        <div className="flex items-center justify-between">
+                        <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
                             <div>
                                 {/* Localize the fixed new-status summary label. */}
                                 <p className="text-sm text-(--color-info) mb-1">{t('new')}</p>
@@ -136,7 +146,7 @@ export default function Index() {
                                     {stats?.new || 0}
                                 </p>
                             </div>
-                            <div className="w-10 h-10 rounded-xl bg-(--color-info-light) flex items-center justify-center">
+                            <div className="w-10 h-10 shrink-0 rounded-xl bg-(--color-info-light) flex items-center justify-center">
                                 <svg
                                     className="w-5 h-5 text-(--color-info)"
                                     fill="none"
@@ -154,7 +164,7 @@ export default function Index() {
                         </div>
                     </div>
                     <div className="bg-(--color-bg-primary) shadow-token-sm p-5 rounded-2xl border-2 border-(--color-success)">
-                        <div className="flex items-center justify-between">
+                        <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
                             <div>
                                 {/* Localize the fixed replied-status summary label. */}
                                 <p className="text-sm text-(--color-success) mb-1">
@@ -164,7 +174,7 @@ export default function Index() {
                                     {stats?.replied || 0}
                                 </p>
                             </div>
-                            <div className="w-10 h-10 rounded-xl bg-(--color-success-light) flex items-center justify-center">
+                            <div className="w-10 h-10 shrink-0 rounded-xl bg-(--color-success-light) flex items-center justify-center">
                                 <svg
                                     className="w-5 h-5 text-(--color-success)"
                                     fill="none"
@@ -182,7 +192,7 @@ export default function Index() {
                         </div>
                     </div>
                     <div className="bg-(--color-bg-primary) shadow-token-sm p-5 rounded-2xl border-2 border-(--color-text-primary)">
-                        <div className="flex items-center justify-between">
+                        <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
                             <div>
                                 {/* Localize the fixed read-status summary label. */}
                                 <p className="text-sm text-(--color-text-tertiary) mb-1">
@@ -192,7 +202,7 @@ export default function Index() {
                                     {stats?.read || 0}
                                 </p>
                             </div>
-                            <div className="w-10 h-10 rounded-xl bg-(--color-bg-tertiary) flex items-center justify-center">
+                            <div className="w-10 h-10 shrink-0 rounded-xl bg-(--color-bg-tertiary) flex items-center justify-center">
                                 <svg
                                     className="w-5 h-5 text-(--color-text-tertiary)"
                                     fill="none"
@@ -230,7 +240,7 @@ export default function Index() {
                             }
                             className={`staff-status-filter px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) focus-visible:ring-offset-2 ${
                                 filters?.status === status || (!filters?.status && status === 'all')
-                                    ? 'bg-(--color-brand-primary) text-white shadow-token-primary'
+                                    ? 'theme-primary-action shadow-token-primary'
                                     : 'text-(--color-text-tertiary) hover:bg-(--color-bg-primary)'
                             }`}
                         >
@@ -241,13 +251,15 @@ export default function Index() {
                 </div>
 
                 {/* Messages Table */}
-                <DataTable
-                    columns={columns}
-                    data={messages?.data || []}
-                    links={messages?.links || []}
-                    emptyMessage="No messages found"
-                    onRowClick={(row) => router.visit(`/admin/contact-messages/${row.id}`)}
-                />
+                <div className="min-w-0 [&_table]:min-w-[760px] [&_table]:table-fixed [&_td]:[overflow-wrap:anywhere] [&_nav]:flex-wrap [&_nav]:gap-1 [&_nav_a]:min-h-9 [&_nav_a]:focus-visible:outline-2">
+                    <DataTable
+                        columns={columns}
+                        data={messages?.data || []}
+                        links={messages?.links || []}
+                        emptyMessage="No messages found"
+                        onRowClick={(row) => router.visit(`/admin/contact-messages/${row.id}`)}
+                    />
+                </div>
             </div>
         </AdminLayout>
     );

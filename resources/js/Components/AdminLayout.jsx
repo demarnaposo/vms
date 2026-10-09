@@ -2,6 +2,7 @@ import { Head } from '@inertiajs/react';
 import React from 'react';
 import AppIcon from './AppIcon';
 import Sidebar from './Sidebar';
+import LayoutHeader from './LayoutHeader';
 // Translate admin layout titles globally.
 import { useLanguage } from '@/Contexts/LanguageContext';
 
@@ -50,7 +51,7 @@ export default function AdminLayout({
                         </div>
                     </div>
 
-                    {header}
+                    <LayoutHeader>{header}</LayoutHeader>
 
                     <div className="p-4 md:p-8">{children}</div>
                 </main>

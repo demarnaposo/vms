@@ -5,13 +5,13 @@ import {
     AdminLayout,
     PageHeader,
     DataTable,
-    Button,
     Badge,
     Modal,
     ModalCancelButton,
     ModalPrimaryButton,
     FormTextarea,
     FormSelect,
+    AppIcon,
 } from '@/Components';
 import { DocumentViewer } from '@/Components/DocumentViewer';
 // Use shared language state for document filters and actions.
@@ -125,7 +125,7 @@ export default function DocumentsIndex({
         {
             header: 'Vendor',
             render: (row) => (
-                <span className="text-(--color-text-primary) font-medium">
+                <span className="min-w-0 [overflow-wrap:anywhere] text-(--color-text-primary) font-medium">
                     {row.vendor?.company_name}
                 </span>
             ),
@@ -133,7 +133,7 @@ export default function DocumentsIndex({
         {
             header: 'Document Type',
             render: (row) => (
-                <span className="text-(--color-text-secondary)">
+                <span className="[overflow-wrap:anywhere] text-(--color-text-secondary)">
                     {/* Translate system master labels without translating custom database values. */}
                     {translateDocumentTypeLabel(language, row.document_type)}
                 </span>
@@ -144,7 +144,7 @@ export default function DocumentsIndex({
             render: (row) => (
                 <a
                     href={`/documents/${row.id}/download`}
-                    className="text-(--color-brand-primary) hover:underline"
+                    className="[overflow-wrap:anywhere] text-(--color-brand-primary) hover:underline focus-visible:outline-2 focus-visible:outline-(--color-brand-primary)"
                     target="_blank"
                     rel="noreferrer"
                 >
@@ -179,7 +179,7 @@ export default function DocumentsIndex({
         header: 'Actions',
         align: 'right',
         render: (row) => (
-            <div className="flex flex-wrap gap-2 justify-end items-center">
+            <div className="flex min-w-0 flex-wrap gap-2 justify-end items-center [&>button]:min-h-9 [&>button]:justify-center">
                 <ActionButton
                     variant="outline"
                     onClick={() => {
@@ -200,6 +200,7 @@ export default function DocumentsIndex({
                                 variant="success"
                                 onClick={() => verifyDocument(row.id)}
                                 disabled={processingDocId === row.id}
+                                disabledReason={'A request is in progress. Please wait.'}
                             >
                                 Verify
                             </ActionButton>
@@ -212,6 +213,7 @@ export default function DocumentsIndex({
                                     setShowRejectModal(true);
                                 }}
                                 disabled={processingDocId === row.id}
+                                disabledReason={'A request is in progress. Please wait.'}
                             >
                                 Reject
                             </ActionButton>
@@ -245,7 +247,7 @@ export default function DocumentsIndex({
 
     return (
         <AdminLayout title="Document Verification" activeNav="Documents" header={header}>
-            <div className="mb-6 space-y-4">
+            <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
                 <div className="inline-flex gap-2 flex-wrap p-1 bg-(--color-bg-tertiary) rounded-xl">
                     {statusFilters.map((status) => (
                         <Link
@@ -254,7 +256,7 @@ export default function DocumentsIndex({
                             aria-current={currentStatus === status.value ? 'page' : undefined}
                             className={`staff-status-filter px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) focus-visible:ring-offset-2 ${
                                 currentStatus === status.value
-                                    ? 'bg-(--color-brand-primary) text-white shadow-token-primary'
+                                    ? 'theme-primary-action shadow-token-primary'
                                     : 'text-(--color-text-tertiary) hover:bg-(--color-bg-primary)'
                             }`}
                             preserveScroll
@@ -264,9 +266,10 @@ export default function DocumentsIndex({
                         </Link>
                     ))}
                 </div>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                <div className="flex w-full min-w-0 items-start gap-2 sm:ml-auto sm:w-auto sm:pt-1">
                     <FormSelect
-                        className="w-full min-w-0 sm:w-80"
+                        size="compact"
+                        className="min-w-0 flex-1 sm:w-52 sm:flex-none [&_label]:sr-only"
                         name="document_type_id"
                         placeholder="All Documents"
                         label="Document Type"
@@ -282,70 +285,84 @@ export default function DocumentsIndex({
                     {(filters.document_type_id ||
                         filters.search ||
                         currentStatus !== 'pending') && (
-                        <Button
-                            variant="outline"
-                            className="shrink-0 focus-visible:ring-2 focus-visible:ring-(--color-brand-primary) focus-visible:ring-offset-2"
+                        <ActionButton
+                            variant="primary"
+                            className="h-9 w-9 shrink-0 justify-center"
+                            aria-label={t('Reset')}
+                            title={t('Reset')}
                             onClick={() =>
                                 router.get('/admin/documents', {}, { preserveScroll: true })
                             }
                         >
-                            Reset
-                        </Button>
+                            <AppIcon name="reset" className="h-5 w-5" />
+                        </ActionButton>
                     )}
                 </div>
             </div>
 
             {/* Scrollable Document List with sticky header */}
-            <DataTable
-                columns={columns}
-                data={documents?.data || []}
-                links={documents?.links || []}
-                emptyIcon="success"
-                emptyMessage={
-                    currentStatus === 'pending' && !filters.document_type_id && !filters.search
-                        ? 'All pending documents have been reviewed.'
-                        : 'No documents found for this filter.'
-                }
-                stickyHeader={true}
-            />
+            <div className="min-w-0 [&_table]:min-w-[960px] [&_table]:table-fixed [&_td]:[overflow-wrap:anywhere] [&_nav]:flex [&_nav]:flex-wrap [&_nav]:gap-1 [&_nav]:space-x-0 [&_nav_a]:focus-visible:outline-2">
+                <DataTable
+                    columns={columns}
+                    data={documents?.data || []}
+                    links={documents?.links || []}
+                    emptyIcon="success"
+                    emptyMessage={
+                        currentStatus === 'pending' && !filters.document_type_id && !filters.search
+                            ? 'All pending documents have been reviewed.'
+                            : 'No documents found for this filter.'
+                    }
+                    stickyHeader={true}
+                />
+            </div>
 
             {/* Reject Modal */}
-            <Modal
-                isOpen={showRejectModal && can.reject_documents}
-                onClose={closeRejectModal}
-                title="Reject Document"
-                footer={
-                    <>
-                        <ModalCancelButton onClick={closeRejectModal} />
-                        <ModalPrimaryButton
-                            variant="danger"
-                            onClick={rejectDocument}
-                            disabled={!rejectReason.trim() || processingDocId === selectedDoc}
-                        >
-                            Reject Document
-                        </ModalPrimaryButton>
-                    </>
-                }
-            >
-                <FormTextarea
-                    label="Reason for Rejection"
-                    value={rejectReason}
-                    onChange={setRejectReason}
-                    placeholder="Please provide a reason for rejection..."
-                    required
-                />
-            </Modal>
+            <div className="[&_.glass-modal]:max-h-[calc(100vh-2rem)] [&_.glass-modal]:overflow-y-auto [&_.glass-modal]:overscroll-contain [&_.glass-modal]:p-4 sm:[&_.glass-modal]:p-6 [&_.glass-modal_h3]:min-w-0 [&_.glass-modal_h3]:break-words">
+                <Modal
+                    isOpen={showRejectModal && can.reject_documents}
+                    onClose={closeRejectModal}
+                    title="Reject Document"
+                    footer={
+                        <div className="flex w-full flex-col-reverse gap-3 sm:flex-row sm:justify-end [&>button]:min-h-9 [&>button]:min-w-0 [&>button]:whitespace-normal [&>button]:focus-visible:outline-2 [&>button]:focus-visible:outline-(--color-brand-primary)">
+                            <ModalCancelButton onClick={closeRejectModal} />
+                            <ModalPrimaryButton
+                                variant="danger"
+                                onClick={rejectDocument}
+                                disabled={!rejectReason.trim() || processingDocId === selectedDoc}
+                                disabledReason={
+                                    processingDocId === selectedDoc
+                                        ? 'A request is in progress. Please wait.'
+                                        : 'Enter a rejection reason before continuing.'
+                                }
+                            >
+                                Reject Document
+                            </ModalPrimaryButton>
+                        </div>
+                    }
+                >
+                    <FormTextarea
+                        label="Reason for Rejection"
+                        value={rejectReason}
+                        onChange={setRejectReason}
+                        placeholder="Please provide a reason for rejection..."
+                        showRequiredIndicator
+                        error={errors?.reason}
+                    />
+                </Modal>
+            </div>
 
             {/* Document Viewer Modal */}
-            <DocumentViewer
-                key={viewerDocument?.id ?? 'none'}
-                document={viewerDocument}
-                isOpen={showViewer}
-                onClose={() => {
-                    setShowViewer(false);
-                    setViewerDocument(null);
-                }}
-            />
+            <div className="[&_.glass-modal]:min-w-0 [&_.glass-modal]:max-h-[calc(100vh-2rem)] [&_.glass-modal>div:first-child]:flex-wrap [&_.glass-modal>div:first-child]:gap-3 [&_.glass-modal>div:first-child>div]:max-w-full [&_.glass-modal>div:first-child>div]:min-w-0 [&_.glass-modal>div:first-child>div:first-child]:w-full sm:[&_.glass-modal>div:first-child>div:first-child]:w-auto [&_.glass-modal>div:first-child>div:first-child>span]:shrink-0 [&_.glass-modal>div:first-child>div]:flex-wrap [&_.glass-modal_a]:min-h-9 [&_.glass-modal_a]:justify-center [&_.glass-modal_button]:min-h-9 [&_.glass-modal_button]:min-w-9 [&_.glass-modal_a]:focus-visible:outline-2 [&_.glass-modal_button]:focus-visible:outline-2 [&_.glass-modal>div:nth-child(2)]:min-h-0 [&_.glass-modal>div:nth-child(2)]:overscroll-contain [&_.glass-modal_iframe]:min-h-[240px] sm:[&_.glass-modal_iframe]:min-h-[500px]">
+                <DocumentViewer
+                    key={viewerDocument?.id ?? 'none'}
+                    document={viewerDocument}
+                    isOpen={showViewer}
+                    onClose={() => {
+                        setShowViewer(false);
+                        setViewerDocument(null);
+                    }}
+                />
+            </div>
         </AdminLayout>
     );
 }

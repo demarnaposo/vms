@@ -17,6 +17,7 @@ class PerformanceCommandTest extends TestCase
 
     public function test_monthly_performance_command_recalculates_scores_and_logs_job(): void
     {
+        (new \App\Services\SystemMasterDataService)->syncRolesAndPermissions();
         $vendorUser = User::factory()->create();
         $scorer = User::factory()->create();
 
@@ -30,16 +31,16 @@ class PerformanceCommandTest extends TestCase
         $metricA = PerformanceMetric::create([
             'name' => 'delivery_timeliness',
             'display_name' => 'Delivery Timeliness',
-            'weight' => 2,
-            'max_score' => 100,
+            'weight' => 60,
+            'max_score' => 4,
             'is_active' => true,
         ]);
 
         $metricB = PerformanceMetric::create([
             'name' => 'issue_frequency',
             'display_name' => 'Issue Frequency',
-            'weight' => 1,
-            'max_score' => 100,
+            'weight' => 40,
+            'max_score' => 4,
             'is_active' => true,
         ]);
 
@@ -47,7 +48,7 @@ class PerformanceCommandTest extends TestCase
             'vendor_id' => $vendor->id,
             'performance_metric_id' => $metricA->id,
             'scored_by' => $scorer->id,
-            'score' => 80,
+            'score' => 3,
             'period_start' => now()->startOfMonth()->toDateString(),
             'period_end' => now()->endOfMonth()->toDateString(),
         ]);
@@ -56,7 +57,7 @@ class PerformanceCommandTest extends TestCase
             'vendor_id' => $vendor->id,
             'performance_metric_id' => $metricB->id,
             'scored_by' => $scorer->id,
-            'score' => 50,
+            'score' => 2,
             'period_start' => now()->startOfMonth()->toDateString(),
             'period_end' => now()->endOfMonth()->toDateString(),
         ]);
@@ -65,11 +66,11 @@ class PerformanceCommandTest extends TestCase
             ->assertSuccessful();
 
         $vendor->refresh();
-        $this->assertSame(70, $vendor->performance_score);
+        $this->assertSame(65, $vendor->performance_score);
 
         $history = ScoreHistory::where('vendor_id', $vendor->id)->latest('id')->first();
         $this->assertNotNull($history);
-        $this->assertSame(70, $history->performance_score);
+        $this->assertSame(65, $history->performance_score);
         $this->assertSame('system', $history->source);
         $this->assertSame('scheduled_monthly', $history->metadata['source'] ?? null);
 

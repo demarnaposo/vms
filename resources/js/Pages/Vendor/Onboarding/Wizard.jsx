@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { AppIcon } from '@/Components';
 import StepBank from './Steps/StepBank';
@@ -16,9 +16,11 @@ export default function Wizard({
     vendor,
     documentTypes,
     vendorCategories = [],
+    businessTypes = [],
     sessionData = {},
 }) {
     const { t } = useLanguage();
+    const { errors = {} } = usePage().props;
     const [step, setStep] = useState(currentStep);
 
     // Sync step with currentStep prop when it changes (e.g., after redirect)
@@ -39,28 +41,36 @@ export default function Wizard({
 
             {/* Navigation - Light Theme */}
             <nav className="border-b border-(--color-border-primary) bg-(--color-bg-primary)/80 backdrop-blur-md sticky top-0 z-50">
-                <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+                <div className="max-w-5xl mx-auto px-4 sm:px-6 min-h-16 py-3 flex flex-wrap gap-3 items-center justify-between">
                     <div className="flex items-center gap-3">
                         <Link href="/" className="flex items-center gap-3">
                             <Logo size="2xl" light={true} linkToHome={false} />
                         </Link>
-                        <span className="font-bold text-lg text-(--color-text-primary)">
+                        <span className="font-bold text-sm sm:text-lg text-(--color-text-primary)">
                             | {t('Vendor Onboarding')}
                         </span>
                     </div>
-                    <div className="flex items-center gap-3 text-sm text-(--color-text-tertiary)">
+                    <div className="flex min-w-0 flex-wrap items-center gap-3 text-sm text-(--color-text-tertiary)">
                         <LanguageSwitcher compact />
-                        <span>
+                        <span className="min-w-0 wrap-anywhere">
                             {t('Welcome')}, {auth.user.name}
                         </span>
                     </div>
                 </div>
             </nav>
 
-            <main className="max-w-5xl mx-auto px-6 py-12">
+            <main className="max-w-5xl mx-auto min-w-0 px-4 sm:px-6 py-6 sm:py-12">
+                {(errors.step || errors.error) && (
+                    <p
+                        role="alert"
+                        className="mb-4 rounded-lg border border-(--color-danger) p-4 text-sm text-(--color-danger)"
+                    >
+                        {t(errors.step || errors.error)}
+                    </p>
+                )}
                 {/* Progress Steps - Light Theme */}
                 <div className="mb-12">
-                    <div className="flex items-center justify-between relative" role="list">
+                    <div className="grid grid-cols-4 gap-2 items-start relative" role="list">
                         <div
                             className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-(--color-bg-muted) -z-10 rounded-full"
                             aria-hidden="true"
@@ -74,12 +84,12 @@ export default function Wizard({
                         {steps.map((s) => (
                             <div
                                 key={s.number}
-                                className="flex flex-col items-center gap-2"
+                                className="flex min-w-0 flex-col items-center gap-2"
                                 role="listitem"
                                 aria-current={step === s.number ? 'step' : undefined}
                             >
                                 <div
-                                    className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold border-4 transition-all duration-300 ${
+                                    className={`w-9 h-9 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-xl font-bold border-4 transition-all duration-300 ${
                                         step >= s.number
                                             ? 'bg-(--color-bg-primary) border-(--color-brand-primary) text-(--color-brand-primary)'
                                             : 'bg-(--color-bg-secondary) border-(--color-border-primary) text-(--color-text-muted)'
@@ -93,7 +103,7 @@ export default function Wizard({
                                     )}
                                 </div>
                                 <span
-                                    className={`text-sm font-medium ${step >= s.number ? 'text-(--color-text-primary)' : 'text-(--color-text-muted)'}`}
+                                    className={`text-xs sm:text-sm break-words text-center font-medium ${step >= s.number ? 'text-(--color-text-primary)' : 'text-(--color-text-muted)'}`}
                                 >
                                     {t(s.title)}
                                     <span className="sr-only">
@@ -115,6 +125,7 @@ export default function Wizard({
                         vendor={vendor}
                         sessionData={sessionData}
                         vendorCategories={vendorCategories}
+                        businessTypes={businessTypes}
                     />
                 )}
                 {step === 2 && <StepBank vendor={vendor} sessionData={sessionData} />}
@@ -127,6 +138,7 @@ export default function Wizard({
                         sessionData={sessionData}
                         documentTypes={documentTypes}
                         vendorCategories={vendorCategories}
+                        businessTypes={businessTypes}
                     />
                 )}
             </main>

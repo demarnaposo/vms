@@ -1,7 +1,7 @@
 import { paymentsEnabled } from '@/utils/paymentModule';
 import { ActionLink } from '@/Components/ActionControls';
 import { Link, usePage } from '@inertiajs/react';
-import { AdminLayout, AppIcon, Card, PageHeader, StatCard, StatGrid } from '@/Components';
+import { AdminLayout, AppIcon, Card, PageHeader, StatCard } from '@/Components';
 // Reuse the centralized Indonesian currency formatter.
 import { formatCurrency } from '@/utils/currencyFormatters';
 // Translate admin dashboard actions and empty states.
@@ -24,8 +24,8 @@ export default function AdminDashboard({
     const user = auth?.user;
     const can = auth?.can || {};
     const quickActionColumns = enabled
-        ? 'md:grid-cols-4'
-        : { 1: 'md:grid-cols-1', 2: 'md:grid-cols-2', 3: 'md:grid-cols-3' }[
+        ? 'xl:grid-cols-4'
+        : { 1: 'xl:grid-cols-1', 2: 'xl:grid-cols-2', 3: 'xl:grid-cols-3' }[
               1 + Number(Boolean(can.approve_vendors)) + Number(Boolean(can.run_compliance))
           ];
 
@@ -72,14 +72,20 @@ export default function AdminDashboard({
     const header = (
         <PageHeader
             title="Dashboard"
-            subtitle={t('Welcome back, :name!', {
-                name: user?.name?.split(' ')[0] || 'Admin',
-            })}
+            subtitle={
+                <span className="min-w-0 [overflow-wrap:anywhere]">
+                    {t('Welcome back, :name!', { name: user?.name?.split(' ')[0] || 'Admin' })}
+                </span>
+            }
             actions={
                 can['vendors.view'] && (
-                    <Link href="/admin/vendors" className="btn-primary">
+                    <ActionLink
+                        variant="primary"
+                        href="/admin/vendors"
+                        className="min-h-9 justify-center whitespace-normal"
+                    >
                         {t('View All Vendors')}
-                    </Link>
+                    </ActionLink>
                 )
             }
         />
@@ -87,9 +93,11 @@ export default function AdminDashboard({
 
     return (
         <AdminLayout title="Admin Dashboard" activeNav="Dashboard" header={header}>
-            <div className="space-y-8">
+            <div className="min-w-0 space-y-6">
                 {/* Stats Grid */}
-                <StatGrid cols={enabled ? 6 : 4}>
+                <div
+                    className={`grid min-w-0 grid-cols-1 sm:grid-cols-2 ${enabled ? 'xl:grid-cols-3 2xl:grid-cols-6' : 'xl:grid-cols-4'} gap-4 [&>div]:min-w-0`}
+                >
                     {statCards
                         .filter(
                             (stat) =>
@@ -110,17 +118,18 @@ export default function AdminDashboard({
                             <StatCard
                                 key={stat.label}
                                 {...stat}
-                                className="h-full border border-(--color-border-primary)"
+                                className="min-w-0 h-full border border-(--color-border-primary) [&_.truncate]:whitespace-normal [&_.truncate]:overflow-visible [&_div]:[overflow-wrap:anywhere]"
                             />
                         ))}
-                </StatGrid>
+                </div>
 
                 <div
-                    className={`grid ${enabled || (can.approve_vendors && can.verify_documents) ? 'lg:grid-cols-2' : ''} gap-6`}
+                    className={`grid ${enabled || (can.approve_vendors && can.verify_documents) ? 'xl:grid-cols-2' : ''} min-w-0 grid-cols-1 gap-6 [&>div]:min-w-0`}
                 >
                     {/* Pending Vendor Applications */}
                     {can.approve_vendors && (
                         <Card
+                            className="min-w-0 [&>div:first-child]:flex-wrap [&>div:first-child]:gap-3 [&>div:first-child>h3]:min-w-0 [&>div:first-child>h3]:flex-wrap"
                             title={
                                 <>
                                     <span className="mr-2 inline-flex align-middle">
@@ -131,12 +140,13 @@ export default function AdminDashboard({
                                 </>
                             }
                             actions={
-                                <Link
+                                <ActionLink
+                                    variant="ghost"
                                     href="/admin/vendors?status=submitted"
-                                    className="text-(--color-brand-primary) hover:text-(--color-brand-primary-hover) text-sm font-medium"
+                                    className="min-h-9 justify-center whitespace-normal text-(--color-brand-primary)! hover:text-(--color-brand-primary-hover)!"
                                 >
                                     {t('View All')}
-                                </Link>
+                                </ActionLink>
                             }
                         >
                             <div className="divide-y divide-(--color-border-secondary)">
@@ -144,13 +154,13 @@ export default function AdminDashboard({
                                     pendingVendors.map((vendor) => (
                                         <div
                                             key={vendor.id}
-                                            className="px-5 py-4 flex flex-wrap items-center justify-between hover:bg-(--color-bg-hover) transition-colors"
+                                            className="p-3 sm:p-4 flex min-w-0 flex-wrap items-center justify-between gap-3 hover:bg-(--color-bg-hover) transition-colors"
                                         >
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-xl bg-(--color-brand-primary-light) flex items-center justify-center text-lg">
+                                            <div className="flex min-w-0 flex-1 items-center gap-3">
+                                                <div className="w-10 h-10 shrink-0 rounded-xl bg-(--color-brand-primary-light) flex items-center justify-center text-lg">
                                                     <AppIcon name="vendors" className="h-5 w-5" />
                                                 </div>
-                                                <div>
+                                                <div className="min-w-0 [overflow-wrap:anywhere]">
                                                     <div className="font-semibold text-(--color-text-primary)">
                                                         {vendor.company_name}
                                                     </div>
@@ -161,6 +171,7 @@ export default function AdminDashboard({
                                             </div>
                                             <ActionLink
                                                 variant="outline"
+                                                className="min-h-9 justify-center whitespace-normal"
                                                 href={`/admin/vendors/${vendor.id}`}
                                             >
                                                 {t('Review')}
@@ -184,6 +195,7 @@ export default function AdminDashboard({
                     {/* Documents pending verification */}
                     {can.verify_documents && (
                         <Card
+                            className="min-w-0 [&>div:first-child]:flex-wrap [&>div:first-child]:gap-3 [&>div:first-child>h3]:min-w-0 [&>div:first-child>h3]:flex-wrap"
                             title={
                                 <>
                                     <span className="mr-2 inline-flex align-middle">
@@ -194,12 +206,13 @@ export default function AdminDashboard({
                                 </>
                             }
                             actions={
-                                <Link
+                                <ActionLink
+                                    variant="ghost"
                                     href="/admin/documents"
-                                    className="text-(--color-brand-primary) hover:text-(--color-brand-primary-hover) text-sm font-medium"
+                                    className="min-h-9 justify-center whitespace-normal text-(--color-brand-primary)! hover:text-(--color-brand-primary-hover)!"
                                 >
                                     {t('View All')}
-                                </Link>
+                                </ActionLink>
                             }
                         >
                             <div className="divide-y divide-(--color-border-secondary)">
@@ -207,13 +220,13 @@ export default function AdminDashboard({
                                     pendingDocuments.map((doc) => (
                                         <div
                                             key={doc.id}
-                                            className="px-5 py-4 flex items-center justify-between hover:bg-(--color-bg-hover) transition-colors"
+                                            className="p-3 sm:p-4 flex min-w-0 flex-wrap items-center justify-between gap-3 hover:bg-(--color-bg-hover) transition-colors"
                                         >
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-xl icon-bg-gradient-primary flex items-center justify-center text-lg">
+                                            <div className="flex min-w-0 flex-1 items-center gap-3">
+                                                <div className="w-10 h-10 shrink-0 rounded-xl icon-bg-gradient-primary flex items-center justify-center text-lg">
                                                     <AppIcon name="documents" className="h-5 w-5" />
                                                 </div>
-                                                <div>
+                                                <div className="min-w-0 [overflow-wrap:anywhere]">
                                                     <div className="font-semibold text-(--color-text-primary)">
                                                         {/* Translate only recognized system document types. */}
                                                         {translateDocumentTypeLabel(
@@ -246,6 +259,7 @@ export default function AdminDashboard({
                     {/* Finance manager view */}
                     {enabled && !can.approve_vendors && can.approve_payments && (
                         <Card
+                            className="min-w-0 [&>div:first-child]:flex-wrap [&>div:first-child]:gap-3 [&>div:first-child>h3]:min-w-0 [&>div:first-child>h3]:flex-wrap xl:col-span-2 shadow-token-md border-(--color-brand-primary-light)"
                             title={
                                 <>
                                     <span className="mr-2 inline-flex align-middle">
@@ -256,27 +270,27 @@ export default function AdminDashboard({
                                 </>
                             }
                             actions={
-                                <Link
+                                <ActionLink
+                                    variant="ghost"
                                     href="/admin/payments?status=pending_finance"
-                                    className="text-(--color-brand-primary) hover:text-(--color-brand-primary-hover) text-sm font-medium"
+                                    className="min-h-9 justify-center whitespace-normal text-(--color-brand-primary)! hover:text-(--color-brand-primary-hover)!"
                                 >
                                     {t('View All')}
-                                </Link>
+                                </ActionLink>
                             }
-                            className="lg:col-span-2 shadow-token-md border-(--color-brand-primary-light)"
                         >
                             <div className="divide-y divide-(--color-border-secondary)">
                                 {pendingPayments.length > 0 ? (
                                     pendingPayments.map((payment) => (
                                         <div
                                             key={payment.id}
-                                            className="px-5 py-4 flex flex-wrap items-center justify-between hover:bg-(--color-bg-hover) transition-colors"
+                                            className="p-3 sm:p-4 flex min-w-0 flex-wrap items-center justify-between gap-3 hover:bg-(--color-bg-hover) transition-colors"
                                         >
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-xl icon-bg-gradient-success flex items-center justify-center text-lg">
+                                            <div className="flex min-w-0 flex-1 items-center gap-3">
+                                                <div className="w-10 h-10 shrink-0 rounded-xl icon-bg-gradient-success flex items-center justify-center text-lg">
                                                     <AppIcon name="payments" className="h-5 w-5" />
                                                 </div>
-                                                <div>
+                                                <div className="min-w-0 [overflow-wrap:anywhere]">
                                                     <div className="font-semibold text-(--color-text-primary)">
                                                         {payment.vendor_name}
                                                     </div>
@@ -291,6 +305,7 @@ export default function AdminDashboard({
                                             </div>
                                             <ActionLink
                                                 variant="outline"
+                                                className="min-h-9 justify-center whitespace-normal"
                                                 href={`/admin/payments/${payment.id}`}
                                             >
                                                 {/* Translate the payment review action. */}
@@ -313,13 +328,15 @@ export default function AdminDashboard({
                 </div>
 
                 {/* Quick Actions */}
-                <Card title="Quick Actions">
-                    <div className="p-4">
-                        <div className={`grid ${quickActionColumns} gap-4`}>
+                <Card title="Quick Actions" className="min-w-0">
+                    <div className="min-w-0">
+                        <div
+                            className={`grid min-w-0 grid-cols-1 ${quickActionColumns} gap-4 [&>a]:min-w-0`}
+                        >
                             {can.approve_vendors && (
                                 <Link
                                     href="/admin/vendors?status=submitted"
-                                    className="p-4 rounded-xl bg-gradient-primary text-white flex flex-col items-center justify-center gap-2 group shadow-token-primary hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                                    className="min-h-9 min-w-0 p-4 rounded-xl bg-gradient-primary text-white! flex flex-col items-center justify-center gap-2 group shadow-token-primary hover:shadow-xl hover:-translate-y-0.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-brand-primary) motion-reduce:transition-none motion-reduce:hover:translate-y-0"
                                 >
                                     <span className="text-2xl group-hover:scale-110 transition-transform inline-flex">
                                         <AppIcon name="reports" className="h-6 w-6" />
@@ -333,7 +350,7 @@ export default function AdminDashboard({
                             {can.run_compliance && (
                                 <Link
                                     href="/admin/compliance"
-                                    className="p-4 rounded-xl bg-gradient-success text-white flex flex-col items-center justify-center gap-2 group shadow-token-success hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                                    className="min-h-9 min-w-0 p-4 rounded-xl bg-gradient-success text-white! flex flex-col items-center justify-center gap-2 group shadow-token-success hover:shadow-xl hover:-translate-y-0.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-brand-primary) motion-reduce:transition-none motion-reduce:hover:translate-y-0"
                                 >
                                     <span className="text-2xl group-hover:scale-110 transition-transform inline-flex">
                                         <AppIcon name="compliance" className="h-6 w-6" />
@@ -347,7 +364,7 @@ export default function AdminDashboard({
                             {enabled && (
                                 <Link
                                     href="/admin/payments"
-                                    className="p-4 rounded-xl bg-gradient-warning text-white flex flex-col items-center justify-center gap-2 group shadow-token-warning hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                                    className="min-h-9 min-w-0 p-4 rounded-xl bg-gradient-warning text-white! flex flex-col items-center justify-center gap-2 group shadow-token-warning hover:shadow-xl hover:-translate-y-0.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-brand-primary) motion-reduce:transition-none motion-reduce:hover:translate-y-0"
                                 >
                                     <span className="text-2xl group-hover:scale-110 transition-transform inline-flex">
                                         <AppIcon name="payments" className="h-6 w-6" />
@@ -364,7 +381,7 @@ export default function AdminDashboard({
                             )}
                             <Link
                                 href="/notifications"
-                                className="p-4 rounded-xl bg-gradient-danger text-white flex flex-col items-center justify-center gap-2 group shadow-token-danger hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                                className="min-h-9 min-w-0 p-4 rounded-xl bg-gradient-danger text-white! flex flex-col items-center justify-center gap-2 group shadow-token-danger hover:shadow-xl hover:-translate-y-0.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-brand-primary) motion-reduce:transition-none motion-reduce:hover:translate-y-0"
                             >
                                 <span className="text-2xl group-hover:scale-110 transition-transform inline-flex">
                                     <AppIcon name="notifications" className="h-6 w-6" />

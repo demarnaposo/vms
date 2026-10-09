@@ -33,9 +33,9 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
     return (
         <VendorLayout title="Compliance" activeNav="Compliance" header={header} vendor={vendor}>
             {/* Translate fixed score guidance and labels while leaving rule records verbatim. */}
-            <div className="space-y-8">
-                <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl p-8 shadow-token-sm">
-                    <div className="flex flex-col md:flex-row items-center gap-8">
+            <div className="min-w-0 space-y-6">
+                <div className="bg-(--color-bg-primary) border border-(--color-border-primary) rounded-2xl min-w-0 p-4 sm:p-6 lg:p-8 shadow-token-sm">
+                    <div className="flex min-w-0 flex-col xl:flex-row items-center gap-6">
                         <div className="relative w-40 h-40 shrink-0">
                             <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                                 <circle
@@ -73,7 +73,7 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
                             </div>
                         </div>
 
-                        <div className="flex-1 text-center md:text-left">
+                        <div className="min-w-0 flex-1 text-center xl:text-left">
                             <h2 className="text-2xl font-bold text-(--color-text-primary) mb-2">
                                 {t('Compliance Score')}
                             </h2>
@@ -86,7 +86,7 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
                                           : 'Critical. Immediate action required.'
                                 )}
                             </p>
-                            <div className="flex justify-center md:justify-start gap-4">
+                            <div className="flex flex-wrap justify-center xl:justify-start gap-3">
                                 <div className="text-center px-4 py-2 bg-(--color-success-light) rounded-lg">
                                     <div className="text-2xl font-bold text-(--color-success)">
                                         {passedRules}
@@ -137,9 +137,9 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
                                         key={rule.id}
                                         className="p-4 hover:bg-(--color-bg-hover) transition-colors"
                                     >
-                                        <div className="flex items-start gap-4">
+                                        <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-3 sm:flex sm:items-start">
                                             <div
-                                                className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
+                                                className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
                                                     status === 'pass'
                                                         ? 'bg-(--color-success-light) text-(--color-success)'
                                                         : status === 'fail'
@@ -158,7 +158,7 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
                                                     className="h-5 w-5"
                                                 />
                                             </div>
-                                            <div className="flex-1">
+                                            <div className="min-w-0 flex-1 [overflow-wrap:anywhere]">
                                                 <div className="flex items-center gap-2">
                                                     <h3 className="font-semibold text-(--color-text-primary)">
                                                         {/* Translate recognized system rule labels. */}
@@ -198,7 +198,7 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
                                                 )}
                                             </div>
                                             <div
-                                                className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                                className={`col-start-2 w-fit shrink-0 px-3 py-1 rounded-full text-xs font-medium ${
                                                     status === 'pass'
                                                         ? 'bg-(--color-success-light) text-(--color-success-dark)'
                                                         : status === 'fail'
@@ -224,9 +224,9 @@ export default function Compliance({ vendor, complianceResults = [], rules = [] 
 
                 {failedRules > 0 && (
                     <Card title="How to Improve">
-                        <div className="p-6">
+                        <div className="min-w-0">
                             <div className="flex items-start gap-4 p-4 bg-(--color-warning-light) border border-(--color-warning) rounded-xl">
-                                <span className="text-2xl inline-flex">
+                                <span className="shrink-0 text-2xl inline-flex">
                                     <AppIcon name="info" className="h-6 w-6" />
                                 </span>
                                 <div>

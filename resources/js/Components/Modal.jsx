@@ -1,3 +1,4 @@
+import { DisabledButton } from './DisabledActionTooltip';
 import { useEffect } from 'react';
 import AppIcon from './AppIcon';
 // Translate reusable modal titles and actions.
@@ -74,22 +75,29 @@ export function ModalCancelButton({ onClick, children = 'Cancel' }) {
     );
 }
 
-export function ModalPrimaryButton({ onClick, disabled = false, variant = 'primary', children }) {
+export function ModalPrimaryButton({
+    onClick,
+    disabled = false,
+    disabledReason,
+    variant = 'primary',
+    children,
+}) {
     const { t } = useLanguage();
     const variants = {
-        primary: 'bg-(--color-brand-primary) hover:bg-(--color-brand-primary-hover) text-white',
+        primary: 'theme-primary-action',
         success: 'bg-(--color-success) hover:bg-(--color-success-hover) text-white',
         danger: 'bg-(--color-danger) hover:bg-(--color-danger-hover) text-white',
     };
 
     return (
-        <button
+        <DisabledButton
             type="button"
             onClick={onClick}
             disabled={disabled}
+            disabledReason={disabledReason}
             className={`px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant]}`}
         >
             {t(children)}
-        </button>
+        </DisabledButton>
     );
 }

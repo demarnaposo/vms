@@ -1,5 +1,5 @@
-import { Link } from '@inertiajs/react';
-import { AdminLayout, PageHeader, DataTable, Badge, Button, AppIcon } from '@/Components';
+import { ActionLink } from '@/Components/ActionControls';
+import { AdminLayout, PageHeader, DataTable, Badge, AppIcon } from '@/Components';
 // Localize fixed performance labels without translating database metric content.
 import { useLanguage } from '@/Contexts/LanguageContext';
 // Localize recognized performance metric master records.
@@ -32,7 +32,9 @@ export default function PerformanceIndex({
         {
             header: 'Vendor',
             render: (row) => (
-                <span className="text-(--color-text-primary) font-medium">{row.company_name}</span>
+                <span className="min-w-0 [overflow-wrap:anywhere] text-(--color-text-primary) font-medium">
+                    {row.company_name}
+                </span>
             ),
         },
         {
@@ -60,17 +62,21 @@ export default function PerformanceIndex({
             header: 'Actions',
             align: 'right',
             render: (row) => (
-                <div className="flex items-center justify-end gap-2">
-                    <Link href={`/admin/performance/${row.id}`}>
-                        <Button variant="outline" size="sm">
-                            View
-                        </Button>
-                    </Link>
-                    <Link href={`/admin/performance/${row.id}/rate`}>
-                        <Button variant="primary" size="sm">
-                            Rate
-                        </Button>
-                    </Link>
+                <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">
+                    <ActionLink
+                        href={`/admin/performance/${row.id}`}
+                        variant="outline"
+                        className="min-h-9 justify-center"
+                    >
+                        {t('View')}
+                    </ActionLink>
+                    <ActionLink
+                        href={`/admin/performance/${row.id}/rate`}
+                        variant="primary"
+                        className="min-h-9 justify-center"
+                    >
+                        {t('Rate')}
+                    </ActionLink>
                 </div>
             ),
         },
@@ -82,19 +88,19 @@ export default function PerformanceIndex({
 
     return (
         <AdminLayout title="Performance Dashboard" activeNav="Performance" header={header}>
-            <div className="space-y-8">
-                <div className="bg-(--color-bg-primary) rounded-xl border border-(--color-border-primary) shadow-sm p-6">
+            <div className="min-w-0 space-y-6">
+                <div className="bg-(--color-bg-primary) rounded-xl border border-(--color-border-primary) shadow-sm min-w-0 p-4 sm:p-6">
                     <h2 className="text-lg font-semibold text-(--color-text-primary) mb-4">
                         {/* Translate the fixed section heading. */}
                         {t('Performance Metrics')}
                     </h2>
-                    <div className="grid md:grid-cols-4 gap-4">
+                    <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 [&>div]:min-w-0">
                         {metrics.map((metric) => (
                             <div
                                 key={metric.id}
                                 className="p-4 rounded-lg bg-(--color-bg-secondary) border border-(--color-border-secondary)"
                             >
-                                <div className="text-(--color-text-primary) font-medium">
+                                <div className="min-w-0 [overflow-wrap:anywhere] text-(--color-text-primary) font-medium">
                                     {/* Translate fixed metric labels and preserve custom metrics. */}
                                     {translateSystemMasterDataField(
                                         language,
@@ -103,7 +109,7 @@ export default function PerformanceIndex({
                                         'display_name'
                                     )}
                                 </div>
-                                <div className="text-sm text-(--color-text-tertiary) mt-1">
+                                <div className="[overflow-wrap:anywhere] text-sm text-(--color-text-tertiary) mt-1">
                                     {/* Translate only fixed metric descriptions. */}
                                     {translateSystemMasterDataField(
                                         language,
@@ -112,11 +118,13 @@ export default function PerformanceIndex({
                                         'description'
                                     )}
                                 </div>
-                                <div className="flex items-center gap-2 mt-2">
+                                <div className="flex flex-wrap items-center gap-2 mt-2">
                                     <span className="text-xs text-(--color-brand-primary)">
                                         {/* Translate the fixed weight label, not metric data. */}
                                         {t('Weight: :weight%', {
-                                            weight: (metric.weight * 100).toFixed(0),
+                                            weight: new Intl.NumberFormat(
+                                                language === 'id' ? 'id-ID' : 'en-US'
+                                            ).format(Number(metric.weight)),
                                         })}
                                     </span>
                                     <span className="text-xs text-(--color-text-tertiary)">
@@ -129,8 +137,8 @@ export default function PerformanceIndex({
                     </div>
                 </div>
 
-                <div className="grid lg:grid-cols-2 gap-8">
-                    <div className="bg-(--color-bg-primary) rounded-xl border border-(--color-border-primary) shadow-sm p-6">
+                <div className="grid min-w-0 grid-cols-1 gap-6 xl:grid-cols-2 [&>div]:min-w-0">
+                    <div className="bg-(--color-bg-primary) rounded-xl border border-(--color-border-primary) shadow-sm min-w-0 p-4 sm:p-6">
                         <h2 className="text-lg font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
                             {/* Translate the fixed ranking heading. */}
                             <AppIcon name="metrics" className="h-5 w-5" /> {t('Top Performers')}
@@ -139,13 +147,13 @@ export default function PerformanceIndex({
                             {topPerformers.map((vendor, idx) => (
                                 <div
                                     key={vendor.id}
-                                    className="flex items-center justify-between p-3 rounded-lg bg-(--color-bg-secondary) border border-(--color-border-secondary)"
+                                    className="flex min-w-0 flex-wrap items-center justify-between gap-3 p-3 rounded-lg bg-(--color-bg-secondary) border border-(--color-border-secondary)"
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-(--color-warning-light) flex items-center justify-center text-(--color-warning) font-bold text-sm">
+                                    <div className="flex min-w-0 items-center gap-3">
+                                        <div className="shrink-0 w-8 h-8 rounded-full bg-(--color-warning-light) flex items-center justify-center text-(--color-warning) font-bold text-sm">
                                             {idx + 1}
                                         </div>
-                                        <span className="text-(--color-text-primary) font-medium">
+                                        <span className="min-w-0 [overflow-wrap:anywhere] text-(--color-text-primary) font-medium">
                                             {vendor.company_name}
                                         </span>
                                     </div>
@@ -165,7 +173,7 @@ export default function PerformanceIndex({
                         </div>
                     </div>
 
-                    <div className="bg-(--color-bg-primary) rounded-xl border border-(--color-border-primary) shadow-sm p-6">
+                    <div className="bg-(--color-bg-primary) rounded-xl border border-(--color-border-primary) shadow-sm min-w-0 p-4 sm:p-6">
                         <h2 className="text-lg font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
                             {/* Translate the fixed improvement heading. */}
                             <AppIcon name="warning" className="h-5 w-5" /> {t('Needs Improvement')}
@@ -174,22 +182,24 @@ export default function PerformanceIndex({
                             {lowPerformers.map((vendor) => (
                                 <div
                                     key={vendor.id}
-                                    className="flex items-center justify-between p-3 rounded-lg bg-(--color-bg-secondary) border border-(--color-border-secondary)"
+                                    className="flex min-w-0 flex-wrap items-center justify-between gap-3 p-3 rounded-lg bg-(--color-bg-secondary) border border-(--color-border-secondary)"
                                 >
-                                    <span className="text-(--color-text-primary) font-medium">
+                                    <span className="min-w-0 [overflow-wrap:anywhere] text-(--color-text-primary) font-medium">
                                         {vendor.company_name}
                                     </span>
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex min-w-0 items-center gap-3">
                                         <span
                                             className={`text-xl font-bold ${getScoreColor(vendor.performance_score)}`}
                                         >
                                             {vendor.performance_score}
                                         </span>
-                                        <Link href={`/admin/performance/${vendor.id}/rate`}>
-                                            <Button variant="primary" size="sm">
-                                                Rate
-                                            </Button>
-                                        </Link>
+                                        <ActionLink
+                                            href={`/admin/performance/${vendor.id}/rate`}
+                                            variant="primary"
+                                            className="min-h-9 justify-center"
+                                        >
+                                            {t('Rate')}
+                                        </ActionLink>
                                     </div>
                                 </div>
                             ))}
@@ -203,11 +213,13 @@ export default function PerformanceIndex({
                     </div>
                 </div>
 
-                <DataTable
-                    columns={columns}
-                    data={vendors}
-                    emptyMessage="No approved or active vendors available for rating"
-                />
+                <div className="min-w-0 [&_table]:min-w-[720px] [&_table]:table-fixed [&_td]:[overflow-wrap:anywhere]">
+                    <DataTable
+                        columns={columns}
+                        data={vendors}
+                        emptyMessage="No approved or active vendors available for rating"
+                    />
+                </div>
             </div>
         </AdminLayout>
     );

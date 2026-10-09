@@ -1,7 +1,22 @@
-export function resolveFlashToast(flash, translate) {
+import { translateDocumentTypeLabel } from '../i18n/documentTypes.js';
+
+export function resolveFlashToast(flash, translate, language = 'en') {
     if (!flash) return null;
 
-    const success = flash.success ? translate(flash.success) : null;
+    const documentMessage = flash.success_i18n;
+    const hasDocumentMessage =
+        [':document verified successfully.', ':document rejected.'].includes(
+            documentMessage?.message
+        ) &&
+        typeof documentMessage?.document_type?.name === 'string' &&
+        typeof documentMessage?.document_type?.display_name === 'string';
+    const success = flash.success
+        ? hasDocumentMessage
+            ? translate(documentMessage.message, {
+                  document: translateDocumentTypeLabel(language, documentMessage.document_type),
+              })
+            : translate(flash.success)
+        : null;
     const error = flash.error ? translate(flash.error) : null;
 
     if (success && error) {

@@ -1,3 +1,4 @@
+import { DisabledButton } from './DisabledActionTooltip';
 // =====================================
 // LAYOUT COMPONENTS
 // =====================================
@@ -73,14 +74,14 @@ export function Button({
     variant = 'primary',
     size = 'md',
     disabled = false,
+    disabledReason,
     onClick,
     type = 'button',
     className = '',
 }) {
     const { t } = useLanguage();
     const variants = {
-        primary:
-            'bg-(--color-brand-primary) hover:bg-(--color-brand-primary-hover) text-white shadow-md shadow-(--color-brand-primary)/30',
+        primary: 'theme-primary-action shadow-md shadow-(--color-brand-primary)/30',
         secondary:
             'bg-(--color-bg-secondary) hover:bg-(--color-bg-tertiary) text-(--color-text-secondary)',
         success: 'bg-(--color-success) hover:bg-(--color-success-dark) text-white',
@@ -98,21 +99,22 @@ export function Button({
     };
 
     return (
-        <button
+        <DisabledButton
             type={type}
             onClick={onClick}
             disabled={disabled}
+            disabledReason={disabledReason}
             className={`inline-flex items-center gap-2 rounded-xl font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]} ${className}`}
         >
             {t(children)}
-        </button>
+        </DisabledButton>
     );
 }
 
 export function LinkButton({ href, children, variant = 'primary', size = 'md', className = '' }) {
     const { t } = useLanguage();
     const variants = {
-        primary: 'bg-(--color-brand-primary) hover:bg-(--color-brand-primary-hover) text-white',
+        primary: 'theme-primary-action',
         secondary:
             'bg-(--color-bg-secondary) hover:bg-(--color-bg-tertiary) text-(--color-text-secondary)',
         ghost: 'hover:bg-(--color-bg-secondary) text-(--color-text-muted) hover:text-(--color-text-primary)',
@@ -141,8 +143,7 @@ export function IconButton({ icon, onClick, variant = 'ghost', size = 'md', titl
     const { t } = useLanguage();
     const variants = {
         ghost: 'hover:bg-(--color-bg-secondary) text-(--color-text-muted) hover:text-(--color-text-primary)',
-        primary:
-            'bg-(--color-brand-primary)/10 hover:bg-(--color-brand-primary)/20 text-(--color-brand-primary)',
+        primary: 'theme-primary-action',
         danger: 'hover:bg-(--color-danger)/10 text-(--color-text-muted) hover:text-(--color-danger)',
     };
 
