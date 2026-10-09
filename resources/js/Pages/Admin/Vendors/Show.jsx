@@ -1,3 +1,4 @@
+import VendorCategoryTooltip from '@/Components/VendorCategoryTooltip';
 import { vendorCategoryLabel } from '@/i18n/vendorCategories';
 import { ActionButton, ActionLink, ActionAnchor } from '@/Components/ActionControls';
 import { router, useForm, usePage } from '@inertiajs/react';
@@ -347,15 +348,18 @@ export default function VendorShow({
                                 ],
                                 [
                                     'Category',
-                                    vendorCategoryLabel(language, vendor?.vendor_category) || '-',
-                                ],
-                                [
-                                    'Category Description',
-                                    vendorCategoryLabel(
-                                        language,
-                                        vendor?.vendor_category,
-                                        'description'
-                                    ) || '-',
+                                    <span
+                                        key="category"
+                                        className="flex min-w-0 flex-wrap items-center gap-2"
+                                    >
+                                        <span className="min-w-0 [overflow-wrap:anywhere]">
+                                            {vendorCategoryLabel(
+                                                language,
+                                                vendor?.vendor_category
+                                            ) || '-'}
+                                        </span>
+                                        <VendorCategoryTooltip category={vendor?.vendor_category} />
+                                    </span>,
                                 ],
                                 ['Experience', vendor?.experience || '-'],
                             ].map(([label, value]) => (
@@ -366,8 +370,8 @@ export default function VendorShow({
                                     <span className="text-(--color-text-secondary)">
                                         {t(label)}
                                     </span>
-                                    <span className="min-w-0 whitespace-pre-wrap [overflow-wrap:anywhere] text-(--color-text-primary) sm:text-right">
-                                        {value}
+                                    <span className="min-w-0 whitespace-pre-wrap [overflow-wrap:anywhere] text-(--color-text-primary) text-left">
+                                        {value ?? '-'}
                                     </span>
                                 </div>
                             ))}
@@ -400,8 +404,8 @@ export default function VendorShow({
                                     <span className="text-(--color-text-secondary)">
                                         {t(label)}
                                     </span>
-                                    <span className="min-w-0 whitespace-pre-wrap [overflow-wrap:anywhere] text-(--color-text-primary) sm:text-right">
-                                        {value}
+                                    <span className="min-w-0 whitespace-pre-wrap [overflow-wrap:anywhere] text-(--color-text-primary) text-left">
+                                        {value ?? '-'}
                                     </span>
                                 </div>
                             ))}
@@ -423,8 +427,8 @@ export default function VendorShow({
                                     <span className="text-(--color-text-secondary)">
                                         {t(label)}
                                     </span>
-                                    <span className="min-w-0 whitespace-pre-wrap [overflow-wrap:anywhere] text-(--color-text-primary) sm:text-right">
-                                        {value}
+                                    <span className="min-w-0 whitespace-pre-wrap [overflow-wrap:anywhere] text-(--color-text-primary) text-left">
+                                        {value ?? '-'}
                                     </span>
                                 </div>
                             ))}
@@ -448,11 +452,13 @@ export default function VendorShow({
                                     {vendor?.compliance_score || 0}%
                                 </span>
                             </div>
-                            <div className="flex flex-wrap justify-between items-center gap-2">
+                            <div className="grid min-w-0 gap-1 sm:grid-cols-2 sm:gap-4">
                                 <span className="text-(--color-text-secondary)">
                                     {t('Compliance Status')}
                                 </span>
-                                <Badge status={vendor?.compliance_status} />
+                                <span className="min-w-0 text-left">
+                                    <Badge status={vendor?.compliance_status} />
+                                </span>
                             </div>
                             {can.rate_vendors && (
                                 <ActionLink

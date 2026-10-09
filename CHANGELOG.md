@@ -6,6 +6,18 @@ The VMS (Vendor Management System) changelog starts on 2026-09-18. Changes befor
 
 ### Changed
 
+- 2026-10-09 — Restricted VMS themes to Ocean and Midnight across the selector, storage, DOM application and both initial HTML bootstraps; normalized removed/unknown preferences to Ocean without resetting other settings and removed unused theme options, descriptions and CSS; documented the two-theme preference policy in README.
+
+- 2026-10-09 — Removed the active profile tab underline while retaining sidebar gradients, active ring and accessible pressed state.
+
+- 2026-10-09 — Matched profile section tabs to the existing sidebar hover/active gradient and shadow behavior, retaining a neutral inactive state and the danger palette for Danger Zone.
+
+- 2026-10-09 — Standardized profile actions and deletion dialog buttons on compact shared ActionButton variants; applied theme/danger gradients to all three section triggers with pressed state, active underline/ring and responsive wrapping.
+
+- 2026-10-09 — Left-aligned vendor overview information and compliance status in consistent responsive columns; replaced the inline category description with the existing accessible category tooltip while preserving master translations and custom content.
+
+- 2026-10-09 — Aligned all three admin dashboard View All card links with the existing 36px outline ActionLink navigation style; retained the primary View All Vendors header action, translations, destination filters, permissions and payment feature flag.
+
 - 2026-10-08 — Restored the original performance slider initial value of 3/4 and native change behavior as requested; retained only the new integer range 1–4 and backend bounds.
 
 - 2026-10-08 — Removed the visible unselected-score wording from the performance slider; show its score value only after interaction while retaining empty submission state and accessible state information.
@@ -75,6 +87,8 @@ The VMS (Vendor Management System) changelog starts on 2026-09-18. Changes befor
 - 2026-10-05 — Made Ocean the fallback theme before and after React initialization, retained valid saved themes, and aligned primary buttons and action links with the active sidebar gradient while preserving semantic variants.
 
 ### Fixed
+
+- 2026-10-09 — Fixed default-language feature assertions to inspect the HTML lang attribute independently of attribute order and the existing theme attribute.
 
 - 2026-10-08 — Show bilingual onboarding file-size errors in MB beside the affected document, retain upload context, and turn oversized server POST requests into inline validation errors after authorization instead of a standalone 413 page.
 

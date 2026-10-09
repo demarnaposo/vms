@@ -83,6 +83,10 @@ VMS is architected for high availability and scalability, utilizing the latest i
 
 ---
 
+## VMS Themes
+
+VMS supports exactly two themes: Ocean (default) and Midnight (dark). The theme selector preserves either valid saved choice using the existing `vms-theme` storage key. Removed or unknown theme preferences fall back to Ocean and are normalized on first load without resetting language or other preferences. If browser storage is unavailable, the selected theme still applies for the current session.
+
 ## Access Credentials (Sandbox Environment)
 
 The system is pre-configured with the following RBAC accounts for validation and UAT (User Acceptance Testing).

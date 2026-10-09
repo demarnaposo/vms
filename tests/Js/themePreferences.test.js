@@ -7,6 +7,8 @@ import {
     SUPPORTED_THEMES,
     getInitialTheme,
     persistTheme,
+    normalizeTheme,
+    applyTheme,
 } from '../../resources/js/utils/themePreferences.js';
 
 const blade = readFileSync(new URL('../../resources/views/app.blade.php', import.meta.url), 'utf8');
@@ -33,15 +35,30 @@ function boot(stored, blocked = false) {
             },
         },
     };
+    const preferences = JSON.stringify({
+        language: 'id',
+        density: 'compact',
+        notifications: false,
+    });
+    const values = new Map([
+        ['vms-theme', stored],
+        ['vms.preferences.v1', preferences],
+        ['other-setting', 'keep'],
+    ]);
     const storage = {
         getItem(key) {
             assert.equal(key, 'vms-theme');
             if (blocked) throw new Error('Storage blocked');
-            return stored;
+            return values.get(key);
+        },
+        setItem(key, value) {
+            assert.equal(key, 'vms-theme');
+            if (blocked) throw new Error('Storage blocked');
+            values.set(key, value);
         },
     };
     runInNewContext(bootstrap, { document, localStorage: storage });
-    return { document, classes, window: { localStorage: storage } };
+    return { document, classes, values, preferences, window: { localStorage: storage } };
 }
 
 test('Ocean is the fallback before React and during initialization for absent/invalid preferences', () => {
@@ -54,7 +71,7 @@ test('Ocean is the fallback before React and during initialization for absent/in
         ),
         'ocean'
     );
-    for (const stored of [null, '', 'invalid', 'OCEAN']) {
+    for (const stored of [null, '', 'invalid', 'OCEAN', 'aurora', 'sunset']) {
         const browser = boot(stored);
         assert.equal(browser.document.documentElement.dataset.theme, 'ocean');
         assert.equal(getInitialTheme(browser.window, browser.document), 'ocean');
@@ -89,7 +106,7 @@ test('theme switching persists using the existing key and blocked storage does n
         assert.equal(getInitialTheme(window), theme);
     }
     persistTheme('invalid', window);
-    assert.equal(stored, 'midnight');
+    assert.equal(stored, 'ocean');
     const browser = boot('sunset', true);
     assert.equal(getInitialTheme(browser.window, browser.document), 'ocean');
     assert.doesNotThrow(() =>
@@ -100,5 +117,35 @@ test('theme switching persists using the existing key and blocked storage does n
         })
     );
     browser.document.documentElement.dataset.theme = 'sunset';
-    assert.equal(getInitialTheme(browser.window, browser.document), 'sunset');
+    assert.equal(getInitialTheme(browser.window, browser.document), 'ocean');
+});
+
+test('only Ocean and Midnight are supported; removed values normalize and apply safely', () => {
+    assert.deepEqual(SUPPORTED_THEMES, ['ocean', 'midnight']);
+    for (const theme of ['ocean', 'midnight', 'aurora', 'sunset', 'unknown', null]) {
+        const expected = theme === 'midnight' ? 'midnight' : 'ocean';
+        assert.equal(normalizeTheme(theme), expected);
+        const browser = boot('midnight');
+        assert.equal(applyTheme(theme, browser.document), expected);
+        assert.equal(browser.document.documentElement.dataset.theme, expected);
+        assert.equal(browser.classes.has('dark'), expected === 'midnight');
+    }
+});
+
+test('legacy bootstrap and React storage normalization preserve every other preference', () => {
+    for (const old of ['aurora', 'sunset', 'unknown']) {
+        const browser = boot(old);
+        assert.equal(browser.values.get('vms-theme'), 'ocean');
+        assert.equal(browser.values.get('vms.preferences.v1'), browser.preferences);
+        assert.equal(browser.values.get('other-setting'), 'keep');
+        browser.values.set('vms-theme', old);
+        assert.equal(getInitialTheme(browser.window, browser.document), 'ocean');
+        assert.equal(browser.values.get('vms-theme'), 'ocean');
+        assert.equal(browser.values.get('vms.preferences.v1'), browser.preferences);
+        assert.equal(browser.values.get('other-setting'), 'keep');
+        persistTheme(old, browser.window);
+        assert.equal(browser.values.get('vms-theme'), 'ocean');
+        assert.equal(browser.values.get('vms.preferences.v1'), browser.preferences);
+        assert.equal(browser.values.get('other-setting'), 'keep');
+    }
 });

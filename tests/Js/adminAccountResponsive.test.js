@@ -133,6 +133,19 @@ for (const language of ['id', 'en']) {
             );
             assert.ok(html.includes(manual));
             assert.ok(html.includes('flex flex-wrap gap-2'));
+            const tabMarkup = html.split('flex flex-wrap gap-2 min-w-0 mb-6')[1].split('</div>')[0];
+            const tabs = [
+                ...tabMarkup.matchAll(/<button\b[^>]*aria-pressed="(?:true|false)"[^>]*>/g),
+            ].filter(([tag]) => /sidebar-main-item/.test(tag));
+            assert.equal(tabs.length, 3);
+            assert.match(tabMarkup, /--gradient-primary:var\(--gradient-danger\)/);
+            assert.equal(tabs.filter(([tag]) => tag.includes('aria-pressed="true"')).length, 1);
+            for (const [tag] of tabs) {
+                assert.ok(tag.includes('type="button"'));
+                assert.match(tag, /sidebar-main-item/);
+            }
+            assert.match(tabs.find(([tag]) => tag.includes('aria-pressed="true"'))[0], /ring-2/);
+            assert.doesNotMatch(tabMarkup, /underline/);
         }
     );
     test(
@@ -150,7 +163,7 @@ for (const language of ['id', 'en']) {
                 (html.match(/aria-label="(?:Show password|Tampilkan kata sandi)"/g) || []).length,
                 3
             );
-            assert.ok(/type="submit"[^>]*disabled=""/.test(html));
+            assert.ok(/<button\b(?=[^>]*type="submit")(?=[^>]*disabled="")[^>]*>/.test(html));
             assert.ok(html.includes('data-disabled-trigger'));
             assert.ok(
                 html.includes(

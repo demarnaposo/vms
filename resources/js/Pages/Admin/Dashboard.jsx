@@ -141,9 +141,9 @@ export default function AdminDashboard({
                             }
                             actions={
                                 <ActionLink
-                                    variant="ghost"
+                                    variant="outline"
                                     href="/admin/vendors?status=submitted"
-                                    className="min-h-9 justify-center whitespace-normal text-(--color-brand-primary)! hover:text-(--color-brand-primary-hover)!"
+                                    className="min-h-9 justify-center whitespace-normal"
                                 >
                                     {t('View All')}
                                 </ActionLink>
@@ -207,9 +207,9 @@ export default function AdminDashboard({
                             }
                             actions={
                                 <ActionLink
-                                    variant="ghost"
+                                    variant="outline"
                                     href="/admin/documents"
-                                    className="min-h-9 justify-center whitespace-normal text-(--color-brand-primary)! hover:text-(--color-brand-primary-hover)!"
+                                    className="min-h-9 justify-center whitespace-normal"
                                 >
                                     {t('View All')}
                                 </ActionLink>
@@ -271,9 +271,9 @@ export default function AdminDashboard({
                             }
                             actions={
                                 <ActionLink
-                                    variant="ghost"
+                                    variant="outline"
                                     href="/admin/payments?status=pending_finance"
-                                    className="min-h-9 justify-center whitespace-normal text-(--color-brand-primary)! hover:text-(--color-brand-primary-hover)!"
+                                    className="min-h-9 justify-center whitespace-normal"
                                 >
                                     {t('View All')}
                                 </ActionLink>

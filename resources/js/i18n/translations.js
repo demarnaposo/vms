@@ -142,9 +142,7 @@ export const INDONESIAN_TRANSLATIONS = Object.freeze({
         'VMS menyatukan onboarding vendor, kepatuhan, dan dokumen dalam satu ruang kerja yang rapi.',
 
     'Theme options': 'Pilihan tema',
-    'Balanced teal': 'Hijau kebiruan seimbang',
     'Cool blue tones': 'Nuansa biru sejuk',
-    'Warm contrast': 'Kontras hangat',
     'Dark workspace': 'Ruang kerja gelap',
     'NIB/OSS (Business Identification Number)': 'NIB/OSS (Nomor Induk Berusaha)',
     'NPWP (Taxpayer Identification Number)': 'NPWP (Nomor Pokok Wajib Pajak)',

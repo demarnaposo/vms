@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { before, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { createElement } from 'react';
@@ -29,6 +30,13 @@ before(async () => {
             {
                 name: 'existing-runtime-packages',
                 setup(builder) {
+                    builder.onLoad({ filter: /\/ThemeSwitcher\.jsx$/ }, async ({ path }) => ({
+                        contents: (await readFile(path, 'utf8')).replace(
+                            'useState(false)',
+                            'useState(window.__testOpenThemeMenu || false)'
+                        ),
+                        loader: 'jsx',
+                    }));
                     builder.onResolve(
                         { filter: /^(react(?:-dom)?(?:\/.*)?|@inertiajs\/react|axios|sonner)$/ },
                         (args) => ({
@@ -45,11 +53,14 @@ before(async () => {
     );
 });
 
-function render(component, props, language = 'en') {
+function render(component, props, language = 'en', theme = 'invalid', isOpen = false) {
     const previousWindow = globalThis.window;
     globalThis.window = {
         location: new URL('http://vms.test'),
-        localStorage: { getItem: () => JSON.stringify({ language }) },
+        __testOpenThemeMenu: isOpen,
+        localStorage: {
+            getItem: (key) => (key === 'vms-theme' ? theme : JSON.stringify({ language })),
+        },
     };
     try {
         return renderToStaticMarkup(
@@ -170,5 +181,18 @@ test('theme selector displays Ocean for invalid preferences in both locales', ()
         const html = render(controls.ThemeSwitcher, {}, locale);
         assert.match(html, />Ocean<\/span>/);
         assert.match(html, /aria-expanded="false"/);
+    }
+});
+
+test('theme menu exposes exactly two accessible choices in both locales and preserves valid selections', () => {
+    for (const locale of ['en', 'id']) {
+        for (const theme of ['ocean', 'midnight', 'aurora', 'sunset', 'unknown']) {
+            const html = render(controls.ThemeSwitcher, {}, locale, theme, true);
+            assert.equal((html.match(/role="menuitemradio"/g) || []).length, 2);
+            assert.equal((html.match(/aria-checked="true"/g) || []).length, 1);
+            assert.doesNotMatch(html, /Aurora|Sunset/);
+            assert.ok(html.includes(`>${theme === 'midnight' ? 'Midnight' : 'Ocean'}</span>`));
+            assert.ok(html.includes(locale === 'id' ? 'Nuansa biru sejuk' : 'Cool blue tones'));
+        }
     }
 });

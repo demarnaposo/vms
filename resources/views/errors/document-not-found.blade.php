@@ -106,8 +106,11 @@
             var theme = 'ocean';
             try {
                 var stored = localStorage.getItem('vms-theme');
-                if (['aurora', 'ocean', 'sunset', 'midnight'].indexOf(stored) !== -1) {
+                if (['ocean', 'midnight'].indexOf(stored) !== -1) {
                     theme = stored;
+                }
+                if (stored !== null && stored !== theme) {
+                    localStorage.setItem('vms-theme', theme);
                 }
             } catch (e) {}
             document.documentElement.dataset.theme = theme;

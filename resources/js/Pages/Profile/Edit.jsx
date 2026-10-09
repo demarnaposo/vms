@@ -1,5 +1,6 @@
+import { ActionButton } from '@/Components/ActionControls';
 import { useForm, usePage } from '@inertiajs/react';
-import { Fragment, useId, useState } from 'react';
+import { useId, useState } from 'react';
 import PasswordInput from '@/Components/PasswordInput';
 // Translate profile settings text from the shared language state.
 import { useLanguage } from '@/Contexts/LanguageContext';
@@ -8,11 +9,8 @@ import {
     AdminLayout,
     PageHeader,
     Card,
-    Button,
     FormInput,
     Modal,
-    ModalCancelButton,
-    ModalPrimaryButton,
     Alert,
     AppIcon,
 } from '@/Components';
@@ -60,7 +58,7 @@ function AdminProfileField({ label, type = 'text', value, onChange, error, requi
 
 function AdminProfileModal(props) {
     return (
-        <div className="[&_.glass-modal]:min-w-0 [&_.glass-modal]:max-h-[calc(100dvh-2rem)] [&_.glass-modal]:overflow-y-auto [&_.glass-modal]:p-4 sm:[&_.glass-modal]:p-6 [&_h3]:min-w-0 [&_h3]:break-words [&_button]:min-h-9 [&_button]:focus-visible:outline-2 [&_button]:focus-visible:outline-offset-2 [&_button]:focus-visible:outline-(--color-brand-primary)">
+        <div className="[&_.glass-modal]:min-w-0 [&_.glass-modal]:max-h-[calc(100dvh-2rem)] [&_.glass-modal]:overflow-y-auto [&_.glass-modal]:p-4 sm:[&_.glass-modal]:p-6 [&_h3]:min-w-0 [&_h3]:break-words [&_.glass-modal>div:first-child>button]:inline-flex [&_.glass-modal>div:first-child>button]:w-9 [&_.glass-modal>div:first-child>button]:shrink-0 [&_.glass-modal>div:first-child>button]:items-center [&_.glass-modal>div:first-child>button]:justify-center [&_.glass-modal>div:first-child>button]:rounded-xl [&_.glass-modal>div:first-child>button:hover]:bg-(--color-bg-secondary) [&_button]:min-h-9 [&_button]:focus-visible:outline-2 [&_button]:focus-visible:outline-offset-2 [&_button]:focus-visible:outline-(--color-brand-primary)">
             <Modal {...props} />
         </div>
     );
@@ -112,11 +110,9 @@ export default function ProfileEdit() {
 
     const Layout = isVendor ? VendorLayout : AdminLayout;
     const ProfileField = isVendor ? FormInput : AdminProfileField;
-    const ProfileModal = isVendor ? Modal : AdminProfileModal;
-    const ModalFooter = isVendor ? Fragment : 'div';
-    const adminActionClass = isVendor
-        ? undefined
-        : 'min-h-9 w-full justify-center whitespace-normal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-brand-primary) sm:w-auto';
+    const ProfileModal = AdminProfileModal;
+    const ModalFooter = 'div';
+    const actionClass = 'min-h-9 w-full justify-center whitespace-normal sm:w-auto';
     const layoutProps = isVendor
         ? { title: 'Profile Settings', activeNav: 'Profile' }
         : { title: 'Profile Settings', activeNav: 'Dashboard' };
@@ -137,17 +133,27 @@ export default function ProfileEdit() {
                 }
             >
                 {/* Section Tabs */}
-                <div className={isVendor ? 'flex gap-2 mb-8' : 'flex flex-wrap gap-2 mb-6'}>
+                <div className="flex flex-wrap gap-2 min-w-0 mb-6">
                     {sections.map((section) => (
-                        <button
+                        <ActionButton
                             key={section.id}
-                            type={isVendor ? undefined : 'button'}
-                            aria-pressed={isVendor ? undefined : activeSection === section.id}
+                            type="button"
+                            variant="ghost"
+                            data-active={activeSection === section.id}
+                            style={
+                                section.id === 'danger'
+                                    ? {
+                                          '--gradient-primary': 'var(--gradient-danger)',
+                                          '--shadow-primary': 'var(--shadow-danger)',
+                                      }
+                                    : undefined
+                            }
+                            aria-pressed={activeSection === section.id}
                             onClick={() => setActiveSection(section.id)}
-                            className={`${isVendor ? '' : 'min-h-9 min-w-0 justify-center whitespace-normal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-brand-primary) '}flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            className={`sidebar-main-item min-h-9 min-w-0 justify-center whitespace-normal ${
                                 activeSection === section.id
-                                    ? 'bg-(--color-brand-primary) text-white shadow-md'
-                                    : 'bg-(--color-bg-primary) text-(--color-text-secondary) hover:text-(--color-brand-primary) border border-(--color-border-primary) shadow-sm'
+                                    ? 'ring-2 ring-offset-2 ring-(--color-text-primary) ring-offset-(--color-bg-primary)'
+                                    : ''
                             }`}
                         >
                             <span className="inline-flex">
@@ -155,7 +161,7 @@ export default function ProfileEdit() {
                             </span>
                             {/* Localize only the fixed profile section label. */}
                             {t(section.label)}
-                        </button>
+                        </ActionButton>
                     ))}
                 </div>
 
@@ -189,14 +195,14 @@ export default function ProfileEdit() {
                                 error={profileForm.errors.phone}
                             />
                             <div className="flex justify-end">
-                                <Button
-                                    className={adminActionClass}
+                                <ActionButton
+                                    className={actionClass}
                                     type="submit"
                                     disabled={profileForm.processing}
                                     disabledReason={'A request is in progress. Please wait.'}
                                 >
                                     {profileForm.processing ? 'Saving...' : 'Save Changes'}
-                                </Button>
+                                </ActionButton>
                             </div>
                         </form>
                     </Card>
@@ -239,14 +245,14 @@ export default function ProfileEdit() {
                                 required
                             />
                             <div className="flex justify-end">
-                                <Button
-                                    className={adminActionClass}
+                                <ActionButton
+                                    className={actionClass}
                                     type="submit"
                                     disabled={passwordForm.processing}
                                     disabledReason={'A request is in progress. Please wait.'}
                                 >
                                     {passwordForm.processing ? 'Updating...' : 'Update Password'}
-                                </Button>
+                                </ActionButton>
                             </div>
                         </form>
                     </Card>
@@ -261,13 +267,13 @@ export default function ProfileEdit() {
                                 removed. This action cannot be undone.
                             </Alert>
                             <div className="mt-6">
-                                <Button
-                                    className={adminActionClass}
+                                <ActionButton
+                                    className={actionClass}
                                     variant="danger"
                                     onClick={() => setShowDeleteModal(true)}
                                 >
                                     Delete My Account
-                                </Button>
+                                </ActionButton>
                             </div>
                         </div>
                     </Card>
@@ -281,15 +287,19 @@ export default function ProfileEdit() {
                 title="Delete Account"
                 footer={
                     <ModalFooter
-                        {...(!isVendor
-                            ? {
-                                  className:
-                                      'flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:justify-end [&>button]:w-full sm:[&>button]:w-auto [&_[data-disabled-trigger]]:w-full sm:[&_[data-disabled-trigger]]:w-auto [&_button]:justify-center [&_button]:whitespace-normal',
-                              }
-                            : {})}
+                        className={
+                            'flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:justify-end [&>button]:w-full sm:[&>button]:w-auto [&_[data-disabled-trigger]]:w-full sm:[&_[data-disabled-trigger]]:w-auto [&_button]:justify-center [&_button]:whitespace-normal'
+                        }
                     >
-                        <ModalCancelButton onClick={() => setShowDeleteModal(false)} />
-                        <ModalPrimaryButton
+                        <ActionButton
+                            variant="outline"
+                            className={actionClass}
+                            onClick={() => setShowDeleteModal(false)}
+                        >
+                            Cancel
+                        </ActionButton>
+                        <ActionButton
+                            className={actionClass}
                             variant="danger"
                             onClick={deleteAccount}
                             disabled={!deleteForm.data.password || deleteForm.processing}
@@ -300,7 +310,7 @@ export default function ProfileEdit() {
                             }
                         >
                             {deleteForm.processing ? 'Deleting...' : 'Delete Account'}
-                        </ModalPrimaryButton>
+                        </ActionButton>
                     </ModalFooter>
                 }
             >

@@ -2,26 +2,20 @@ import { useEffect, useRef, useState } from 'react';
 import AppIcon from './AppIcon';
 import { useLanguage } from '@/Contexts/LanguageContext';
 
-import { DEFAULT_THEME, getInitialTheme, persistTheme } from '@/utils/themePreferences';
+import {
+    DEFAULT_THEME,
+    applyTheme,
+    getInitialTheme,
+    normalizeTheme,
+    persistTheme,
+} from '@/utils/themePreferences';
 
 const THEME_OPTIONS = [
-    {
-        id: 'aurora',
-        label: 'Aurora',
-        description: 'Balanced teal',
-        icon: 'sparkles',
-    },
     {
         id: 'ocean',
         label: 'Ocean',
         description: 'Cool blue tones',
         icon: 'wave',
-    },
-    {
-        id: 'sunset',
-        label: 'Sunset',
-        description: 'Warm contrast',
-        icon: 'sun',
     },
     {
         id: 'midnight',
@@ -30,18 +24,6 @@ const THEME_OPTIONS = [
         icon: 'moon',
     },
 ];
-
-function applyTheme(theme) {
-    const root = document.documentElement;
-
-    root.dataset.theme = theme;
-
-    if (theme === 'midnight') {
-        root.classList.add('dark');
-    } else {
-        root.classList.remove('dark');
-    }
-}
 
 export default function ThemeSwitcher({ className = '', compact = false, align = 'right' }) {
     const { t } = useLanguage();
@@ -80,9 +62,10 @@ export default function ThemeSwitcher({ className = '', compact = false, align =
         THEME_OPTIONS.find((option) => option.id === DEFAULT_THEME);
 
     const handleSelect = (nextTheme) => {
-        setTheme(nextTheme);
-        applyTheme(nextTheme);
-        persistTheme(nextTheme);
+        const normalized = normalizeTheme(nextTheme);
+        setTheme(normalized);
+        applyTheme(normalized);
+        persistTheme(normalized);
         setIsOpen(false);
     };
 
@@ -111,7 +94,7 @@ export default function ThemeSwitcher({ className = '', compact = false, align =
 
             {isOpen && (
                 <div
-                    className={`absolute ${alignClass[align] || alignClass.right} mt-2 w-52 rounded-2xl border border-(--color-border-primary) bg-(--color-bg-primary)/96 backdrop-blur-xl shadow-token-lg p-2 z-50`}
+                    className={`absolute ${alignClass[align] || alignClass.right} mt-2 w-52 max-w-[calc(100vw-2rem)] rounded-2xl border border-(--color-border-primary) bg-(--color-bg-primary)/96 backdrop-blur-xl shadow-token-lg p-2 z-50`}
                     role="menu"
                 >
                     {THEME_OPTIONS.map((option) => {
@@ -127,7 +110,8 @@ export default function ThemeSwitcher({ className = '', compact = false, align =
                                         ? 'bg-(--color-brand-primary-light) text-(--color-brand-primary)'
                                         : 'text-(--color-text-secondary) hover:bg-(--color-bg-secondary)'
                                 }`}
-                                role="menuitem"
+                                role="menuitemradio"
+                                aria-checked={isActive}
                             >
                                 <span className="flex items-center gap-2 min-w-0">
                                     <AppIcon name={option.icon} className="h-4 w-4 shrink-0" />

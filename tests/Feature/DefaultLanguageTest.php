@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 class DefaultLanguageTest extends TestCase
@@ -17,7 +18,7 @@ class DefaultLanguageTest extends TestCase
     public function test_new_visitors_receive_indonesian_html_on_landing_and_login(): void
     {
         foreach (['/', '/login'] as $url) {
-            $this->get($url)->assertOk()->assertSee('<html lang="id">', false);
+            $this->assertHtmlLanguage($this->get($url)->assertOk(), 'id');
         }
         $this->assertSame('en', config('app.fallback_locale'));
     }
@@ -32,8 +33,10 @@ class DefaultLanguageTest extends TestCase
 
     public function test_saved_english_cookie_overrides_indonesian_default(): void
     {
-        $this->withUnencryptedCookie('vms_locale', 'en')
-            ->get('/login')->assertOk()->assertSee('<html lang="en">', false);
+        $this->assertHtmlLanguage(
+            $this->withUnencryptedCookie('vms_locale', 'en')->get('/login')->assertOk(),
+            'en'
+        );
         $this->from('/register')->post('/register', [])->assertRedirect('/register');
         $this->assertSame('The name field is required.', session('errors')->get('name')[0]);
     }
@@ -42,7 +45,20 @@ class DefaultLanguageTest extends TestCase
     {
         foreach (['en', 'id', 'en', 'id'] as $locale) {
             $this->withUnencryptedCookie('vms_locale', $locale)->post('/locale')->assertNoContent();
-            $this->get('/')->assertOk()->assertSee('<html lang="'.$locale.'">', false);
+            $this->assertHtmlLanguage($this->get('/')->assertOk(), $locale);
+        }
+    }
+
+    private function assertHtmlLanguage(TestResponse $response, string $locale): void
+    {
+        $document = new \DOMDocument;
+        $previous = libxml_use_internal_errors(true);
+        try {
+            $document->loadHTML($response->getContent());
+            $this->assertSame($locale, $document->documentElement?->getAttribute('lang'));
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
         }
     }
 }
